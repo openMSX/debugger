@@ -1,0 +1,28 @@
+----------------
+openMSX debugger
+----------------
+
+The openMSX debugger is a separate program that interfaces with
+openMSX and controls its debugger from within a graphical user
+interface.
+
+* Requirements
+
+The debugger requires the Qt4 GUI library to be installed.
+
+Because the debugger communicates though the openMSX network
+socket, openMSX should have the network socket enabled.
+
+* Building
+
+Build as follows:
+
+qmake
+make
+
+* Installing
+
+Install src/openmsx-debugger manually in any place you want.
+
+Put the TCL scripts in the scripts/ directory in the openMSX
+scripts directory.
