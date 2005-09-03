@@ -72,6 +72,7 @@ private:
 	void createForm();
 	QWidget *createNamedWidget(const QString& name, QWidget *widget);
 
+	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
 	void breakOccured(quint16);
 	void setBreakMode();
@@ -79,6 +80,7 @@ private:
 
 private slots:
 	void systemConnect();
+	void systemDisconnect();
 	void systemPause();
 	void executeBreak();
 	void executeRun();
@@ -88,12 +90,11 @@ private slots:
 	void executeStepOut();
 
 	void initConnection();
-	void finalizeConnection(bool halted);
 	void dataTransfered(CommRequest *r);
 	void cancelTransfer(CommRequest *r);
 	void handleUpdate(UpdateMessage *m);
 	void connectionClosed();
-	void handleError(QString error);
+	void handleError( CommClient::ConnectionError error );
 
 };
 

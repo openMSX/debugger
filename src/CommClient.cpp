@@ -44,7 +44,8 @@ CommClient::CommClient()
 	connect( socket, SIGNAL(connected()), SLOT(socketConnected()) );
 	connect( socket, SIGNAL(disconnected()), SLOT(socketDisonnected()) );
     connect( socket, SIGNAL(readyRead()), SLOT(socketReadyRead()) );
-    connect( socket, SIGNAL(error(int)), SLOT(socketError(int)) );
+    connect( socket, SIGNAL(error(QAbstractSocket::SocketError)),
+	                 SLOT(socketError(QAbstractSocket::SocketError)) );
 	
 }
 
@@ -59,7 +60,9 @@ void CommClient::connectToOpenMSX(const QString & host, quint16 port )
 
 void CommClient::closeConnection()
 {
-	socket->disconnectFromHost();
+	if( socket->state() != QAbstractSocket::UnconnectedState )
+		socket->disconnectFromHost();
+	socketDisconnected();
 }
 
 void CommClient::getDebuggableData(CommDebuggableRequest *r) 
@@ -129,7 +132,8 @@ void CommClient::socketReadyRead()
 			UpdateMessage *msg = new UpdateMessage;
 			
 			// read the type attribute
-			int len, start = reply.indexOf(" type=\"")+7;
+			int start = reply.indexOf(" type=\"")+7;
+			int len;
 			if(start>=0) {
 				len = reply.indexOf('\"', start)-start;
 				msg->type = reply.mid(start, len);
@@ -202,10 +206,31 @@ void CommClient::socketDisconnected()
 	rejectRequests();
 }
 
-void CommClient::socketError( int e )
+void CommClient::socketError( QAbstractSocket::SocketError e )
 {
-	printf("error: %i\n", e);
-	emit errorOccured(socket->errorString());
+	ConnectionError error;
+
+	switch (e) {
+		case QAbstractSocket::ConnectionRefusedError:
+			error = CONNECTION_REFUSED;
+			break;
+		case QAbstractSocket::RemoteHostClosedError:
+			error = CONNECTION_CLOSED;
+			break;
+		case QAbstractSocket::HostNotFoundError:
+			error = HOST_NOT_FOUND;
+			break;
+		case QAbstractSocket::NetworkError:
+			error = NETWORK_ERROR;
+			break;
+		case QAbstractSocket::UnknownSocketError:
+			error = UNKNOWN_ERROR;
+			break;
+		default:
+			error = SOCKET_ERROR;
+	}
+	
+	emit errorOccured(error);
 }
 
 void CommClient::rejectRequests()

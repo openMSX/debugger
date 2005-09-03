@@ -69,6 +69,9 @@ public:
 	CommClient();
 	~CommClient();
 
+	enum ConnectionError {CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_NOT_FOUND,
+		                  SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR};
+
 	void connectToOpenMSX(const QString& host, quint16 port = 9938);
 	void closeConnection();
 
@@ -82,7 +85,7 @@ signals:
 	void dataTransferReady(CommRequest *r);
 	void dataTransferCancelled(CommRequest *r);
 	void updateReceived(UpdateMessage *m);
-	void errorOccured( QString error );
+	void errorOccured( ConnectionError error );
 
 private:
 	QTcpSocket *socket;
@@ -97,7 +100,7 @@ private slots:
 	void socketConnected();
     void socketReadyRead();
     void socketDisconnected();
-    void socketError( int e );
+    void socketError( QAbstractSocket::SocketError e );
 
 };
 

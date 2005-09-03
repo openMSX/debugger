@@ -256,8 +256,8 @@ void DebuggerForm::createForm()
 	               SLOT( handleUpdate(UpdateMessage *) ) );
 	connect(&comm, SIGNAL( connectionTerminated() ),
 	               SLOT( connectionClosed() ) );
-	connect(&comm, SIGNAL( errorOccured( QString error ) ),
-	               SLOT( handleError( QString error ) ) );
+	connect(&comm, SIGNAL( errorOccured( CommClient::ConnectionError ) ),
+	               SLOT( handleError( CommClient::ConnectionError ) ) );
 
 	connect(disasmView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
 	        &comm,      SLOT( getDebuggableData(CommDebuggableRequest *) ) );
@@ -304,11 +304,41 @@ void DebuggerForm::connectionClosed()
 	stackView->setEnabled(FALSE);
 }
 
-void DebuggerForm::handleError(QString error)
+void DebuggerForm::handleError( CommClient::ConnectionError error )
 {
-	printf("%s\n", error.toAscii().data());
-	QMessageBox::critical(this, "Network error!", error, QMessageBox::Ok, QMessageBox::NoButton);
+	QString msg;
+	
+	switch(error) {
+		case CommClient::CONNECTION_REFUSED:
+			msg = tr("A connection could not be established. Make sure openMSX is "
+		             "started and listening on \"localhost:9938\".");
+			break;
+		case CommClient::CONNECTION_CLOSED:
+			msg = tr("The connection was closed prematurely.");
+			break;
+		case CommClient::HOST_NOT_FOUND:
+			msg = tr("The hostname could not be found. Please change the address"
+			         " and try again.");
+			break;
+		case CommClient::SOCKET_ERROR:
+			msg = tr("A socket error occurred. This should not happen! If this "
+		             "problem can be reproduced, please submit a bug report "
+			         "describing the step to get this error.");
+			break;
+		case CommClient::NETWORK_ERROR:
+			msg = tr("A network error occurred. This usually means that the "
+			         "connection to openMSX was interrupted by a network "
+		             "problem.");
+			break;
+		case CommClient::UNKNOWN_ERROR:
+			msg = tr("An unknown error occurred. This should not happen! If this "
+		             "problem can be reproduced, please submit a bug report "
+			         "describing the step to get this error.");
+			break;
+	}
+	QMessageBox::critical(this, "Connection error!", msg, QMessageBox::Ok, QMessageBox::NoButton);
 	comm.closeConnection();
+	connectionClosed();
 }
 
 void DebuggerForm::dataTransfered(CommRequest *r) 
@@ -448,6 +478,11 @@ void DebuggerForm::systemConnect()
 {
 	systemConnectAction->setEnabled(FALSE);
 	comm.connectToOpenMSX("localhost");
+}
+
+void DebuggerForm::systemDisconnect()
+{
+	comm.closeConnection();
 }
 
 void DebuggerForm::systemPause()
