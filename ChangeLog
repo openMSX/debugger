@@ -2,6 +2,8 @@ $Id$
 
 2005-09-04 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
 	* fixed compiler warnings
+	* define own 'debug_bin2hex' proc:
+	    removes dependency on the bin2hex.tcl script
 
 2005-09-04 Edwin Velds <e.velds@gmail.com>
 	* Fixed typos in connects

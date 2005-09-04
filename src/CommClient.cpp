@@ -74,10 +74,10 @@ void CommClient::getDebuggableData(CommDebuggableRequest *r)
 	
 	commandQueue.push_back(r);
 	
-	QString cmd = QString("bin2hex [ debug read_block %1 %2 %3 ]")
+	QString cmd = QString("debug_bin2hex [ debug read_block %1 %2 %3 ]")
 					.arg(r->debuggable.data())
 					.arg(r->readOffset)
-	            	.arg(r->readSize);
+					.arg(r->readSize);
 	sendCommand(cmd.toAscii());
 }	
 

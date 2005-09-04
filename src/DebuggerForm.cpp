@@ -283,6 +283,17 @@ void DebuggerForm::initConnection()
 	comm.getCommandResult(reqUpdateStatus);
 	CommCommandRequest *reqUpdateBreak = new CommCommandRequest(DISCARD_RESULT_ID, "update enable break");
 	comm.getCommandResult(reqUpdateBreak);
+	
+	// define 'debug_bin2hex' proc for internal use
+	CommCommandRequest* bin2hex = new CommCommandRequest(DISCARD_RESULT_ID,
+		"proc debug_bin2hex { input } {\n"
+		"  set result \"\"\n"
+		"  foreach i [split $input {}] {\n"
+		"    append result [format %02X [scan $i %c]] \"\"\n"
+		"  }\n"
+		"  return $result\n"
+		"}\n");
+	comm.getCommandResult(bin2hex);
 }
 
 void DebuggerForm::connectionClosed()
