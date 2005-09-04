@@ -1,5 +1,8 @@
 $Id$
 
+2005-09-04 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
+	* fixed compiler warnings
+
 2005-09-04 Edwin Velds <e.velds@gmail.com>
 	* Fixed typos in connects
 	* Better error handling

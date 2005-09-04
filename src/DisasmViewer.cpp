@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QStyleOptionFocusRect>
 #include <cmath>
+#include <cassert>
 
 DisasmViewer::DisasmViewer( QWidget* parent )
 	: QFrame( parent )
@@ -34,7 +35,7 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 
-	cursorAddr = -1;
+	cursorAddr = (quint16)-1;
 	programCounter = 0x1070;
 	waitingForData = FALSE;
 	nextRequest = NULL;
@@ -180,6 +181,9 @@ void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 				dt = 10+int(visibleLines);
 				db = 10;
 				break;
+			default:
+				assert(false);
+				dt = db = 0; // avoid warning
 		}
 	
 		if( (line>dt || disasmLines[0].addr==0) 

@@ -133,7 +133,7 @@ void CommClient::socketReadyRead()
 			
 			// read the type attribute
 			int start = reply.indexOf(" type=\"")+7;
-			int len;
+			int len = 0;
 			if(start>=0) {
 				len = reply.indexOf('\"', start)-start;
 				msg->type = reply.mid(start, len);
