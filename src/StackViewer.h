@@ -37,7 +37,7 @@ private:
 	bool waitingForData;
 
 	int stackPointer;
-    int topAddress;
+	int topAddress;
 	unsigned char *memory;
 	int memoryLength;
 

@@ -25,7 +25,7 @@ class DebuggerForm : public QMainWindow
 	Q_OBJECT;
 public:
 	DebuggerForm( QWidget* parent = 0 );
-    ~DebuggerForm();
+	~DebuggerForm();
 
 public slots:
 	void showAbout();
@@ -55,7 +55,7 @@ private:
 	QSplitter *mainSplitter;
 	QSplitter *disasmSplitter;
 
- 	DisasmViewer *disasmView;
+	DisasmViewer *disasmView;
 	HexViewer *hexView;
 	CPURegsViewer *regsView;
 	FlagsViewer *flagsView;

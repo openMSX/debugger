@@ -40,7 +40,7 @@ private:
 
 	QString dataName;
 //	int cursorAddr;
-    int hexTopAddress;
+	int hexTopAddress;
 	unsigned char *hexData;
 	int hexDataLength;
 

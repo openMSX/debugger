@@ -43,8 +43,8 @@ CommClient::CommClient()
 
 	connect( socket, SIGNAL(connected()), SLOT(socketConnected()) );
 	connect( socket, SIGNAL(disconnected()), SLOT(socketDisonnected()) );
-    connect( socket, SIGNAL(readyRead()), SLOT(socketReadyRead()) );
-    connect( socket, SIGNAL(error(QAbstractSocket::SocketError)),
+	connect( socket, SIGNAL(readyRead()), SLOT(socketReadyRead()) );
+	connect( socket, SIGNAL(error(QAbstractSocket::SocketError)),
 	                 SLOT(socketError(QAbstractSocket::SocketError)) );
 	
 }
@@ -113,7 +113,7 @@ void CommClient::socketReadyRead()
 		QByteArray reply = socket->readLine();
 		
 		if(reply=="<openmsx-output>\n") {
-         	// open openMSX control
+			// open openMSX control
 			socket->write("<openmsx-control>\n", 18);
 			connectionEstablished = TRUE;
 			waitingForOpenMSX = FALSE;
@@ -218,7 +218,7 @@ void CommClient::socketError( QAbstractSocket::SocketError e )
 			error = CONNECTION_CLOSED;
 			break;
 		case QAbstractSocket::HostNotFoundError:
-			error = HOST_NOT_FOUND;
+			error = HOST_ADDRESS_NOT_FOUND;
 			break;
 		case QAbstractSocket::NetworkError:
 			error = NETWORK_ERROR;
@@ -227,7 +227,7 @@ void CommClient::socketError( QAbstractSocket::SocketError e )
 			error = UNKNOWN_ERROR;
 			break;
 		default:
-			error = SOCKET_ERROR;
+			error = UNSPECIFIED_SOCKET_ERROR;
 	}
 	
 	emit errorOccured(error);

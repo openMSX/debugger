@@ -120,7 +120,7 @@ void StackViewer::setLocation(int addr)
 			size = memoryLength-start;
 
 		CommDebuggableRequest *req = new CommDebuggableRequest(STACK_MEMORY_REQ_ID, "memory", 
-	    	                                                   start, size, memory, start);
+		                                                       start, size, memory, start);
 
 		emit needUpdate( req );	
 		waitingForData = TRUE;

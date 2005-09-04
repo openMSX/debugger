@@ -115,10 +115,10 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 			p.fillRect(frameL+32, y+1-h, 
 			           width() -32 - frameL - frameR ,h, palette().color(QPalette::Highlight));
 			if(hasFocus()) {
-        		QStyleOptionFocusRect so;
-        		so.backgroundColor = palette().color(QPalette::Highlight);
+				QStyleOptionFocusRect so;
+				so.backgroundColor = palette().color(QPalette::Highlight);
 				so.rect = QRect(frameL+32, y+1-h, width()-32-frameL-frameR ,h);
-		        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &so, &p, this);
+				style()->drawPrimitive(QStyle::PE_FrameFocusRect, &so, &p, this);
 			}
 			p.setPen(palette().color(QPalette::HighlightedText));
 		}
@@ -272,7 +272,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest *req)
 	// locate the requested line 
 	disasmTopLine = 0;
 	while(disasmLines[disasmTopLine].addr<req->address
-		  && int(disasmLines.size()-disasmTopLine)>int(visibleLines)) disasmTopLine++;
+	      && int(disasmLines.size()-disasmTopLine)>int(visibleLines)) disasmTopLine++;
 	
 	switch(req->method) {
 		case Middle:
@@ -300,7 +300,7 @@ void DisasmViewer::updateCancelled(CommMemoryRequest *req)
 	if(nextRequest) {
 		emit needUpdate(nextRequest);
 		nextRequest = NULL;
-	} else {		
+	} else {
 		waitingForData = FALSE;
 	}
 }

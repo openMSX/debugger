@@ -121,14 +121,14 @@ void DebuggerForm::createMenus()
 	executeMenu->addAction(executeStepOverAction);
 	executeMenu->addAction(executeStepOutAction);
 	executeMenu->addAction(executeRunToAction);
-	
+
 	// create help menu
 	helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(helpAboutAction);	
 }
 
 void DebuggerForm::createToolbars()	
-{	
+{
 	// create debug toolbar
 	systemToolbar = addToolBar(tr("System"));
 	systemToolbar->addAction(systemConnectAction);
@@ -156,7 +156,7 @@ void DebuggerForm::createStatusbar()
 QWidget *DebuggerForm::createNamedWidget(const QString& name, QWidget *widget)
 {
 	QVBoxLayout *vboxLayout = new QVBoxLayout;
-    vboxLayout->setMargin(3);
+	vboxLayout->setMargin(3);
 	vboxLayout->setSpacing(2);
 	
 	QLabel *lbl = new QLabel(name);
@@ -166,7 +166,7 @@ QWidget *DebuggerForm::createNamedWidget(const QString& name, QWidget *widget)
 	
 	QWidget *combined = new QWidget;
 	combined->setLayout(vboxLayout);
-	
+
 	return combined;
 }
 
@@ -265,7 +265,7 @@ void DebuggerForm::createForm()
 	        &comm,   SLOT( getDebuggableData(CommDebuggableRequest *) ) );
 	connect(stackView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
 	        &comm,     SLOT( getDebuggableData(CommDebuggableRequest *) ) );
-			
+
 }
 
 DebuggerForm::~DebuggerForm()
@@ -322,28 +322,28 @@ void DebuggerForm::handleError( CommClient::ConnectionError error )
 	switch(error) {
 		case CommClient::CONNECTION_REFUSED:
 			msg = tr("A connection could not be established. Make sure openMSX is "
-		             "started and listening on \"localhost:9938\".");
+			         "started and listening on \"localhost:9938\".");
 			break;
 		case CommClient::CONNECTION_CLOSED:
 			msg = tr("The connection was closed prematurely.");
 			break;
-		case CommClient::HOST_NOT_FOUND:
+		case CommClient::HOST_ADDRESS_NOT_FOUND:
 			msg = tr("The hostname could not be found. Please change the address"
 			         " and try again.");
 			break;
-		case CommClient::SOCKET_ERROR:
+		case CommClient::UNSPECIFIED_SOCKET_ERROR:
 			msg = tr("A socket error occurred. This should not happen! If this "
-		             "problem can be reproduced, please submit a bug report "
+			         "problem can be reproduced, please submit a bug report "
 			         "describing the step to get this error.");
 			break;
 		case CommClient::NETWORK_ERROR:
 			msg = tr("A network error occurred. This usually means that the "
 			         "connection to openMSX was interrupted by a network "
-		             "problem.");
+			         "problem.");
 			break;
 		case CommClient::UNKNOWN_ERROR:
 			msg = tr("An unknown error occurred. This should not happen! If this "
-		             "problem can be reproduced, please submit a bug report "
+			         "problem can be reproduced, please submit a bug report "
 			         "describing the step to get this error.");
 			break;
 	}
@@ -464,7 +464,7 @@ void DebuggerForm::breakOccured(quint16)
 	// refresh memory viewer
 	hexView->refresh();
 }
-	
+
 void DebuggerForm::setBreakMode()
 {
 	executeBreakAction->setEnabled(FALSE);
@@ -473,7 +473,7 @@ void DebuggerForm::setBreakMode()
 	executeStepOverAction->setEnabled(TRUE);
 	executeStepOutAction->setEnabled(TRUE);
 	executeRunToAction->setEnabled(TRUE);
-}	
+}
 
 void DebuggerForm::setRunMode()
 {
@@ -483,7 +483,7 @@ void DebuggerForm::setRunMode()
 	executeStepOverAction->setEnabled(FALSE);
 	executeStepOutAction->setEnabled(FALSE);
 	executeRunToAction->setEnabled(FALSE);
-}	
+}
 
 void DebuggerForm::systemConnect()
 {
@@ -548,10 +548,10 @@ void DebuggerForm::executeStepOut()
 
 void DebuggerForm::showAbout()
 {
-    QString s;
+	QString s;
 	s.sprintf("openMSX debugger %i.%i.%i", VERSION_MAJOR,
 	                                       VERSION_MINOR,
 	                                       VERSION_PATCH);
-    
-    QMessageBox::about(this, "openMSX", s);
+
+	QMessageBox::about(this, "openMSX", s);
 }

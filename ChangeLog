@@ -8,6 +8,7 @@ $Id$
 2005-09-04 Edwin Velds <e.velds@gmail.com>
 	* Fixed typos in connects
 	* Better error handling
+	* Changed errors to avoid winsock conflicts
 
 2005-08-31 Edwin Velds <e.velds@gmail.com>
 	* Initial import

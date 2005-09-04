@@ -12,7 +12,7 @@ enum { DISCARD_RESULT_ID,
        CPUREG_REQ_ID,
        HEXDATA_MEMORY_REQ_ID,
        STACK_MEMORY_REQ_ID,
-	
+
        BREAKPOINTS_REQ_ID,
        SLOTMAP_REQ_ID,
 
@@ -69,8 +69,8 @@ public:
 	CommClient();
 	~CommClient();
 
-	enum ConnectionError {CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_NOT_FOUND,
-		                  SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR};
+	enum ConnectionError {CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_ADDRESS_NOT_FOUND,
+	                      UNSPECIFIED_SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR};
 
 	void connectToOpenMSX(const QString& host, quint16 port = 9938);
 	void closeConnection();
@@ -92,15 +92,15 @@ private:
 	bool connectionEstablished;
 	bool waitingForOpenMSX;
 	std::deque<CommRequest *> commandQueue;
-	
+
 	void sendCommand(const QByteArray& cmd);
 	void rejectRequests();
 
 private slots:
 	void socketConnected();
-    void socketReadyRead();
-    void socketDisconnected();
-    void socketError( QAbstractSocket::SocketError e );
+	void socketReadyRead();
+	void socketDisconnected();
+	void socketError( QAbstractSocket::SocketError e );
 
 };
 

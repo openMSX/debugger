@@ -45,7 +45,7 @@ public:
 public slots:
 	void setAddress(quint16 addr, int method = Top, bool doRepaint = TRUE);
 	void setProgramCounter(quint16 pc);
-    void scrollBarAction(int action);
+	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
 
 protected:
@@ -64,7 +64,7 @@ private:
 
 	int frameL, frameR, frameT, frameB;
 	double visibleLines;
-    int disasmTopLine;
+	int disasmTopLine;
 	DisasmLines disasmLines;
 	unsigned char *memory;
 	int waitingForData;

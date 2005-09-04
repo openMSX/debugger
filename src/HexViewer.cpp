@@ -140,7 +140,7 @@ void HexViewer::setLocation(int addr)
 			size = hexDataLength-start;
 	
 		CommDebuggableRequest *req = new CommDebuggableRequest(HEXDATA_MEMORY_REQ_ID, dataName.toAscii().data(), 
-	    	                                                   start, size, hexData, start);
+		                                                       start, size, hexData, start);
 
 		emit needUpdate( req );	
 		waitingForData = TRUE;
