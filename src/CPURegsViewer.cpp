@@ -10,6 +10,10 @@
 CPURegsViewer::CPURegsViewer( QWidget* parent )
 	: QFrame( parent )
 {
+	// avoid UMR
+	memset(&regs,        0, sizeof(regs));
+	memset(&regsChanged, 0, sizeof(regsChanged));
+	
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);

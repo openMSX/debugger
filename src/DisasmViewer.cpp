@@ -22,7 +22,8 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 	// init main memory
 	// added four bytes as runover buffer for dasm
 	// otherwise dasm would need to check the buffer end continously.
-	memory = new unsigned char[65536+4];
+	memory = new unsigned char[65536 + 4];
+	memset(memory, 0, 65536 + 4);
 
 	scrollBar = new QScrollBar(Qt::Vertical, this);
 	scrollBar->setMinimum(0);

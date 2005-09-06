@@ -9,6 +9,8 @@
 FlagsViewer::FlagsViewer( QWidget* parent )
 	: QFrame( parent )
 {
+	flags = flagsChanged = 0; // avoid UMR
+	
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);

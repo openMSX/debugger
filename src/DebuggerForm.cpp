@@ -227,7 +227,8 @@ void DebuggerForm::createForm()
 	// init main memory
 	// added four bytes as runover buffer for dasm
 	// otherwise dasm would need to check the buffer end continously.
-	mainMemory = new unsigned char[65536+4];
+	mainMemory = new unsigned char[65536 + 4];
+	memset(mainMemory, 0, 65536 + 4);
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&breakpoints);
 	hexView->setData("memory", mainMemory, 65536);
