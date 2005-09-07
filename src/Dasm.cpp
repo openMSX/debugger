@@ -47,7 +47,7 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 			case 0xDD:
 				r = "ix";
 				if (membuf[pc+1] != 0xcb) {
-					s = mnemonic_xx[membuf[1]];
+					s = mnemonic_xx[membuf[pc+1]];
 					dest.numBytes = 2;
 				} else {
 					s = mnemonic_xx_cb[membuf[pc+3]];
