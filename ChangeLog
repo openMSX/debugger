@@ -1,5 +1,10 @@
 $Id$
 
+2005-09-08 Edwin Velds <e.velds@gmail.com>
+	* Changed disasm viewer initialisation code
+	* Added ignoring openMSX log messages
+	* Added memory initialisation
+
 2005-09-04 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
 	* fixed compiler warnings
 	* define own 'debug_bin2hex' proc:

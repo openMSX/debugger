@@ -24,5 +24,3 @@ make
 
 Install src/openmsx-debugger manually in any place you want.
 
-Put the TCL scripts in the scripts/ directory in the openMSX
-scripts directory.

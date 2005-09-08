@@ -223,17 +223,6 @@ void DebuggerForm::createForm()
 	w2 = new QWidget;
 	rightLayout->addWidget(w2, 1);
 	
-
-	// init main memory
-	// added four bytes as runover buffer for dasm
-	// otherwise dasm would need to check the buffer end continously.
-	mainMemory = new unsigned char[65536 + 4];
-	memset(mainMemory, 0, 65536 + 4);
-	disasmView->setMemory(mainMemory);
-	disasmView->setBreakpoints(&breakpoints);
-	hexView->setData("memory", mainMemory, 65536);
-	stackView->setData(mainMemory, 65536);
-	
 	disasmView->setEnabled(FALSE);
 	hexView->setEnabled(FALSE);
 	regsView->setEnabled(FALSE);
@@ -267,6 +256,15 @@ void DebuggerForm::createForm()
 	connect(stackView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
 	        &comm,     SLOT( getDebuggableData(CommDebuggableRequest *) ) );
 
+	// init main memory
+	// added four bytes as runover buffer for dasm
+	// otherwise dasm would need to check the buffer end continously.
+	mainMemory = new unsigned char[65536+4];
+	memset(mainMemory, 0, 65536+4);
+	disasmView->setMemory(mainMemory);
+	disasmView->setBreakpoints(&breakpoints);
+	hexView->setData("memory", mainMemory, 65536);
+	stackView->setData(mainMemory, 65536);
 }
 
 DebuggerForm::~DebuggerForm()
@@ -400,12 +398,13 @@ void DebuggerForm::finalizeConnection(bool halted)
 		breakOccured(0);
 	}else
 		setRunMode();
+
 	disasmView->setEnabled(TRUE);
 	hexView->setEnabled(TRUE);
 	regsView->setEnabled(TRUE);
 	flagsView->setEnabled(TRUE);
 	stackView->setEnabled(TRUE);
-}	
+}
 
 void DebuggerForm::cancelTransfer(CommRequest *r) 
 {

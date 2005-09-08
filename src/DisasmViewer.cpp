@@ -19,12 +19,12 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
 	
-	// init main memory
-	// added four bytes as runover buffer for dasm
-	// otherwise dasm would need to check the buffer end continously.
-	memory = new unsigned char[65536 + 4];
-	memset(memory, 0, 65536 + 4);
-
+	memory = NULL;
+	cursorAddr = (quint16)-1;
+	programCounter = 0x1070;
+	waitingForData = FALSE;
+	nextRequest = NULL;
+	
 	scrollBar = new QScrollBar(Qt::Vertical, this);
 	scrollBar->setMinimum(0);
 	scrollBar->setMaximum(0xFFFF);
@@ -36,19 +36,10 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 
-	cursorAddr = (quint16)-1;
-	programCounter = 0x1070;
-	waitingForData = FALSE;
-	nextRequest = NULL;
-	
-	dasm(memory, 0, int(3*4*visibleLines), disasmLines);
-	disasmTopLine = int(visibleLines);
-	
-	// manual scrollbar handling routines (real size of the data is not known)	
+	// manual scrollbar handling routines (real size of the data is not known)
 	connect(scrollBar, SIGNAL( actionTriggered(int) ), this, SLOT( scrollBarAction(int) ) );
 	connect(scrollBar, SIGNAL( valueChanged(int) ), this, SLOT( scrollBarChanged(int) ) );
 
-	setAddress(0x100, TopAlways);
 }
 
 void DisasmViewer::resizeEvent(QResizeEvent *e)
@@ -58,7 +49,7 @@ void DisasmViewer::resizeEvent(QResizeEvent *e)
 	scrollBar->setGeometry(width() - frameR, frameT,
 	                       scrollBar->sizeHint().width(),
 	                       height()-frameT-frameB);
-	scrollBar->setMaximum(0X10000-int(visibleLines));
+	scrollBar->setMaximum(0x10000-int(visibleLines));
 	
 	// calc the number of lines that can be displayed
 	// partial lines count as a whole
@@ -101,7 +92,8 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 	int y = frameT + h - 1;
 	
 	QString hexStr;
-	DisasmRow *row;
+	const DisasmRow *row;
+	bool displayDisasm = memory!=NULL && isEnabled();
 
 	for(int i=0; i<int(ceil(visibleLines)); i++) {
 
@@ -109,7 +101,10 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 		p.setPen( palette().color(QPalette::Text) );
 
 		// fetch the data for this line
-		row = &disasmLines[i+disasmTopLine];
+		if(displayDisasm)
+			row = &disasmLines[i+disasmTopLine];
+		else
+			row = &DISABLED_ROW;
 
 		// draw cursor line or breakpoint
 		if(row->addr==cursorAddr) {
@@ -143,7 +138,7 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 
 		// print 1 to 4 bytes
 		for(int j=0; j<row->numBytes; j++){
-			hexStr.sprintf("%02X", memory[row->addr + j]);
+			hexStr.sprintf("%02X", displayDisasm ? memory[row->addr + j] : 0);
 			p.drawText(xMCode[j], y-d, hexStr);
 		}
 
@@ -159,7 +154,6 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 
 void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 {
-
 	int line = findDisasmLine(addr);
 
 	if(line>=0) {
@@ -227,7 +221,7 @@ void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 	// The requested address it outside the pre-disassembled bounds.
 	// This means that a new block of memory must be transfered from
 	// openMSX and disassembled.
-		
+
 	// determine disasm bounds
 	int disasmStart;
 	int disasmEnd;
@@ -361,6 +355,16 @@ void DisasmViewer::scrollBarChanged(int value)
 void DisasmViewer::setMemory(unsigned char *memPtr)
 {
 	memory = memPtr;
+	// init disasmLines
+	DisasmRow newRow;
+	newRow.numBytes = 1;
+	newRow.instr = "nop";
+	newRow.instr.resize(18, ' ');
+	for(int i=0; i<150; i++) {
+		newRow.addr = i;
+		disasmLines.push_back(newRow);
+	}
+	disasmTopLine = 50;
 }
 
 void DisasmViewer::setBreakpoints(Breakpoints *bps)
@@ -410,7 +414,7 @@ void DisasmViewer::mousePressEvent(QMouseEvent *e)
 	}
 	
 	if(e->x() >= frameL+32 && e->x() < width()-frameR &&
-		e->y() >= frameT && e->y() < height()-frameB)	
+		e->y() >= frameT && e->y() < height()-frameB)
 	{
 		// calc clicked line number
 		int h = fontMetrics().height();

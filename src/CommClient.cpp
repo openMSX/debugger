@@ -111,7 +111,7 @@ void CommClient::socketReadyRead()
 	// read from the server
 	while ( socket->canReadLine() ) {
 		QByteArray reply = socket->readLine();
-		
+
 		if(reply=="<openmsx-output>\n") {
 			// open openMSX control
 			socket->write("<openmsx-control>\n", 18);
@@ -153,7 +153,7 @@ void CommClient::socketReadyRead()
 			
 			emit updateReceived( msg );
 			
-		} else {
+		} else if(!reply.startsWith("<log")) {
 			CommRequest *c = commandQueue.front();
 		
 			if(c->requestType == CommRequest::REQUEST_COMMAND) {

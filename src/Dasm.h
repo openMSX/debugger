@@ -12,6 +12,8 @@ typedef struct {
 	std::string instr;
 } DisasmRow;
 
+static const DisasmRow DISABLED_ROW = {0, 1, "-       "};
+
 typedef std::vector<DisasmRow> DisasmLines;
 
 void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short endAddr, DisasmLines& disasm);
