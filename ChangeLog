@@ -1,5 +1,9 @@
 $Id$
 
+2005-09-09 Albert Beevendorp
+	* fixed a bug causing the disassembly showing the
+	    wrong byte/word
+
 2005-09-08 Edwin Velds <e.velds@gmail.com>
 	* Changed disasm viewer initialisation code
 	* Added ignoring openMSX log messages

@@ -29,7 +29,7 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 	const char* r = 0;
 	int pc = startAddr;
 	DisasmRow dest;
-	
+
 	disasm.clear();
 	while (pc <= int(endAddr)) {
 		dest.addr = pc;
@@ -68,26 +68,26 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 				s = mnemonic_main[membuf[pc]];
 				dest.numBytes = 1;
 		}
-	
+
 		for (int j = 0; s[j]; ++j) {
 			switch (s[j]) {
 			case 'B':
-				dest.numBytes += 1;
 				dest.instr += '#' + toHex(membuf[pc + dest.numBytes], 2);
+				dest.numBytes += 1;
 				break;
 			case 'R':
-				dest.numBytes += 1;
 				dest.instr += '#' + toHex((pc + 2 + (signed char)membuf[pc + dest.numBytes]) & 0xFFFF, 4);
+				dest.numBytes += 1;
 				break;
 			case 'W':
-				dest.numBytes += 2;
 				dest.instr += '#' + toHex(membuf[pc + dest.numBytes] + membuf[pc + dest.numBytes + 1] * 256, 4);
+				dest.numBytes += 2;
 				break;
 			case 'X': {
-				dest.numBytes += 1;
 				unsigned char offset = membuf[pc + dest.numBytes];
 				dest.instr += '(' + std::string(r) + sign(offset)
 				           +  '#' + toHex(abs(offset), 2) + ')';
+				dest.numBytes += 1;
 				break;
 			}
 			case 'Y': {
