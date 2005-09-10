@@ -12,9 +12,9 @@ enum { DISCARD_RESULT_ID,
        CPUREG_REQ_ID,
        HEXDATA_MEMORY_REQ_ID,
        STACK_MEMORY_REQ_ID,
+       SLOTS_REQ_ID,
 
        BREAKPOINTS_REQ_ID,
-       SLOTMAP_REQ_ID,
 
        INIT_PAUSE,
        INIT_BREAK

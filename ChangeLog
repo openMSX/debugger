@@ -1,5 +1,9 @@
 $Id$
 
+2005-09-11 Edwin Velds <e.velds@gmail.com>
+	* Added memory slot/segment viewer widget
+	* Added Breakpoint menu (still inactive)
+
 2005-09-09 Albert Beevendorp
 	* fixed a bug causing the disassembly showing the
 	    wrong byte/word

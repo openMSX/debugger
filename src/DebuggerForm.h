@@ -16,7 +16,7 @@
 #include "FlagsViewer.h"
 #include "CommClient.h"
 #include "StackViewer.h"
-
+#include "SlotViewer.h"
 #include "DebuggerData.h"
 
 
@@ -33,6 +33,7 @@ public slots:
 private:
 	QMenu *systemMenu;
 	QMenu *executeMenu;
+	QMenu *breakpointMenu;
 	QMenu *helpMenu;
 
 	QToolBar *systemToolbar;
@@ -50,6 +51,8 @@ private:
 	QAction *executeRunToAction;
 	QAction *executeStepOutAction;
 
+	QAction *breakpointToggleAction;
+
 	QAction *helpAboutAction;
 
 	QSplitter *mainSplitter;
@@ -60,6 +63,7 @@ private:
 	CPURegsViewer *regsView;
 	FlagsViewer *flagsView;
 	StackViewer *stackView;
+	SlotViewer *slotView;
 
 	CommClient comm;
 	Breakpoints breakpoints;

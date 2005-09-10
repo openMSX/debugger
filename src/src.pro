@@ -20,6 +20,7 @@ HEADERS += CommClient.h \
            FlagsViewer.h \
            StackViewer.h \
            HexViewer.h \
+           SlotViewer.h \
            version.h
 SOURCES += CommClient.cpp \
            CPURegsViewer.cpp \
@@ -30,5 +31,6 @@ SOURCES += CommClient.cpp \
            FlagsViewer.cpp \
            HexViewer.cpp \
            StackViewer.cpp \
+           SlotViewer.cpp \
            DebuggerData.cpp \
            main.cpp

@@ -85,6 +85,12 @@ void DebuggerForm::createActions()
 	executeRunToAction->setIcon(QIcon(":/icons/runto.png"));
 	executeRunToAction->setEnabled(FALSE);
 
+	breakpointToggleAction = new QAction(tr("Toggle"), this);
+	breakpointToggleAction->setShortcut(tr("F5"));
+	breakpointToggleAction->setStatusTip(tr("Toggle breakpoint on/off at cursor"));
+	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
+	breakpointToggleAction->setEnabled(FALSE);
+
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the appliction information"));
 
@@ -121,6 +127,10 @@ void DebuggerForm::createMenus()
 	executeMenu->addAction(executeStepOverAction);
 	executeMenu->addAction(executeStepOutAction);
 	executeMenu->addAction(executeRunToAction);
+
+	// create breakpoint menu
+	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
+	breakpointMenu->addAction(breakpointToggleAction);
 
 	// create help menu
 	helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -215,6 +225,10 @@ void DebuggerForm::createForm()
 	stackView = new StackViewer;
 	topLayout->addWidget(createNamedWidget(tr("Stack:"), stackView), 0);
 
+	// create slot viewer
+	slotView = new SlotViewer;
+	topLayout->addWidget(createNamedWidget(tr("Memory layout:"), slotView), 0);
+
 	// create spacer on the right
 	w2 = new QWidget;
 	topLayout->addWidget(w2, 1);
@@ -228,6 +242,7 @@ void DebuggerForm::createForm()
 	regsView->setEnabled(FALSE);
 	flagsView->setEnabled(FALSE);
 	stackView->setEnabled(FALSE);
+	slotView->setEnabled(FALSE);
 
 	connect(regsView,   SIGNAL( pcChanged(quint16) ),
 	        disasmView, SLOT( setProgramCounter(quint16) ) );
@@ -255,6 +270,8 @@ void DebuggerForm::createForm()
 	        &comm,   SLOT( getDebuggableData(CommDebuggableRequest *) ) );
 	connect(stackView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
 	        &comm,     SLOT( getDebuggableData(CommDebuggableRequest *) ) );
+	connect(slotView, SIGNAL( needUpdate(CommCommandRequest *) ), 
+	        &comm,    SLOT( getCommandResult(CommCommandRequest *) ) );
 
 	// init main memory
 	// added four bytes as runover buffer for dasm
@@ -293,6 +310,20 @@ void DebuggerForm::initConnection()
 		"  return $result\n"
 		"}\n");
 	comm.getCommandResult(bin2hex);
+
+	// define 'debug_memmapper' proc for internal use
+	CommCommandRequest* memmap = new CommCommandRequest(DISCARD_RESULT_ID,
+		"proc debug_memmapper { } {\n"
+		"  set result \"\"\n"
+		"  for { set page 0 } { $page &lt; 4 } { incr page } {\n"
+		"    set tmp [get_selected_slot $page]\n"
+		"    append result [lindex $tmp 0] [lindex $tmp 1] \"\\n\"\n"
+		"    append result [debug read \"MapperIO\" $page] \"\\n\"\n"
+		"  }\n"
+		"  return $result\n"
+		"}\n");
+	comm.getCommandResult(memmap);
+
 }
 
 void DebuggerForm::connectionClosed()
@@ -312,6 +343,7 @@ void DebuggerForm::connectionClosed()
 	regsView->setEnabled(FALSE);
 	flagsView->setEnabled(FALSE);
 	stackView->setEnabled(FALSE);
+	slotView->setEnabled(FALSE);
 }
 
 void DebuggerForm::handleError( CommClient::ConnectionError error )
@@ -386,6 +418,9 @@ void DebuggerForm::dataTransfered(CommRequest *r)
 			breakpoints.setBreakpoints( ((CommCommandRequest *)r)->result );
 			delete r;
 			break;
+		case SLOTS_REQ_ID:
+			slotView->slotsUpdated( (CommCommandRequest *)r );
+			break;
 	}
 }
 
@@ -404,6 +439,7 @@ void DebuggerForm::finalizeConnection(bool halted)
 	regsView->setEnabled(TRUE);
 	flagsView->setEnabled(TRUE);
 	stackView->setEnabled(TRUE);
+	slotView->setEnabled(TRUE);
 }
 
 void DebuggerForm::cancelTransfer(CommRequest *r) 
@@ -426,6 +462,7 @@ void DebuggerForm::cancelTransfer(CommRequest *r)
 		case INIT_BREAK:
 		case DISCARD_RESULT_ID:
 		case BREAKPOINTS_REQ_ID:
+		case SLOTS_REQ_ID:
 			delete r;
 			break;
 	}
@@ -463,6 +500,9 @@ void DebuggerForm::breakOccured(quint16)
 	
 	// refresh memory viewer
 	hexView->refresh();
+
+	// refresh slot viewer
+	slotView->refresh();
 }
 
 void DebuggerForm::setBreakMode()
