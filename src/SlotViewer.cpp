@@ -13,18 +13,11 @@ SlotViewer::SlotViewer( QWidget* parent )
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
-	pages[0].ps = '0';
-	pages[0].ss = 'X';
-	pages[0].segment = 3;
-	pages[1].ps = '0';
-	pages[1].ss = 'X';
-	pages[1].segment = 2;
-	pages[2].ps = '3';
-	pages[2].ss = '0';
-	pages[2].segment = 1;
-	pages[3].ps = '3';
-	pages[3].ss = '0';
-	pages[3].segment = 0;
+	memLayout = NULL;
+	for(int p=0; p<4; p++) {
+		slotsChanged[p] = FALSE;
+		segmentsChanged[p] = FALSE;
+	}
 
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL;
@@ -90,6 +83,7 @@ void SlotViewer::paintEvent(QPaintEvent *e)
 	int y = frameT + headerHeight + dy/2 + fontMetrics().height()/2 - fontMetrics().descent();
 
 	QString str;
+	int isOn = isEnabled() && memLayout!=NULL;
 	
 	for(int i=0; i<4; i++) {
 		p.setPen( palette().color(QPalette::Text) );
@@ -103,19 +97,39 @@ void SlotViewer::paintEvent(QPaintEvent *e)
 		p.drawText(mid2 - fontMetrics().width(str)/2, y, str);
 		
 		// print slot
-		if(pages[i].ss == 'X')
-			str = pages[i].ps;
-		else
-			str.sprintf("%c-%c", pages[i].ps, pages[i].ss);
-		if(slotsChanged[i])
+		if(isOn) {
+			if(memLayout->isSubslotted[memLayout->primarySlot[i] & 3])
+				str.sprintf("%c-%c", memLayout->primarySlot[i], memLayout->secondarySlot[i]);
+			else
+				str = memLayout->primarySlot[i];
+		} else {
+			str = "-";
+		}
+		// set pen colour to red if slot was recently changed
+		if(slotsChanged[i] && isOn)
 			p.setPen( Qt::red );
 		else
 			p.setPen( palette().color(QPalette::Text) );
+		
 		p.drawText(mid3 - fontMetrics().width(str)/2, y, str);
 		
 		// print segment
-		str.sprintf("%i", pages[i].segment);
-		if(segmentsChanged[i])
+		if(isOn) {
+			int ms;
+			if(memLayout->isSubslotted[memLayout->primarySlot[i] & 3])
+				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3]
+				                         [memLayout->secondarySlot[i] & 3];
+			else
+				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3][0];
+			if(ms>0)
+				str.sprintf("%i", memLayout->mapperSegment[i]);
+			else
+				str = "-";
+		} else {
+			str = "-";
+		}
+		// set pen colour to red if slot was recently changed
+		if(segmentsChanged[i] && isOn)
 			p.setPen( Qt::red );
 		else
 			p.setPen( palette().color(QPalette::Text) );
@@ -145,17 +159,34 @@ void SlotViewer::refresh()
 	emit needUpdate(req);
 }
 
+void SlotViewer::setMemoryLayout(MemoryLayout *ml)
+{
+	memLayout = ml;
+}
+
 void SlotViewer::slotsUpdated(CommCommandRequest *r)
 {
 	QList<QByteArray> lines = r->result.split('\n');
 
+	// parse page slots and segments
 	for(int p=0; p<4; p++) {
-		slotsChanged[p] = (pages[p].ps != lines[p*2][0]) ||
-		                  (pages[p].ss != lines[p*2][1]);
-		pages[p].ps = lines[p*2][0];
-		pages[p].ss = lines[p*2][1];
-		segmentsChanged[p] = pages[p].segment != lines[p*2+1].toUShort();
-		pages[p].segment = lines[p*2+1].toUShort();
+		slotsChanged[p] = (memLayout->primarySlot[p] != lines[p*2][0]) ||
+		                  (memLayout->secondarySlot[p] != lines[p*2][1]);
+		memLayout->primarySlot[p] = lines[p*2][0];
+		memLayout->secondarySlot[p] = lines[p*2][1];
+		segmentsChanged[p] = memLayout->mapperSegment[p] != lines[p*2+1].toUShort();
+		memLayout->mapperSegment[p] = lines[p*2+1].toUShort();
+	}
+	// parse slot layout
+	int l=8;
+	for(int ps=0; ps<4; ps++) {
+		memLayout->isSubslotted[ps] = lines[l++][0]=='1';
+		if(memLayout->isSubslotted[ps]) {
+			for(int ss=0; ss<4; ss++)
+				memLayout->mapperSize[ps][ss] = lines[l++].toUShort();
+		} else {
+			memLayout->mapperSize[ps][0] = lines[l++].toUShort();
+		}
 	}
 	delete r;
 	update();

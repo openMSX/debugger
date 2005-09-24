@@ -1,5 +1,10 @@
 $Id$
 
+2005-09-24 Edwin Velds <e.velds@gmail.com>
+	* Add breakpoint toggle
+	* Made breakpoints sensitive to slot and mapper segment
+	* Moved slot info outside SlotViewer
+
 2005-09-11 Edwin Velds <e.velds@gmail.com>
 	* Added memory slot/segment viewer widget
 	* Added Breakpoint menu (still inactive)

@@ -23,6 +23,9 @@ enum { DISCARD_RESULT_ID,
 class CommRequest
 {
 public:
+	CommRequest() {};
+	~CommRequest() {};
+
 	enum RequestType {REQUEST_DEBUGGABLE, REQUEST_COMMAND};
 	RequestType requestType;
 	int sourceID;

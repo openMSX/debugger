@@ -75,6 +75,7 @@ private:
 	
 signals:
 	void needUpdate(CommDebuggableRequest *r);
+	void toggleBreakpoint(int addr);
 };
 
 #endif    // _DISASMVIEWER_H

@@ -6,12 +6,7 @@
 #include <QFrame>
 
 #include "CommClient.h"
-
-struct Page {
-	char ps;
-	char ss;
-	quint8 segment;
-};
+#include "DebuggerData.h"
 
 class SlotViewer : public QFrame
 {
@@ -20,6 +15,7 @@ public:
 	SlotViewer( QWidget* parent = 0 );
 
 	void refresh();
+	void setMemoryLayout(MemoryLayout *ml);
 	void slotsUpdated(CommCommandRequest *r);
 
 protected:
@@ -31,7 +27,8 @@ private:
 	int headerSize1, headerSize2, headerSize3, headerSize4;
 	int headerHeight;
 
-	Page pages[4];
+	MemoryLayout *memLayout;
+
 	bool slotsChanged[4];
 	bool segmentsChanged[4];
 

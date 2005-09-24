@@ -413,24 +413,29 @@ void DisasmViewer::mousePressEvent(QMouseEvent *e)
 		return;
 	}
 	
-	if(e->x() >= frameL+32 && e->x() < width()-frameR &&
+	if(e->x() >= frameL && e->x() < width()-frameR &&
 		e->y() >= frameT && e->y() < height()-frameB)
 	{
 		// calc clicked line number
 		int h = fontMetrics().height();
 		int line = (e->y()-frameT)/h;
 		
-		// check if the line exists (bottom of memory could have an empty line)
-		if(line + disasmTopLine < int(disasmLines.size()))
-			cursorAddr = disasmLines[disasmTopLine+line].addr;
-		else
-			return;
+		if(e->x() > frameL+32) {
+			// check if the line exists (bottom of memory could have an empty line)
+			if(line + disasmTopLine < int(disasmLines.size()))
+				cursorAddr = disasmLines[disasmTopLine+line].addr;
+			else
+				return;
 		
-		// scroll if partial line
-		if(line==int(visibleLines))
-			setAddress(disasmLines[disasmTopLine+1].addr, TopAlways);
-		else
-			update();
-		
-	}
+			// scroll if partial line
+			if(line==int(visibleLines))
+				setAddress(disasmLines[disasmTopLine+1].addr, TopAlways);
+			else
+				update();
+		} else if(e->x() < frameL+16) {
+			// clicked on the breakpoint area
+			if(line + disasmTopLine < int(disasmLines.size()))
+				emit toggleBreakpoint(disasmLines[line + disasmTopLine].addr);
+		}
+	} 
 }

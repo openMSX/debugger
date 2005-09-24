@@ -25,7 +25,7 @@ DebuggerForm::DebuggerForm( QWidget* parent)
 	createForm();
 }
 
-void DebuggerForm::createActions()	
+void DebuggerForm::createActions()
 {
 	systemConnectAction = new QAction(tr("&Connect"), this);
 	systemConnectAction->setShortcut(tr("Ctrl+C"));
@@ -104,6 +104,7 @@ void DebuggerForm::createActions()
 	connect( executeStepOverAction, SIGNAL( triggered() ), this, SLOT( executeStepOver() ) );
 	connect( executeRunToAction, SIGNAL( triggered() ), this, SLOT( executeRunTo() ) );
 	connect( executeStepOutAction, SIGNAL( triggered() ), this, SLOT( executeStepOut() ) );
+	connect( breakpointToggleAction, SIGNAL( triggered() ), this, SLOT( breakpointToggle() ) );
 	connect( helpAboutAction, SIGNAL( triggered() ), this, SLOT( showAbout() ) );
 }
 
@@ -134,7 +135,7 @@ void DebuggerForm::createMenus()
 
 	// create help menu
 	helpMenu = menuBar()->addMenu(tr("&Help"));
-	helpMenu->addAction(helpAboutAction);	
+	helpMenu->addAction(helpAboutAction);
 }
 
 void DebuggerForm::createToolbars()	
@@ -250,6 +251,8 @@ void DebuggerForm::createForm()
 	        flagsView,  SLOT( setFlags(quint8) ) );
 	connect(regsView,   SIGNAL( spChanged(quint16) ),
 	        stackView,  SLOT( setStackPointer(quint16) ) );	
+	connect(disasmView, SIGNAL( toggleBreakpoint(int) ),
+	                    SLOT( breakpointToggle(int) ) );
 
 	connect(&comm, SIGNAL( connectionReady() ),
 	               SLOT( initConnection() ) );
@@ -276,12 +279,14 @@ void DebuggerForm::createForm()
 	// init main memory
 	// added four bytes as runover buffer for dasm
 	// otherwise dasm would need to check the buffer end continously.
+	breakpoints.setMemoryLayout(&memLayout);
 	mainMemory = new unsigned char[65536+4];
 	memset(mainMemory, 0, 65536+4);
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&breakpoints);
 	hexView->setData("memory", mainMemory, 65536);
 	stackView->setData(mainMemory, 65536);
+	slotView->setMemoryLayout(&memLayout);
 }
 
 DebuggerForm::~DebuggerForm()
@@ -319,6 +324,17 @@ void DebuggerForm::initConnection()
 		"    set tmp [get_selected_slot $page]\n"
 		"    append result [lindex $tmp 0] [lindex $tmp 1] \"\\n\"\n"
 		"    append result [debug read \"MapperIO\" $page] \"\\n\"\n"
+		"  }\n"
+		"  for { set ps 0 } { $ps &lt; 4 } { incr ps } {\n"
+		"    if [openmsx_info issubslotted $ps] {\n"
+		"      append result \"1\\n\"\n"
+		"      for { set ss 0 } { $ss &lt; 4 } { incr ss } {\n"
+		"        append result [get_mapper_size $ps $ss] \"\\n\"\n"
+		"      }\n"
+		"    } else {\n"
+		"      append result \"0\\n\"\n"
+		"      append result [get_mapper_size $ps 0] \"\\n\"\n"
+		"    }\n"
 		"  }\n"
 		"  return $result\n"
 		"}\n");
@@ -416,6 +432,7 @@ void DebuggerForm::dataTransfered(CommRequest *r)
 			break;
 		case BREAKPOINTS_REQ_ID:
 			breakpoints.setBreakpoints( ((CommCommandRequest *)r)->result );
+			disasmView->update();
 			delete r;
 			break;
 		case SLOTS_REQ_ID:
@@ -474,6 +491,8 @@ void DebuggerForm::handleUpdate(UpdateMessage *m)
 		pauseStatusChanged(m->result == "true");
 	} else if (m->type == "break" && m->name == "pc") {
 		breakOccured( m->result.toShort(0,0) );
+	} else if (m->type == "resume" && m->name == "pc") {
+		setRunMode();
 	}
 	delete m;
 }
@@ -513,6 +532,7 @@ void DebuggerForm::setBreakMode()
 	executeStepOverAction->setEnabled(TRUE);
 	executeStepOutAction->setEnabled(TRUE);
 	executeRunToAction->setEnabled(TRUE);
+	breakpointToggleAction->setEnabled(TRUE);
 }
 
 void DebuggerForm::setRunMode()
@@ -523,6 +543,7 @@ void DebuggerForm::setRunMode()
 	executeStepOverAction->setEnabled(FALSE);
 	executeStepOutAction->setEnabled(FALSE);
 	executeRunToAction->setEnabled(FALSE);
+	breakpointToggleAction->setEnabled(FALSE);
 }
 
 void DebuggerForm::systemConnect()
@@ -584,6 +605,28 @@ void DebuggerForm::executeRunTo()
 
 void DebuggerForm::executeStepOut()
 {
+}
+
+void DebuggerForm::breakpointToggle(int addr)
+{
+	// set breakpoint
+	QString cmd;
+	int address = (addr>=0)?addr:disasmView->cursorAddr;
+	
+	if( breakpoints.isBreakpoint(address) )
+		cmd = "debug remove_bp " + breakpoints.idString(address);
+	else {
+		int p = (address & 0xC000) >> 14;
+		cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }", address, memLayout.primarySlot[p],
+		            memLayout.secondarySlot[p], memLayout.mapperSegment[p]);
+	}
+	
+	CommCommandRequest *req = new CommCommandRequest(DISCARD_RESULT_ID, cmd.toAscii() );
+
+	comm.getCommandResult(req);
+	// refresh breakpoints 
+	req = new CommCommandRequest(BREAKPOINTS_REQ_ID, "debug list_bp");
+	comm.getCommandResult(req);
 }
 
 void DebuggerForm::showAbout()

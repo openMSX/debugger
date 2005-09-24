@@ -67,6 +67,7 @@ private:
 
 	CommClient comm;
 	Breakpoints breakpoints;
+	MemoryLayout memLayout;
 	unsigned char *mainMemory;
 	
 	void createActions();
@@ -92,6 +93,7 @@ private slots:
 	void executeStepOver();
 	void executeRunTo();
 	void executeStepOut();
+	void breakpointToggle(int addr = -1);
 
 	void initConnection();
 	void dataTransfered(CommRequest *r);
