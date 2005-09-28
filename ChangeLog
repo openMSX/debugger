@@ -1,5 +1,8 @@
 $Id$
 
+2005-09-28 Edwin Velds <e.velds@gmail.com>
+	* Fixed bug that caused a crash when no subslots/mapper was available
+
 2005-09-24 Edwin Velds <e.velds@gmail.com>
 	* Add breakpoint toggle
 	* Made breakpoints sensitive to slot and mapper segment
