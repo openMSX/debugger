@@ -1,5 +1,8 @@
 $Id$
 
+2005-10-17 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
+	* OpenMSX now uses unix domain sockets, updated connection code
+
 2005-09-28 Edwin Velds <e.velds@gmail.com>
 	* Fixed bug that caused a crash when no subslots/mapper was available
 

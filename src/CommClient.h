@@ -72,29 +72,31 @@ public:
 	CommClient();
 	~CommClient();
 
-	enum ConnectionError {CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_ADDRESS_NOT_FOUND,
-	                      UNSPECIFIED_SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR};
+	enum ConnectionError {
+		CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_ADDRESS_NOT_FOUND,
+		UNSPECIFIED_SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR
+	};
 
-	void connectToOpenMSX(const QString& host, quint16 port = 9938);
+	void connectToOpenMSX(int fd);
 	void closeConnection();
 
 public slots:
-	void getDebuggableData(CommDebuggableRequest *r);
-	void getCommandResult(CommCommandRequest *r);
+	void getDebuggableData(CommDebuggableRequest* r);
+	void getCommandResult(CommCommandRequest* r);
 
 signals:
 	void connectionReady();
 	void connectionTerminated();
-	void dataTransferReady(CommRequest *r);
-	void dataTransferCancelled(CommRequest *r);
-	void updateReceived(UpdateMessage *m);
-	void errorOccured( ConnectionError error );
+	void dataTransferReady(CommRequest* r);
+	void dataTransferCancelled(CommRequest* r);
+	void updateReceived(UpdateMessage* m);
+	void errorOccured(ConnectionError error);
 
 private:
-	QTcpSocket *socket;
+	QTcpSocket* socket;
 	bool connectionEstablished;
 	bool waitingForOpenMSX;
-	std::deque<CommRequest *> commandQueue;
+	std::deque<CommRequest*> commandQueue;
 
 	void sendCommand(const QByteArray& cmd);
 	void rejectRequests();
@@ -103,8 +105,7 @@ private slots:
 	void socketConnected();
 	void socketReadyRead();
 	void socketDisconnected();
-	void socketError( QAbstractSocket::SocketError e );
-
+	void socketError(QAbstractSocket::SocketError e);
 };
 
 #endif    // _COMMCLIENT_H

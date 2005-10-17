@@ -21,7 +21,8 @@ HEADERS += CommClient.h \
            StackViewer.h \
            HexViewer.h \
            SlotViewer.h \
-           version.h
+           version.h \
+           ServerList.h
 SOURCES += CommClient.cpp \
            CPURegsViewer.cpp \
            Dasm.cpp \
@@ -33,4 +34,5 @@ SOURCES += CommClient.cpp \
            StackViewer.cpp \
            SlotViewer.cpp \
            DebuggerData.cpp \
-           main.cpp
+           main.cpp \
+           ServerList.cpp

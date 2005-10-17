@@ -53,9 +53,9 @@ CommClient::~CommClient()
 {
 }
 
-void CommClient::connectToOpenMSX(const QString & host, quint16 port )
+void CommClient::connectToOpenMSX(int fd)
 {
-	socket->connectToHost(host, port);
+	socket->setSocketDescriptor(fd);
 }
 
 void CommClient::closeConnection()

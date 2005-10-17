@@ -1,6 +1,7 @@
 // $Id$
 
 #include "DebuggerForm.h"
+#include "ServerList.h"
 
 #include <QMessageBox>
 #include <QMenuBar>
@@ -553,7 +554,14 @@ void DebuggerForm::setRunMode()
 void DebuggerForm::systemConnect()
 {
 	systemConnectAction->setEnabled(FALSE);
-	comm.connectToOpenMSX("localhost");
+	
+	std::vector<std::string> servers;
+	collectServers(servers);
+	if (!servers.empty()) {
+		// TODO let user pick one if there is more than one
+		int fd = openSocket(servers.front());
+		comm.connectToOpenMSX(fd);
+	}
 }
 
 void DebuggerForm::systemDisconnect()
