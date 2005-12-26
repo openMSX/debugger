@@ -9,12 +9,9 @@ static inline char hex2val(char c)
 }
 
 
-CommDebuggableRequest::CommDebuggableRequest(int source, 
-                                             const char *debuggableName, 
-                                             int readAt, 
-                                             int length, 
-                                             unsigned char *targetPtr, 
-                                             int writeAt)
+CommDebuggableRequest::CommDebuggableRequest(
+	int source, const char* debuggableName, int readAt, 
+	int length, unsigned char *targetPtr, int writeAt)
 {
 	requestType = REQUEST_DEBUGGABLE;
 	sourceID = source;
@@ -39,35 +36,34 @@ CommCommandRequest::CommCommandRequest(int source, const char *cmd)
 CommClient::CommClient()
 {
 	connectionEstablished = FALSE;
-	socket = new QTcpSocket(this);
-
-	connect( socket, SIGNAL(connected()), SLOT(socketConnected()) );
-	connect( socket, SIGNAL(disconnected()), SLOT(socketDisonnected()) );
-	connect( socket, SIGNAL(readyRead()), SLOT(socketReadyRead()) );
-	connect( socket, SIGNAL(error(QAbstractSocket::SocketError)),
-	                 SLOT(socketError(QAbstractSocket::SocketError)) );
-	
 }
 
 CommClient::~CommClient()
 {
 }
 
-void CommClient::connectToOpenMSX(int fd)
+void CommClient::connectToOpenMSX(std::auto_ptr<QAbstractSocket> s)
 {
-	socket->setSocketDescriptor(fd);
+	socket = s;
+	connect(socket.get(), SIGNAL(connected()),
+	        SLOT(socketConnected()));
+	connect(socket.get(), SIGNAL(disconnected()),
+	        SLOT(socketDisconnected()));
+	connect(socket.get(), SIGNAL(readyRead()),
+	        SLOT(socketReadyRead()));
+	connect(socket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
+	        SLOT(socketError(QAbstractSocket::SocketError)));
 }
 
 void CommClient::closeConnection()
 {
-	if( socket->state() != QAbstractSocket::UnconnectedState )
-		socket->disconnectFromHost();
+	socket->disconnectFromHost();
 	socketDisconnected();
 }
 
-void CommClient::getDebuggableData(CommDebuggableRequest *r) 
+void CommClient::getDebuggableData(CommDebuggableRequest* r) 
 {
-	if(!connectionEstablished) {
+	if (!connectionEstablished) {
 		emit dataTransferCancelled(r);
 		return;
 	}
@@ -75,15 +71,15 @@ void CommClient::getDebuggableData(CommDebuggableRequest *r)
 	commandQueue.push_back(r);
 	
 	QString cmd = QString("debug_bin2hex [ debug read_block %1 %2 %3 ]")
-					.arg(r->debuggable.data())
-					.arg(r->readOffset)
-					.arg(r->readSize);
+	                .arg(r->debuggable.data())
+	                .arg(r->readOffset)
+	                .arg(r->readSize);
 	sendCommand(cmd.toAscii());
-}	
+}
 
-void CommClient::getCommandResult(CommCommandRequest *r)
+void CommClient::getCommandResult(CommCommandRequest* r)
 {
-	if(!connectionEstablished) {
+	if (!connectionEstablished) {
 		emit dataTransferCancelled(r);
 		return;
 	}
@@ -109,40 +105,38 @@ void CommClient::socketConnected()
 void CommClient::socketReadyRead()
 {
 	// read from the server
-	while ( socket->canReadLine() ) {
+	while (socket->canReadLine()) {
 		QByteArray reply = socket->readLine();
 
-		if(reply=="<openmsx-output>\n") {
+		if (reply == "<openmsx-output>\n") {
 			// open openMSX control
 			socket->write("<openmsx-control>\n", 18);
 			connectionEstablished = TRUE;
 			waitingForOpenMSX = FALSE;
-
 			emit connectionReady();
 
-		} else if(reply=="</openmsx-output>\n") {
+		} else if (reply == "</openmsx-output>\n") {
 			// terminate openMSX connection
 			connectionEstablished = FALSE;
 			socket->disconnectFromHost();
-			
 			emit connectionTerminated();
 
-		} else if(reply.startsWith("<update")) {
-			// handle breakpoints and status changes			
-			UpdateMessage *msg = new UpdateMessage;
+		} else if (reply.startsWith("<update")) {
+			// handle breakpoints and status changes
+			UpdateMessage* msg = new UpdateMessage();
 			
 			// read the type attribute
-			int start = reply.indexOf(" type=\"")+7;
+			int start = reply.indexOf(" type=\"") + 7;
 			int len = 0;
-			if(start>=0) {
-				len = reply.indexOf('\"', start)-start;
+			if(start >= 0) {
+				len = reply.indexOf('\"', start) - start;
 				msg->type = reply.mid(start, len);
 			}
 			
 			// read the name attribute
-			start = reply.indexOf(" name=\"", start+len)+7;
-			if(start>=0) {
-				len = reply.indexOf('\"', start)-start;
+			start = reply.indexOf(" name=\"", start + len) + 7;
+			if(start >= 0) {
+				len = reply.indexOf('\"', start) - start;
 				msg->name = reply.mid(start, len);
 			}
 			
@@ -150,48 +144,45 @@ void CommClient::socketReadyRead()
 			start = reply.indexOf('>') + 1;
 			len = reply.lastIndexOf('<') - start;
 			msg->result = reply.mid(start, len);
+			emit updateReceived(msg);
 			
-			emit updateReceived( msg );
-			
-		} else if(!reply.startsWith("<log")) {
-			CommRequest *c = commandQueue.front();
-		
-			if(c->requestType == CommRequest::REQUEST_COMMAND) {
+		} else if (!reply.startsWith("<log")) {
+			CommRequest* c = commandQueue.front();
+			if (c->requestType == CommRequest::REQUEST_COMMAND) {
 				// command results can be multiple lines 
-				CommCommandRequest *r = (CommCommandRequest *)c;
-				int start = 0, len = reply.length();
+				CommCommandRequest* r = (CommCommandRequest*)c;
+				int start = 0;
+				int len = reply.length();
 				bool last = FALSE;
 				
-				if(reply.startsWith("<reply")) {
+				if (reply.startsWith("<reply")) {
 					start = reply.indexOf('>') + 1;
 					r->result = "";
 				}
-				
-				if(reply.endsWith("</reply>\n")) {
+				if (reply.endsWith("</reply>\n")) {
 					len -= 9;
 					last = TRUE;
-				}					
+				}
 				
-				r->result.append(reply.mid(start, len-start));
+				r->result.append(reply.mid(start, len - start));
 				
-				if(last) {
+				if (last) {
 					emit dataTransferReady( c );
 					commandQueue.pop_front();
 				}
-
 			} else {
 				// binary replies are simple hex streams of a single line
-				CommDebuggableRequest *r = (CommDebuggableRequest *)c;
+				CommDebuggableRequest* r = (CommDebuggableRequest*)c;
 				int start = reply.indexOf('>') + 1;
 				int end = reply.lastIndexOf('<');
-				unsigned char *cptr = r->target + r->readOffset;
-				const char *data = reply.data();
+				unsigned char* cptr = r->target + r->readOffset;
+				const char* data = reply.data();
 			
-				for(int i=start; i<end; i+=2, cptr++)
-					*cptr = (unsigned char)( (hex2val(data[i]) << 4) + hex2val(data[i+1]));
+				for (int i = start; i < end; i += 2, cptr++)
+					*cptr = (unsigned char)((hex2val(data[i]) << 4) + hex2val(data[i + 1]));
 				
 				// send a signal
-				emit dataTransferReady( c );
+				emit dataTransferReady(c);
 				commandQueue.pop_front();
 			}
 		}
@@ -206,10 +197,9 @@ void CommClient::socketDisconnected()
 	rejectRequests();
 }
 
-void CommClient::socketError( QAbstractSocket::SocketError e )
+void CommClient::socketError(QAbstractSocket::SocketError e)
 {
 	ConnectionError error;
-
 	switch (e) {
 		case QAbstractSocket::ConnectionRefusedError:
 			error = CONNECTION_REFUSED;
@@ -229,14 +219,13 @@ void CommClient::socketError( QAbstractSocket::SocketError e )
 		default:
 			error = UNSPECIFIED_SOCKET_ERROR;
 	}
-	
 	emit errorOccured(error);
 }
 
 void CommClient::rejectRequests()
 {
-	while(!commandQueue.empty()) {
-		emit dataTransferCancelled( commandQueue.front() );
+	while (!commandQueue.empty()) {
+		emit dataTransferCancelled(commandQueue.front());
 		commandQueue.pop_front();
 	}
 }

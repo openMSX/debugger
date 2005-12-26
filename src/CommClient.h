@@ -3,9 +3,10 @@
 #ifndef _COMMCLIENT_H
 #define _COMMCLIENT_H
 
-#include <QTcpSocket>
+#include <QAbstractSocket>
 #include <QByteArray>
 #include <deque>
+#include <memory>
 
 enum { DISCARD_RESULT_ID,
        DISASM_MEMORY_REQ_ID,
@@ -77,7 +78,7 @@ public:
 		UNSPECIFIED_SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR
 	};
 
-	void connectToOpenMSX(int fd);
+	void connectToOpenMSX(std::auto_ptr<QAbstractSocket> s);
 	void closeConnection();
 
 public slots:
@@ -93,7 +94,7 @@ signals:
 	void errorOccured(ConnectionError error);
 
 private:
-	QTcpSocket* socket;
+	std::auto_ptr<QAbstractSocket> socket;
 	bool connectionEstablished;
 	bool waitingForOpenMSX;
 	std::deque<CommRequest*> commandQueue;

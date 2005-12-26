@@ -1,6 +1,7 @@
 // $Id$
 
 #include "ServerList.h"
+#include "QTcpSocket"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -8,7 +9,6 @@
 
 #ifdef _WIN32
 #include <fstream>
-#include <winsock2.h>
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -148,10 +148,12 @@ static void deleteSocket(const string& socket)
 	rmdir(dir.c_str()); // ignore errors
 }
 
-int openSocket(const string& socketName)
+std::auto_ptr<QAbstractSocket> openSocket(const string& socketName)
 {
+	std::auto_ptr<QAbstractSocket> result;
+
 	if (!checkSocket(socketName)) {
-		return -1;
+		return std::auto_ptr<QAbstractSocket>(NULL);
 	}
 
 #ifdef _WIN32
@@ -159,39 +161,33 @@ int openSocket(const string& socketName)
 	std::ifstream in(socketName.c_str());
 	in >> port;
 	if (port == -1) {
-		return -1;
+		return std::auto_ptr<QAbstractSocket>(NULL);
 	}
 
-	int sd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sd == -1) {
-		return -1;
-	}
-
-	sockaddr_in addr;
-	memset((char*)&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	addr.sin_port = htons(port);
-
+	result.reset(new QTcpSocket());
+	result->connectToHost("localhost", port);
 #else
 	int sd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sd == -1) {
-		return -1;
+		return std::auto_ptr<QAbstractSocket>(NULL);
 	}
-
 	sockaddr_un addr; 
 	addr.sun_family = AF_UNIX; 
 	strcpy(addr.sun_path, socketName.c_str()); 
+	if (connect(sd, (sockaddr*)&addr, sizeof(addr)) == 0) {
+		result.reset(new QTcpSocket());
+		result->setSocketDescriptor(sd);
+	}
 #endif
 
-	if (connect(sd, (sockaddr*)&addr, sizeof(addr)) == -1) {
+	if (result->state() != QAbstractSocket::ConnectedState) {
 		// It appears to be a socket but we cannot connect to it.
 		// Must be a stale socket. Try to clean it up.
 		deleteSocket(socketName);
-		close(sd);
-		return -1;
+		
+		return std::auto_ptr<QAbstractSocket>(NULL);
 	}
-	return sd;
+	return result;
 }
 
 void collectServers(vector<string>& servers)
@@ -203,9 +199,8 @@ void collectServers(vector<string>& servers)
 	ReadDir readDir(dir);
 	while (dirent* entry = readDir.getEntry()) {
 		string socketName = dir + '/' + entry->d_name;
-		int sd = openSocket(socketName);
-		if (sd != -1) {
-			close(sd);
+		std::auto_ptr<QAbstractSocket> socket = openSocket(socketName);
+		if (socket.get()) {
 			servers.push_back(socketName);
 		}
 	}

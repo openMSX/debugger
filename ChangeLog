@@ -1,5 +1,10 @@
 $Id$
 
+2005-12-26 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
+	* Use QTcpSocket iso winsock for TCP connections in windows:
+	   - should now compile again on windows without manually hacking
+	     the generated Makefiles
+
 2005-10-17 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
 	* OpenMSX now uses unix domain sockets, updated connection code
 

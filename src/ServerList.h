@@ -5,8 +5,11 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+
+class QAbstractSocket;
 
 void collectServers(std::vector<std::string>& servers);
-int openSocket(const std::string& socketName);
+std::auto_ptr<QAbstractSocket> openSocket(const std::string& socketName);
 
 #endif

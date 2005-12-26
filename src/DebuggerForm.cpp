@@ -559,8 +559,7 @@ void DebuggerForm::systemConnect()
 	collectServers(servers);
 	if (!servers.empty()) {
 		// TODO let user pick one if there is more than one
-		int fd = openSocket(servers.front());
-		comm.connectToOpenMSX(fd);
+		comm.connectToOpenMSX(openSocket(servers.front()));
 	}
 }
 
