@@ -303,8 +303,6 @@ void DebuggerForm::initConnection()
 	comm.getCommandResult(reqBreak);
 	CommCommandRequest *reqUpdateStatus = new CommCommandRequest(DISCARD_RESULT_ID, "update enable status");
 	comm.getCommandResult(reqUpdateStatus);
-	CommCommandRequest *reqUpdateBreak = new CommCommandRequest(DISCARD_RESULT_ID, "update enable break");
-	comm.getCommandResult(reqUpdateBreak);
 	
 	// define 'debug_bin2hex' proc for internal use
 	CommCommandRequest* bin2hex = new CommCommandRequest(DISCARD_RESULT_ID,
@@ -492,13 +490,17 @@ void DebuggerForm::cancelTransfer(CommRequest *r)
 
 void DebuggerForm::handleUpdate(UpdateMessage *m)
 {
-	if(m->type == "status" && m->name == "paused") {
-		pauseStatusChanged(m->result == "true");
-	} else if (m->type == "break" && m->name == "pc") {
-		breakOccured( m->result.toShort(0,0) );
-	} else if (m->type == "resume" && m->name == "pc") {
-		setRunMode();
-	}
+	if(m->type == "status") 
+		if(m->name == "cpu") {
+			if(m->result == "suspended") {
+				breakOccured( m->result.toShort(0,0) );
+			} else {
+				setRunMode();
+			}
+		} else if(m->name == "paused") {
+			pauseStatusChanged(m->result == "true");
+		}
+
 	delete m;
 }
 

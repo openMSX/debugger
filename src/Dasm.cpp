@@ -138,7 +138,7 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 					break;
 			}
 		}
-		dest.instr.resize(18, ' ');
+		dest.instr.resize(19, ' ');
 		disasm.push_back(dest);
 		pc += dest.numBytes;
 	}

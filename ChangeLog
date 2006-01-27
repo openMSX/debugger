@@ -1,5 +1,9 @@
 $Id$
 
+2006-01-27 Edwin Velds <e.velds@gmail.com>
+	* Updated to use the new "cpu" status update instead of
+	  break/resume.
+
 2005-12-26 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
 	* Use QTcpSocket iso winsock for TCP connections in windows:
 	   - should now compile again on windows without manually hacking
