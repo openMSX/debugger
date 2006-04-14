@@ -1,5 +1,14 @@
 $Id$
 
+2006-04-14 Maarten ter Huurne <maarten@treewalker.org>
+	* Made a build system similar to openMSX, on request of Edwin.
+	  It's still in the early stages, but it can produce a working
+	  executable on my system already.
+	  To try it, edit build/main.mk and set QT_BASE correctly, then run:
+	    make -f build/main.mk
+	  This new build system does not interfere with the qmake build,
+	  so we can use them side by side until the new system is mature.
+
 2006-01-27 Edwin Velds <e.velds@gmail.com>
 	* Updated to use the new "cpu" status update instead of
 	  break/resume.
