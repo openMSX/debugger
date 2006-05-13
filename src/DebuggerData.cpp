@@ -2,7 +2,7 @@
 
 #include "DebuggerData.h"
 
-#include <QList>
+#include <QStringList>
 
 
 //
@@ -31,19 +31,17 @@ void Breakpoints::setMemoryLayout(MemoryLayout *ml)
 	memLayout = ml;
 }
 
-void Breakpoints::setBreakpoints(QByteArray& str)
+void Breakpoints::setBreakpoints(const QString& str)
 {
-	QList<QByteArray> bps = str.split('\n');
+	QStringList bps = str.split('\n');
 	
 	breakpoints.clear();
-	for ( QList<QByteArray>::Iterator it = bps.begin(); it != bps.end(); ++it ) {
+	for (QStringList::Iterator it = bps.begin(); it != bps.end(); ++it) {
 		Breakpoint newBp;
-		int p, q;
-
-		p = (*it).indexOf(' ');
+		int p = (*it).indexOf(' ');
 		newBp.id = (*it).left(p).trimmed();
 		if(newBp.id.isEmpty()) break;
-		q = (*it).indexOf(' ', p+1);
+		int q = (*it).indexOf(' ', p+1);
 		if(q==-1) {
 			newBp.address = (*it).mid(p).toUShort(0,0);
 		} else {
@@ -65,7 +63,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 	
 	if(p>=0) {
 		p += 11;
-		QByteArray arg = getNextArgument(bp.condition, p);
+		QString arg = getNextArgument(bp.condition, p);
 		if(!arg.isEmpty()) {
 			int s = arg.toInt();
 			if(s<0 || s>3) return;
@@ -86,9 +84,9 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 	}
 }
 
-QByteArray Breakpoints::getNextArgument(QByteArray& data, int& pos)
+QString Breakpoints::getNextArgument(QString& data, int& pos)
 {
-	QByteArray result;
+	QString result;
 	
 	while(data[pos]==' ' || data[pos]=='\t') pos++;
 	for(;;) {

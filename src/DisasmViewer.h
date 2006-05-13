@@ -3,36 +3,19 @@
 #ifndef _DISASMVIEWER_H
 #define _DISASMVIEWER_H
 
+#include "DebuggerData.h"
+#include "Dasm.h"
 #include <QFrame>
-#include <QScrollBar>
 #include <QPixmap>
 
-#include "CommClient.h"
-#include "Dasm.h"
-
-#include "DebuggerData.h"
-
-class CommMemoryRequest : public CommDebuggableRequest
-{
-public:
-	CommMemoryRequest(int readAt = 0, 
-	                  int length = 0, 
-	                  unsigned char *targetPtr = NULL, 
-	                  int writeAt = 0)
-		: CommDebuggableRequest(DISASM_MEMORY_REQ_ID, "memory", readAt, length, targetPtr, writeAt) {};
-
-	int address;
-	int method;
-	bool repaint;
-};
-
-
+class CommMemoryRequest;
+class QScrollBar;
 
 class DisasmViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	DisasmViewer( QWidget* parent = 0 );
+	DisasmViewer(QWidget* parent = 0);
 
 	void setMemory(unsigned char *memPtr);
 	void setBreakpoints(Breakpoints *bps);
@@ -43,7 +26,7 @@ public:
 	quint16 cursorAddr;
 
 public slots:
-	void setAddress(quint16 addr, int method = Top, bool doRepaint = TRUE);
+	void setAddress(quint16 addr, int method = Top);
 	void setProgramCounter(quint16 pc);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
@@ -74,7 +57,6 @@ private:
 	int findDisasmLine(quint16 lineAddr);
 	
 signals:
-	void needUpdate(CommDebuggableRequest *r);
 	void toggleBreakpoint(int addr);
 };
 

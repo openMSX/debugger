@@ -14,6 +14,10 @@ MOC_HDR_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(addsuffix .h, \
 		$(MOC_SRC_HDR) \
 	)))
+UI_FULL+=$(sort \
+	$(addprefix $(CURDIR),$(addsuffix .ui, \
+		$(UI) \
+	)))
 DIST_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(DIST) node.mk) \
 	)

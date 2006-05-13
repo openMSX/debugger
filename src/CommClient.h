@@ -3,110 +3,36 @@
 #ifndef _COMMCLIENT_H
 #define _COMMCLIENT_H
 
-#include <QAbstractSocket>
-#include <QByteArray>
-#include <deque>
-#include <memory>
+#include <QString>
+#include <QObject>
 
-enum { DISCARD_RESULT_ID,
-       DISASM_MEMORY_REQ_ID,
-       CPUREG_REQ_ID,
-       HEXDATA_MEMORY_REQ_ID,
-       STACK_MEMORY_REQ_ID,
-       SLOTS_REQ_ID,
-
-       BREAKPOINTS_REQ_ID,
-
-       INIT_PAUSE,
-       INIT_BREAK
-};
-
-class CommRequest
-{
-public:
-	CommRequest() {};
-	~CommRequest() {};
-
-	enum RequestType {REQUEST_DEBUGGABLE, REQUEST_COMMAND};
-	RequestType requestType;
-	int sourceID;
-};
-
-struct UpdateMessage {
-	QByteArray type;
-	QByteArray name;
-	QByteArray result;
-};
-
-class CommDebuggableRequest : public CommRequest
-{
-public:
-	CommDebuggableRequest(int source, 
-	                      const char *debuggableName, 
-	                      int readAt = 0, 
-	                      int length = 0, 
-	                      unsigned char *targetPtr = NULL, 
-	                      int writeAt = 0);
-
-	QByteArray debuggable;
-	unsigned char *target;
-	int readOffset;
-	int readSize;
-	int writeOffset;
-};
-
-
-class CommCommandRequest : public CommRequest
-{
-public:
-	CommCommandRequest(int source, const char *cmd);
-
-	QByteArray command;
-	QByteArray result;
-};
-
+class OpenMSXConnection;
+class Command;
 
 class CommClient : public QObject
 {
 	Q_OBJECT
 public:
-	CommClient();
-	~CommClient();
+	static CommClient& instance();
 
-	enum ConnectionError {
-		CONNECTION_REFUSED, CONNECTION_CLOSED, HOST_ADDRESS_NOT_FOUND,
-		UNSPECIFIED_SOCKET_ERROR, NETWORK_ERROR, UNKNOWN_ERROR
-	};
-
-	void connectToOpenMSX(std::auto_ptr<QAbstractSocket> s);
-	void closeConnection();
+	void sendCommand(Command* command);
 
 public slots:
-	void getDebuggableData(CommDebuggableRequest* r);
-	void getCommandResult(CommCommandRequest* r);
+	void connectToOpenMSX(OpenMSXConnection* conn);
+	void closeConnection();
 
 signals:
 	void connectionReady();
 	void connectionTerminated();
-	void dataTransferReady(CommRequest* r);
-	void dataTransferCancelled(CommRequest* r);
-	void updateReceived(UpdateMessage* m);
-	void errorOccured(ConnectionError error);
+
+	void logParsed(const QString& level, const QString& message);
+	void updateParsed(const QString& type, const QString& name, const QString& message);
 
 private:
-	std::auto_ptr<QAbstractSocket> socket;
-	bool connectionEstablished;
-	bool waitingForOpenMSX;
-	std::deque<CommRequest*> commandQueue;
+	CommClient();
+	~CommClient();
 
-	void sendCommand(const QByteArray& cmd);
-	void rejectRequests();
-
-private slots:
-	void socketConnected();
-	void socketReadyRead();
-	void socketDisconnected();
-	void socketError(QAbstractSocket::SocketError e);
+	OpenMSXConnection* connection;
 };
 
 #endif    // _COMMCLIENT_H

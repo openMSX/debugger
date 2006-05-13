@@ -1,11 +1,48 @@
 // $Id$
 
 #include "DisasmViewer.h"
+#include "OpenMSXConnection.h"
+#include "CommClient.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOptionFocusRect>
+#include <QScrollBar>
 #include <cmath>
 #include <cassert>
+
+class CommMemoryRequest : public ReadDebugBlockCommand
+{
+public:
+	CommMemoryRequest(unsigned offset_, unsigned size_, unsigned char* target,
+	                  DisasmViewer& viewer_)
+		: ReadDebugBlockCommand("memory", offset_, size_, target)
+		, offset(offset_), size(size_)
+		, viewer(viewer_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		copyData(message);
+		viewer.memoryUpdated(this);
+	}
+
+	virtual void cancel()
+	{
+		viewer.updateCancelled(this);
+	}
+
+	// TODO Refactor: public members are ugly
+	unsigned offset;
+	unsigned size;
+	int address;
+	int method;
+
+private:
+	DisasmViewer& viewer;
+};
+
+
 
 DisasmViewer::DisasmViewer( QWidget* parent )
 	: QFrame( parent )
@@ -24,7 +61,7 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 	programCounter = 0x1070;
 	waitingForData = FALSE;
 	nextRequest = NULL;
-	
+
 	scrollBar = new QScrollBar(Qt::Vertical, this);
 	scrollBar->setMinimum(0);
 	scrollBar->setMaximum(0xFFFF);
@@ -152,7 +189,7 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 	}
 }
 
-void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
+void DisasmViewer::setAddress(quint16 addr, int method)
 {
 	int line = findDisasmLine(addr);
 
@@ -205,7 +242,7 @@ void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 			}
 			if(disasmTopLine<0) disasmTopLine = 0;
 			if(disasmTopLine>=int(disasmLines.size())) disasmTopLine = disasmLines.size()-1;
-			if(doRepaint) update();
+			update();
 			return;
 		}
 	}
@@ -245,16 +282,15 @@ void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 	if(disasmStart<0) disasmStart = 0;
 	if(disasmEnd>0xFFFF) disasmEnd = 0xFFFF;
 	
-	CommMemoryRequest *req = new CommMemoryRequest(disasmStart, disasmEnd-disasmStart+1, memory, disasmStart);
+	CommMemoryRequest* req = new CommMemoryRequest(disasmStart, disasmEnd-disasmStart+1, &memory[disasmStart], *this);
 	req->address = addr;
 	req->method = method;
-	req->repaint = doRepaint;
 	
 	if(waitingForData) {
 		if(nextRequest) delete nextRequest;
 		nextRequest = req;
 	} else {
-		emit needUpdate(req);
+		CommClient::instance().sendCommand(req);
 		waitingForData = TRUE;
 	}
 }
@@ -262,7 +298,7 @@ void DisasmViewer::setAddress(quint16 addr, int method, bool doRepaint)
 void DisasmViewer::memoryUpdated(CommMemoryRequest *req)
 {
 	// disassemble the newly received memory
-	dasm(memory, req->readOffset, req->readOffset+req->readSize-1, disasmLines);
+	dasm(memory, req->offset, req->offset+req->size-1, disasmLines);
 
 	// locate the requested line 
 	disasmTopLine = 0;
@@ -285,7 +321,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest *req)
 	if(!nextRequest)
 		scrollBar->setValue(disasmLines[disasmTopLine].addr);
 
-	if(req->repaint) update();
+	update();
 	updateCancelled(req);
 }
 
@@ -293,7 +329,7 @@ void DisasmViewer::updateCancelled(CommMemoryRequest *req)
 {
 	delete req;
 	if(nextRequest) {
-		emit needUpdate(nextRequest);
+		CommClient::instance().sendCommand(nextRequest);
 		nextRequest = NULL;
 	} else {
 		waitingForData = FALSE;

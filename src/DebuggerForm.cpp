@@ -1,8 +1,16 @@
 // $Id$
 
 #include "DebuggerForm.h"
-#include "ServerList.h"
-
+#include "DisasmViewer.h"
+#include "HexViewer.h"
+#include "CPURegsViewer.h"
+#include "FlagsViewer.h"
+#include "StackViewer.h"
+#include "SlotViewer.h"
+#include "CommClient.h"
+#include "OpenMSXConnection.h"
+#include "ConnectDialog.h"
+#include "version.h"
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -14,10 +22,92 @@
 #include <QStringList>
 #include <QPixmap>
 
-#include "version.h"
 
-DebuggerForm::DebuggerForm( QWidget* parent)
-	: QMainWindow( parent )
+
+class QueryPauseHandler : public SimpleCommand
+{
+public:
+	QueryPauseHandler(DebuggerForm& form_)
+		: SimpleCommand("set pause")
+		, form(form_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		bool checked = message.trimmed() == "on";
+		form.systemPauseAction->setChecked(checked);
+		delete this;
+	}
+private:
+	DebuggerForm& form;
+};
+
+
+class QueryBreakedHandler : public SimpleCommand
+{
+public:
+	QueryBreakedHandler(DebuggerForm& form_)
+		: SimpleCommand("debug breaked")
+		, form(form_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		form.finalizeConnection(message.trimmed() == "1");
+		delete this;
+	}
+private:
+	DebuggerForm& form;
+};
+
+
+class ListBreakPointsHandler : public SimpleCommand
+{
+public:
+	ListBreakPointsHandler(DebuggerForm& form_)
+		: SimpleCommand("debug list_bp")
+		, form(form_)
+	{
+	}
+	
+	virtual void replyOk(const QString& message)
+	{
+		form.breakpoints.setBreakpoints(message);
+		form.disasmView->update();
+		delete this;
+	}
+private:
+	DebuggerForm& form;
+};
+
+
+class CPURegRequest : public ReadDebugBlockCommand
+{
+public:
+	CPURegRequest(DebuggerForm& form_)
+		: ReadDebugBlockCommand("{CPU regs}", 0, 28, buf)
+		, form(form_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		copyData(message);
+		form.regsView->setData(buf);
+		delete this;
+	}
+
+private:
+	DebuggerForm& form;
+	unsigned char buf[28];
+};
+
+
+DebuggerForm::DebuggerForm(QWidget* parent)
+	: QMainWindow(parent)
+	, comm(CommClient::instance())
 {
 	createActions();
 	createMenus();
@@ -193,11 +283,11 @@ void DebuggerForm::createForm()
 	mainSplitter->addWidget(disasmSplitter);
 	
 	// create the disasm viewer widget
-	disasmView = new DisasmViewer;
+	disasmView = new DisasmViewer();
 	disasmSplitter->addWidget(createNamedWidget(tr("Code view:"), disasmView));
 	
 	// create the memory view widget
-	hexView = new HexViewer;
+	hexView = new HexViewer();
 	disasmSplitter->addWidget(createNamedWidget(tr("Main memory:"), hexView));
 	
 	// * create the right side of the gui
@@ -220,23 +310,23 @@ void DebuggerForm::createForm()
 	topLayout->addWidget(createNamedWidget(tr("CPU registers:"), regsView), 0);
 	
 	// create flags viewer
-	flagsView = new FlagsViewer;
+	flagsView = new FlagsViewer();
 	topLayout->addWidget(createNamedWidget(tr("Flags:"), flagsView), 0);
 
 	// create stack viewer
-	stackView = new StackViewer;
+	stackView = new StackViewer();
 	topLayout->addWidget(createNamedWidget(tr("Stack:"), stackView), 0);
 
 	// create slot viewer
-	slotView = new SlotViewer;
+	slotView = new SlotViewer();
 	topLayout->addWidget(createNamedWidget(tr("Memory layout:"), slotView), 0);
 
 	// create spacer on the right
-	w2 = new QWidget;
+	w2 = new QWidget();
 	topLayout->addWidget(w2, 1);
 
 	// create rest
-	w2 = new QWidget;
+	w2 = new QWidget();
 	rightLayout->addWidget(w2, 1);
 	
 	disasmView->setEnabled(FALSE);
@@ -257,25 +347,10 @@ void DebuggerForm::createForm()
 
 	connect(&comm, SIGNAL( connectionReady() ),
 	               SLOT( initConnection() ) );
-	connect(&comm, SIGNAL( dataTransferReady(CommRequest *) ),
-	               SLOT( dataTransfered(CommRequest *) ) );
-	connect(&comm, SIGNAL( dataTransferCancelled(CommRequest *) ),
-	               SLOT( cancelTransfer(CommRequest *) ) );
-	connect(&comm, SIGNAL( updateReceived(UpdateMessage *) ),
-	               SLOT( handleUpdate(UpdateMessage *) ) );
+	connect(&comm, SIGNAL(updateParsed(const QString&, const QString&, const QString&)),
+	               SLOT(handleUpdate(const QString&, const QString&, const QString&)));
 	connect(&comm, SIGNAL( connectionTerminated() ),
 	               SLOT( connectionClosed() ) );
-	connect(&comm, SIGNAL( errorOccured( CommClient::ConnectionError ) ),
-	               SLOT( handleError( CommClient::ConnectionError ) ) );
-
-	connect(disasmView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
-	        &comm,      SLOT( getDebuggableData(CommDebuggableRequest *) ) );
-	connect(hexView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
-	        &comm,   SLOT( getDebuggableData(CommDebuggableRequest *) ) );
-	connect(stackView, SIGNAL( needUpdate(CommDebuggableRequest *) ), 
-	        &comm,     SLOT( getDebuggableData(CommDebuggableRequest *) ) );
-	connect(slotView, SIGNAL( needUpdate(CommCommandRequest *) ), 
-	        &comm,    SLOT( getCommandResult(CommCommandRequest *) ) );
 
 	// init main memory
 	// added four bytes as runover buffer for dasm
@@ -292,31 +367,28 @@ void DebuggerForm::createForm()
 
 DebuggerForm::~DebuggerForm()
 {
-	delete [] mainMemory;
+	delete[] mainMemory;
 }
 
 void DebuggerForm::initConnection()
 {
-	CommCommandRequest *reqPause = new CommCommandRequest(INIT_PAUSE, "set pause");
-	comm.getCommandResult(reqPause);
-	CommCommandRequest *reqBreak = new CommCommandRequest(INIT_BREAK, "debug breaked");
-	comm.getCommandResult(reqBreak);
-	CommCommandRequest *reqUpdateStatus = new CommCommandRequest(DISCARD_RESULT_ID, "update enable status");
-	comm.getCommandResult(reqUpdateStatus);
-	
+	comm.sendCommand(new QueryPauseHandler(*this));
+	comm.sendCommand(new QueryBreakedHandler(*this));
+
+	comm.sendCommand(new SimpleCommand("update enable status"));
+
 	// define 'debug_bin2hex' proc for internal use
-	CommCommandRequest* bin2hex = new CommCommandRequest(DISCARD_RESULT_ID,
+	comm.sendCommand(new SimpleCommand(
 		"proc debug_bin2hex { input } {\n"
 		"  set result \"\"\n"
 		"  foreach i [split $input {}] {\n"
 		"    append result [format %02X [scan $i %c]] \"\"\n"
 		"  }\n"
 		"  return $result\n"
-		"}\n");
-	comm.getCommandResult(bin2hex);
+		"}\n"));
 
 	// define 'debug_memmapper' proc for internal use
-	CommCommandRequest* memmap = new CommCommandRequest(DISCARD_RESULT_ID,
+	comm.sendCommand(new SimpleCommand(
 		"proc debug_memmapper { } {\n"
 		"  set result \"\"\n"
 		"  for { set page 0 } { $page &lt; 4 } { incr page } {\n"
@@ -340,9 +412,7 @@ void DebuggerForm::initConnection()
 		"    }\n"
 		"  }\n"
 		"  return $result\n"
-		"}\n");
-	comm.getCommandResult(memmap);
-
+		"}\n"));
 }
 
 void DebuggerForm::connectionClosed()
@@ -365,92 +435,13 @@ void DebuggerForm::connectionClosed()
 	slotView->setEnabled(FALSE);
 }
 
-void DebuggerForm::handleError( CommClient::ConnectionError error )
-{
-	QString msg;
-	
-	switch(error) {
-		case CommClient::CONNECTION_REFUSED:
-			msg = tr("A connection could not be established. Make sure openMSX is "
-			         "started and listening on \"localhost:9938\".");
-			break;
-		case CommClient::CONNECTION_CLOSED:
-			msg = tr("The connection was closed prematurely.");
-			break;
-		case CommClient::HOST_ADDRESS_NOT_FOUND:
-			msg = tr("The hostname could not be found. Please change the address"
-			         " and try again.");
-			break;
-		case CommClient::UNSPECIFIED_SOCKET_ERROR:
-			msg = tr("A socket error occurred. This should not happen! If this "
-			         "problem can be reproduced, please submit a bug report "
-			         "describing the step to get this error.");
-			break;
-		case CommClient::NETWORK_ERROR:
-			msg = tr("A network error occurred. This usually means that the "
-			         "connection to openMSX was interrupted by a network "
-			         "problem.");
-			break;
-		case CommClient::UNKNOWN_ERROR:
-			msg = tr("An unknown error occurred. This should not happen! If this "
-			         "problem can be reproduced, please submit a bug report "
-			         "describing the step to get this error.");
-			break;
-	}
-	QMessageBox::critical(this, "Connection error!", msg, QMessageBox::Ok, QMessageBox::NoButton);
-	comm.closeConnection();
-	connectionClosed();
-}
-
-void DebuggerForm::dataTransfered(CommRequest *r) 
-{
-	switch(r->sourceID) {
-		case DISCARD_RESULT_ID:
-			delete r;
-			break;
-		case DISASM_MEMORY_REQ_ID:
-			disasmView->memoryUpdated( (CommMemoryRequest *)r );
-			break;
-		case CPUREG_REQ_ID:
-		{
-			CommDebuggableRequest *dr = (CommDebuggableRequest *)r;
-			regsView->setData( dr->target );
-			delete dr->target;
-			delete dr;
-			break;
-		}
-		case HEXDATA_MEMORY_REQ_ID:
-			hexView->hexdataTransfered( (CommDebuggableRequest *)r );
-			break;
-		case STACK_MEMORY_REQ_ID:
-			stackView->memdataTransfered( (CommDebuggableRequest *)r );
-			break;
-		case INIT_PAUSE:
-			systemPauseAction->setChecked( ((CommCommandRequest *)r)->result.trimmed()=="on" );
-			delete r;
-			break;
-		case INIT_BREAK:
-			finalizeConnection( ((CommCommandRequest *)r)->result.trimmed()=="1" );
-			delete r;
-			break;
-		case BREAKPOINTS_REQ_ID:
-			breakpoints.setBreakpoints( ((CommCommandRequest *)r)->result );
-			disasmView->update();
-			delete r;
-			break;
-		case SLOTS_REQ_ID:
-			slotView->slotsUpdated( (CommCommandRequest *)r );
-			break;
-	}
-}
-
 void DebuggerForm::finalizeConnection(bool halted)
 {
 	systemDisconnectAction->setEnabled(TRUE);
 	systemPauseAction->setEnabled(TRUE);
 	if(halted){
 		setBreakMode();
-		breakOccured(0);
+		breakOccured();
 	}else
 		setRunMode();
 
@@ -462,46 +453,20 @@ void DebuggerForm::finalizeConnection(bool halted)
 	slotView->setEnabled(TRUE);
 }
 
-void DebuggerForm::cancelTransfer(CommRequest *r) 
+void DebuggerForm::handleUpdate(const QString& type, const QString& name,
+                                const QString& message)
 {
-	switch(r->sourceID) {
-		case DISASM_MEMORY_REQ_ID:
-			disasmView->updateCancelled( (CommMemoryRequest *)r );
-			break;
-		case CPUREG_REQ_ID:
-			delete ((CommDebuggableRequest *)r)->target;
-			delete r;
-			break;
-		case HEXDATA_MEMORY_REQ_ID:
-			hexView->transferCancelled( (CommDebuggableRequest *)r );
-			break;
-		case STACK_MEMORY_REQ_ID:
-			stackView->transferCancelled( (CommDebuggableRequest *)r );
-			break;
-		case INIT_PAUSE:
-		case INIT_BREAK:
-		case DISCARD_RESULT_ID:
-		case BREAKPOINTS_REQ_ID:
-		case SLOTS_REQ_ID:
-			delete r;
-			break;
-	}
-}
-
-void DebuggerForm::handleUpdate(UpdateMessage *m)
-{
-	if(m->type == "status") 
-		if(m->name == "cpu") {
-			if(m->result == "suspended") {
-				breakOccured( m->result.toShort(0,0) );
+	if (type == "status") {
+		if (name == "cpu") {
+			if (message == "suspended") {
+				breakOccured();
 			} else {
 				setRunMode();
 			}
-		} else if(m->name == "paused") {
-			pauseStatusChanged(m->result == "true");
+		} else if (name == "paused") {
+			pauseStatusChanged(message == "true");
 		}
-
-	delete m;
+	}
 }
 
 void DebuggerForm::pauseStatusChanged(bool isPaused) 
@@ -509,20 +474,16 @@ void DebuggerForm::pauseStatusChanged(bool isPaused)
 	systemPauseAction->setChecked(isPaused);
 }
 
-void DebuggerForm::breakOccured(quint16)
+void DebuggerForm::breakOccured()
 {
 	setBreakMode();
-
-	// refresh breakpoints 
-	CommCommandRequest *req = new CommCommandRequest(BREAKPOINTS_REQ_ID, "debug list_bp");
-	comm.getCommandResult(req);
+	comm.sendCommand(new ListBreakPointsHandler(*this));
 
 	// update registers 
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
-	CommDebuggableRequest *regs = new CommDebuggableRequest(CPUREG_REQ_ID, "{CPU regs}", 0, 28, NULL, 0);
-	regs->target = (unsigned char *)new Z80Registers;
-	comm.getDebuggableData(regs);
+	CPURegRequest *regs = new CPURegRequest(*this);
+	comm.sendCommand(regs);
 	
 	// refresh memory viewer
 	hexView->refresh();
@@ -556,12 +517,9 @@ void DebuggerForm::setRunMode()
 void DebuggerForm::systemConnect()
 {
 	systemConnectAction->setEnabled(FALSE);
-	
-	std::vector<std::string> servers;
-	collectServers(servers);
-	if (!servers.empty()) {
-		// TODO let user pick one if there is more than one
-		comm.connectToOpenMSX(openSocket(servers.front()));
+	OpenMSXConnection* connection = ConnectDialog::getConnection(this);
+	if (connection) {
+		comm.connectToOpenMSX(connection);
 	}
 }
 
@@ -572,74 +530,63 @@ void DebuggerForm::systemDisconnect()
 
 void DebuggerForm::systemPause()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "set pause ");
-	if( systemPauseAction->isChecked() )
-		r->command.append("true");
-	else
-		r->command.append("false");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand(QString("set pause ") +
+	                    (systemPauseAction->isChecked() ? "true" : "false")));
 }
 
 void DebuggerForm::executeBreak()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "debug break");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand("debug break"));
 }
 
 void DebuggerForm::executeRun()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "debug cont");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand("debug cont"));
 	setRunMode();
 }
 
 void DebuggerForm::executeStep()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "debug step");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand("debug step"));
 	setRunMode();
 }
 
 void DebuggerForm::executeStepOver()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "step_over");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand("step_over"));
 	setRunMode();
 }
 
 void DebuggerForm::executeRunTo()
 {
-	CommCommandRequest *r = new CommCommandRequest(DISCARD_RESULT_ID, "");
-	r->command.setNum(disasmView->cursorAddr, 16);
-	r->command.prepend("run_to 0x");
-	comm.getCommandResult(r);
+	comm.sendCommand(new SimpleCommand(
+	                  "run_to " + QString::number(disasmView->cursorAddr)));
 	setRunMode();
 }
 
 void DebuggerForm::executeStepOut()
 {
+	// TODO
 }
 
 void DebuggerForm::breakpointToggle(int addr)
 {
-	// set breakpoint
+	// TODO move this test out of this function???
+	if (addr < 0) addr = disasmView->cursorAddr;
+	
 	QString cmd;
-	int address = (addr>=0)?addr:disasmView->cursorAddr;
-	
-	if( breakpoints.isBreakpoint(address) )
-		cmd = "debug remove_bp " + breakpoints.idString(address);
-	else {
-		int p = (address & 0xC000) >> 14;
-		cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }", address, memLayout.primarySlot[p],
-		            memLayout.secondarySlot[p], memLayout.mapperSegment[p]);
+	if (breakpoints.isBreakpoint(addr)) {
+		cmd = "debug remove_bp " + breakpoints.idString(addr);
+	} else {
+		int p = (addr & 0xC000) >> 14;
+		cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }",
+		            addr, memLayout.primarySlot[p],
+		            memLayout.secondarySlot[p],
+		            memLayout.mapperSegment[p]);
 	}
-	
-	CommCommandRequest *req = new CommCommandRequest(DISCARD_RESULT_ID, cmd.toAscii() );
+	comm.sendCommand(new SimpleCommand(cmd));
 
-	comm.getCommandResult(req);
-	// refresh breakpoints 
-	req = new CommCommandRequest(BREAKPOINTS_REQ_ID, "debug list_bp");
-	comm.getCommandResult(req);
+	comm.sendCommand(new ListBreakPointsHandler(*this));
 }
 
 void DebuggerForm::showAbout()

@@ -1,10 +1,32 @@
 // $Id$
 
 #include "SlotViewer.h"
+#include "DebuggerData.h"
+#include "OpenMSXConnection.h"
+#include "CommClient.h"
 #include <QPainter>
-#include <QPixmap>
 #include <QPaintEvent>
 #include <QStyleOptionHeader>
+
+
+class DebugMemMapperHandler : public SimpleCommand
+{
+public:
+	DebugMemMapperHandler(SlotViewer& viewer_)
+		: SimpleCommand("debug_memmapper")
+		, viewer(viewer_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		viewer.slotsUpdated(message);
+		delete this;
+	}
+private:
+	SlotViewer& viewer;
+};
+
 
 SlotViewer::SlotViewer( QWidget* parent )
 	: QFrame( parent )
@@ -154,9 +176,7 @@ void SlotViewer::setSizes()
 
 void SlotViewer::refresh()
 {
-	CommCommandRequest *req = new CommCommandRequest(SLOTS_REQ_ID, "debug_memmapper");
-	
-	emit needUpdate(req);
+	CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
 }
 
 void SlotViewer::setMemoryLayout(MemoryLayout *ml)
@@ -164,30 +184,30 @@ void SlotViewer::setMemoryLayout(MemoryLayout *ml)
 	memLayout = ml;
 }
 
-void SlotViewer::slotsUpdated(CommCommandRequest *r)
+void SlotViewer::slotsUpdated(const QString& message)
 {
-	QList<QByteArray> lines = r->result.split('\n');
+	QStringList lines = message.split('\n');
 
 	// parse page slots and segments
-	for(int p=0; p<4; p++) {
+	for (int p = 0; p < 4; ++p) {
 		slotsChanged[p] = (memLayout->primarySlot[p] != lines[p*2][0]) ||
 		                  (memLayout->secondarySlot[p] != lines[p*2][1]);
-		memLayout->primarySlot[p] = lines[p*2][0];
-		memLayout->secondarySlot[p] = lines[p*2][1];
+		memLayout->primarySlot[p] = lines[p*2][0].toAscii();
+		memLayout->secondarySlot[p] = lines[p*2][1].toAscii();
 		segmentsChanged[p] = memLayout->mapperSegment[p] != lines[p*2+1].toUShort();
 		memLayout->mapperSegment[p] = lines[p*2+1].toUShort();
 	}
 	// parse slot layout
-	int l=8;
-	for(int ps=0; ps<4; ps++) {
-		memLayout->isSubslotted[ps] = lines[l++][0]=='1';
-		if(memLayout->isSubslotted[ps]) {
-			for(int ss=0; ss<4; ss++)
+	int l = 8;
+	for (int ps = 0; ps < 4; ++ps) {
+		memLayout->isSubslotted[ps] = lines[l++][0] == '1';
+		if (memLayout->isSubslotted[ps]) {
+			for (int ss = 0; ss < 4; ++ss) {
 				memLayout->mapperSize[ps][ss] = lines[l++].toUShort();
+			}
 		} else {
 			memLayout->mapperSize[ps][0] = lines[l++].toUShort();
 		}
 	}
-	delete r;
 	update();
 }

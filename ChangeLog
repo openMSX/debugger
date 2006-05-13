@@ -1,5 +1,10 @@
 $Id$
 
+2006-05-12 Wouter Vermaelen <wouter.vermaelen@scarlet.be>
+	* Replaced connection code:
+	   - this code _should_ also work on windows
+	   - still work in progress
+
 2006-05-10 Maarten ter Huurne <maarten@treewalker.org>
 	* Got new build system working on OS X.
 

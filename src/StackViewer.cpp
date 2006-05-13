@@ -1,22 +1,55 @@
 // $Id$
 
 #include "StackViewer.h"
+#include "OpenMSXConnection.h"
+#include "CommClient.h"
+#include <QScrollBar>
+#include <QPaintEvent>
 #include <QPainter>
-#include <QPixmap>
 #include <cmath>
 
-StackViewer::StackViewer( QWidget* parent )
-	: QFrame( parent )
+class StackRequest : public ReadDebugBlockCommand
+{
+public:
+	StackRequest(unsigned offset_, unsigned size,
+	           unsigned char* target, StackViewer& viewer_)
+		: ReadDebugBlockCommand("memory", offset_, size, target)
+		, offset(offset_)
+		, viewer(viewer_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		copyData(message);
+		viewer.memdataTransfered(this);
+	}
+
+	virtual void cancel()
+	{
+		viewer.transferCancelled(this);
+	}
+
+	// TODO public members are ugly!!
+	unsigned offset;
+
+private:
+	StackViewer& viewer;
+};
+
+
+StackViewer::StackViewer(QWidget* parent)
+	: QFrame(parent)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
-	setFont(QFont( "Courier New", 12));
+	setFont(QFont("Courier New", 12));
 
 	stackPointer = 0;
 	topAddress = 0;
-	waitingForData = FALSE;
+	waitingForData = false;
 	
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->hide();
@@ -112,19 +145,20 @@ void StackViewer::setData(unsigned char *memPtr, int memLength)
 
 void StackViewer::setLocation(int addr)
 {	
-	if(!waitingForData) {
-		int start = (addr & 0xFFFFFFFE) | (stackPointer & 1);
-		int size = 2*int(ceil(visibleLines));
-
-		if(start+size>=memoryLength)
-			size = memoryLength-start;
-
-		CommDebuggableRequest *req = new CommDebuggableRequest(STACK_MEMORY_REQ_ID, "memory", 
-		                                                       start, size, memory, start);
-
-		emit needUpdate( req );	
-		waitingForData = TRUE;
+	if (waitingForData) {
+		// ignore
+		return;
 	}
+	int start = (addr & ~1) | (stackPointer & 1);
+	int size = 2*int(ceil(visibleLines));
+
+	if(start+size>=memoryLength)
+		size = memoryLength-start;
+
+	StackRequest *req = new StackRequest(start, size,
+	                                     &memory[start], *this);
+	CommClient::instance().sendCommand(req);
+	waitingForData = true;
 }
 
 void StackViewer::setStackPointer(quint16 addr)
@@ -135,18 +169,18 @@ void StackViewer::setStackPointer(quint16 addr)
 	setLocation(addr);
 }
 
-void StackViewer::memdataTransfered(CommDebuggableRequest *r)
+void StackViewer::memdataTransfered(StackRequest *r)
 {
-	topAddress = r->readOffset;
+	topAddress = r->offset;
 	update();
 	transferCancelled(r);
 }
 
-void StackViewer::transferCancelled(CommDebuggableRequest *r)
+void StackViewer::transferCancelled(StackRequest *r)
 {
-	delete r;
-	waitingForData = FALSE;
+	waitingForData = false;
 	// check whether a new value is available
-	if( (topAddress&0xFFFFFFFE) != (vertScrollBar->value()&0xFFFFFFFE) )
+	if ((topAddress & ~1) != (vertScrollBar->value() & ~1)) {
 		setLocation(vertScrollBar->value());
+	}
 }

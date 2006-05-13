@@ -4,12 +4,10 @@
 #define _STACKVIEWER_H
 
 #include <QFrame>
-#include <QScrollBar>
-#include <QPaintEvent>
-#include <QPainter>
 
-#include "CommClient.h"
-
+class StackRequest;
+class QScrollBar;
+class QPaintEvent;
 
 class StackViewer : public QFrame
 {
@@ -18,8 +16,8 @@ public:
 	StackViewer( QWidget* parent = 0 );
 
 	void setData(unsigned char *memPtr, int memLength);
-	void memdataTransfered(CommDebuggableRequest *r);
-	void transferCancelled(CommDebuggableRequest *r);
+	void memdataTransfered(StackRequest *r);
+	void transferCancelled(StackRequest *r);
 
 public slots:
 	void setLocation(int addr);
@@ -43,9 +41,6 @@ private:
 
 	void setSizes();
 	void setScrollBarValues();
-
-signals:
-	void needUpdate(CommDebuggableRequest *r);
 };
 
 #endif    // _STACKVIEWER_H

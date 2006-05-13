@@ -4,7 +4,6 @@
 #define _DEBUGGERDATA_H
 
 #include <QLinkedList>
-#include <QByteArray>
 #include <QString>
 
 
@@ -19,7 +18,6 @@ public:
 	
 	bool isSubslotted[4];
 	int mapperSize[4][4];
-	
 };
 
 
@@ -29,7 +27,7 @@ public:
 	Breakpoints() { memLayout = NULL; };
 
 	void setMemoryLayout(MemoryLayout *ml);
-	void setBreakpoints(QByteArray& str);
+	void setBreakpoints(const QString& str);
 	int breakpointCount();
 	bool isBreakpoint(quint16 addr);
 	const QString idString(quint16 addr);
@@ -38,14 +36,13 @@ public:
 	int findNextBreakpoint();
 
 private:
-
 	struct Breakpoint {
-		QByteArray id;
+		QString id;
 		quint16 address;
 		char ps;
 		char ss;
 		qint16 segment;
-		QByteArray condition;
+		QString condition;
 	};
 	typedef QLinkedList<Breakpoint> BreakpointList;
 
@@ -54,9 +51,8 @@ private:
 	
 	void parseCondition(Breakpoint& bp);
 	void insertBreakpoint(Breakpoint& bp);
-	QByteArray getNextArgument(QByteArray& data, int& pos);
+	QString getNextArgument(QString& data, int& pos);
 	bool inCurrentSlot(const Breakpoint& bp);
 };
-
 
 #endif // _DEBUGGERDATA_H

@@ -1,9 +1,43 @@
 // $Id$
 
 #include "HexViewer.h"
+#include "OpenMSXConnection.h"
+#include "CommClient.h"
+#include <QScrollBar>
+#include <QPaintEvent>
 #include <QPainter>
 #include <QPixmap>
 #include <cmath>
+
+
+class HexRequest : public ReadDebugBlockCommand
+{
+public:
+	HexRequest(const QString& debuggable, unsigned offset_, unsigned size,
+	           unsigned char* target, HexViewer& viewer_)
+		: ReadDebugBlockCommand(debuggable, offset_, size, target)
+		, offset(offset_)
+		, viewer(viewer_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		copyData(message);
+		viewer.hexdataTransfered(this);
+	}
+
+	virtual void cancel()
+	{
+		viewer.transferCancelled(this);
+	}
+
+	// TODO public data is ugly!!
+	unsigned offset;
+
+private:
+	HexViewer& viewer;
+};
 
 
 HexViewer::HexViewer( QWidget* parent )
@@ -139,22 +173,22 @@ void HexViewer::setLocation(int addr)
 		if(start+size>hexDataLength)
 			size = hexDataLength-start;
 	
-		CommDebuggableRequest *req = new CommDebuggableRequest(HEXDATA_MEMORY_REQ_ID, dataName.toAscii().data(), 
-		                                                       start, size, hexData, start);
+		HexRequest *req = new HexRequest(dataName, 
+		                                 start, size, &hexData[start], *this);
 
-		emit needUpdate( req );	
+		CommClient::instance().sendCommand(req);
 		waitingForData = TRUE;
 	}
 }
 
-void HexViewer::hexdataTransfered(CommDebuggableRequest *r)
+void HexViewer::hexdataTransfered(HexRequest *r)
 {
-	hexTopAddress = r->readOffset;
+	hexTopAddress = r->offset;
 	update();
 	transferCancelled(r);
 }
 
-void HexViewer::transferCancelled(CommDebuggableRequest *r)
+void HexViewer::transferCancelled(HexRequest *r)
 {
 	delete r;
 	waitingForData = FALSE;

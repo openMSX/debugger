@@ -5,7 +5,7 @@
 TEMPLATE = app
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += network
+QT += network xml
 TARGET = openmsx-debugger
 RESOURCES = ../resources/resources.qrc
 
@@ -22,7 +22,9 @@ HEADERS += CommClient.h \
            HexViewer.h \
            SlotViewer.h \
            version.h \
-           ServerList.h
+           ServerList.h \
+           ConnectDialog.h \
+           OpenMSXConnection.h
 SOURCES += CommClient.cpp \
            CPURegsViewer.cpp \
            Dasm.cpp \
@@ -35,4 +37,7 @@ SOURCES += CommClient.cpp \
            SlotViewer.cpp \
            DebuggerData.cpp \
            main.cpp \
-           ServerList.cpp
+           ServerList.cpp \
+           ConnectDialog.cpp \
+           OpenMSXConnection.cpp
+FORMS +=   ConnectDialog.ui

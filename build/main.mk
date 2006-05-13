@@ -122,6 +122,7 @@ RESOURCES_FULL:=$(RESOURCES_PATH)/resources.qrc
 SOURCES_FULL:=
 HEADERS_FULL:=
 MOC_HDR_FULL:=
+UI_FULL:=
 DIST_FULL:=
 # Include root node.
 CURDIR:=
@@ -131,6 +132,7 @@ include node.mk
 SOURCES_FULL:=$(SOURCES_FULL:./%=%)
 HEADERS_FULL:=$(HEADERS_FULL:./%=%)
 MOC_HDR_FULL:=$(MOC_HDR_FULL:./%=%)
+UI_FULL:=$(UI_FULL:./%=%)
 DIST_FULL:=$(DIST_FULL:./%=%)
 # Apply subset to sources list.
 SOURCES_FULL:=$(filter $(SOURCES_PATH)/$(OPENMSX_SUBSET)%,$(SOURCES_FULL))
@@ -153,7 +155,11 @@ MOC_SRC_FULL:=$(patsubst \
 RES_SRC_FULL:=$(patsubst \
 	$(RESOURCES_PATH)/%.qrc,$(GEN_SRC_PATH)/qrc_%.cpp,$(RESOURCES_FULL) \
 	)
+UI_HDR_FULL:=$(patsubst \
+	$(SOURCES_PATH)/%.ui,$(GEN_SRC_PATH)/ui_%.h,$(UI_FULL) \
+	)
 GEN_SRC_FULL:=$(MOC_SRC_FULL) $(RES_SRC_FULL)
+HEADERS_FULL+=$(UI_HDR_FULL)
 
 SOURCES:=$(SOURCES_FULL:$(SOURCES_PATH)/%.cpp=%)
 GEN_SRC:=$(GEN_SRC_FULL:$(GEN_SRC_PATH)/%.cpp=%)
@@ -197,13 +203,14 @@ all: $(BINARY_FULL)
 endif
 
 # Temporarily(?) hardcoded:
-QT_BASE:=/opt/qt4
-QT_COMPONENTS:=Core Gui Network
+QT_BASE:=/usr/share/qt4
+QT_COMPONENTS:=Core Gui Network Xml
 CXX:=g++
-CXXFLAGS:=
+CXXFLAGS:= -g
 COMPILE_FLAGS:= \
 	$(addprefix -I$(QT_BASE)/include/Qt,$(QT_COMPONENTS)) \
-	-I$(QT_BASE)/include
+	-I$(QT_BASE)/include \
+	-I$(GEN_SRC_PATH)
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_BASE)/lib $(addprefix -framework Qt,$(QT_COMPONENTS))
 else
@@ -217,11 +224,20 @@ $(MOC_SRC_FULL): $(GEN_SRC_PATH)/moc_%.cpp: $(SOURCES_PATH)/%.h
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/moc -o $@ $<
 
+debug:
+	echo "$(UI_FULL) $(GEN_SRC_PATH) $(SOURCES_PATH)"
+
 # Generate resource source.
 $(RES_SRC_FULL): $(GEN_SRC_PATH)/qrc_%.cpp: $(RESOURCES_PATH)/%.qrc
 	@echo "Generating $(patsubst $(GEN_SRC_PATH)/%,%,$@)..."
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/rcc -name $(<:$(RESOURCES_PATH)/%.qrc=%) $< -o $@
+
+# Generate ui files
+$(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
+	@echo "Generating $(patsubst $(GEN_SRC_PATH)/%,%,$@)..."
+	@mkdir -p $(@D)
+	@$(QT_BASE)/bin/uic -o $@ $<
 
 # Compile and generate dependency files in one go.
 SRC_DEPEND_SUBST=$(patsubst $(SOURCES_PATH)/%.cpp,$(DEPEND_PATH)/%.d,$<)

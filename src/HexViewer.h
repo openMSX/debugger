@@ -4,12 +4,10 @@
 #define _HEXVIEWER_H
 
 #include <QFrame>
-#include <QScrollBar>
-#include <QPaintEvent>
-#include <QPainter>
 
-#include "CommClient.h"
-
+class HexRequest;
+class QScrollBar;
+class QPaintEvent;
 
 class HexViewer : public QFrame
 {
@@ -18,8 +16,8 @@ public:
 	HexViewer( QWidget* parent = 0 );
 
 	void setData(const char *name, unsigned char *datPtr, int datLength);
-	void hexdataTransfered(CommDebuggableRequest *r);
-	void transferCancelled(CommDebuggableRequest *r);
+	void hexdataTransfered(HexRequest *r);
+	void transferCancelled(HexRequest *r);
 	void refresh();
 
 public slots:
@@ -30,7 +28,6 @@ protected:
 	void paintEvent(QPaintEvent *e);
 
 private:
-//	QScrollBar *horScrollBar;
 	QScrollBar *vertScrollBar;
 
 	int frameL, frameR, frameT, frameB;
@@ -39,15 +36,11 @@ private:
 	bool waitingForData;
 
 	QString dataName;
-//	int cursorAddr;
 	int hexTopAddress;
 	unsigned char *hexData;
 	int hexDataLength;
 
 	void setScrollBarValues();
-
-signals:
-	void needUpdate(CommDebuggableRequest *r);
 };
 
 #endif    // _HEXVIEWER_H

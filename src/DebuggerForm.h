@@ -3,6 +3,7 @@
 #ifndef _DEBUGGERFORM_H
 #define _DEBUGGERFORM_H
 
+#include "DebuggerData.h"
 #include <QMainWindow>
 #include <QAction>
 #include <QMenu>
@@ -10,15 +11,13 @@
 #include <QSplitter>
 #include <QMap>
 
-#include "DisasmViewer.h"
-#include "HexViewer.h"
-#include "CPURegsViewer.h"
-#include "FlagsViewer.h"
-#include "CommClient.h"
-#include "StackViewer.h"
-#include "SlotViewer.h"
-#include "DebuggerData.h"
-
+class DisasmViewer;
+class HexViewer;
+class CPURegsViewer;
+class FlagsViewer;
+class StackViewer;
+class SlotViewer;
+class CommClient;
 
 class DebuggerForm : public QMainWindow
 {
@@ -65,7 +64,7 @@ private:
 	StackViewer *stackView;
 	SlotViewer *slotView;
 
-	CommClient comm;
+	CommClient& comm;
 	Breakpoints breakpoints;
 	MemoryLayout memLayout;
 	unsigned char *mainMemory;
@@ -79,9 +78,11 @@ private:
 
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
-	void breakOccured(quint16);
+	void breakOccured();
 	void setBreakMode();
 	void setRunMode();
+
+	void refreshBreakpoints();
 
 private slots:
 	void systemConnect();
@@ -96,12 +97,13 @@ private slots:
 	void breakpointToggle(int addr = -1);
 
 	void initConnection();
-	void dataTransfered(CommRequest *r);
-	void cancelTransfer(CommRequest *r);
-	void handleUpdate(UpdateMessage *m);
+	void handleUpdate(const QString& type, const QString& name, const QString& message);
 	void connectionClosed();
-	void handleError( CommClient::ConnectionError error );
 
+	friend class QueryPauseHandler;
+	friend class QueryBreakedHandler;
+	friend class ListBreakPointsHandler;
+	friend class CPURegRequest;
 };
 
 #endif    // _DEBUGGERFORM_H

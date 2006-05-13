@@ -5,8 +5,7 @@
 
 #include <QFrame>
 
-#include "CommClient.h"
-#include "DebuggerData.h"
+class MemoryLayout;
 
 class SlotViewer : public QFrame
 {
@@ -16,7 +15,7 @@ public:
 
 	void refresh();
 	void setMemoryLayout(MemoryLayout *ml);
-	void slotsUpdated(CommCommandRequest *r);
+	void slotsUpdated(const QString& message);
 
 protected:
 	void resizeEvent(QResizeEvent *e);
@@ -33,9 +32,6 @@ private:
 	bool segmentsChanged[4];
 
 	void setSizes();
-
-signals:
-	void needUpdate(CommCommandRequest *r);
 };
 
 #endif    // _SLOTVIEWER_H
