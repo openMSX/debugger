@@ -17,8 +17,8 @@
 # ===============
 
 # Logical targets which require dependency files.
-#DEPEND_TARGETS:=all default install run bindist
-DEPEND_TARGETS:=all default
+#DEPEND_TARGETS:=all app default install run bindist
+DEPEND_TARGETS:=all app default
 # Logical targets which do not require dependency files.
 #NODEPEND_TARGETS:=clean config probe
 NODEPEND_TARGETS:=clean
@@ -40,6 +40,45 @@ BUILD_BASE:=derived
 MAKE_PATH:=build
 
 
+# Platforms
+# =========
+
+ifeq ($(origin OPENMSX_TARGET_OS),environment)
+# Do not perform autodetection if platform was specified by the user.
+else # OPENMSX_TARGET_OS not from environment
+
+DETECTSYS_PATH:=$(BUILD_BASE)/detectsys
+DETECTSYS_MAKE:=$(DETECTSYS_PATH)/detectsys.mk
+DETECTSYS_SCRIPT:=$(MAKE_PATH)/detectsys.sh
+
+-include $(DETECTSYS_MAKE)
+
+$(DETECTSYS_MAKE): $(DETECTSYS_SCRIPT)
+	@echo "Autodetecting native system:"
+	@mkdir -p $(@D)
+	@sh $< > $@
+
+endif # OPENMSX_TARGET_OS
+
+PLATFORM:=
+ifneq ($(origin OPENMSX_TARGET_OS),undefined)
+PLATFORM:=$(OPENMSX_TARGET_OS)
+endif
+
+# Ignore rest of Makefile if autodetection was not performed yet.
+# Note that the include above will force a reload of the Makefile.
+ifneq ($(PLATFORM),)
+
+# Load OS specific settings.
+#$(call DEFCHECK,OPENMSX_TARGET_OS)
+#include $(MAKE_PATH)/platform-$(OPENMSX_TARGET_OS).mk
+# Check that all expected variables were defined by OS specific Makefile:
+# - executable file name extension
+#$(call DEFCHECK,EXEEXT)
+# - platform supports symlinks?
+#$(call BOOLCHECK,USE_SYMLINK)
+
+
 # Paths
 # =====
 
@@ -49,7 +88,21 @@ BUILD_PATH:=$(BUILD_BASE)
 SOURCES_PATH:=src
 RESOURCES_PATH:=resources
 
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+# Note: Make cannot deal with spaces inside paths: it will even see BINARY_FULL
+#       as two files instead of one. Therefore, we use an underscore during
+#       development and we'll have to rename the app folder for the release
+#       versions.
+APP_SUPPORT_PATH:=build/package-darwin
+APP_PATH:=$(BUILD_PATH)/openMSX_Debugger.app
+APP_PLIST:=$(APP_PATH)/Contents/Info.plist
+APP_ICON:=$(APP_PATH)/Contents/Resources/openmsx-logo.icns
+APP_RESOURCES:=$(APP_ICON)
+BINARY_PATH:=$(APP_PATH)/Contents/MacOS
+PKGINFO_FULL:=$(APP_PATH)/PkgInfo
+else
 BINARY_PATH:=$(BUILD_PATH)/bin
+endif
 #BINARY_FILE:=openmsx-debugger$(EXEEXT)
 BINARY_FILE:=openmsx-debugger
 #ifeq ($(VERSION_EXEC),true)
@@ -124,12 +177,24 @@ ifneq ($(filter $(DEPEND_TARGETS),$(MAKECMDGOALS)),)
 endif
 
 # Clean up build tree of current flavour.
+# We don't have flavours (yet?), so clean up everything except "detectsys".
 clean:
 	@echo "Cleaning up..."
-	@rm -rf $(BUILD_PATH)
+	@rm -rf $(OBJECTS_PATH)
+	@rm -rf $(DEPEND_PATH)
+	@rm -rf $(GEN_SRC_PATH)
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+	@rm -rf $(APP_PATH)
+else
+	@rm -rf $(BINARY_PATH)
+endif
 
 # Default target.
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+all: app
+else
 all: $(BINARY_FULL)
+endif
 
 # Temporarily(?) hardcoded:
 QT_BASE:=/opt/qt4
@@ -139,9 +204,12 @@ CXXFLAGS:=
 COMPILE_FLAGS:= \
 	$(addprefix -I$(QT_BASE)/include/Qt,$(QT_COMPONENTS)) \
 	-I$(QT_BASE)/include
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+LINK_FLAGS:=-F$(QT_BASE)/lib $(addprefix -framework Qt,$(QT_COMPONENTS))
+else
 LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/lib -L$(QT_BASE)/lib $(addprefix -lQt,$(QT_COMPONENTS))
+endif
 DEPEND_FLAGS:=
-USE_SYMLINK:=true
 
 # Generate Meta Object Compiler sources.
 $(MOC_SRC_FULL): $(GEN_SRC_PATH)/moc_%.cpp: $(SOURCES_PATH)/%.h
@@ -182,14 +250,32 @@ $(DEPEND_FULL):
 # Link executable.
 $(BINARY_FULL): $(OBJECTS_FULL) $(GEN_OBJ_FULL)
 ifeq ($(OPENMSX_SUBSET),)
-	@echo "Linking $(notdir $@)..."
+	@echo "Linking $(@F)..."
 	@mkdir -p $(@D)
 	@$(CXX) -o $@ $(CXXFLAGS) $^ $(LINK_FLAGS)
-  ifeq ($(USE_SYMLINK),true)
-	@ln -sf $(@:$(BUILD_BASE)/%=%) $(BUILD_BASE)/$(BINARY_FILE)
-  else
-	@cp $@ $(BUILD_BASE)/$(BINARY_FILE)
-  endif
 else
 	@echo "Not linking $(notdir $@) because only a subset was built."
 endif
+
+# Application folder.
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+app: $(BINARY_FULL) $(PKGINFO_FULL) $(APP_PLIST) $(APP_RESOURCES)
+
+$(PKGINFO_FULL):
+	@echo "Generating $(@F)..."
+	@mkdir -p $(@D)
+	@echo "APPLoMXD" > $@
+
+$(APP_PLIST): $(APP_PATH)/Contents/%: $(APP_SUPPORT_PATH)/%
+	@echo "Generating $(@F)..."
+	@mkdir -p $(@D)
+	@sed -e 's/%ICON%/$(notdir $(APP_ICON))/' \
+		-e 's/%VERSION%/$(PACKAGE_DETAILED_VERSION)/' < $< > $@
+
+$(APP_RESOURCES): $(APP_PATH)/Contents/Resources/%: $(APP_SUPPORT_PATH)/%
+	@echo "Copying $(@F)..."
+	@mkdir -p $(@D)
+	@cp $< $@
+endif
+
+endif # PLATFORM

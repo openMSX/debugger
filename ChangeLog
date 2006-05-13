@@ -1,5 +1,8 @@
 $Id$
 
+2006-05-10 Maarten ter Huurne <maarten@treewalker.org>
+	* Got new build system working on OS X.
+
 2006-04-14 Maarten ter Huurne <maarten@treewalker.org>
 	* Made a build system similar to openMSX, on request of Edwin.
 	  It's still in the early stages, but it can produce a working
