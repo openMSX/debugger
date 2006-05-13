@@ -159,7 +159,6 @@ UI_HDR_FULL:=$(patsubst \
 	$(SOURCES_PATH)/%.ui,$(GEN_SRC_PATH)/ui_%.h,$(UI_FULL) \
 	)
 GEN_SRC_FULL:=$(MOC_SRC_FULL) $(RES_SRC_FULL)
-HEADERS_FULL+=$(UI_HDR_FULL)
 
 SOURCES:=$(SOURCES_FULL:$(SOURCES_PATH)/%.cpp=%)
 GEN_SRC:=$(GEN_SRC_FULL:$(GEN_SRC_PATH)/%.cpp=%)
@@ -203,7 +202,7 @@ all: $(BINARY_FULL)
 endif
 
 # Temporarily(?) hardcoded:
-QT_BASE:=/usr/share/qt4
+QT_BASE:=/opt/qt4
 QT_COMPONENTS:=Core Gui Network Xml
 CXX:=g++
 CXXFLAGS:= -g
@@ -220,24 +219,27 @@ DEPEND_FLAGS:=
 
 # Generate Meta Object Compiler sources.
 $(MOC_SRC_FULL): $(GEN_SRC_PATH)/moc_%.cpp: $(SOURCES_PATH)/%.h
-	@echo "Generating $(patsubst $(GEN_SRC_PATH)/%,%,$@)..."
+	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/moc -o $@ $<
 
-debug:
-	echo "$(UI_FULL) $(GEN_SRC_PATH) $(SOURCES_PATH)"
-
 # Generate resource source.
 $(RES_SRC_FULL): $(GEN_SRC_PATH)/qrc_%.cpp: $(RESOURCES_PATH)/%.qrc
-	@echo "Generating $(patsubst $(GEN_SRC_PATH)/%,%,$@)..."
+	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/rcc -name $(<:$(RESOURCES_PATH)/%.qrc=%) $< -o $@
 
-# Generate ui files
+# Generate ui files.
 $(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
-	@echo "Generating $(patsubst $(GEN_SRC_PATH)/%,%,$@)..."
+	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/uic -o $@ $<
+# Dependencies that enforce the creation of ui files before compilation.
+# This is based on the assumption that ui files only exist as part of a
+# file triplet <name>.ui, <name>.h, <name>.cpp.
+HEADERS_WITH_UI:=$(UI_HDR_FULL:$(GEN_SRC_PATH)/ui_%.h=$(SOURCES_PATH)/%.h)
+$(HEADERS_WITH_UI): $(SOURCES_PATH)/%.h: $(GEN_SRC_PATH)/ui_%.h
+$(HEADERS_WITH_UI:%.h=%.cpp): $(SOURCES_PATH)/%.cpp: $(SOURCES_PATH)/%.h
 
 # Compile and generate dependency files in one go.
 SRC_DEPEND_SUBST=$(patsubst $(SOURCES_PATH)/%.cpp,$(DEPEND_PATH)/%.d,$<)
