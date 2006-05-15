@@ -11,8 +11,11 @@
 #include "OpenMSXConnection.h"
 #include "ConnectDialog.h"
 #include "version.h"
+#include <QAction>
 #include <QMessageBox>
+#include <QMenu>
 #include <QMenuBar>
+#include <QToolBar>
 #include <QStatusBar>
 #include <QWidget>
 #include <QLabel>
@@ -20,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QString>
 #include <QStringList>
+#include <QSplitter>
 #include <QPixmap>
 
 

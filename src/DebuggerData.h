@@ -1,21 +1,20 @@
 // $Id$
 
-#ifndef _DEBUGGERDATA_H
-#define _DEBUGGERDATA_H
+#ifndef DEBUGGERDATA_H
+#define DEBUGGERDATA_H
 
 #include <QLinkedList>
 #include <QString>
 
 
-class MemoryLayout
+struct MemoryLayout
 {
-public:
 	MemoryLayout();
 
 	char primarySlot[4];
 	char secondarySlot[4];
 	unsigned char mapperSegment[4];
-	
+
 	bool isSubslotted[4];
 	int mapperSize[4][4];
 };
@@ -24,7 +23,7 @@ public:
 class Breakpoints
 {
 public:
-	Breakpoints() { memLayout = NULL; };
+	Breakpoints();
 
 	void setMemoryLayout(MemoryLayout *ml);
 	void setBreakpoints(const QString& str);
@@ -47,7 +46,7 @@ private:
 	typedef QLinkedList<Breakpoint> BreakpointList;
 
 	BreakpointList breakpoints;
-	MemoryLayout *memLayout;
+	MemoryLayout* memLayout;
 	
 	void parseCondition(Breakpoint& bp);
 	void insertBreakpoint(Breakpoint& bp);
@@ -55,4 +54,4 @@ private:
 	bool inCurrentSlot(const Breakpoint& bp);
 };
 
-#endif // _DEBUGGERDATA_H
+#endif // DEBUGGERDATA_H

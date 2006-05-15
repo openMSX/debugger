@@ -26,6 +26,11 @@ MemoryLayout::MemoryLayout()
 // Breakpoints
 //
 
+Breakpoints::Breakpoints()
+	: memLayout(NULL)
+{
+}
+
 void Breakpoints::setMemoryLayout(MemoryLayout *ml)
 {
 	memLayout = ml;

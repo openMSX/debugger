@@ -1,23 +1,25 @@
 // $Id$
 
-#ifndef _FLAGSVIEWER_H
-#define _FLAGSVIEWER_H
+#ifndef FLAGSVIEWER_H
+#define FLAGSVIEWER_H
 
 #include <QFrame>
 
+class QPainter;
+class QString;
 
 class FlagsViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	FlagsViewer( QWidget* parent = 0 );
+	FlagsViewer(QWidget* parent = 0);
 
 public slots:
 	void setFlags(quint8 newFlags);
 
 protected:
-	void resizeEvent(QResizeEvent *e);
-	void paintEvent(QPaintEvent *e);
+	void resizeEvent(QResizeEvent* e);
+	void paintEvent(QPaintEvent* e);
 
 private:
 	int frameL, frameR, frameT, frameB;
@@ -26,7 +28,8 @@ private:
 	unsigned char flagsChanged;
 
 	void setSizes();
-	void drawValue(QPainter& p, const int x, const int y, const QString& str, const bool changed);
+	void drawValue(QPainter& p, int x, int y, const QString& str,
+	               const bool changed);
 };
 
-#endif    // _FLAGSVIEWER_H
+#endif // FLAGSVIEWER_H

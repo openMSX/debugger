@@ -7,7 +7,7 @@ MOC_SRC_HDR:= \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection
 
 SRC_HDR:= \
-	Dasm DasmTables DebuggerData ServerList
+	Dasm DasmTables DebuggerData
 
 SRC_ONLY:= \
 	main

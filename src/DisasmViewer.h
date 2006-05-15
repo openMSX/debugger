@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef _DISASMVIEWER_H
-#define _DISASMVIEWER_H
+#ifndef DISASMVIEWER_H
+#define DISASMVIEWER_H
 
 #include "DebuggerData.h"
 #include "Dasm.h"
@@ -17,11 +17,12 @@ class DisasmViewer : public QFrame
 public:
 	DisasmViewer(QWidget* parent = 0);
 
-	void setMemory(unsigned char *memPtr);
-	void setBreakpoints(Breakpoints *bps);
-	void memoryUpdated(CommMemoryRequest *req);
-	void updateCancelled(CommMemoryRequest *req);
+	void setMemory(unsigned char* memPtr);
+	void setBreakpoints(Breakpoints* bps);
+	void memoryUpdated(CommMemoryRequest* req);
+	void updateCancelled(CommMemoryRequest* req);
 
+	// TODO get rid of public members
 	quint16 programCounter;
 	quint16 cursorAddr;
 
@@ -32,15 +33,15 @@ public slots:
 	void scrollBarChanged(int value);
 
 protected:
-	void resizeEvent(QResizeEvent *e);
-	void paintEvent(QPaintEvent *e);
-	void keyPressEvent(QKeyEvent *e);
-	void mousePressEvent(QMouseEvent *e);
+	void resizeEvent(QResizeEvent* e);
+	void paintEvent(QPaintEvent* e);
+	void keyPressEvent(QKeyEvent* e);
+	void mousePressEvent(QMouseEvent* e);
 
 private:
 	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
 
-	QScrollBar *scrollBar;
+	QScrollBar* scrollBar;
 
 	QPixmap breakMarker;
 	QPixmap pcMarker;
@@ -49,15 +50,15 @@ private:
 	double visibleLines;
 	int disasmTopLine;
 	DisasmLines disasmLines;
-	unsigned char *memory;
+	unsigned char* memory;
 	int waitingForData;
-	CommMemoryRequest *nextRequest;
-	Breakpoints *breakpoints;
-	
+	CommMemoryRequest* nextRequest;
+	Breakpoints* breakpoints;
+
 	int findDisasmLine(quint16 lineAddr);
-	
+
 signals:
 	void toggleBreakpoint(int addr);
 };
 
-#endif    // _DISASMVIEWER_H
+#endif // DISASMVIEWER_H

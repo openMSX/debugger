@@ -1,13 +1,13 @@
 // $Id$
 
-#ifndef _COMMCLIENT_H
-#define _COMMCLIENT_H
+#ifndef COMMCLIENT_H
+#define COMMCLIENT_H
 
-#include <QString>
 #include <QObject>
 
 class OpenMSXConnection;
 class Command;
+class QString;
 
 class CommClient : public QObject
 {
@@ -35,4 +35,4 @@ private:
 	OpenMSXConnection* connection;
 };
 
-#endif    // _COMMCLIENT_H
+#endif // COMMCLIENT_H

@@ -1,15 +1,10 @@
 // $Id$
 
-#ifndef _DEBUGGERFORM_H
-#define _DEBUGGERFORM_H
+#ifndef DEBUGGERFORM_H
+#define DEBUGGERFORM_H
 
 #include "DebuggerData.h"
 #include <QMainWindow>
-#include <QAction>
-#include <QMenu>
-#include <QToolBar>
-#include <QSplitter>
-#include <QMap>
 
 class DisasmViewer;
 class HexViewer;
@@ -18,63 +13,67 @@ class FlagsViewer;
 class StackViewer;
 class SlotViewer;
 class CommClient;
+class QAction;
+class QMenu;
+class QToolBar;
+class QSplitter;
 
 class DebuggerForm : public QMainWindow
 {
 	Q_OBJECT;
 public:
-	DebuggerForm( QWidget* parent = 0 );
+	DebuggerForm(QWidget* parent = 0);
 	~DebuggerForm();
 
 public slots:
 	void showAbout();
 
 private:
-	QMenu *systemMenu;
-	QMenu *executeMenu;
-	QMenu *breakpointMenu;
-	QMenu *helpMenu;
+	QMenu* systemMenu;
+	QMenu* executeMenu;
+	QMenu* breakpointMenu;
+	QMenu* helpMenu;
 
-	QToolBar *systemToolbar;
-	QToolBar *executeToolbar;
+	QToolBar* systemToolbar;
+	QToolBar* executeToolbar;
 
-	QAction *systemConnectAction;
-	QAction *systemDisconnectAction;
-	QAction *systemPauseAction;
-	QAction *systemExitAction;
+	QAction* systemConnectAction;
+	QAction* systemDisconnectAction;
+	QAction* systemPauseAction;
+	QAction* systemExitAction;
 
-	QAction *executeBreakAction;
-	QAction *executeRunAction;
-	QAction *executeStepAction;
-	QAction *executeStepOverAction;
-	QAction *executeRunToAction;
-	QAction *executeStepOutAction;
+	QAction* executeBreakAction;
+	QAction* executeRunAction;
+	QAction* executeStepAction;
+	QAction* executeStepOverAction;
+	QAction* executeRunToAction;
+	QAction* executeStepOutAction;
 
-	QAction *breakpointToggleAction;
+	QAction* breakpointToggleAction;
 
-	QAction *helpAboutAction;
+	QAction* helpAboutAction;
 
-	QSplitter *mainSplitter;
-	QSplitter *disasmSplitter;
+	QSplitter* mainSplitter;
+	QSplitter* disasmSplitter;
 
-	DisasmViewer *disasmView;
-	HexViewer *hexView;
-	CPURegsViewer *regsView;
-	FlagsViewer *flagsView;
-	StackViewer *stackView;
-	SlotViewer *slotView;
+	DisasmViewer* disasmView;
+	HexViewer* hexView;
+	CPURegsViewer* regsView;
+	FlagsViewer* flagsView;
+	StackViewer* stackView;
+	SlotViewer* slotView;
 
 	CommClient& comm;
 	Breakpoints breakpoints;
 	MemoryLayout memLayout;
-	unsigned char *mainMemory;
+	unsigned char* mainMemory;
 	
 	void createActions();
 	void createMenus();
 	void createToolbars();
 	void createStatusbar();
 	void createForm();
-	QWidget *createNamedWidget(const QString& name, QWidget *widget);
+	QWidget* createNamedWidget(const QString& name, QWidget* widget);
 
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
@@ -106,4 +105,4 @@ private slots:
 	friend class CPURegRequest;
 };
 
-#endif    // _DEBUGGERFORM_H
+#endif // DEBUGGERFORM_H

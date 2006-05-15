@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef _STACKVIEWER_H
-#define _STACKVIEWER_H
+#ifndef STACKVIEWER_H
+#define STACKVIEWER_H
 
 #include <QFrame>
 
@@ -13,22 +13,22 @@ class StackViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	StackViewer( QWidget* parent = 0 );
+	StackViewer(QWidget* parent = 0);
 
-	void setData(unsigned char *memPtr, int memLength);
-	void memdataTransfered(StackRequest *r);
-	void transferCancelled(StackRequest *r);
+	void setData(unsigned char* memPtr, int memLength);
+	void memdataTransfered(StackRequest* r);
+	void transferCancelled(StackRequest* r);
 
 public slots:
 	void setLocation(int addr);
 	void setStackPointer(quint16 addr);
 
 protected:
-	void resizeEvent(QResizeEvent *e);
-	void paintEvent(QPaintEvent *e);
+	void resizeEvent(QResizeEvent* e);
+	void paintEvent(QPaintEvent* e);
 
 private:
-	QScrollBar *vertScrollBar;
+	QScrollBar* vertScrollBar;
 
 	int frameL, frameR, frameT, frameB;
 	double visibleLines;
@@ -36,11 +36,11 @@ private:
 
 	int stackPointer;
 	int topAddress;
-	unsigned char *memory;
+	unsigned char* memory;
 	int memoryLength;
 
 	void setSizes();
 	void setScrollBarValues();
 };
 
-#endif    // _STACKVIEWER_H
+#endif // STACKVIEWER_H
