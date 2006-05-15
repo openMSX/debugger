@@ -23,7 +23,8 @@ static std::string toHex(unsigned value, unsigned width)
 }
 
 
-void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short endAddr, DisasmLines& disasm)
+void dasm(const unsigned char* membuf, unsigned short startAddr,
+          unsigned short endAddr, DisasmLines& disasm)
 {
 	const char* s;
 	const char* r = 0;
@@ -37,30 +38,30 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 		dest.instr.clear();
 		switch (membuf[pc]) {
 			case 0xCB:
-				s = mnemonic_cb[membuf[pc+1]];
+				s = mnemonic_cb[membuf[pc + 1]];
 				dest.numBytes = 2;
 				break;
 			case 0xED:
-				s = mnemonic_ed[membuf[pc+1]];
+				s = mnemonic_ed[membuf[pc + 1]];
 				dest.numBytes = 2;
 				break;
 			case 0xDD:
 				r = "ix";
-				if (membuf[pc+1] != 0xcb) {
-					s = mnemonic_xx[membuf[pc+1]];
+				if (membuf[pc + 1] != 0xcb) {
+					s = mnemonic_xx[membuf[pc + 1]];
 					dest.numBytes = 2;
 				} else {
-					s = mnemonic_xx_cb[membuf[pc+3]];
+					s = mnemonic_xx_cb[membuf[pc + 3]];
 					dest.numBytes = 4;
 				}
 				break;
 			case 0xFD:
 				r = "iy";
-				if (membuf[pc+1] != 0xcb) {
-					s = mnemonic_xx[membuf[pc+1]];
+				if (membuf[pc + 1] != 0xcb) {
+					s = mnemonic_xx[membuf[pc + 1]];
 					dest.numBytes = 2;
 				} else {
-					s = mnemonic_xx_cb[membuf[pc+3]];
+					s = mnemonic_xx_cb[membuf[pc + 3]];
 					dest.numBytes = 4;
 				}
 				break;
@@ -142,5 +143,4 @@ void dasm(const unsigned char *membuf, unsigned short startAddr, unsigned short 
 		disasm.push_back(dest);
 		pc += dest.numBytes;
 	}
-
 }

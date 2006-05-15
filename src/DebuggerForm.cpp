@@ -27,7 +27,6 @@
 #include <QPixmap>
 
 
-
 class QueryPauseHandler : public SimpleCommand
 {
 public:
@@ -131,14 +130,14 @@ void DebuggerForm::createActions()
 	systemDisconnectAction->setShortcut(tr(""));
 	systemDisconnectAction->setStatusTip(tr("Disconnect from openMSX"));
 	systemDisconnectAction->setIcon(QIcon(":/icons/disconnect.png"));
-	systemDisconnectAction->setEnabled(FALSE);
+	systemDisconnectAction->setEnabled(false);
 	
 	systemPauseAction = new QAction(tr("&Pause emulator"), this);
 	systemPauseAction->setShortcut(Qt::Key_Pause);
 	systemPauseAction->setStatusTip(tr("Pause the emulation"));
 	systemPauseAction->setIcon(QIcon(":/icons/pause.png"));
-	systemPauseAction->setCheckable(TRUE);
-	systemPauseAction->setEnabled(FALSE);
+	systemPauseAction->setCheckable(true);
+	systemPauseAction->setEnabled(false);
 	
 	systemExitAction = new QAction(tr("E&xit"), this);
 	systemExitAction->setShortcut(tr("Alt+X"));
@@ -148,62 +147,62 @@ void DebuggerForm::createActions()
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
 	executeBreakAction->setIcon(QIcon(":/icons/break.png"));
-	executeBreakAction->setEnabled(FALSE);
+	executeBreakAction->setEnabled(false);
 	
 	executeRunAction = new QAction(tr("Run"), this);
 	executeRunAction->setShortcut(tr("F9"));
 	executeRunAction->setStatusTip(tr("Leave debug mode and resume execution"));
 	executeRunAction->setIcon(QIcon(":/icons/run.png"));
-	executeRunAction->setEnabled(FALSE);
+	executeRunAction->setEnabled(false);
 
 	executeStepAction = new QAction(tr("Step into"), this);
 	executeStepAction->setShortcut(tr("F7"));
 	executeStepAction->setStatusTip(tr("Execute a single instruction"));
 	executeStepAction->setIcon(QIcon(":/icons/stepinto.png"));
-	executeStepAction->setEnabled(FALSE);
+	executeStepAction->setEnabled(false);
 
 	executeStepOverAction = new QAction(tr("Step over"), this);
 	executeStepOverAction->setShortcut(tr("F8"));
 	executeStepOverAction->setStatusTip(tr("Execute the next instruction including any called subroutines"));
 	executeStepOverAction->setIcon(QIcon(":/icons/stepover.png"));
-	executeStepOverAction->setEnabled(FALSE);
+	executeStepOverAction->setEnabled(false);
 
 	executeStepOutAction = new QAction(tr("Step out"), this);
 	executeStepOutAction->setShortcut(tr("F11"));
 	executeStepOutAction->setStatusTip(tr("Resume execution until the current routine has finished"));
 	executeStepOutAction->setIcon(QIcon(":/icons/stepout.png"));
-	executeStepOutAction->setEnabled(FALSE);
+	executeStepOutAction->setEnabled(false);
 
 	executeRunToAction = new QAction(tr("Run to"), this);
 	executeRunToAction->setShortcut(tr("F4"));
 	executeRunToAction->setStatusTip(tr("Resume execution until the selected line is reached"));
 	executeRunToAction->setIcon(QIcon(":/icons/runto.png"));
-	executeRunToAction->setEnabled(FALSE);
+	executeRunToAction->setEnabled(false);
 
 	breakpointToggleAction = new QAction(tr("Toggle"), this);
 	breakpointToggleAction->setShortcut(tr("F5"));
 	breakpointToggleAction->setStatusTip(tr("Toggle breakpoint on/off at cursor"));
 	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
-	breakpointToggleAction->setEnabled(FALSE);
+	breakpointToggleAction->setEnabled(false);
 
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the appliction information"));
 
-	connect( systemConnectAction, SIGNAL( triggered() ), this, SLOT( systemConnect() ) );
-	connect( systemDisconnectAction, SIGNAL( triggered() ), this, SLOT( systemDisconnect() ) );
-	connect( systemPauseAction, SIGNAL( triggered() ), this, SLOT( systemPause() ) );
-	connect( systemExitAction, SIGNAL( triggered() ), this, SLOT( close() ) );
-	connect( executeBreakAction, SIGNAL( triggered() ), this, SLOT( executeBreak() ) );
-	connect( executeRunAction, SIGNAL( triggered() ), this, SLOT( executeRun() ) );
-	connect( executeStepAction, SIGNAL( triggered() ), this, SLOT( executeStep() ) );
-	connect( executeStepOverAction, SIGNAL( triggered() ), this, SLOT( executeStepOver() ) );
-	connect( executeRunToAction, SIGNAL( triggered() ), this, SLOT( executeRunTo() ) );
-	connect( executeStepOutAction, SIGNAL( triggered() ), this, SLOT( executeStepOut() ) );
-	connect( breakpointToggleAction, SIGNAL( triggered() ), this, SLOT( breakpointToggle() ) );
-	connect( helpAboutAction, SIGNAL( triggered() ), this, SLOT( showAbout() ) );
+	connect(systemConnectAction, SIGNAL(triggered()), this, SLOT(systemConnect()));
+	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
+	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
+	connect(systemExitAction, SIGNAL(triggered()), this, SLOT(close()));
+	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
+	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
+	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
+	connect(executeStepOverAction, SIGNAL(triggered()), this, SLOT(executeStepOver()));
+	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
+	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
+	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(breakpointToggle()));
+	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 }
 
-void DebuggerForm::createMenus()	
+void DebuggerForm::createMenus()
 {
 	// create system menu
 	systemMenu = menuBar()->addMenu(tr("&System"));
@@ -233,7 +232,7 @@ void DebuggerForm::createMenus()
 	helpMenu->addAction(helpAboutAction);
 }
 
-void DebuggerForm::createToolbars()	
+void DebuggerForm::createToolbars()
 {
 	// create debug toolbar
 	systemToolbar = addToolBar(tr("System"));
@@ -253,36 +252,35 @@ void DebuggerForm::createToolbars()
 	executeToolbar->addAction(executeRunToAction);
 }
 
-void DebuggerForm::createStatusbar()	
+void DebuggerForm::createStatusbar()
 {
 	// create the statusbar
 	statusBar()->showMessage("No emulation running.");
 }
 
-QWidget *DebuggerForm::createNamedWidget(const QString& name, QWidget *widget)
+QWidget* DebuggerForm::createNamedWidget(const QString& name, QWidget* widget)
 {
-	QVBoxLayout *vboxLayout = new QVBoxLayout;
+	QVBoxLayout* vboxLayout = new QVBoxLayout();
 	vboxLayout->setMargin(3);
 	vboxLayout->setSpacing(2);
 	
-	QLabel *lbl = new QLabel(name);
+	QLabel* lbl = new QLabel(name);
 
 	vboxLayout->addWidget(lbl, 0);
 	vboxLayout->addWidget(widget, 1);
-	
-	QWidget *combined = new QWidget;
+
+	QWidget* combined = new QWidget();
 	combined->setLayout(vboxLayout);
 
 	return combined;
 }
 
-void DebuggerForm::createForm()	
+void DebuggerForm::createForm()
 {
 	mainSplitter = new QSplitter(Qt::Horizontal, this);
 	setCentralWidget(mainSplitter);
 
-	// * create the left side of the gui
-
+	// create the left side of the gui
 	disasmSplitter = new QSplitter(Qt::Vertical, this);
 	mainSplitter->addWidget(disasmSplitter);
 	
@@ -294,23 +292,23 @@ void DebuggerForm::createForm()
 	hexView = new HexViewer();
 	disasmSplitter->addWidget(createNamedWidget(tr("Main memory:"), hexView));
 	
-	// * create the right side of the gui
-	QWidget *w = new QWidget;
+	// create the right side of the gui
+	QWidget* w = new QWidget;
 	mainSplitter->addWidget(w);
-	QVBoxLayout *rightLayout = new QVBoxLayout;
+	QVBoxLayout* rightLayout = new QVBoxLayout();
 	rightLayout->setMargin(0);
 	rightLayout->setSpacing(0);
 	w->setLayout(rightLayout);
 
-	QWidget *w2 = new QWidget;
-	rightLayout->addWidget(w2, 0);	
-	QHBoxLayout *topLayout = new QHBoxLayout;
+	QWidget* w2 = new QWidget();
+	rightLayout->addWidget(w2, 0);
+	QHBoxLayout* topLayout = new QHBoxLayout();
 	topLayout->setMargin(0);
 	topLayout->setSpacing(0);
 	w2->setLayout(topLayout);
 	
 	// create register viewer
-	regsView = new CPURegsViewer;
+	regsView = new CPURegsViewer();
 	topLayout->addWidget(createNamedWidget(tr("CPU registers:"), regsView), 0);
 	
 	// create flags viewer
@@ -326,42 +324,42 @@ void DebuggerForm::createForm()
 	topLayout->addWidget(createNamedWidget(tr("Memory layout:"), slotView), 0);
 
 	// create spacer on the right
-	w2 = new QWidget();
-	topLayout->addWidget(w2, 1);
+	QWidget* w3 = new QWidget();
+	topLayout->addWidget(w3, 1);
 
 	// create rest
-	w2 = new QWidget();
-	rightLayout->addWidget(w2, 1);
-	
-	disasmView->setEnabled(FALSE);
-	hexView->setEnabled(FALSE);
-	regsView->setEnabled(FALSE);
-	flagsView->setEnabled(FALSE);
-	stackView->setEnabled(FALSE);
-	slotView->setEnabled(FALSE);
+	QWidget* w4 = new QWidget();
+	rightLayout->addWidget(w4, 1);
 
-	connect(regsView,   SIGNAL( pcChanged(quint16) ),
-	        disasmView, SLOT( setProgramCounter(quint16) ) );
-	connect(regsView,   SIGNAL( flagsChanged(quint8) ),
-	        flagsView,  SLOT( setFlags(quint8) ) );
-	connect(regsView,   SIGNAL( spChanged(quint16) ),
-	        stackView,  SLOT( setStackPointer(quint16) ) );	
-	connect(disasmView, SIGNAL( toggleBreakpoint(int) ),
-	                    SLOT( breakpointToggle(int) ) );
+	disasmView->setEnabled(false);
+	hexView->setEnabled(false);
+	regsView->setEnabled(false);
+	flagsView->setEnabled(false);
+	stackView->setEnabled(false);
+	slotView->setEnabled(false);
 
-	connect(&comm, SIGNAL( connectionReady() ),
-	               SLOT( initConnection() ) );
+	connect(regsView,   SIGNAL(pcChanged(quint16)),
+	        disasmView, SLOT(setProgramCounter(quint16)));
+	connect(regsView,   SIGNAL(flagsChanged(quint8)),
+	        flagsView,  SLOT(setFlags(quint8)));
+	connect(regsView,   SIGNAL(spChanged(quint16)),
+	        stackView,  SLOT(setStackPointer(quint16)));
+	connect(disasmView, SIGNAL(toggleBreakpoint(int)),
+	                    SLOT(breakpointToggle(int)));
+
+	connect(&comm, SIGNAL(connectionReady()),
+	        SLOT(initConnection()));
 	connect(&comm, SIGNAL(updateParsed(const QString&, const QString&, const QString&)),
-	               SLOT(handleUpdate(const QString&, const QString&, const QString&)));
-	connect(&comm, SIGNAL( connectionTerminated() ),
-	               SLOT( connectionClosed() ) );
+	        SLOT(handleUpdate(const QString&, const QString&, const QString&)));
+	connect(&comm, SIGNAL(connectionTerminated()),
+	        SLOT(connectionClosed()));
 
 	// init main memory
 	// added four bytes as runover buffer for dasm
 	// otherwise dasm would need to check the buffer end continously.
 	breakpoints.setMemoryLayout(&memLayout);
-	mainMemory = new unsigned char[65536+4];
-	memset(mainMemory, 0, 65536+4);
+	mainMemory = new unsigned char[65536 + 4];
+	memset(mainMemory, 0, 65536 + 4);
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&breakpoints);
 	hexView->setData("memory", mainMemory, 65536);
@@ -421,40 +419,41 @@ void DebuggerForm::initConnection()
 
 void DebuggerForm::connectionClosed()
 {
-	systemDisconnectAction->setEnabled(FALSE);
-	systemPauseAction->setEnabled(FALSE);
-	executeBreakAction->setEnabled(FALSE);
-	executeRunAction->setEnabled(FALSE);
-	executeStepAction->setEnabled(FALSE);
-	executeStepOverAction->setEnabled(FALSE);
-	executeStepOutAction->setEnabled(FALSE);
-	executeRunToAction->setEnabled(FALSE);
-	systemConnectAction->setEnabled(TRUE);
+	systemDisconnectAction->setEnabled(false);
+	systemPauseAction->setEnabled(false);
+	executeBreakAction->setEnabled(false);
+	executeRunAction->setEnabled(false);
+	executeStepAction->setEnabled(false);
+	executeStepOverAction->setEnabled(false);
+	executeStepOutAction->setEnabled(false);
+	executeRunToAction->setEnabled(false);
+	systemConnectAction->setEnabled(true);
 
-	disasmView->setEnabled(FALSE);
-	hexView->setEnabled(FALSE);
-	regsView->setEnabled(FALSE);
-	flagsView->setEnabled(FALSE);
-	stackView->setEnabled(FALSE);
-	slotView->setEnabled(FALSE);
+	disasmView->setEnabled(false);
+	hexView->setEnabled(false);
+	regsView->setEnabled(false);
+	flagsView->setEnabled(false);
+	stackView->setEnabled(false);
+	slotView->setEnabled(false);
 }
 
 void DebuggerForm::finalizeConnection(bool halted)
 {
-	systemDisconnectAction->setEnabled(TRUE);
-	systemPauseAction->setEnabled(TRUE);
-	if(halted){
+	systemDisconnectAction->setEnabled(true);
+	systemPauseAction->setEnabled(true);
+	if (halted){
 		setBreakMode();
 		breakOccured();
-	}else
+	} else {
 		setRunMode();
+	}
 
-	disasmView->setEnabled(TRUE);
-	hexView->setEnabled(TRUE);
-	regsView->setEnabled(TRUE);
-	flagsView->setEnabled(TRUE);
-	stackView->setEnabled(TRUE);
-	slotView->setEnabled(TRUE);
+	disasmView->setEnabled(true);
+	hexView->setEnabled(true);
+	regsView->setEnabled(true);
+	flagsView->setEnabled(true);
+	stackView->setEnabled(true);
+	slotView->setEnabled(true);
 }
 
 void DebuggerForm::handleUpdate(const QString& type, const QString& name,
@@ -486,9 +485,9 @@ void DebuggerForm::breakOccured()
 	// update registers 
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
-	CPURegRequest *regs = new CPURegRequest(*this);
+	CPURegRequest* regs = new CPURegRequest(*this);
 	comm.sendCommand(regs);
-	
+
 	// refresh memory viewer
 	hexView->refresh();
 
@@ -498,29 +497,29 @@ void DebuggerForm::breakOccured()
 
 void DebuggerForm::setBreakMode()
 {
-	executeBreakAction->setEnabled(FALSE);
-	executeRunAction->setEnabled(TRUE);
-	executeStepAction->setEnabled(TRUE);
-	executeStepOverAction->setEnabled(TRUE);
-	executeStepOutAction->setEnabled(TRUE);
-	executeRunToAction->setEnabled(TRUE);
-	breakpointToggleAction->setEnabled(TRUE);
+	executeBreakAction->setEnabled(false);
+	executeRunAction->setEnabled(true);
+	executeStepAction->setEnabled(true);
+	executeStepOverAction->setEnabled(true);
+	executeStepOutAction->setEnabled(true);
+	executeRunToAction->setEnabled(true);
+	breakpointToggleAction->setEnabled(true);
 }
 
 void DebuggerForm::setRunMode()
 {
-	executeBreakAction->setEnabled(TRUE);
-	executeRunAction->setEnabled(FALSE);
-	executeStepAction->setEnabled(FALSE);
-	executeStepOverAction->setEnabled(FALSE);
-	executeStepOutAction->setEnabled(FALSE);
-	executeRunToAction->setEnabled(FALSE);
-	breakpointToggleAction->setEnabled(FALSE);
+	executeBreakAction->setEnabled(true);
+	executeRunAction->setEnabled(false);
+	executeStepAction->setEnabled(false);
+	executeStepOverAction->setEnabled(false);
+	executeStepOutAction->setEnabled(false);
+	executeRunToAction->setEnabled(false);
+	breakpointToggleAction->setEnabled(false);
 }
 
 void DebuggerForm::systemConnect()
 {
-	systemConnectAction->setEnabled(FALSE);
+	systemConnectAction->setEnabled(false);
 	OpenMSXConnection* connection = ConnectDialog::getConnection(this);
 	if (connection) {
 		comm.connectToOpenMSX(connection);
@@ -599,6 +598,5 @@ void DebuggerForm::showAbout()
 	s.sprintf("openMSX debugger %i.%i.%i", VERSION_MAJOR,
 	                                       VERSION_MINOR,
 	                                       VERSION_PATCH);
-
 	QMessageBox::about(this, "openMSX", s);
 }

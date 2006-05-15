@@ -1,3 +1,5 @@
+// $Id$
+
 #include "ConnectDialog.h"
 #include "OpenMSXConnection.h"
 #include <QProcess>

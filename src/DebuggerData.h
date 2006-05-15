@@ -50,7 +50,6 @@ private:
 	
 	void parseCondition(Breakpoint& bp);
 	void insertBreakpoint(Breakpoint& bp);
-	QString getNextArgument(QString& data, int& pos);
 	bool inCurrentSlot(const Breakpoint& bp);
 };
 

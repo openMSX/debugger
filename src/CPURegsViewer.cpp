@@ -2,13 +2,11 @@
 
 #include "CPURegsViewer.h"
 #include <QPainter>
-#include <QPixmap>
-#include <QFrame>
 #include <QPaintEvent>
 
 
-CPURegsViewer::CPURegsViewer( QWidget* parent )
-	: QFrame( parent )
+CPURegsViewer::CPURegsViewer(QWidget* parent)
+	: QFrame(parent)
 {
 	// avoid UMR
 	memset(&regs,        0, sizeof(regs));
@@ -24,18 +22,18 @@ CPURegsViewer::CPURegsViewer( QWidget* parent )
 	setSizes();
 }
 
-void CPURegsViewer::resizeEvent(QResizeEvent *e)
+void CPURegsViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 }
 
-void CPURegsViewer::paintEvent(QPaintEvent *e)
+void CPURegsViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
 	
 	QPainter p(this);
-	p.setPen( palette().color(QPalette::Text) );
+	p.setPen(palette().color(QPalette::Text));
 	
 	int h = fontMetrics().height();
 	int regWidth = fontMetrics().width("HLW");
@@ -43,16 +41,16 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 	int d = fontMetrics().descent();
 	
 	// calc and set drawing bounds
-	QRect r( e->rect() );
-	if(r.left()<frameL) r.setLeft(frameL);
-	if(r.top()<frameT) r.setTop(frameT);
-	if(r.right()>width()-frameR-1) r.setRight(width()-frameR-1);
-	if(r.bottom()>height()-frameB-1) r.setBottom(height()-frameB-1);
+	QRect r(e->rect());
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop (frameT);
+	if (r.right()  > (width()  - frameR - 1)) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > (height() - frameB - 1)) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
-	int	x = frameL + 4;
+	int x = frameL + 4;
 	int y = frameT + h - 1 - d;
-	
+
 	QString hexStr;
 
 	p.drawText(x, y, "AF");
@@ -60,7 +58,7 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 	hexStr.sprintf("%04X", regs.AF);
 	drawValue(p, x, y, hexStr, regsChanged.AF);
 	x += valWidth;
-	
+
 	p.drawText(x, y, "AF'");
 	x += regWidth;
 	hexStr.sprintf("%04X", regs.AF2);
@@ -82,7 +80,7 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 	x = frameL+4;
 	y += h;
-	
+
 	p.drawText(x, y, "DE");
 	x += regWidth;
 	hexStr.sprintf("%04X", regs.DE);
@@ -110,13 +108,13 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 	x = frameL+4;
 	y += h;
-	
+
 	p.drawText(x, y, "IX");
 	x += regWidth;
 	hexStr.sprintf("%04X", regs.IX);
 	drawValue(p, x, y, hexStr, regsChanged.IX);
 	x += valWidth;
-	
+
 	p.drawText(x, y, "IY");
 	x += regWidth;
 	hexStr.sprintf("%04X", regs.IY);
@@ -124,7 +122,7 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 	x = frameL+4;
 	y += h;
-	
+
 	p.drawText(x, y, "PC");
 	x += regWidth;
 	hexStr.sprintf("%04X", regs.PC);
@@ -138,13 +136,13 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 	x = frameL+4;
 	y += h;
-	
+
 	p.drawText(x, y, "I");
 	x += regWidth;
 	hexStr.sprintf("%02X", regs.I);
 	drawValue(p, x, y, hexStr, regsChanged.I);
 	x += valWidth;
-	
+
 	p.drawText(x, y, "R");
 	x += regWidth;
 	hexStr.sprintf("%02X", regs.R);
@@ -152,7 +150,7 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 	x = frameL+4;
 	y += h;
-	
+
 	p.drawText(x, y, "IM");
 	x += regWidth;
 	hexStr.sprintf("%i", regs.IM);
@@ -167,33 +165,35 @@ void CPURegsViewer::paintEvent(QPaintEvent *e)
 
 void CPURegsViewer::setSizes()
 {
-	int v = frameT + 8*fontMetrics().height() + frameB;
+	int v = frameT + 8 * fontMetrics().height() + frameB;
 	setMinimumHeight(v);
 	setMaximumHeight(v);
-	
+
 	v = frameL + 4 + fontMetrics().width("HLWFFFFWWHLWFFFFW") + 4 + frameR;
 	setMinimumWidth(v);
 	setMaximumWidth(v);
 }
 
-void CPURegsViewer::drawValue(QPainter& p, const int x, const int y, const QString& str, const bool changed)
+void CPURegsViewer::drawValue(QPainter& p, const int x, const int y,
+                              const QString& str, const bool changed)
 {
-	if(changed)
-		p.setPen( Qt::red );
+	if (changed) {
+		p.setPen(Qt::red);
+	}
 	p.drawText(x, y, str);
-	if(changed)
-		p.setPen( palette().color(QPalette::Text) );
+	if (changed) {
+		p.setPen(palette().color(QPalette::Text));
+	}
 }
 
-void CPURegsViewer::setData(unsigned char *datPtr)
+void CPURegsViewer::setData(unsigned char* datPtr)
 {
-	
-	for(int i=0; i<24; i+=2)
-		*((quint16 *)(datPtr + i)) = datPtr[i]*256 + datPtr[i+1];
+	for (int i = 0; i < 24; i += 2) {
+		*((quint16*)(datPtr + i)) = datPtr[i + 0] * 256 + datPtr[i + 1];
+	}
+	Z80Registers* newRegs;
+	newRegs = (Z80Registers*)datPtr;
 
-	Z80Registers *newRegs;
-	newRegs = (Z80Registers *)datPtr;
-	
 	regsChanged.AF = regs.AF != newRegs->AF;
 	regs.AF = newRegs->AF;
 	regsChanged.BC = regs.BC != newRegs->BC;
@@ -228,8 +228,8 @@ void CPURegsViewer::setData(unsigned char *datPtr)
 	regs.IFF = newRegs->IFF;
 
 	update();
-	
+
 	emit pcChanged(regs.PC);
 	emit spChanged(regs.SP);
-	emit flagsChanged(newRegs->AF&0xFF);
+	emit flagsChanged(newRegs->AF & 0xFF);
 }

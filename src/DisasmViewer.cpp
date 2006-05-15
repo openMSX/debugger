@@ -44,14 +44,14 @@ private:
 
 
 
-DisasmViewer::DisasmViewer( QWidget* parent )
-	: QFrame( parent )
+DisasmViewer::DisasmViewer(QWidget* parent)
+	: QFrame(parent)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
-	setFont(QFont( "Verdana", 11));
+	setFont(QFont("Verdana", 11));
 	
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
@@ -59,7 +59,7 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 	memory = NULL;
 	cursorAddr = (quint16)-1;
 	programCounter = 0x1070;
-	waitingForData = FALSE;
+	waitingForData = false;
 	nextRequest = NULL;
 
 	scrollBar = new QScrollBar(Qt::Vertical, this);
@@ -74,19 +74,18 @@ DisasmViewer::DisasmViewer( QWidget* parent )
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 
 	// manual scrollbar handling routines (real size of the data is not known)
-	connect(scrollBar, SIGNAL( actionTriggered(int) ), this, SLOT( scrollBarAction(int) ) );
-	connect(scrollBar, SIGNAL( valueChanged(int) ), this, SLOT( scrollBarChanged(int) ) );
-
+	connect(scrollBar, SIGNAL(actionTriggered(int)), this, SLOT(scrollBarAction(int)));
+	connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
 }
 
-void DisasmViewer::resizeEvent(QResizeEvent *e)
+void DisasmViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
-	
+
 	scrollBar->setGeometry(width() - frameR, frameT,
 	                       scrollBar->sizeHint().width(),
-	                       height()-frameT-frameB);
-	scrollBar->setMaximum(0x10000-int(visibleLines));
+	                       height() - frameT - frameB);
+	scrollBar->setMaximum(0x10000 - int(visibleLines));
 	
 	// calc the number of lines that can be displayed
 	// partial lines count as a whole
@@ -95,96 +94,98 @@ void DisasmViewer::resizeEvent(QResizeEvent *e)
 	setAddress(scrollBar->value());
 }
 
-void DisasmViewer::paintEvent(QPaintEvent *e)
+void DisasmViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
-	
+
 	QPainter p(this);
 	int h = fontMetrics().height();
 	int d = fontMetrics().descent();
 	
 	// calc and set drawing bounds
 	QRect r(e->rect());
-	if(r.left()<frameL) r.setLeft(frameL);
-	if(r.top()<frameT) r.setTop(frameT);
-	if(r.right()>width()-frameR-1) r.setRight(width()-frameR-1);
-	if(r.bottom()>height()-frameB-1) r.setBottom(height()-frameB-1);
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop(frameT);
+	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
 	// draw icon column first
-	p.fillRect(frameL, frameT, 32, height()-frameT-frameB, QColor(224, 224, 224));
+	p.fillRect(frameL, frameT, 32, height() - frameT - frameB,
+	           QColor(224, 224, 224));
 	
 	// calc layout (not optimal)
 	int charWidth = fontMetrics().width("MULUW") / 5;
 	int xAddr = frameL + 40;
 	int xMCode[4];
-	xMCode[0] = xAddr + 6*charWidth;
-	xMCode[1] = xMCode[0] + 3*charWidth;
-	xMCode[2] = xMCode[1] + 3*charWidth;
-	xMCode[3] = xMCode[2] + 3*charWidth;
-	int xMnem   = xMCode[3] + 4*charWidth;
-	int xMnemArg = xMnem + 8*charWidth;
+	xMCode[0] = xAddr     + 6 * charWidth;
+	xMCode[1] = xMCode[0] + 3 * charWidth;
+	xMCode[2] = xMCode[1] + 3 * charWidth;
+	xMCode[3] = xMCode[2] + 3 * charWidth;
+	int xMnem = xMCode[3] + 4 * charWidth;
+	int xMnemArg = xMnem  + 8 * charWidth;
 
 	int y = frameT + h - 1;
 	
 	QString hexStr;
-	const DisasmRow *row;
-	bool displayDisasm = memory!=NULL && isEnabled();
+	const DisasmRow* row;
+	bool displayDisasm = memory != NULL && isEnabled();
 
-	for(int i=0; i<int(ceil(visibleLines)); i++) {
-
+	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
 		// default to text pen 
-		p.setPen( palette().color(QPalette::Text) );
+		p.setPen(palette().color(QPalette::Text));
 
 		// fetch the data for this line
-		if(displayDisasm)
-			row = &disasmLines[i+disasmTopLine];
-		else
-			row = &DISABLED_ROW;
+		row = displayDisasm
+		    ? &disasmLines[i+disasmTopLine]
+		    : &DISABLED_ROW;
 
 		// draw cursor line or breakpoint
-		if(row->addr==cursorAddr) {
-			p.fillRect(frameL+32, y+1-h, 
-			           width() -32 - frameL - frameR ,h, palette().color(QPalette::Highlight));
-			if(hasFocus()) {
+		if (row->addr == cursorAddr) {
+			p.fillRect(frameL + 32, y + 1 - h, 
+			           width() - 32 - frameL - frameR, h,
+			           palette().color(QPalette::Highlight));
+			if (hasFocus()) {
 				QStyleOptionFocusRect so;
 				so.backgroundColor = palette().color(QPalette::Highlight);
-				so.rect = QRect(frameL+32, y+1-h, width()-32-frameL-frameR ,h);
+				so.rect = QRect(frameL + 32, y + 1 - h,
+				                width() - 32 - frameL - frameR, h);
 				style()->drawPrimitive(QStyle::PE_FrameFocusRect, &so, &p, this);
 			}
 			p.setPen(palette().color(QPalette::HighlightedText));
 		}
-		if( breakpoints->isBreakpoint(row->addr) ) {
+		if (breakpoints->isBreakpoint(row->addr)) {
 			// draw breakpoint
-			p.drawPixmap(frameL + 2, y - h/2 -5, breakMarker);
-			if(row->addr!=cursorAddr) {
-				p.fillRect(frameL+32, y+1-h, 
-				           width() -32 - frameL - frameR ,h, Qt::red);
+			p.drawPixmap(frameL + 2, y - h / 2 -5, breakMarker);
+			if (row->addr != cursorAddr) {
+				p.fillRect(frameL + 32, y + 1 - h, 
+				           width() -32 - frameL - frameR, h,
+				           Qt::red);
 				p.setPen(Qt::white);
 			}
 		}
 		// check for PC
-		if(row->addr==programCounter) {
-			p.drawPixmap(frameL + 18, y - h/2 -5, pcMarker);
+		if (row->addr == programCounter) {
+			p.drawPixmap(frameL + 18, y - h / 2 -5, pcMarker);
 		}
 
 		// print the address
 		hexStr.sprintf("%04X", row->addr);
-		p.drawText(xAddr, y-d, hexStr);
+		p.drawText(xAddr, y - d, hexStr);
 
 		// print 1 to 4 bytes
-		for(int j=0; j<row->numBytes; j++){
+		for (int j = 0; j < row->numBytes; ++j) {
 			hexStr.sprintf("%02X", displayDisasm ? memory[row->addr + j] : 0);
-			p.drawText(xMCode[j], y-d, hexStr);
+			p.drawText(xMCode[j], y - d, hexStr);
 		}
 
 		// print the instruction and arguments
-		p.drawText(xMnem, y-d, row->instr.substr(0, 7).c_str());
-		p.drawText(xMnemArg, y-d, row->instr.substr(7, 20).c_str());
+		p.drawText(xMnem,    y - d, row->instr.substr(0,  7).c_str());
+		p.drawText(xMnemArg, y - d, row->instr.substr(7, 20).c_str());
 
 		// check for end of memory to avoid drawing the last (partial) line
-		if(int(row->addr)+row->numBytes>0xFFFF) break;
+		if (int(row->addr) + row->numBytes > 0xFFFF) break;
 		y += h;
 	}
 }
@@ -192,10 +193,9 @@ void DisasmViewer::paintEvent(QPaintEvent *e)
 void DisasmViewer::setAddress(quint16 addr, int method)
 {
 	int line = findDisasmLine(addr);
-
-	if(line>=0) {
+	if (line >= 0) {
 		int dt, db;
-		switch(method) {
+		switch (method) {
 			case Top:
 			case Middle:
 			case Bottom:
@@ -204,13 +204,13 @@ void DisasmViewer::setAddress(quint16 addr, int method)
 				break;
 			case TopAlways:
 				dt = 10;
-				db = int(visibleLines)+10;
+				db = int(visibleLines) + 10;
 				break;
 			case MiddleAlways:
-				dt = db = 10+int(visibleLines)/2;
+				dt = db = 10 + int(visibleLines) / 2;
 				break;
 			case BottomAlways:
-				dt = 10+int(visibleLines);
+				dt = 10 + int(visibleLines);
 				db = 10;
 				break;
 			default:
@@ -218,42 +218,40 @@ void DisasmViewer::setAddress(quint16 addr, int method)
 				dt = db = 0; // avoid warning
 		}
 	
-		if( (line>dt || disasmLines[0].addr==0) 
-			&& (line<int(disasmLines.size())-db || disasmLines.back().addr+disasmLines.back().numBytes==0x10000 ))
-		{
+		if ((line > dt || disasmLines[0].addr == 0) &&
+		    (line < int(disasmLines.size()) - db ||
+		     disasmLines.back().addr+disasmLines.back().numBytes == 0x10000)) {
 			// line is within existing disasm'd data. Find where to put it.
-			if(method==Top || method==TopAlways || 
-				(method==Closest && addr<disasmLines[disasmTopLine].addr ))
-			{
+			if (method == Top || method == TopAlways || 
+			    (method == Closest && addr < disasmLines[disasmTopLine].addr)) {
 				// Move line to top
 				disasmTopLine = line;
-			} 
-			else if(method==Bottom || method==BottomAlways || 
-				(method==Closest && addr>=disasmLines[disasmTopLine+int(visibleLines)-1].addr ))
-			{
+			} else if (method == Bottom || method == BottomAlways || 
+			           (method == Closest &&
+				    addr >= disasmLines[disasmTopLine + int(visibleLines) - 1].addr)) {
 				// Move line to bottom
-				disasmTopLine = line-int(visibleLines)+1;
-			} 
-			else if(method==MiddleAlways || (method=Middle && addr<disasmLines[disasmTopLine].addr
-				&& addr>disasmLines[disasmTopLine+int(visibleLines)-1].addr))
-			{
+				disasmTopLine = line - int(visibleLines) + 1;
+			} else if (method == MiddleAlways ||
+			           (method == Middle &&
+				    addr < disasmLines[disasmTopLine].addr &&
+				    addr > disasmLines[disasmTopLine + int(visibleLines) - 1].addr)) {
 				// Move line to middle
-				disasmTopLine = line-int(visibleLines)/2;
+				disasmTopLine = line - int(visibleLines) / 2;
 			}
-			if(disasmTopLine<0) disasmTopLine = 0;
-			if(disasmTopLine>=int(disasmLines.size())) disasmTopLine = disasmLines.size()-1;
+			if (disasmTopLine < 0) disasmTopLine = 0;
+			if (disasmTopLine >= int(disasmLines.size())) disasmTopLine = disasmLines.size() - 1;
 			update();
 			return;
 		}
 	}
 
-	if(method==Closest)
-		if(addr<disasmLines[disasmTopLine].addr) {
+	if (method == Closest) {
+		if (addr < disasmLines[disasmTopLine].addr) {
 			method = Top;
 		} else {
 			method = Bottom;
 		}
-	
+	}
 
 	// The requested address it outside the pre-disassembled bounds.
 	// This means that a new block of memory must be transfered from
@@ -262,77 +260,81 @@ void DisasmViewer::setAddress(quint16 addr, int method)
 	// determine disasm bounds
 	int disasmStart;
 	int disasmEnd;
-	int extra = 4*(int(visibleLines)>9?int(ceil(visibleLines)):10);
+	int extra = 4 * (int(visibleLines) > 9 ? int(ceil(visibleLines)) : 10);
 
-	switch(method) {
+	switch (method) {
 		case Middle:
 		case MiddleAlways:
-			disasmStart = addr - 3*extra/2;
-			disasmEnd = addr + 3*extra/2;
+			disasmStart = addr - 3 * extra / 2;
+			disasmEnd   = addr + 3 * extra / 2;
 			break;
 		case Bottom:
 		case BottomAlways:
-			disasmStart = addr - 2*extra;
-			disasmEnd = addr + extra;
+			disasmStart = addr - 2 * extra;
+			disasmEnd   = addr +     extra;
 			break;
 		default:
-			disasmStart = addr - extra;
-			disasmEnd = addr + 2*extra;
+			disasmStart = addr -     extra;
+			disasmEnd   = addr + 2 * extra;
 	}
-	if(disasmStart<0) disasmStart = 0;
-	if(disasmEnd>0xFFFF) disasmEnd = 0xFFFF;
+	if (disasmStart < 0) disasmStart = 0;
+	if (disasmEnd > 0xFFFF) disasmEnd = 0xFFFF;
 	
-	CommMemoryRequest* req = new CommMemoryRequest(disasmStart, disasmEnd-disasmStart+1, &memory[disasmStart], *this);
+	CommMemoryRequest* req = new CommMemoryRequest(
+		disasmStart, disasmEnd - disasmStart + 1, &memory[disasmStart], *this);
 	req->address = addr;
 	req->method = method;
 	
-	if(waitingForData) {
-		if(nextRequest) delete nextRequest;
+	if (waitingForData) {
+		if (nextRequest) delete nextRequest;
 		nextRequest = req;
 	} else {
 		CommClient::instance().sendCommand(req);
-		waitingForData = TRUE;
+		waitingForData = true;
 	}
 }
 
-void DisasmViewer::memoryUpdated(CommMemoryRequest *req)
+void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 {
 	// disassemble the newly received memory
-	dasm(memory, req->offset, req->offset+req->size-1, disasmLines);
+	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines);
 
 	// locate the requested line 
 	disasmTopLine = 0;
-	while(disasmLines[disasmTopLine].addr<req->address
-	      && int(disasmLines.size()-disasmTopLine)>int(visibleLines)) disasmTopLine++;
+	while (disasmLines[disasmTopLine].addr < req->address &&
+	       int(disasmLines.size() - disasmTopLine) > int(visibleLines)) {
+		++disasmTopLine;
+	}
 	
-	switch(req->method) {
+	switch (req->method) {
 		case Middle:
 		case MiddleAlways:
-			disasmTopLine -= int(visibleLines)/2;
+			disasmTopLine -= int(visibleLines) / 2;
 			break;
 		case Bottom:
 		case BottomAlways:
-			disasmTopLine -= int(visibleLines)-1;
+			disasmTopLine -= int(visibleLines) - 1;
 			break;
 	}
-	if(disasmTopLine<0) disasmTopLine = 0;
+	if (disasmTopLine < 0) disasmTopLine = 0;
 	
 	// sync the scrollbar with the actual address reached
-	if(!nextRequest)
+	if (!nextRequest) {
 		scrollBar->setValue(disasmLines[disasmTopLine].addr);
+	}
 
 	update();
 	updateCancelled(req);
 }
 
-void DisasmViewer::updateCancelled(CommMemoryRequest *req)
+void DisasmViewer::updateCancelled(CommMemoryRequest* req)
 {
 	delete req;
-	if(nextRequest) {
+	if (nextRequest) {
 		CommClient::instance().sendCommand(nextRequest);
 		nextRequest = NULL;
 	} else {
-		waitingForData = FALSE;
+		waitingForData = false;
 	}
 }
 
@@ -345,31 +347,34 @@ void DisasmViewer::setProgramCounter(quint16 pc)
 int DisasmViewer::findDisasmLine(quint16 lineAddr)
 {
 	int line = disasmLines.size();
-	
-	while(--line>=0)
-		if(disasmLines[line].addr == lineAddr) 
+	while (--line >= 0) {
+		if (disasmLines[line].addr == lineAddr) {
 			break;
-
+		}
+	}
 	return line;
-}	
+}
 
 void DisasmViewer::scrollBarAction(int action)
 {
-	switch(action) {
+	switch (action) {
 		case QScrollBar::SliderSingleStepAdd:
-			setAddress(disasmLines[disasmTopLine+1].addr, TopAlways);
+			setAddress(disasmLines[disasmTopLine + 1].addr, TopAlways);
 			break;
 		case QScrollBar::SliderSingleStepSub:
-			if(disasmTopLine>0)
-				setAddress(disasmLines[disasmTopLine-1].addr, TopAlways);
+			if (disasmTopLine > 0) {
+				setAddress(disasmLines[disasmTopLine - 1].addr, TopAlways);
+			}
 			break;
 		case QScrollBar::SliderPageStepAdd:
-			if(disasmTopLine+int(ceil(visibleLines))-1<int(disasmLines.size()))
-				setAddress(disasmLines[disasmTopLine+int(ceil(visibleLines))-1].addr, TopAlways);
+			if (disasmTopLine + int(ceil(visibleLines)) - 1 < int(disasmLines.size())) {
+				setAddress(disasmLines[disasmTopLine + int(ceil(visibleLines)) - 1].addr, TopAlways);
+			}
 			break;
 		case QScrollBar::SliderPageStepSub:
-			if(disasmTopLine>0)
+			if (disasmTopLine > 0) {
 				setAddress(disasmLines[disasmTopLine-1].addr, BottomAlways);
+			}
 			break;
 		case QScrollBar::SliderToMinimum:
 			setAddress(0, TopAlways);
@@ -387,8 +392,7 @@ void DisasmViewer::scrollBarChanged(int value)
 	setAddress(value, TopAlways);
 }
 
-
-void DisasmViewer::setMemory(unsigned char *memPtr)
+void DisasmViewer::setMemory(unsigned char* memPtr)
 {
 	memory = memPtr;
 	// init disasmLines
@@ -396,82 +400,88 @@ void DisasmViewer::setMemory(unsigned char *memPtr)
 	newRow.numBytes = 1;
 	newRow.instr = "nop";
 	newRow.instr.resize(18, ' ');
-	for(int i=0; i<150; i++) {
+	for (int i = 0; i < 150; ++i) {
 		newRow.addr = i;
 		disasmLines.push_back(newRow);
 	}
 	disasmTopLine = 50;
 }
 
-void DisasmViewer::setBreakpoints(Breakpoints *bps)
+void DisasmViewer::setBreakpoints(Breakpoints* bps)
 {
 	breakpoints = bps;
 }
 
-void DisasmViewer::keyPressEvent(QKeyEvent *e)
+void DisasmViewer::keyPressEvent(QKeyEvent* e)
 {
-	int line;
-	
-	switch(e->key()) {
-		case Qt::Key_Up:
-			line = findDisasmLine(cursorAddr);
-			if(line>0) 
-				cursorAddr = disasmLines[line-1].addr;
-			setAddress(cursorAddr, Closest);
-			e->accept();
-			break;
-		case Qt::Key_Down:
-			line = findDisasmLine(cursorAddr);
-			if(line>=0 && line<int(disasmLines.size())-1) 
-				cursorAddr = disasmLines[line+1].addr;
-			setAddress(cursorAddr, Closest);
-			e->accept();
-			break;
-		case Qt::Key_PageUp:
-			if(disasmTopLine>0)
-				setAddress(disasmLines[disasmTopLine-1].addr, BottomAlways);
-			e->accept();
-			break;
-		case Qt::Key_PageDown:
-			if(disasmTopLine+int(ceil(visibleLines))-1<int(disasmLines.size()) )
-				setAddress(disasmLines[disasmTopLine+int(ceil(visibleLines))-1].addr, TopAlways);
-			e->accept();
-			break;
-		default:
-			QFrame::keyReleaseEvent(e);
+	switch (e->key()) {
+	case Qt::Key_Up: {
+		int line = findDisasmLine(cursorAddr);
+		if (line > 0) {
+			cursorAddr = disasmLines[line - 1].addr;
+		}
+		setAddress(cursorAddr, Closest);
+		e->accept();
+		break;
+	}
+	case Qt::Key_Down: {
+		int line = findDisasmLine(cursorAddr);
+		if (line >= 0 && line < int(disasmLines.size()) - 1) {
+			cursorAddr = disasmLines[line + 1].addr;
+		}
+		setAddress(cursorAddr, Closest);
+		e->accept();
+		break;
+	}
+	case Qt::Key_PageUp:
+		if (disasmTopLine > 0) {
+			setAddress(disasmLines[disasmTopLine - 1].addr, BottomAlways);
+		}
+		e->accept();
+		break;
+	case Qt::Key_PageDown:
+		if (disasmTopLine + int(ceil(visibleLines)) - 1 < int(disasmLines.size())) {
+			setAddress(disasmLines[disasmTopLine + int(ceil(visibleLines)) - 1].addr, TopAlways);
+		}
+		e->accept();
+		break;
+	default:
+		QFrame::keyReleaseEvent(e);
 	}
 }
 
-void DisasmViewer::mousePressEvent(QMouseEvent *e)
+void DisasmViewer::mousePressEvent(QMouseEvent* e)
 {
-	if(!(e->button()==Qt::LeftButton)) {
+	if (!(e->button() == Qt::LeftButton)) {
 		QFrame::mousePressEvent(e);
 		return;
 	}
-	
-	if(e->x() >= frameL && e->x() < width()-frameR &&
-		e->y() >= frameT && e->y() < height()-frameB)
-	{
+
+	if (e->x() >= frameL && e->x() < width()  - frameR &&
+	    e->y() >= frameT && e->y() < height() - frameB) {
 		// calc clicked line number
 		int h = fontMetrics().height();
 		int line = (e->y()-frameT)/h;
-		
-		if(e->x() > frameL+32) {
-			// check if the line exists (bottom of memory could have an empty line)
-			if(line + disasmTopLine < int(disasmLines.size()))
-				cursorAddr = disasmLines[disasmTopLine+line].addr;
-			else
+		if (e->x() > frameL + 32) {
+			// check if the line exists
+			// (bottom of memory could have an empty line)
+			if (line + disasmTopLine < int(disasmLines.size())) {
+				cursorAddr = disasmLines[disasmTopLine + line].addr;
+			} else {
 				return;
+			}
 		
 			// scroll if partial line
-			if(line==int(visibleLines))
-				setAddress(disasmLines[disasmTopLine+1].addr, TopAlways);
-			else
+			if (line == int(visibleLines)) {
+				setAddress(disasmLines[disasmTopLine + 1].addr, TopAlways);
+			} else {
 				update();
-		} else if(e->x() < frameL+16) {
+			}
+		} else if (e->x() < frameL+16) {
 			// clicked on the breakpoint area
-			if(line + disasmTopLine < int(disasmLines.size()))
+			if (line + disasmTopLine < int(disasmLines.size())) {
 				emit toggleBreakpoint(disasmLines[line + disasmTopLine].addr);
+			}
 		}
 	} 
 }

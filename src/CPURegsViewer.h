@@ -5,6 +5,8 @@
 
 #include <QFrame>
 
+class QPaintEvent;
+
 
 struct Z80Registers {
 	quint16 AF,BC,DE,HL;
