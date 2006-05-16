@@ -50,7 +50,7 @@ StackViewer::StackViewer(QWidget* parent)
 	stackPointer = 0;
 	topAddress = 0;
 	waitingForData = false;
-	
+
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->hide();
 	
@@ -58,8 +58,8 @@ StackViewer::StackViewer(QWidget* parent)
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
 	setSizes();
-	
-	connect(vertScrollBar, SIGNAL( valueChanged(int) ), this, SLOT( setLocation(int) ) );	
+
+	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
 }
 
 void StackViewer::setSizes()
@@ -74,44 +74,44 @@ void StackViewer::setScrollBarValues()
 	vertScrollBar->setMinimum(stackPointer);
 
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
-	
-	int lines = (memoryLength-stackPointer)/2;
-	vertScrollBar->setMaximum(stackPointer + 2*(lines-int(visibleLines)));
+
+	int lines = (memoryLength-stackPointer) / 2;
+	vertScrollBar->setMaximum(stackPointer + 2 * (lines - int(visibleLines)));
 	vertScrollBar->setSingleStep(1);
 	vertScrollBar->setPageStep(int(visibleLines));
 }
 
-void StackViewer::resizeEvent(QResizeEvent *e)
+void StackViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 
-	setScrollBarValues();	
+	setScrollBarValues();
 	vertScrollBar->setGeometry(width() - frameR, frameT,
-	                       vertScrollBar->sizeHint().width(),
-	                       height()-frameT-frameB);
+	                           vertScrollBar->sizeHint().width(),
+	                           height() - frameT - frameB);
 	vertScrollBar->show();
 	// calc the number of lines that can be displayed
 	// partial lines count as a whole
 }
 
-void StackViewer::paintEvent(QPaintEvent *e)
+void StackViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
-	
+
 	QPainter p(this);
 	int h = fontMetrics().height();
 	int d = fontMetrics().descent();
-	
+
 	// set font
-	p.setPen( Qt::black );
+	p.setPen(Qt::black);
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
-	if(r.left()<frameL) r.setLeft(frameL);
-	if(r.top()<frameT) r.setTop(frameT);
-	if(r.right()>width()-frameR-1) r.setRight(width()-frameR-1);
-	if(r.bottom()>height()-frameB-1) r.setBottom(height()-frameB-1);
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop (frameT);
+	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
 	// calc layout (not optimal)
@@ -120,23 +120,22 @@ void StackViewer::paintEvent(QPaintEvent *e)
 
 	int y = frameT + h - 1;
 	
-	QString hexStr;
-
 	int address = topAddress;
 
-	for(int i=0; i<int(ceil(visibleLines)); i++) {
+	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
 		// print address
+		QString hexStr;
 		hexStr.sprintf("%04X", address);
-		p.drawText(xAddr, y-d, hexStr);
-		hexStr.sprintf("%02X%02X", memory[address+1], memory[address]);
-		p.drawText(xStack, y-d, hexStr);
+		p.drawText(xAddr,  y - d, hexStr);
+		hexStr.sprintf("%02X%02X", memory[address + 1], memory[address]);
+		p.drawText(xStack, y - d, hexStr);
 		y += h;
 		address += 2;
-		if(address>=memoryLength-1) break;
+		if (address >= memoryLength - 1) break;
 	}
 }
 
-void StackViewer::setData(unsigned char *memPtr, int memLength)
+void StackViewer::setData(unsigned char* memPtr, int memLength)
 {
 	memory = memPtr;
 	memoryLength = memLength;
@@ -150,12 +149,12 @@ void StackViewer::setLocation(int addr)
 		return;
 	}
 	int start = (addr & ~1) | (stackPointer & 1);
-	int size = 2*int(ceil(visibleLines));
+	int size = 2 * int(ceil(visibleLines));
 
-	if(start+size>=memoryLength)
-		size = memoryLength-start;
-
-	StackRequest *req = new StackRequest(start, size,
+	if(start + size >= memoryLength) {
+		size = memoryLength - start;
+	}
+	StackRequest* req = new StackRequest(start, size,
 	                                     &memory[start], *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
@@ -169,14 +168,14 @@ void StackViewer::setStackPointer(quint16 addr)
 	setLocation(addr);
 }
 
-void StackViewer::memdataTransfered(StackRequest *r)
+void StackViewer::memdataTransfered(StackRequest* r)
 {
 	topAddress = r->offset;
 	update();
 	transferCancelled(r);
 }
 
-void StackViewer::transferCancelled(StackRequest *r)
+void StackViewer::transferCancelled(StackRequest* r)
 {
 	waitingForData = false;
 	// check whether a new value is available

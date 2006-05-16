@@ -28,17 +28,17 @@ private:
 };
 
 
-SlotViewer::SlotViewer( QWidget* parent )
-	: QFrame( parent )
+SlotViewer::SlotViewer(QWidget* parent)
+	: QFrame(parent)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
 	memLayout = NULL;
-	for(int p=0; p<4; p++) {
-		slotsChanged[p] = FALSE;
-		segmentsChanged[p] = FALSE;
+	for (int p = 0; p < 4; ++p) {
+		slotsChanged[p] = false;
+		segmentsChanged[p] = false;
 	}
 
 	frameL = frameT = frameB = frameWidth();
@@ -47,16 +47,16 @@ SlotViewer::SlotViewer( QWidget* parent )
 	setSizes();
 }
 
-void SlotViewer::resizeEvent(QResizeEvent *e)
+void SlotViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 }
 
-void SlotViewer::paintEvent(QPaintEvent *e)
+void SlotViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
-	
+
 	QPainter p(this);
 
 	QStyleOptionHeader so;
@@ -73,90 +73,96 @@ void SlotViewer::paintEvent(QPaintEvent *e)
 	so.section = 0;
 	so.text = "Page";
 	style()->drawControl(QStyle::CE_Header, &so, &p);
-	so.rect.setLeft(so.rect.left()+headerSize1);
+	so.rect.setLeft(so.rect.left() + headerSize1);
 	so.rect.setWidth(headerSize2);
 	so.section = 1;
 	so.text = "Address";
 	style()->drawControl(QStyle::CE_Header, &so, &p);
-	so.rect.setLeft(so.rect.left()+headerSize2);
+	so.rect.setLeft(so.rect.left() + headerSize2);
 	so.rect.setWidth(headerSize3);
 	so.section = 2;
 	so.text = "Slot";
 	style()->drawControl(QStyle::CE_Header, &so, &p);
-	so.rect.setLeft(so.rect.left()+headerSize3);
+	so.rect.setLeft(so.rect.left() + headerSize3);
 	so.rect.setWidth(headerSize4);
 	so.section = 3;
 	so.text = "Segment";
 	style()->drawControl(QStyle::CE_Header, &so, &p);
-	
+
 	// calc and set drawing bounds
-	QRect r( e->rect() );
-	if(r.left()<frameL) r.setLeft(frameL);
-	if(r.top()<frameT) r.setTop(frameT);
-	if(r.right()>width()-frameR-1) r.setRight(width()-frameR-1);
-	if(r.bottom()>height()-frameB-1) r.setBottom(height()-frameB-1);
+	QRect r(e->rect());
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop (frameT);
+	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
-	int	mid1 = frameL + headerSize1/2;
-	int	mid2 = frameL + headerSize1 + headerSize2/2;
-	int	mid3 = frameL + headerSize1 + headerSize2 + headerSize3/2;
-	int	mid4 = frameL + headerSize1 + headerSize2 + headerSize3+ headerSize4/2;
-	int dy = (height() - frameT - frameB - headerHeight)/4;
-	int y = frameT + headerHeight + dy/2 + fontMetrics().height()/2 - fontMetrics().descent();
+	int mid1 = frameL + headerSize1 / 2;
+	int mid2 = frameL + headerSize1 + headerSize2 / 2;
+	int mid3 = frameL + headerSize1 + headerSize2 + headerSize3 / 2;
+	int mid4 = frameL + headerSize1 + headerSize2 + headerSize3 + headerSize4 / 2;
+	int dy = (height() - frameT - frameB - headerHeight) / 4;
+	int y = frameT + headerHeight + dy / 2 + fontMetrics().height() / 2 -
+	        fontMetrics().descent();
 
-	QString str;
-	int isOn = isEnabled() && memLayout!=NULL;
-	
-	for(int i=0; i<4; i++) {
-		p.setPen( palette().color(QPalette::Text) );
-		
+	int isOn = isEnabled() && memLayout != NULL;
+	for(int i = 0; i < 4; ++i) {
+		QString str;
+		p.setPen(palette().color(QPalette::Text));
+
 		// print page nr
 		str.sprintf("%i", i);
-		p.drawText(mid1 - fontMetrics().width(str)/2, y, str);
-		
+		p.drawText(mid1 - fontMetrics().width(str) / 2, y, str);
+
 		// print address
 		str.sprintf("$%04X", i * 0x4000);
-		p.drawText(mid2 - fontMetrics().width(str)/2, y, str);
-		
+		p.drawText(mid2 - fontMetrics().width(str) / 2, y, str);
+
 		// print slot
-		if(isOn) {
-			if(memLayout->isSubslotted[memLayout->primarySlot[i] & 3])
-				str.sprintf("%c-%c", memLayout->primarySlot[i], memLayout->secondarySlot[i]);
-			else
+		if (isOn) {
+			if (memLayout->isSubslotted[memLayout->primarySlot[i] & 3]) {
+				str.sprintf("%c-%c", memLayout->primarySlot[i],
+				                     memLayout->secondarySlot[i]);
+			} else {
 				str = memLayout->primarySlot[i];
+			}
 		} else {
 			str = "-";
 		}
 		// set pen colour to red if slot was recently changed
-		if(slotsChanged[i] && isOn)
-			p.setPen( Qt::red );
-		else
-			p.setPen( palette().color(QPalette::Text) );
-		
-		p.drawText(mid3 - fontMetrics().width(str)/2, y, str);
+		if (slotsChanged[i] && isOn) {
+			p.setPen(Qt::red);
+		} else {
+			p.setPen(palette().color(QPalette::Text));
+		}
+
+		p.drawText(mid3 - fontMetrics().width(str) / 2, y, str);
 		
 		// print segment
-		if(isOn) {
+		if (isOn) {
 			int ms;
-			if(memLayout->isSubslotted[memLayout->primarySlot[i] & 3])
+			if (memLayout->isSubslotted[memLayout->primarySlot[i] & 3]) {
 				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3]
-				                         [memLayout->secondarySlot[i] & 3];
-			else
+				                          [memLayout->secondarySlot[i] & 3];
+			} else {
 				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3][0];
-			if(ms>0)
+			}
+			if (ms > 0) {
 				str.sprintf("%i", memLayout->mapperSegment[i]);
-			else
+			} else {
 				str = "-";
+			}
 		} else {
 			str = "-";
 		}
 		// set pen colour to red if slot was recently changed
-		if(segmentsChanged[i] && isOn)
-			p.setPen( Qt::red );
-		else
-			p.setPen( palette().color(QPalette::Text) );
-		p.drawText(mid4 - fontMetrics().width(str)/2, y, str);
-		
+		if (segmentsChanged[i] && isOn) {
+			p.setPen(Qt::red);
+		} else {
+			p.setPen(palette().color(QPalette::Text));
+		}
+		p.drawText(mid4 - fontMetrics().width(str) / 2, y, str);
+
 		y += dy;
 	}
 }
@@ -169,7 +175,7 @@ void SlotViewer::setSizes()
 	headerSize4 = 8 + fontMetrics().width("Segment");
 	headerHeight = 8 + fontMetrics().height();
 	
-	int v = headerSize1+headerSize2+headerSize3+headerSize4+frameL+frameR;
+	int v = headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR;
 	setMinimumWidth(v);
 	setMaximumWidth(v);
 }
@@ -179,7 +185,7 @@ void SlotViewer::refresh()
 	CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
 }
 
-void SlotViewer::setMemoryLayout(MemoryLayout *ml)
+void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 {
 	memLayout = ml;
 }
@@ -190,12 +196,13 @@ void SlotViewer::slotsUpdated(const QString& message)
 
 	// parse page slots and segments
 	for (int p = 0; p < 4; ++p) {
-		slotsChanged[p] = (memLayout->primarySlot[p] != lines[p*2][0]) ||
-		                  (memLayout->secondarySlot[p] != lines[p*2][1]);
-		memLayout->primarySlot[p] = lines[p*2][0].toAscii();
-		memLayout->secondarySlot[p] = lines[p*2][1].toAscii();
-		segmentsChanged[p] = memLayout->mapperSegment[p] != lines[p*2+1].toUShort();
-		memLayout->mapperSegment[p] = lines[p*2+1].toUShort();
+		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0]) ||
+		                  (memLayout->secondarySlot[p] != lines[p * 2][1]);
+		memLayout->primarySlot  [p] = lines[p * 2][0].toAscii();
+		memLayout->secondarySlot[p] = lines[p * 2][1].toAscii();
+		segmentsChanged[p] = memLayout->mapperSegment[p] !=
+		                     lines[p * 2 + 1].toUShort();
+		memLayout->mapperSegment[p] = lines[p * 2 + 1].toUShort();
 	}
 	// parse slot layout
 	int l = 8;

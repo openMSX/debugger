@@ -16,8 +16,6 @@ public:
 	HexViewer(QWidget* parent = 0);
 
 	void setData(const char* name, unsigned char* datPtr, int datLength);
-	void hexdataTransfered(HexRequest* r);
-	void transferCancelled(HexRequest* r);
 	void refresh();
 
 public slots:
@@ -28,6 +26,10 @@ protected:
 	void paintEvent(QPaintEvent* e);
 
 private:
+	void setScrollBarValues();
+	void hexdataTransfered(HexRequest* r);
+	void transferCancelled(HexRequest* r);
+
 	QScrollBar* vertScrollBar;
 
 	int frameL, frameR, frameT, frameB;
@@ -40,7 +42,7 @@ private:
 	unsigned char* hexData;
 	int hexDataLength;
 
-	void setScrollBarValues();
+	friend class HexRequest;
 };
 
 #endif // HEXVIEWER_H

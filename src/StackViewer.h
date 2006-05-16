@@ -16,8 +16,6 @@ public:
 	StackViewer(QWidget* parent = 0);
 
 	void setData(unsigned char* memPtr, int memLength);
-	void memdataTransfered(StackRequest* r);
-	void transferCancelled(StackRequest* r);
 
 public slots:
 	void setLocation(int addr);
@@ -28,6 +26,11 @@ protected:
 	void paintEvent(QPaintEvent* e);
 
 private:
+	void setSizes();
+	void setScrollBarValues();
+	void memdataTransfered(StackRequest* r);
+	void transferCancelled(StackRequest* r);
+
 	QScrollBar* vertScrollBar;
 
 	int frameL, frameR, frameT, frameB;
@@ -39,8 +42,7 @@ private:
 	unsigned char* memory;
 	int memoryLength;
 
-	void setSizes();
-	void setScrollBarValues();
+	friend class StackRequest;
 };
 
 #endif // STACKVIEWER_H

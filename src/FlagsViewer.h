@@ -6,6 +6,8 @@
 #include <QFrame>
 
 class QPainter;
+class QResizeEvent;
+class QPaintEvent;
 class QString;
 
 class FlagsViewer : public QFrame

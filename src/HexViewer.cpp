@@ -6,7 +6,6 @@
 #include <QScrollBar>
 #include <QPaintEvent>
 #include <QPainter>
-#include <QPixmap>
 #include <cmath>
 
 
@@ -40,18 +39,18 @@ private:
 };
 
 
-HexViewer::HexViewer( QWidget* parent )
-	: QFrame( parent )
+HexViewer::HexViewer(QWidget* parent)
+	: QFrame(parent)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
-	setFont(QFont( "Courier New", 12));
+	setFont(QFont("Courier New", 12));
 
 	horBytes = 16;
 	hexTopAddress = 0;
-	waitingForData = FALSE;
+	waitingForData = false;
 	
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->hide();
@@ -59,7 +58,7 @@ HexViewer::HexViewer( QWidget* parent )
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
-	connect(vertScrollBar, SIGNAL( valueChanged(int) ), this, SLOT( setLocation(int) ) );	
+	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
 }
 
 void HexViewer::setScrollBarValues()
@@ -69,94 +68,93 @@ void HexViewer::setScrollBarValues()
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 	
 	int maxLine = int(ceil(double(hexDataLength) / horBytes)) - int(visibleLines);
-	if(maxLine<0) maxLine = 0;
+	if (maxLine < 0) maxLine = 0;
 	vertScrollBar->setMaximum(maxLine);
 	vertScrollBar->setSingleStep(1);
 	vertScrollBar->setPageStep(int(visibleLines));
 }
 
-void HexViewer::resizeEvent(QResizeEvent *e)
+void HexViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 
-	setScrollBarValues();	
+	setScrollBarValues();
 	vertScrollBar->setGeometry(width() - frameR, frameT,
-	                       vertScrollBar->sizeHint().width(),
-	                       height()-frameT-frameB);
+	                           vertScrollBar->sizeHint().width(),
+	                           height() - frameT - frameB);
 	vertScrollBar->show();
 	// calc the number of lines that can be displayed
 	// partial lines count as a whole
 }
 
-void HexViewer::paintEvent(QPaintEvent *e)
+void HexViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
-	
+
 	QPainter p(this);
 	int h = fontMetrics().height();
 	int d = fontMetrics().descent();
-	
+
 	// set font
-	p.setPen( Qt::black );
+	p.setPen(Qt::black);
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
-	if(r.left()<frameL) r.setLeft(frameL);
-	if(r.top()<frameT) r.setTop(frameT);
-	if(r.right()>width()-frameR-1) r.setRight(width()-frameR-1);
-	if(r.bottom()>height()-frameB-1) r.setBottom(height()-frameB-1);
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop (frameT);
+	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
 	// calc layout (not optimal)
 	int charWidth = fontMetrics().width("A");
 	int spacing = charWidth / 2;
 	int xAddr = frameL + 8;
-	int xHex1 = xAddr + 6*charWidth;
-	int dHex = 2*charWidth + spacing;
+	int xHex1 = xAddr + 6 * charWidth;
+	int dHex = 2 * charWidth + spacing;
 
 	int y = frameT + h - 1;
 	
-	QString hexStr;
-
 	int address = hexTopAddress;
-	int addr;
-	unsigned char chr;
 
-	for(int i=0; i<int(ceil(visibleLines)); i++) {
+	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
 		// print address
+		QString hexStr;
 		hexStr.sprintf("%04X", address);
-		p.drawText(xAddr, y-d, hexStr);
+		p.drawText(xAddr, y - d, hexStr);
 		// print bytes
 		int x = xHex1;
-		for(addr=address; addr<address+horBytes; addr++) {
+		for (int addr = address; addr < address + horBytes; ++addr) {
 			// at extra spacing halfway
-			if(!(horBytes & 1))
-				if(addr-address==horBytes/2)
+			if (!(horBytes & 1)) {
+				if (addr - address == horBytes / 2) {
 					x += spacing;
+				}
+			}
 			// print data (if there still is any)
-			if(addr<hexDataLength) {
+			if (addr < hexDataLength) {
 				hexStr.sprintf("%02X", hexData[addr]);
-				p.drawText(x, y-d, hexStr);
+				p.drawText(x, y - d, hexStr);
 			}
 			x += dHex;
 		}
-		x += 2*spacing;
-		hexStr = "";
-		for(addr=address; addr<address+horBytes; addr++) {
-			if(addr>=hexDataLength) break;
-			chr = hexData[addr];
-			if(chr<32 || chr>127) chr = '.';
+		x += 2 * spacing;
+		hexStr.clear();
+		for (int addr = address; addr < address + horBytes; ++addr) {
+			if (addr >= hexDataLength) break;
+			unsigned char chr = hexData[addr];
+			if (chr < 32 || chr > 127) chr = '.';
 			hexStr += chr;
 		}
-		p.drawText(x, y-d, hexStr);
+		p.drawText(x, y - d, hexStr);
 		y += h;
 		address += horBytes;
-		if(address>=hexDataLength) break;
+		if (address >= hexDataLength) break;
 	}
 }
 
-void HexViewer::setData(const char *name, unsigned char *datPtr, int datLength)
+void HexViewer::setData(const char* name, unsigned char* datPtr, int datLength)
 {
 	dataName = name;
 	hexData = datPtr;
@@ -166,38 +164,38 @@ void HexViewer::setData(const char *name, unsigned char *datPtr, int datLength)
 
 void HexViewer::setLocation(int addr)
 {	
-	if(!waitingForData) {
-		int start = addr*horBytes;
-		int size = horBytes*int(ceil(visibleLines));
+	if (!waitingForData) {
+		int start = addr * horBytes;
+		int size = horBytes * int(ceil(visibleLines));
 
-		if(start+size>hexDataLength)
-			size = hexDataLength-start;
-	
-		HexRequest *req = new HexRequest(dataName, 
-		                                 start, size, &hexData[start], *this);
-
+		if (start + size > hexDataLength) {
+			size = hexDataLength - start;
+		}
+		HexRequest* req = new HexRequest(
+			dataName, start, size, &hexData[start], *this);
 		CommClient::instance().sendCommand(req);
 		waitingForData = TRUE;
 	}
 }
 
-void HexViewer::hexdataTransfered(HexRequest *r)
+void HexViewer::hexdataTransfered(HexRequest* r)
 {
 	hexTopAddress = r->offset;
 	update();
 	transferCancelled(r);
 }
 
-void HexViewer::transferCancelled(HexRequest *r)
+void HexViewer::transferCancelled(HexRequest* r)
 {
 	delete r;
-	waitingForData = FALSE;
+	waitingForData = false;
 	// check whether a new value is available
-	if(hexTopAddress != vertScrollBar->value()*horBytes)
+	if (hexTopAddress != vertScrollBar->value() * horBytes) {
 		setLocation(vertScrollBar->value());
+	}
 }
 
 void HexViewer::refresh()
 {
-	setLocation( vertScrollBar->value() );
+	setLocation(vertScrollBar->value());
 }
