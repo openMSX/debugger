@@ -311,6 +311,11 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 	ui.table->insertRow(row);
 	ui.table->setItem(row, 0, pidItem);
 	ui.table->setItem(row, 1, titleItem);
+
+	if (row == 0) {
+		// automatically select first row
+		ui.table->setCurrentItem(pidItem);
+	}
 }
 
 void ConnectDialog::connectionBad(OpenMSXConnection& connection)
