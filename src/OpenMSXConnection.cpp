@@ -79,7 +79,7 @@ OpenMSXConnection::~OpenMSXConnection()
 {
 	cleanup();
 	assert(commands.empty());
-	assert(socket->state() != QAbstractSocket::ConnectedState);
+	assert(!connected);
 }
 
 void OpenMSXConnection::sendCommand(Command* command)
@@ -98,7 +98,7 @@ void OpenMSXConnection::cleanup()
 {
 	if (socket->isValid()) {
 		socket->write("</openmsx-control>\n");
-		socket->close();
+		socket->disconnectFromHost();
 	}
 	connected = false;
 	cancelPending();
