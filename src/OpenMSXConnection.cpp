@@ -1,3 +1,5 @@
+// $Id$
+
 #include "OpenMSXConnection.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
@@ -96,13 +98,15 @@ void OpenMSXConnection::sendCommand(Command* command)
 
 void OpenMSXConnection::cleanup()
 {
-	if (socket->isValid()) {
-		socket->write("</openmsx-control>\n");
-		socket->disconnectFromHost();
+	if (connected) {
+		connected = false;
+		if (socket->isValid()) {
+			socket->write("</openmsx-control>\n");
+			socket->disconnectFromHost();
+		}
+		cancelPending();
+		emit disconnected();
 	}
-	connected = false;
-	cancelPending();
-	emit disconnected();
 }
 
 void OpenMSXConnection::cancelPending()
@@ -169,7 +173,7 @@ bool OpenMSXConnection::endElement(
 		if (connected) {
 			Command* command = commands.dequeue();
 			if (xmlAttrs.value("result") == "ok") {
-				command->replyOk(xmlData);
+				command->replyOk (xmlData);
 			} else {
 				command->replyNok(xmlData);
 			}

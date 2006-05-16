@@ -374,6 +374,9 @@ DebuggerForm::~DebuggerForm()
 
 void DebuggerForm::initConnection()
 {
+	systemConnectAction->setEnabled(false);
+	systemDisconnectAction->setEnabled(true);
+
 	comm.sendCommand(new QueryPauseHandler(*this));
 	comm.sendCommand(new QueryBreakedHandler(*this));
 
@@ -419,7 +422,6 @@ void DebuggerForm::initConnection()
 
 void DebuggerForm::connectionClosed()
 {
-	systemDisconnectAction->setEnabled(false);
 	systemPauseAction->setEnabled(false);
 	executeBreakAction->setEnabled(false);
 	executeRunAction->setEnabled(false);
@@ -427,6 +429,7 @@ void DebuggerForm::connectionClosed()
 	executeStepOverAction->setEnabled(false);
 	executeStepOutAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
+	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
 
 	disasmView->setEnabled(false);
@@ -439,9 +442,8 @@ void DebuggerForm::connectionClosed()
 
 void DebuggerForm::finalizeConnection(bool halted)
 {
-	systemDisconnectAction->setEnabled(true);
 	systemPauseAction->setEnabled(true);
-	if (halted){
+	if (halted) {
 		setBreakMode();
 		breakOccured();
 	} else {
@@ -519,7 +521,6 @@ void DebuggerForm::setRunMode()
 
 void DebuggerForm::systemConnect()
 {
-	systemConnectAction->setEnabled(false);
 	OpenMSXConnection* connection = ConnectDialog::getConnection(this);
 	if (connection) {
 		comm.connectToOpenMSX(connection);
