@@ -27,16 +27,18 @@ void FlagsViewer::resizeEvent(QResizeEvent* e)
 
 void FlagsViewer::paintEvent(QPaintEvent* e)
 {
+	const char* const flagNames[8] =
+		{ "C"   , "N", "P"   , "", "H", "", "Z"   , "S"   };
+	const char* const flagOn[8] =
+		{ "(C)" , "" , "(PO)", "", "",  "", "(Z)" , "(M)" };
+	const char* const flagOff[8] =
+		{ "(NC)", "" , "(PE)", "", "",  "", "(NZ)", "(P)" };
+
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
 
 	QPainter p(this);
 	p.setPen(palette().color(QPalette::Text));
-
-	int h = fontMetrics().height();
-	int flagWidth = fontMetrics().width("ZW");
-	int valWidth = fontMetrics().width("0 ");
-	int d = fontMetrics().descent();
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
@@ -46,79 +48,21 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
-	int x = frameL + 4;
+	int h = fontMetrics().height();
+	int flagWidth = fontMetrics().width("ZW");
+	int valWidth = fontMetrics().width("0 ");
+	int d = fontMetrics().descent();
 	int y = frameT + h - 1 - d;
-	
-	QString hexStr;
-
-	p.drawText(x, y, "S");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 128 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 128);
-	x += valWidth;
-	p.drawText(x, y, (flags & 128) ? "(M)" : "(P)");
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, "Z");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 64 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 64);
-	x += valWidth;
-	p.drawText(x, y, (flags & 64) ? "(Z)" : "(NZ)");
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, " ");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 32 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 32);
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, "H");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 16 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 16);
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, " ");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 8 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 8);
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, "P");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 4 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 4);
-	x += valWidth;
-	p.drawText(x, y, (flags & 4) ? "(PO)" : "(PE)");
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, "N");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 2 ? 1 : 0);
-	drawValue(p, x, y, hexStr, flagsChanged & 2);
-
-	x = frameL + 4;
-	y += h;
-
-	p.drawText(x, y, "C");
-	x += flagWidth;
-	hexStr.sprintf("%1i", flags & 1);
-	drawValue(p, x, y, hexStr, flagsChanged & 1);
-	x += valWidth;
-	p.drawText(x, y, (flags & 1) ? "(C)" : "(NC)");
+	for (int flag = 7; flag >= 0; --flag) {
+		int x = frameL + 4;
+		p.drawText(x, y, flagNames[flag]);
+		x += flagWidth;
+		int bit = 1 << flag;
+		drawValue(p, x, y, (flags & bit) ? "1" : "0", flagsChanged & bit);
+		x += valWidth;
+		p.drawText(x, y, (flags & bit) ? flagOn[flag] : flagOff[flag]);
+		y += h;
+	}
 }
 
 void FlagsViewer::setSizes()
