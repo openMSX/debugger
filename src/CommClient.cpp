@@ -36,9 +36,9 @@ void CommClient::connectToOpenMSX(OpenMSXConnection* conn)
 void CommClient::closeConnection()
 {
 	if (connection) {
-		OpenMSXConnection* tmp = connection;
+		connection->disconnect( this, SLOT( closeConnection() ) );
+		delete connection;
 		connection = NULL;
-		delete tmp; // triggers closeConnection()
 		emit connectionTerminated();
 	}
 }

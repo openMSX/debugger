@@ -77,7 +77,8 @@ private:
 	                const QString& qName);
 	bool characters(const QString& ch);
 
-	std::auto_ptr<QAbstractSocket> socket;
+	//std::auto_ptr<QAbstractSocket> socket;
+	QAbstractSocket* socket;
 	std::auto_ptr<QXmlInputSource> input;
 	std::auto_ptr<QXmlSimpleReader> reader;
 

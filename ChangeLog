@@ -1,5 +1,9 @@
 $Id$
 
+2006-06-14 Edwin Velds <e.velds@gmail.com>
+	* Updated the connection dialog
+	* Fixed a bug that caused a crash on closing openMSX
+
 2006-05-13 Maarten ter Huurne <maarten@treewalker.org>
 	* Added support for UI files in the new build system.
 	* Got rid of the qmake build, since the generated UI headers in src/

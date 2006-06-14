@@ -10,17 +10,18 @@ interface.
 
 The debugger requires the Qt4 GUI library to be installed.
 
-Because the debugger communicates though the openMSX network
-socket, openMSX should have the network socket enabled.
+A (reasonably) new CVS version of openMSX.
 
 * Building
 
-Build as follows:
+Set the variable QT_BASE in the file build/main.mk to point to 
+correct Qt4 install directory.
 
-qmake
+Then build with:
+
 make
 
 * Installing
 
-Install src/openmsx-debugger manually in any place you want.
+Install derived/bin/openmsx-debugger manually in any place you want.
 

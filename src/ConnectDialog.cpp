@@ -3,7 +3,6 @@
 #include "ConnectDialog.h"
 #include "OpenMSXConnection.h"
 #include <QProcess>
-#include <QHeaderView>
 #include <QString>
 #include <QDir>
 #include <QFileInfo>
@@ -157,42 +156,23 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 }
 
 
-// Command handler to get initial info from new openmsx connections
-
-class ConnectionInfoRequest : public Command
-{
-public:
-	ConnectionInfoRequest(ConnectDialog& dialog, OpenMSXConnection& connection);
-
-	virtual QString getCommand() const;
-	virtual void replyOk (const QString& message);
-	virtual void replyNok(const QString& message);
-	virtual void cancel();
-
-private:
-	enum State { GET_PID, GET_TITLE };
-
-	ConnectDialog& dialog;
-	OpenMSXConnection& connection;
-	State state;
-	QString pid;
-};
+// ConnectionInfoRequest class 
 
 ConnectionInfoRequest::ConnectionInfoRequest(
 		ConnectDialog& dialog_, OpenMSXConnection& connection_)
 	: dialog(dialog_), connection(connection_)
 {
-	state = GET_PID;
+	state = GET_MACHINE;
 	connection.sendCommand(this);
 }
 
 QString ConnectionInfoRequest::getCommand() const
 {
 	switch (state) {
-	case GET_PID:
-		return "pid";
+	case GET_MACHINE:
+		return "openmsx_info version";
 	case GET_TITLE:
-		return "openmsx_info time"; // TODO fix this
+		return "guess_title";
 	default:
 		assert(false);
 		return "";
@@ -202,15 +182,17 @@ QString ConnectionInfoRequest::getCommand() const
 void ConnectionInfoRequest::replyOk(const QString& message)
 {
 	switch (state) {
-	case GET_PID:
-		pid = message;
+	case GET_MACHINE:
+		title = message;
 		state = GET_TITLE;
 		connection.sendCommand(this);
 		break;
 	case GET_TITLE: {
-		QString title = message;
-		dialog.connectionOk(connection, pid, title);
-		delete this;
+		if( message != "" )
+			title += " (" + message + ")";
+		dialog.connectionOk(connection, title);
+		state = DONE;
+		connect( &connection, SIGNAL( disconnected() ), this, SLOT( terminate() ) );
 		break;
 	}
 	default:
@@ -226,16 +208,32 @@ void ConnectionInfoRequest::replyNok(const QString& /*message*/)
 void ConnectionInfoRequest::cancel()
 {
 	dialog.connectionBad(connection);
-	delete this;
 }
 
+void ConnectionInfoRequest::terminate()
+{
+	cancel();
+}
 
 // class ConnectDialog
 
 OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 {
 	ConnectDialog dialog(parent);
-	dialog.exec();
+
+	// delay for at most 200ms while checking the connections
+	dialog.delay = 1;
+	dialog.startTimer( 200 );
+	while( dialog.pendingConnections.size() && dialog.delay ) 
+		qApp->processEvents( QEventLoop::AllEvents, 200 );
+
+	// if there is only one valid connection, use it immediately,
+	// otherwise execute the dialog.
+	if( dialog.pendingConnections.size() == 0 && dialog.confirmedConnections.size() == 1 )
+		dialog.on_connectButton_clicked();
+	else
+		dialog.exec();
+
 	return dialog.result;
 }
 
@@ -244,9 +242,6 @@ ConnectDialog::ConnectDialog(QWidget* parent)
 	, result(NULL)
 {
 	ui.setupUi(this);
-	ui.table->verticalHeader()->hide();
-	ui.table->horizontalHeader()->setStretchLastSection(true);
-	ui.table->setColumnCount(2);
 	on_rescanButton_clicked();
 }
 
@@ -255,21 +250,28 @@ ConnectDialog::~ConnectDialog()
 	clear();
 }
 
+void ConnectDialog::timerEvent( QTimerEvent *event )
+{
+	killTimer(event->timerId());
+	delay = 0;
+}
+
 void ConnectDialog::clear()
 {
-	ui.table->setRowCount(0);
+	ui.listConnections->clear();
 
-	OpenMSXConnections pendingCopy(pendingConnections);
-	OpenMSXConnections confirmedCopy(confirmedConnections);
+	// First kill the infos. That will remove the disconnect signals.
+	qDeleteAll(connectionInfos);
+	connectionInfos.clear();
+	qDeleteAll(pendingConnections);
 	pendingConnections.clear();
+	qDeleteAll(confirmedConnections);
 	confirmedConnections.clear();
-	qDeleteAll(pendingCopy);
-	qDeleteAll(confirmedCopy);
 }
 
 void ConnectDialog::on_connectButton_clicked()
 {
-	int row = ui.table->currentRow();
+	int row = ui.listConnections->currentRow();
 	if (row != -1) {
 		assert((0 <= row) && (row < confirmedConnections.size()));
 		result = confirmedConnections[row];
@@ -283,7 +285,7 @@ void ConnectDialog::on_rescanButton_clicked()
 	clear();
 	collectServers(pendingConnections);
 	foreach (OpenMSXConnection* connection, pendingConnections) {
-		new ConnectionInfoRequest(*this, *connection);
+		connectionInfos.append(new ConnectionInfoRequest(*this, *connection));
 	}
 }
 
@@ -293,7 +295,7 @@ void ConnectDialog::on_launchButton_clicked()
 }
 
 void ConnectDialog::connectionOk(OpenMSXConnection& connection,
-                                 const QString& pid, const QString& title)
+                                 const QString& title)
 {
 	OpenMSXConnections::iterator it = qFind(pendingConnections.begin(),
 	                                        pendingConnections.end(),
@@ -305,16 +307,11 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 	pendingConnections.erase(it);
 	confirmedConnections.push_back(&connection);
 
-	int row = ui.table->rowCount();
-	QTableWidgetItem* pidItem = new QTableWidgetItem(pid);
-	QTableWidgetItem* titleItem = new QTableWidgetItem(title);
-	ui.table->insertRow(row);
-	ui.table->setItem(row, 0, pidItem);
-	ui.table->setItem(row, 1, titleItem);
+	new QListWidgetItem( title, ui.listConnections );
 
-	if (row == 0) {
+	if (ui.listConnections->count() == 1) {
 		// automatically select first row
-		ui.table->setCurrentItem(pidItem);
+		ui.listConnections->setCurrentRow(0);
 	}
 }
 
@@ -324,7 +321,14 @@ void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 	                                        pendingConnections.end(),
 	                                        &connection);
 	if (it == pendingConnections.end()) {
-		// connection is already beiing destoyed
+		// was this connection established but terminated?
+		int id = confirmedConnections.indexOf( &connection );
+		if( id >= 0 ) {
+			OpenMSXConnection *conn = confirmedConnections.takeAt( id );
+			QListWidgetItem *item = ui.listConnections->takeItem( id );
+			delete item;
+			delete conn;
+                }
 		return;
 	}
 	pendingConnections.erase(it);

@@ -68,10 +68,10 @@ OpenMSXConnection::OpenMSXConnection(QAbstractSocket* socket_)
 	reader->setContentHandler(this);
 	reader->setErrorHandler(this);
 
-	connect(socket.get(), SIGNAL(readyRead()), this, SLOT(processData()));
-	connect(socket.get(), SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+	connect(socket, SIGNAL(readyRead()), this, SLOT(processData()));
+	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
 	        this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-	connect(socket.get(), SIGNAL(error(QAbstractSocket::SocketError)),
+	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
 	        this, SLOT(socketError(QAbstractSocket::SocketError)));
 
 	socket->write("<openmsx-control>\n");
@@ -82,6 +82,7 @@ OpenMSXConnection::~OpenMSXConnection()
 	cleanup();
 	assert(commands.empty());
 	assert(!connected);
+	socket->deleteLater();
 }
 
 void OpenMSXConnection::sendCommand(Command* command)
@@ -101,6 +102,9 @@ void OpenMSXConnection::cleanup()
 	if (connected) {
 		connected = false;
 		if (socket->isValid()) {
+			socket->disconnect( this, SLOT(processData()));
+			socket->disconnect( this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+			socket->disconnect( this, SLOT(socketError(QAbstractSocket::SocketError)));
 			socket->write("</openmsx-control>\n");
 			socket->disconnectFromHost();
 		}
@@ -142,17 +146,17 @@ void OpenMSXConnection::processData()
 		input.reset(new QXmlInputSource());
 		input->setData(socket->readAll());
 		reader->parse(input.get(), true); // incremental parsing
-	}
+	} 
 }
 
 bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
 {
 	qWarning((QString("Fatal error on line") + exception.lineNumber() +
 	          ", column" + exception.columnNumber() +
-	          ": " + exception.message()).toAscii());
+	          ": " + exception.message()).toAscii().data());
 	cleanup();
 	return false;
-}
+} 
 
 bool OpenMSXConnection::startElement(
 		const QString& /*namespaceURI*/, const QString& /*localName*/,
@@ -167,8 +171,8 @@ bool OpenMSXConnection::endElement(
 		const QString& /*namespaceURI*/, const QString& /*localName*/,
 		const QString& qName)
 {
-	if (qName == "openmsx-ouput") {
-		cleanup();
+	if (qName == "openmsx-output") {
+		// ignore
 	} else if (qName == "reply") {
 		if (connected) {
 			Command* command = commands.dequeue();
@@ -186,7 +190,7 @@ bool OpenMSXConnection::endElement(
 	} else if (qName == "update") {
 		emit updateParsed(xmlAttrs.value("type"), xmlAttrs.value("name"), xmlData);
 	} else {
-		qWarning((QString("Unknown XML tag: ") + qName).toAscii());
+		qWarning((QString("Unknown XML tag: ") + qName).toAscii().data());
 	}
 	return true;
 }
