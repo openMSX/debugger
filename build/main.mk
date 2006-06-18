@@ -215,7 +215,7 @@ ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_BASE)/lib $(addprefix -framework Qt,$(QT_COMPONENTS))
 else
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
-LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/bin -L$(QT_BASE)/bin $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS)))
+LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/bin -L$(QT_BASE)/bin $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -mwindows
 else
 LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/lib -L$(QT_BASE)/lib $(addprefix -lQt,$(QT_COMPONENTS))
 endif
