@@ -3,6 +3,7 @@
 #include "DisasmViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
+#include "DebuggerData.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOptionFocusRect>
@@ -141,6 +142,14 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 		    ? &disasmLines[i+disasmTopLine]
 		    : &DISABLED_ROW;
 
+		// if there is a label here, draw the label
+		if( row->rowType == DisasmRow::LABEL ) {
+			hexStr = QString("%1:").arg(row->instr.c_str());
+			p.drawText(xAddr, y - d, hexStr);
+			y += h;
+			continue;
+		}
+		
 		// draw cursor line or breakpoint
 		if (row->addr == cursorAddr) {
 			p.fillRect(frameL + 32, y + 1 - h, 
@@ -297,7 +306,7 @@ void DisasmViewer::setAddress(quint16 addr, int method)
 void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 {
 	// disassemble the newly received memory
-	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines);
+	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines, memLayout, symTable);
 
 	// locate the requested line 
 	disasmTopLine = 0;
@@ -410,6 +419,16 @@ void DisasmViewer::setMemory(unsigned char* memPtr)
 void DisasmViewer::setBreakpoints(Breakpoints* bps)
 {
 	breakpoints = bps;
+}
+
+void DisasmViewer::setMemoryLayout(MemoryLayout* ml)
+{
+	memLayout = ml;
+}
+
+void DisasmViewer::setSymbolTable(SymbolTable* st)
+{
+	symTable = st;
 }
 
 void DisasmViewer::keyPressEvent(QKeyEvent* e)

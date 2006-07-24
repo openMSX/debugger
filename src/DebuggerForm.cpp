@@ -10,6 +10,7 @@
 #include "CommClient.h"
 #include "OpenMSXConnection.h"
 #include "ConnectDialog.h"
+#include "SymbolManager.h"
 #include "version.h"
 #include <QAction>
 #include <QMessageBox>
@@ -139,6 +140,10 @@ void DebuggerForm::createActions()
 	systemPauseAction->setCheckable(true);
 	systemPauseAction->setEnabled(false);
 	
+	systemSymbolManagerAction = new QAction(tr("&Symbol mananger ..."), this);
+	systemSymbolManagerAction->setStatusTip(tr("Start the symbol manager"));
+	systemSymbolManagerAction->setIcon(QIcon(":/icons/symmanager.png"));
+	
 	systemExitAction = new QAction(tr("E&xit"), this);
 	systemExitAction->setShortcut(tr("Alt+X"));
 	systemExitAction->setStatusTip(tr("Quit the openMSX debugger"));
@@ -191,6 +196,7 @@ void DebuggerForm::createActions()
 	connect(systemConnectAction, SIGNAL(triggered()), this, SLOT(systemConnect()));
 	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
 	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
+	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
 	connect(systemExitAction, SIGNAL(triggered()), this, SLOT(close()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
@@ -210,6 +216,8 @@ void DebuggerForm::createMenus()
 	systemMenu->addAction(systemDisconnectAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemPauseAction);
+	systemMenu->addSeparator();
+	systemMenu->addAction(systemSymbolManagerAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemExitAction);
 
@@ -240,6 +248,8 @@ void DebuggerForm::createToolbars()
 	systemToolbar->addAction(systemDisconnectAction);
 	systemToolbar->addSeparator();
 	systemToolbar->addAction(systemPauseAction);
+	systemToolbar->addSeparator();
+	systemToolbar->addAction(systemSymbolManagerAction);
 
 	// create debug toolbar
 	executeToolbar = addToolBar(tr("Execution"));
@@ -362,6 +372,8 @@ void DebuggerForm::createForm()
 	memset(mainMemory, 0, 65536 + 4);
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&breakpoints);
+	disasmView->setMemoryLayout(&memLayout);
+	disasmView->setSymbolTable(&symTable);
 	hexView->setData("memory", mainMemory, 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);
@@ -536,6 +548,12 @@ void DebuggerForm::systemPause()
 {
 	comm.sendCommand(new SimpleCommand(QString("set pause ") +
 	                    (systemPauseAction->isChecked() ? "true" : "false")));
+}
+
+void DebuggerForm::systemSymbolManager()
+{
+	SymbolManager symManager( symTable, this );
+	symManager.exec();
 }
 
 void DebuggerForm::executeBreak()

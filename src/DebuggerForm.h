@@ -4,6 +4,7 @@
 #define DEBUGGERFORM_H
 
 #include "DebuggerData.h"
+#include "SymbolTable.h"
 #include <QMainWindow>
 
 class DisasmViewer;
@@ -40,6 +41,7 @@ private:
 	QAction* systemConnectAction;
 	QAction* systemDisconnectAction;
 	QAction* systemPauseAction;
+	QAction* systemSymbolManagerAction;
 	QAction* systemExitAction;
 
 	QAction* executeBreakAction;
@@ -66,6 +68,7 @@ private:
 	CommClient& comm;
 	Breakpoints breakpoints;
 	MemoryLayout memLayout;
+	SymbolTable symTable;
 	unsigned char* mainMemory;
 	
 	void createActions();
@@ -87,6 +90,7 @@ private slots:
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();
+	void systemSymbolManager();
 	void executeBreak();
 	void executeRun();
 	void executeStep();

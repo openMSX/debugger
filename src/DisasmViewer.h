@@ -3,13 +3,15 @@
 #ifndef DISASMVIEWER_H
 #define DISASMVIEWER_H
 
-#include "DebuggerData.h"
 #include "Dasm.h"
 #include <QFrame>
 #include <QPixmap>
 
 class CommMemoryRequest;
 class QScrollBar;
+class Breakpoints;
+class MemoryLayout;
+class SymbolTable;
 
 class DisasmViewer : public QFrame
 {
@@ -19,6 +21,8 @@ public:
 
 	void setMemory(unsigned char* memPtr);
 	void setBreakpoints(Breakpoints* bps);
+	void setMemoryLayout(MemoryLayout* ml);
+	void setSymbolTable(SymbolTable* st);
 	void memoryUpdated(CommMemoryRequest* req);
 	void updateCancelled(CommMemoryRequest* req);
 
@@ -54,6 +58,8 @@ private:
 	int waitingForData;
 	CommMemoryRequest* nextRequest;
 	Breakpoints* breakpoints;
+	MemoryLayout *memLayout;
+	SymbolTable *symTable;
 
 	int findDisasmLine(quint16 lineAddr);
 

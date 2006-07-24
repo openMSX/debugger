@@ -2,6 +2,8 @@
 
 #include "Dasm.h"
 #include "DasmTables.h"
+#include "DebuggerData.h"
+#include "SymbolTable.h"
 #include <sstream>
 #include <iomanip>
 
@@ -24,15 +26,33 @@ static std::string toHex(unsigned value, unsigned width)
 
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
-          unsigned short endAddr, DisasmLines& disasm)
+          unsigned short endAddr, DisasmLines& disasm, 
+          MemoryLayout *memLayout, SymbolTable *symTable)
 {
 	const char* s;
 	const char* r = 0;
 	int pc = startAddr;
 	DisasmRow dest;
-
+	AddressSymbol *symbol;
+	
 	disasm.clear();
+	symTable->findFirstAddressSymbol( pc, memLayout );
+	symbol = symTable->getCurrentAddressSymbol();
 	while (pc <= int(endAddr)) {
+		// check for a label
+		if( symbol ) {
+			if( symbol->getAddress() == pc ) {
+				dest.rowType = DisasmRow::LABEL;
+				dest.numBytes = 0;
+				dest.addr = pc;
+				dest.instr = symbol->getText().toAscii().data();
+				disasm.push_back(dest);
+				symTable->findNextAddressSymbol( memLayout );
+				symbol = symTable->getCurrentAddressSymbol();
+			}
+		}
+		
+		dest.rowType = DisasmRow::INSTRUCTION;
 		dest.addr = pc;
 		dest.numBytes = 0;
 		dest.instr.clear();

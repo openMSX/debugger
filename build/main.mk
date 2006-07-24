@@ -203,7 +203,7 @@ endif
 
 # Temporarily(?) hardcoded:
 # Note: On MinGW32, use only slashes in paths, no backslashes.
-QT_BASE:=/opt/qt4
+QT_BASE:=/usr/local
 QT_COMPONENTS:=Core Gui Network Xml
 CXX:=g++
 CXXFLAGS:= -g
