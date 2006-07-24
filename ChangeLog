@@ -1,5 +1,10 @@
 $Id$
 
+2006-07-25 Edwin Velds <e.velds@gmail.com>
+	* Added preliminary support for symbol tables.
+	  Manual adding of symbols and loading of TNIASM symbol files are
+	  implemented.
+
 2006-06-14 Edwin Velds <e.velds@gmail.com>
 	* Updated the connection dialog
 	* Fixed a bug that caused a crash on closing openMSX
