@@ -239,16 +239,21 @@ $(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
 	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
 	@$(QT_BASE)/bin/uic -o $@ $<
-# Dependencies that enforce the creation of ui files before compilation.
-# This is based on the assumption that ui files only exist as part of a
-# file triplet <name>.ui, <name>.h, <name>.cpp.
-HEADERS_WITH_UI:=$(UI_HDR_FULL:$(GEN_SRC_PATH)/ui_%.h=$(SOURCES_PATH)/%.h)
-$(HEADERS_WITH_UI): $(SOURCES_PATH)/%.h: $(GEN_SRC_PATH)/ui_%.h
-$(HEADERS_WITH_UI:%.h=%.cpp): $(SOURCES_PATH)/%.cpp: $(SOURCES_PATH)/%.h
+# This is a workaround for the lack of order-only dependencies in GNU Make
+# versions before than 3.80 (for example Mac OS X 10.3 still ships with 3.79).
+# It creates a dummy file, which is never modified after its initial creation.
+# If a rule that produces a file does not modify that file, Make considers the
+# target to be up-to-date. That way, the targets "ui-dummy-file" depends on
+# will always be checked before compilation, but they will not cause all object
+# files to be considered outdated.
+UI_DUMMY_FILE:=$(GEN_SRC_PATH)/ui-dummy-file
+$(UI_DUMMY_FILE): $(UI_HDR_FULL)
+	@test -e $@ || touch $@
 
 # Compile and generate dependency files in one go.
 SRC_DEPEND_SUBST=$(patsubst $(SOURCES_PATH)/%.cpp,$(DEPEND_PATH)/%.d,$<)
 GEN_DEPEND_SUBST=$(patsubst $(GEN_SRC_PATH)/%.cpp,$(DEPEND_PATH)/%.d,$<)
+$(OBJECTS_FULL): $(UI_DUMMY_FILE)
 $(OBJECTS_FULL): $(OBJECTS_PATH)/%.o: $(SOURCES_PATH)/%.cpp $(DEPEND_PATH)/%.d
 	@echo "Compiling $(patsubst $(SOURCES_PATH)/%,%,$<)..."
 	@mkdir -p $(@D)
