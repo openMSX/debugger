@@ -201,8 +201,6 @@ else
 all: $(BINARY_FULL)
 endif
 
-# Temporarily(?) hardcoded:
-# Note: On MinGW32, use only slashes in paths, no backslashes.
 QT_INSTALL_HEADERS:=$(shell qmake -query QT_INSTALL_HEADERS)
 QT_INSTALL_LIBS:=$(shell qmake -query QT_INSTALL_LIBS)
 QT_INSTALL_BINS:=$(QT_INSTALL_LIBS)/../bin
