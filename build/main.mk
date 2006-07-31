@@ -203,21 +203,23 @@ endif
 
 # Temporarily(?) hardcoded:
 # Note: On MinGW32, use only slashes in paths, no backslashes.
-QT_BASE:=/usr/local
+QT_INSTALL_HEADERS:=$(shell qmake -query QT_INSTALL_HEADERS)
+QT_INSTALL_LIBS:=$(shell qmake -query QT_INSTALL_LIBS)
+QT_INSTALL_BINS:=$(QT_INSTALL_LIBS)/../bin
 QT_COMPONENTS:=Core Gui Network Xml
 CXX:=g++
 CXXFLAGS:= -g
 COMPILE_FLAGS:= \
-	$(addprefix -I$(QT_BASE)/include/Qt,$(QT_COMPONENTS)) \
-	-I$(QT_BASE)/include \
+	$(addprefix -I$(QT_INSTALL_HEADERS)/Qt,$(QT_COMPONENTS)) \
+	-I$(QT_INSTALL_HEADERS) \
 	-I$(GEN_SRC_PATH)
 ifeq ($(OPENMSX_TARGET_OS),darwin)
-LINK_FLAGS:=-F$(QT_BASE)/lib $(addprefix -framework Qt,$(QT_COMPONENTS))
+LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 else
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
-LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/bin -L$(QT_BASE)/bin $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -mwindows
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -mwindows
 else
-LINK_FLAGS:=-Wl,-rpath,$(QT_BASE)/lib -L$(QT_BASE)/lib $(addprefix -lQt,$(QT_COMPONENTS))
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_LIBS) -L$(QT_INSTALL_LIBS) $(addprefix -lQt,$(QT_COMPONENTS))
 endif
 endif
 DEPEND_FLAGS:=
@@ -226,19 +228,19 @@ DEPEND_FLAGS:=
 $(MOC_SRC_FULL): $(GEN_SRC_PATH)/moc_%.cpp: $(SOURCES_PATH)/%.h
 	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
-	@$(QT_BASE)/bin/moc -o $@ $<
+	@$(QT_INSTALL_BINS)/moc -o $@ $<
 
 # Generate resource source.
 $(RES_SRC_FULL): $(GEN_SRC_PATH)/qrc_%.cpp: $(RESOURCES_PATH)/%.qrc
 	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
-	@$(QT_BASE)/bin/rcc -name $(<:$(RESOURCES_PATH)/%.qrc=%) $< -o $@
+	@$(QT_INSTALL_BINS)/rcc -name $(<:$(RESOURCES_PATH)/%.qrc=%) $< -o $@
 
 # Generate ui files.
 $(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
 	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
-	@$(QT_BASE)/bin/uic -o $@ $<
+	@$(QT_INSTALL_BINS)/uic -o $@ $<
 # This is a workaround for the lack of order-only dependencies in GNU Make
 # versions before than 3.80 (for example Mac OS X 10.3 still ships with 3.79).
 # It creates a dummy file, which is never modified after its initial creation.
