@@ -203,6 +203,11 @@ endif
 
 QT_INSTALL_HEADERS:=$(shell qmake -query QT_INSTALL_HEADERS)
 QT_INSTALL_LIBS:=$(shell qmake -query QT_INSTALL_LIBS)
+# On MingW32 you get backslashes from qmake -query, which we don't want:
+ifeq ($(OPENMSX_TARGET_OS),mingw32)
+QT_INSTALL_HEADERS:=$(subst \,/,$(QT_INSTALL_HEADERS))
+QT_INSTALL_LIBS:=$(subst \,/,$(QT_INSTALL_LIBS))
+endif
 QT_INSTALL_BINS:=$(QT_INSTALL_LIBS)/../bin
 QT_COMPONENTS:=Core Gui Network Xml
 CXX:=g++
