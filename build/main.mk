@@ -202,7 +202,6 @@ all: $(BINARY_FULL)
 endif
 
 QT_INSTALL_HEADERS:=$(shell qmake -query QT_INSTALL_HEADERS)
-echo "Found: $QT_INSTALL_HEADERS"
 QT_INSTALL_LIBS:=$(shell qmake -query QT_INSTALL_LIBS)
 QT_INSTALL_BINS:=$(QT_INSTALL_LIBS)/../bin
 QT_COMPONENTS:=Core Gui Network Xml
