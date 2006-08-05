@@ -8,7 +8,7 @@ SOURCES_FULL+=$(sort \
 	)))
 HEADERS_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(addsuffix .h, \
-		$(MOC_SRC_HDR) $(HDR_ONLY) \
+		$(MOC_SRC_HDR) $(SRC_HDR) $(HDR_ONLY) \
 	)))
 MOC_HDR_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(addsuffix .h, \
