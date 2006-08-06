@@ -20,8 +20,8 @@
 #DEPEND_TARGETS:=all app default install run bindist
 DEPEND_TARGETS:=all app default
 # Logical targets which do not require dependency files.
-#NODEPEND_TARGETS:=clean config probe
-NODEPEND_TARGETS:=clean
+#NODEPEND_TARGETS:=clean config probe dist
+NODEPEND_TARGETS:=clean dist
 # Mark all logical targets as such.
 .PHONY: $(DEPEND_TARGETS) $(NODEPEND_TARGETS)
 
@@ -38,6 +38,20 @@ BUILD_BASE:=derived
 
 # All global Makefiles are inside this directory.
 MAKE_PATH:=build
+
+
+# Version
+# =======
+
+include $(MAKE_PATH)/version.mk
+CHANGELOG_REVISION:=\
+	$(shell sed -ne "s/\$$Id: ChangeLog,v \([^ ]*\).*/\1/p" ChangeLog)
+ifeq ($(RELEASE_FLAG),true)
+PACKAGE_DETAILED_VERSION:=$(PACKAGE_VERSION)
+else
+PACKAGE_DETAILED_VERSION:=$(PACKAGE_VERSION)-$(CHANGELOG_REVISION)
+endif
+PACKAGE_FULL:=$(PACKAGE_NAME)-$(PACKAGE_DETAILED_VERSION)
 
 
 # Platforms
@@ -310,5 +324,25 @@ $(APP_RESOURCES): $(APP_PATH)/Contents/Resources/%: $(APP_SUPPORT_PATH)/%
 	@mkdir -p $(@D)
 	@cp $< $@
 endif
+
+
+# Source Packaging
+# ================
+
+DIST_BASE:=$(BUILD_BASE)/dist
+DIST_PATH:=$(DIST_BASE)/$(PACKAGE_FULL)
+
+dist: $(DETECTSYS_SCRIPT)
+	@echo "Removing any old distribution files..."
+	@rm -rf $(DIST_PATH)
+	@echo "Gathering files for distribution..."
+	@mkdir -p $(DIST_PATH)
+	@build/install-recursive.sh $(DIST_FULL) $(DIST_PATH)
+	@build/install-recursive.sh $(HEADERS_FULL) $(DIST_PATH)
+	@build/install-recursive.sh $(SOURCES_FULL) $(DIST_PATH)
+	@build/install-recursive.sh $(UI_FULL) $(DIST_PATH)
+	@echo "Creating tarball..."
+	@cd $(DIST_BASE) && \
+		GZIP=--best tar zcf $(PACKAGE_FULL).tar.gz $(PACKAGE_FULL)
 
 endif # PLATFORM

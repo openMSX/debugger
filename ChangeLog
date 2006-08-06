@@ -1,5 +1,9 @@
 $Id$
 
+2006-08-06 Maarten ter Huurne <maarten@treewalker.org>
+	* Implemented "make dist", which creates a source distribution tar.gz
+	  archive in the directory "derived/dist".
+
 2006-07-25 Edwin Velds <e.velds@gmail.com>
 	* Added preliminary support for symbol tables.
 	  Manual adding of symbols and loading of TNIASM symbol files are
