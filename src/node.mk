@@ -7,13 +7,10 @@ MOC_SRC_HDR:= \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager
 
 SRC_HDR:= \
-	Dasm DasmTables DebuggerData SymbolTable
+	Dasm DasmTables DebuggerData SymbolTable Version
 
 SRC_ONLY:= \
 	main
-
-HDR_ONLY:= \
-	version
 
 UI:= \
 	ConnectDialog SymbolManager

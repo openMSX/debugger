@@ -11,7 +11,7 @@
 #include "OpenMSXConnection.h"
 #include "ConnectDialog.h"
 #include "SymbolManager.h"
-#include "version.h"
+#include "Version.h"
 #include <QAction>
 #include <QMessageBox>
 #include <QMenu>
@@ -613,9 +613,5 @@ void DebuggerForm::breakpointToggle(int addr)
 
 void DebuggerForm::showAbout()
 {
-	QString s;
-	s.sprintf("openMSX debugger %i.%i.%i", VERSION_MAJOR,
-	                                       VERSION_MINOR,
-	                                       VERSION_PATCH);
-	QMessageBox::about(this, "openMSX", s);
+	QMessageBox::about(this, "openMSX", QString(Version::FULL_VERSION.c_str()));
 }
