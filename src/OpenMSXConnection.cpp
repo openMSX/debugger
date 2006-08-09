@@ -51,7 +51,7 @@ static unsigned char hex2val(char c)
 }
 void ReadDebugBlockCommand::copyData(const QString& message)
 {
-	assert(message.size() == 2 * size);
+	assert(static_cast<unsigned>(message.size()) == 2 * size);
 	for (unsigned i = 0; i < size; ++i) {
 		target[i] = (hex2val(message[2 * i + 0].toAscii()) << 4) +
 		            (hex2val(message[2 * i + 1].toAscii()) << 0);
@@ -146,7 +146,7 @@ void OpenMSXConnection::processData()
 		input.reset(new QXmlInputSource());
 		input->setData(socket->readAll());
 		reader->parse(input.get(), true); // incremental parsing
-	} 
+	}
 }
 
 bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
@@ -156,7 +156,7 @@ bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
 	          ": " + exception.message()).toAscii().data());
 	cleanup();
 	return false;
-} 
+}
 
 bool OpenMSXConnection::startElement(
 		const QString& /*namespaceURI*/, const QString& /*localName*/,
