@@ -7,9 +7,9 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	: QDialog(parent), symTable(symtable)
 {
 	setupUi(this);
-	
+
 	treeLabelsUpdateCount = 0;
-	
+
 	connect( treeFiles, SIGNAL( itemSelectionChanged() ), this, SLOT( fileSelectionChange() ) );
 	connect( btnAddFile, SIGNAL( clicked() ), this, SLOT( addFile() ) );
 	connect( btnRemoveFile, SIGNAL( clicked() ), this, SLOT( removeFile() ) );
@@ -23,7 +23,7 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	groupSegments->setEnabled(false);
 	btnRemoveFile->setEnabled(false);
 	btnRemoveSymbol->setEnabled(false);
-	
+
 	initFileList();
 	initAddressSymbolList();
 }
@@ -59,6 +59,9 @@ void SymbolManager::initAddressSymbolList()
 		item->setText( 0, sym->getText() );
 		item->setText( 1, QString("$%1").arg(sym->getAddress(), 4, 16, QChar('0')) );
 		switch( sym->status() ) {
+			case AddressSymbol::ACTIVE:
+				// No color coding.
+				break;
 			case AddressSymbol::HIDDEN:
 				item->setTextColor(0, QColor(128, 128, 128) );
 				break;
@@ -117,15 +120,15 @@ void SymbolManager::addFile()
 
 void SymbolManager::removeFile()
 {
-	int r = QMessageBox::question(this, tr("Remove symbol file(s)"), 
+	int r = QMessageBox::question(this, tr("Remove symbol file(s)"),
 		tr("When removing the symbol file(s), do you want keep or delete the attached symbols?"),
 		"Keep symbols", "Delete symbols", "Cancel", 1, 2);
-	
+
 	if( r == 2 ) return;
-	
+
 	for( int i = 0; i < treeFiles->selectedItems().size(); i++ )
 		symTable.unloadFile( treeFiles->selectedItems().at(i)->text(0), r == 0);
-	
+
 	initFileList();
 	initAddressSymbolList();
 }
@@ -133,7 +136,7 @@ void SymbolManager::removeFile()
 void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 {
 	if( column > 1 ) return;
-	
+
 	AddressSymbol *sym = (AddressSymbol *)(item->data(0, Qt::UserRole).toInt());
 	if( sym->getSource() == 0 ) {
 		treeLabels->openPersistentEditor( item, column );
