@@ -244,6 +244,15 @@ endif
 endif
 DEPEND_FLAGS:=
 
+# GCC flags:
+# (these should be omitted if we ever want to support other compilers)
+# Generic compilation flags.
+CXXFLAGS+=-pipe
+# Stricter warning and error reporting.
+CXXFLAGS+=-Wall
+# Empty definition of used headers, so header removal doesn't break things.
+DEPEND_FLAGS+=-MP
+
 # Generate version header.
 $(VERSION_HEADER): ChangeLog $(MAKE_PATH)/version.mk
 	@echo "Creating $@..."
