@@ -9,13 +9,14 @@ interface.
 * Requirements
 
 The debugger requires the Qt4 GUI library to be installed.
+If you are installing from binary packages, make sure you install the
+development package (name ending with "-dev" or "-devel") as well.
 
 A (reasonably) new CVS version of openMSX.
 
 * Building
 
-Set the variable QT_BASE in the file build/main.mk to point to 
-correct Qt4 install directory.
+Qt4's "qmake" should be in your PATH.
 
 Then build with:
 
