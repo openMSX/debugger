@@ -75,7 +75,7 @@ public:
 		, form(form_)
 	{
 	}
-	
+
 	virtual void replyOk(const QString& message)
 	{
 		form.breakpoints.setBreakpoints(message);
@@ -132,28 +132,28 @@ void DebuggerForm::createActions()
 	systemDisconnectAction->setStatusTip(tr("Disconnect from openMSX"));
 	systemDisconnectAction->setIcon(QIcon(":/icons/disconnect.png"));
 	systemDisconnectAction->setEnabled(false);
-	
+
 	systemPauseAction = new QAction(tr("&Pause emulator"), this);
 	systemPauseAction->setShortcut(Qt::Key_Pause);
 	systemPauseAction->setStatusTip(tr("Pause the emulation"));
 	systemPauseAction->setIcon(QIcon(":/icons/pause.png"));
 	systemPauseAction->setCheckable(true);
 	systemPauseAction->setEnabled(false);
-	
+
 	systemSymbolManagerAction = new QAction(tr("&Symbol mananger ..."), this);
 	systemSymbolManagerAction->setStatusTip(tr("Start the symbol manager"));
 	systemSymbolManagerAction->setIcon(QIcon(":/icons/symmanager.png"));
-	
-	systemExitAction = new QAction(tr("E&xit"), this);
-	systemExitAction->setShortcut(tr("Alt+X"));
-	systemExitAction->setStatusTip(tr("Quit the openMSX debugger"));
-	
+
+	systemQuitAction = new QAction(tr("&Quit"), this);
+	systemQuitAction->setShortcut(tr("Ctrl+Q"));
+	systemQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
+
 	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
 	executeBreakAction->setIcon(QIcon(":/icons/break.png"));
 	executeBreakAction->setEnabled(false);
-	
+
 	executeRunAction = new QAction(tr("Run"), this);
 	executeRunAction->setShortcut(tr("F9"));
 	executeRunAction->setStatusTip(tr("Leave debug mode and resume execution"));
@@ -197,7 +197,7 @@ void DebuggerForm::createActions()
 	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
 	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
-	connect(systemExitAction, SIGNAL(triggered()), this, SLOT(close()));
+	connect(systemQuitAction, SIGNAL(triggered()), this, SLOT(close()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
 	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
@@ -219,7 +219,7 @@ void DebuggerForm::createMenus()
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemSymbolManagerAction);
 	systemMenu->addSeparator();
-	systemMenu->addAction(systemExitAction);
+	systemMenu->addAction(systemQuitAction);
 
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
@@ -273,7 +273,7 @@ QWidget* DebuggerForm::createNamedWidget(const QString& name, QWidget* widget)
 	QVBoxLayout* vboxLayout = new QVBoxLayout();
 	vboxLayout->setMargin(3);
 	vboxLayout->setSpacing(2);
-	
+
 	QLabel* lbl = new QLabel(name);
 
 	vboxLayout->addWidget(lbl, 0);
@@ -293,15 +293,15 @@ void DebuggerForm::createForm()
 	// create the left side of the gui
 	disasmSplitter = new QSplitter(Qt::Vertical, this);
 	mainSplitter->addWidget(disasmSplitter);
-	
+
 	// create the disasm viewer widget
 	disasmView = new DisasmViewer();
 	disasmSplitter->addWidget(createNamedWidget(tr("Code view:"), disasmView));
-	
+
 	// create the memory view widget
 	hexView = new HexViewer();
 	disasmSplitter->addWidget(createNamedWidget(tr("Main memory:"), hexView));
-	
+
 	// create the right side of the gui
 	QWidget* w = new QWidget;
 	mainSplitter->addWidget(w);
@@ -316,11 +316,11 @@ void DebuggerForm::createForm()
 	topLayout->setMargin(0);
 	topLayout->setSpacing(0);
 	w2->setLayout(topLayout);
-	
+
 	// create register viewer
 	regsView = new CPURegsViewer();
 	topLayout->addWidget(createNamedWidget(tr("CPU registers:"), regsView), 0);
-	
+
 	// create flags viewer
 	flagsView = new FlagsViewer();
 	topLayout->addWidget(createNamedWidget(tr("Flags:"), flagsView), 0);
@@ -486,7 +486,7 @@ void DebuggerForm::handleUpdate(const QString& type, const QString& name,
 	}
 }
 
-void DebuggerForm::pauseStatusChanged(bool isPaused) 
+void DebuggerForm::pauseStatusChanged(bool isPaused)
 {
 	systemPauseAction->setChecked(isPaused);
 }
@@ -496,7 +496,7 @@ void DebuggerForm::breakOccured()
 	setBreakMode();
 	comm.sendCommand(new ListBreakPointsHandler(*this));
 
-	// update registers 
+	// update registers
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
 	CPURegRequest* regs = new CPURegRequest(*this);
@@ -595,7 +595,7 @@ void DebuggerForm::breakpointToggle(int addr)
 {
 	// TODO move this test out of this function???
 	if (addr < 0) addr = disasmView->cursorAddr;
-	
+
 	QString cmd;
 	if (breakpoints.isBreakpoint(addr)) {
 		cmd = "debug remove_bp " + breakpoints.idString(addr);

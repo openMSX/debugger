@@ -42,7 +42,7 @@ private:
 	QAction* systemDisconnectAction;
 	QAction* systemPauseAction;
 	QAction* systemSymbolManagerAction;
-	QAction* systemExitAction;
+	QAction* systemQuitAction;
 
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
@@ -70,7 +70,7 @@ private:
 	MemoryLayout memLayout;
 	SymbolTable symTable;
 	unsigned char* mainMemory;
-	
+
 	void createActions();
 	void createMenus();
 	void createToolbars();
