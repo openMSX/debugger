@@ -48,6 +48,9 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
+	// redraw background
+	p.fillRect( r, palette().color(QPalette::Base) );
+
 	int h = fontMetrics().height();
 	int flagWidth = fontMetrics().width("ZW");
 	int valWidth = fontMetrics().width("0 ");

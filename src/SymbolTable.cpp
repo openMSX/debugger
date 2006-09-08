@@ -7,87 +7,6 @@
 #include <QStringList>
 
 /*
- * AddressSymbol member functions
- */
-
-AddressSymbol::AddressSymbol( const QString& str, int addr, int val ) 
-	: text( str ), address( addr ), validSlots( val )
-{
-	symbolStatus = ACTIVE;
-	source = 0;
-}
-
-const QString& AddressSymbol::getText() const
-{
-	return text;
-}
-
-void AddressSymbol::setText( const QString& str )
-{
-	text = str;
-}
-
-int AddressSymbol::getAddress() const
-{
-	return address;
-}
-
-void AddressSymbol::setAddress( int addr )
-{
-	address = addr;
-}
-
-const int AddressSymbol::getValidSlots() const
-{
-	return validSlots;
-}
-
-void AddressSymbol::setValidSlots( int val )
-{
-	validSlots = val & 0xFFFF;
-}
-
-const QString *AddressSymbol::getSource() const
-{
-	return source;
-}
-
-void AddressSymbol::setSource( QString *name )
-{
-	source = name;
-}
-
-AddressSymbol::SymbolStatus AddressSymbol::status() const
-{
-	return symbolStatus;
-}
-
-void AddressSymbol::setStatus( SymbolStatus s )
-{
-	symbolStatus = s;
-}
-
-bool AddressSymbol::isSlotValid( MemoryLayout *ml )
-{
-	if( ml ) {
-		int page = address >> 14;
-		int ps = ml->primarySlot[page] & 3;
-		int ss = 0;
-		if( ml->isSubslotted[page] ) ss = ml->secondarySlot[page] & 3;
-		if( validSlots & (1 << (4*ps+ss)) ) {
-			if( validSegments.size() ) {
-				for( int i = 0; i < validSegments.size(); i++ )
-					if( ml->mapperSegment[page] == validSegments[i] )
-						return true;
-			} else
-				return true;
-		}
-	} else
-		return true;
-	return false;
-}
-
-/*
  * SymbolTable member functions
  */
 
@@ -97,56 +16,91 @@ SymbolTable::SymbolTable()
 
 SymbolTable::~SymbolTable()
 {
-	qDeleteAll( addressSymbols );
 	addressSymbols.clear();
+	valueSymbols.clear();
+	qDeleteAll( symbols );
+	symbols.clear();
 }
 
-void SymbolTable::addAddressSymbol( AddressSymbol *symbol )
+void SymbolTable::add( Symbol *symbol )
 {
-	QList<AddressSymbol*>::iterator i;
-	for( i = addressSymbols.begin(); i != addressSymbols.end(); ++i )
-		if( (*i)->getAddress() > symbol->getAddress() ) {
-			addressSymbols.insert( i, symbol );
-			return;
+	symbols.append( symbol );
+	symbol->table = this;
+	mapSymbol( symbol );
+}
+
+void SymbolTable::removeAt( int index )
+{
+	Symbol *symbol = symbols.takeAt( index );
+	
+	unmapSymbol( symbol );
+}
+
+void SymbolTable::mapSymbol( Symbol *symbol )
+{
+	if( symbol->type() != Symbol::VALUE ) {
+		addressSymbols.insert( symbol->value(), symbol );
+	}
+	if( symbol->type() != Symbol::JUMPLABEL ) {
+		valueSymbols.insert( symbol->value(), symbol );
+	}
+}
+
+void SymbolTable::unmapSymbol( Symbol *symbol )
+{
+	QMutableMapIterator<int, Symbol*> i(addressSymbols);
+	while (i.hasNext()) {
+		i.next();
+		if( i.value() == symbol ) i.remove();
+	}
+	QMutableHashIterator<int, Symbol*> j(valueSymbols);
+	while (j.hasNext()) {
+		j.next();
+		if( j.value() == symbol ) j.remove();
+	}
+}
+
+void SymbolTable::symbolTypeChanged( Symbol *symbol )
+{
+	unmapSymbol( symbol );
+	mapSymbol( symbol );
+}
+
+void SymbolTable::symbolValueChanged( Symbol *symbol )
+{
+	unmapSymbol( symbol );
+	mapSymbol( symbol );
+}
+
+Symbol *SymbolTable::findFirstAddressSymbol( int addr, MemoryLayout *ml )
+{
+	currentAddress = addressSymbols.begin();
+	while( currentAddress != addressSymbols.end() ) {
+		if( (*currentAddress)->value() >= addr ) {
+			if( (*currentAddress)->isSlotValid( ml ) )
+				return *currentAddress;
 		}
-	addressSymbols.append( symbol );
-}
-
-void SymbolTable::removeAddressSymbolAt( int index )
-{
-	delete addressSymbols[index];
-	addressSymbols.removeAt(index);
-}
-
-AddressSymbol *SymbolTable::findFirstAddressSymbol( int addr, MemoryLayout *ml )
-{
-	currentSymbol = addressSymbols.begin();
-	while( currentSymbol != addressSymbols.end() ) {
-		if( (*currentSymbol)->getAddress() >= addr ) {
-			if( (*currentSymbol)->isSlotValid( ml ) )
-				return *currentSymbol;
-		}
-		++currentSymbol;
+		++currentAddress;
 	}
 	return 0;
 }
 
-AddressSymbol *SymbolTable::getCurrentAddressSymbol()
+Symbol *SymbolTable::getCurrentAddressSymbol()
 {
-	if( currentSymbol == addressSymbols.end() )
+	if( currentAddress == addressSymbols.end() )
 		return 0;
 	else
-		return *currentSymbol;
+		return *currentAddress;
 }
 
-AddressSymbol *SymbolTable::findNextAddressSymbol( MemoryLayout *ml )
+Symbol *SymbolTable::findNextAddressSymbol( MemoryLayout *ml )
 {
 	for(;;) {
-		currentSymbol++;
-		if( currentSymbol == addressSymbols.end() )
+		currentAddress++;
+		if( currentAddress == addressSymbols.end() )
 			return 0;
-		else if( (*currentSymbol)->isSlotValid(ml) )
-			return *currentSymbol;
+		else if( (*currentAddress)->isSlotValid(ml) )
+			return *currentAddress;
 	}
 }
 
@@ -176,9 +130,44 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 		if( l.size() != 2 ) continue;
 		QStringList a = l.at(1).split( "h ;" );
 		if( a.size() != 2 ) continue;
-		AddressSymbol *sym = new AddressSymbol( l.at(0), a.at(0).toInt(0, 16) );
+		Symbol *sym = new Symbol( l.at(0), a.at(0).toInt(0, 16) );
 		sym->setSource( symSource );
-		addAddressSymbol( sym );
+		add( sym );
+	}
+	return true;
+}
+
+bool SymbolTable::readASMSXFile( const QString& filename )
+{
+	QFile file( filename );
+	
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return false;
+
+	QString *symSource = new QString(filename);
+	symbolFiles.append(symSource);
+	QTextStream in(&file);
+	int filePart = 0;
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		if( line[0] == ';' ) {
+			if( line.startsWith("; global and local") ) {
+				filePart = 1;
+			} else if( line.startsWith("; other") ) {
+				filePart = 2;
+			}
+		} else {
+			if( line[0] == '$' ) {
+				if( filePart == 1 ) {
+					QStringList l = line.split(" ");
+					Symbol *sym = new Symbol( l.at(1).trimmed(), l.at(0).right(4).toInt(0, 16) );
+					sym->setSource( symSource );
+					add( sym );
+				} else if( filePart == 2 ) {
+					
+				}
+			}
+		}
 	}
 	return true;
 }
@@ -199,18 +188,140 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 	
 	if( index >= 0 ) {
 		QString *name = symbolFiles.takeAt(index);
-		int i = 0;
-		while( i < addressSymbols.size() ) {
-			AddressSymbol *sym = addressSymbols[i];
-			if( sym->getSource() == name ) {
-				if( keepSymbols ) {
-					sym->setSource(0);
-					i++;
-				} else {
-					addressSymbols.removeAt( i );
-					delete sym;
-				}
-			} else i++;
+
+		if( !keepSymbols ) {
+			// remove symbols from address map
+			QMutableMapIterator<int, Symbol*> mi(addressSymbols);
+			while (mi.hasNext()) {
+				mi.next();
+				if( mi.value()->source() == name ) mi.remove();
+			}
+			// remove symbols from value hash
+			QMutableHashIterator<int, Symbol*> hi(valueSymbols);
+			while (hi.hasNext()) {
+				hi.next();
+				if( hi.value()->source() == name ) hi.remove();
+			}
+		}
+		// remove symbols from value hash
+		QMutableListIterator<Symbol*> i(symbols);
+		while (i.hasNext()) {
+			i.next();
+			if( i.value()->source() == name ) 
+				if( keepSymbols )
+					i.value()->setSource(0);
+				else
+					i.remove();
 		}
 	}
+}
+
+/*
+ * Symbol member functions
+ */
+
+Symbol::Symbol( const QString& str, int addr, int val ) 
+	: symText( str ), symValue( addr ), symSlots( val )
+{
+	symStatus = ACTIVE;
+	symType = JUMPLABEL;
+	symSource = 0;
+	symRegisters = 0;
+	table = 0;
+}
+
+const QString& Symbol::text() const
+{
+	return symText;
+}
+
+void Symbol::setText( const QString& str )
+{
+	symText = str;
+}
+
+int Symbol::value() const
+{
+	return symValue;
+}
+
+void Symbol::setValue( int addr )
+{
+	if( addr != symValue ) {
+		symValue = addr;
+		if(table) table->symbolValueChanged( this );
+	}
+}
+
+int Symbol::validSlots() const
+{
+	return symSlots;
+}
+
+void Symbol::setValidSlots( int val )
+{
+	symSlots = val & 0xFFFF;
+}
+
+int Symbol::validRegisters() const
+{
+	return symRegisters;
+}
+
+void Symbol::setValidRegisters( int regs )
+{
+	symRegisters = regs;
+}
+
+const QString *Symbol::source() const
+{
+	return symSource;
+}
+
+void Symbol::setSource( QString *name )
+{
+	symSource = name;
+}
+
+Symbol::SymbolStatus Symbol::status() const
+{
+	return symStatus;
+}
+
+void Symbol::setStatus( SymbolStatus s )
+{
+	symStatus = s;
+}
+
+Symbol::SymbolType Symbol::type() const
+{
+	return symType;
+}
+
+void Symbol::setType( SymbolType t )
+{
+	if( symType != t ) {
+		symType = t;
+		if( table ) table->symbolTypeChanged( this );
+	}
+}
+
+bool Symbol::isSlotValid( MemoryLayout *ml )
+{
+	if( ml ) {
+		int page = symValue >> 14;
+		int ps = ml->primarySlot[page] & 3;
+		int ss = 0;
+		if( ml->isSubslotted[page] ) ss = ml->secondarySlot[page] & 3;
+		if( symSlots & (1 << (4*ps+ss)) ) {
+			if( symSegments.size() ) {
+				for( int i = 0; i < symSegments.size(); i++ )
+					if( ml->mapperSegment[page] == symSegments[i] )
+						return true;
+			} else
+				return true;
+		}
+	} else
+		return true;
+	return false;
 }

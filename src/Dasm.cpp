@@ -33,22 +33,20 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 	const char* r = 0;
 	int pc = startAddr;
 	DisasmRow dest;
-	AddressSymbol *symbol;
+	Symbol *symbol;
 	
 	disasm.clear();
-	symTable->findFirstAddressSymbol( pc, memLayout );
-	symbol = symTable->getCurrentAddressSymbol();
+	symbol = symTable->findFirstAddressSymbol( pc, memLayout );
 	while (pc <= int(endAddr)) {
 		// check for a label
 		if( symbol ) {
-			if( symbol->getAddress() == pc ) {
+			if( symbol->value() == pc ) {
 				dest.rowType = DisasmRow::LABEL;
 				dest.numBytes = 0;
 				dest.addr = pc;
-				dest.instr = symbol->getText().toAscii().data();
+				dest.instr = symbol->text().toAscii().data();
 				disasm.push_back(dest);
-				symTable->findNextAddressSymbol( memLayout );
-				symbol = symTable->getCurrentAddressSymbol();
+				symbol = symTable->findNextAddressSymbol( memLayout );
 			}
 		}
 		

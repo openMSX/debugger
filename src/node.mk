@@ -4,7 +4,7 @@ include build/node-start.mk
 
 MOC_SRC_HDR:= \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \
-	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager
+	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager Settings
 
 SRC_HDR:= \
 	Dasm DasmTables DebuggerData SymbolTable Version

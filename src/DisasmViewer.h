@@ -61,7 +61,7 @@ private:
 	MemoryLayout *memLayout;
 	SymbolTable *symTable;
 
-	int findDisasmLine(quint16 lineAddr);
+	int findDisasmLine(quint16 lineAddr, bool findDownward = false);
 
 signals:
 	void toggleBreakpoint(int addr);

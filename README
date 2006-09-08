@@ -16,9 +16,7 @@ A (reasonably) new CVS version of openMSX.
 
 * Building
 
-Qt4's "qmake" should be in your PATH.
-
-Then build with:
+Build with:
 
 make
 

@@ -48,6 +48,9 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	if (r.bottom() > (height() - frameB - 1)) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
+	// redraw background
+	p.fillRect( r, palette().color(QPalette::Base) );
+
 	int x = frameL + 4;
 	int y = frameT + h - 1 - d;
 

@@ -59,6 +59,17 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 
 	QPainter p(this);
 
+	// calc and set drawing bounds
+	QRect r(e->rect());
+	if (r.left() < frameL) r.setLeft(frameL);
+	if (r.top()  < frameT) r.setTop (frameT);
+	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
+	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
+	p.setClipRect(r);
+
+	// redraw background
+	p.fillRect( r, palette().color(QPalette::Base) );
+	
 	QStyleOptionHeader so;
 	so.init(this);
 	so.state |= QStyle::State_Raised;
@@ -88,14 +99,6 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	so.section = 3;
 	so.text = "Segment";
 	style()->drawControl(QStyle::CE_Header, &so, &p);
-
-	// calc and set drawing bounds
-	QRect r(e->rect());
-	if (r.left() < frameL) r.setLeft(frameL);
-	if (r.top()  < frameT) r.setTop (frameT);
-	if (r.right()  > width()  - frameR - 1) r.setRight (width()  - frameR - 1);
-	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
-	p.setClipRect(r);
 
 	int mid1 = frameL + headerSize1 / 2;
 	int mid2 = frameL + headerSize1 + headerSize2 / 2;

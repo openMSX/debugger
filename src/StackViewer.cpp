@@ -114,6 +114,9 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
+	// redraw background
+	p.fillRect( r, palette().color(QPalette::Base) );
+
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
 	int xStack = xAddr + fontMetrics().width("FFFF ");

@@ -17,7 +17,7 @@ private:
 	int treeLabelsUpdateCount;
 
 	void initFileList();
-	void initAddressSymbolList();
+	void initSymbolList();
 
 	void beginTreeLabelsUpdate();
 	void endTreeLabelsUpdate();

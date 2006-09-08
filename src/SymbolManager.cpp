@@ -1,7 +1,9 @@
 #include "SymbolManager.h"
+#include "Settings.h"
 #include <QFileDialog>
-#include <QSettings>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
 
 SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	: QDialog(parent), symTable(symtable)
@@ -25,19 +27,12 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	btnRemoveSymbol->setEnabled(false);
 
 	initFileList();
-	initAddressSymbolList();
+	initSymbolList();
 }
 
-void SymbolManager::beginTreeLabelsUpdate()
-{
-	treeLabelsUpdateCount++;
-}
-
-void SymbolManager::endTreeLabelsUpdate()
-{
-	if( treeLabelsUpdateCount > 0 )
-		treeLabelsUpdateCount--;
-}
+/*
+ * File list support functions
+ */
 
 void SymbolManager::initFileList()
 {
@@ -48,74 +43,53 @@ void SymbolManager::initFileList()
 	}
 }
 
-void SymbolManager::initAddressSymbolList()
-{
-	treeLabels->clear();
-	beginTreeLabelsUpdate();
-	AddressSymbol *sym = symTable.findFirstAddressSymbol( 0 );
-	while( sym != 0 ) {
-		QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
-		item->setData(0, Qt::UserRole, int(sym) );
-		item->setText( 0, sym->getText() );
-		item->setText( 1, QString("$%1").arg(sym->getAddress(), 4, 16, QChar('0')) );
-		switch( sym->status() ) {
-			case AddressSymbol::ACTIVE:
-				// No color coding.
-				break;
-			case AddressSymbol::HIDDEN:
-				item->setTextColor(0, QColor(128, 128, 128) );
-				break;
-			case AddressSymbol::LOST:
-				item->setTextColor(0, QColor(128, 0, 0) );
-				break;
-		}
-		if( sym->getSource() )
-			item->setIcon( 0, QIcon(":/icons/symfil.png") );
-		else
-			item->setIcon( 0, QIcon(":/icons/symman.png") );
-		sym = symTable.findNextAddressSymbol();
-	}
-	endTreeLabelsUpdate();
-}
-
-void SymbolManager::fileSelectionChange()
-{
-	btnRemoveFile->setEnabled( treeFiles->selectedItems().size() );
-}
-
 void SymbolManager::addFile()
 {
 	// create dialog
 	QFileDialog *d = new QFileDialog(this);
 	QStringList types;
 	types << "Symbol files (*.sym)"
-	      << "TNIASM 0.x symbol files (*.sym)";
+	      << "TNIASM 0.x symbol files (*.sym)"
+	      << "asMSX 0.x symbol files (*.sym)";
 	d->setFilters( types );
 	d->setAcceptMode( QFileDialog::AcceptOpen );
 	d->setFileMode( QFileDialog::ExistingFile );
 	// set default directory
-	QSettings settings("openMSX", "debugger");
-	d->setDirectory( settings.value("SymbolManager/OpenDir", QDir::currentPath() ).toString() );
+	d->setDirectory( Settings::get().value("SymbolManager/OpenDir", QDir::currentPath() ).toString() );
 	// run
 	if( d->exec() ) {
 		QString f = d->selectedFilter();
 		QString n = d->selectedFiles().at(0);
 		// load file from the correct type
 		bool read = false;
-		if( f.startsWith( "Symbol files" ) ) {
+		if( f.startsWith( "TNIASM 0" ) ) {
 			read = symTable.readTNIASM0File( n );
-		} else if( f.startsWith( "TNIASM 0" ) ) {
-			read = symTable.readTNIASM0File( n );
+		} else if( f.startsWith( "asMSX" ) ) {
+			read = symTable.readASMSXFile( n );
+		} else {
+			if( n.endsWith(".sym") ) {
+				// auto detect which sym file
+				QFile file( n );
+				if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+					QTextStream in(&file);
+					QString line = in.readLine();
+					file.close();
+					if( line[0] == ';' )
+						read = symTable.readASMSXFile( n );
+					else
+						read = symTable.readTNIASM0File( n );
+				}
+			}
 		}
 		// if read succesful, add it to the list
 		if( read ) {
 			QTreeWidgetItem *item = new QTreeWidgetItem(treeFiles);
 			item->setText( 0, d->selectedFiles().at(0) );
-			initAddressSymbolList();
+			initSymbolList();
 		}
 	}
 	// story last used path
-	settings.setValue( "SymbolManager/OpenDir", d->directory().absolutePath() );
+	Settings::get().setValue( "SymbolManager/OpenDir", d->directory().absolutePath() );
 }
 
 void SymbolManager::removeFile()
@@ -130,30 +104,79 @@ void SymbolManager::removeFile()
 		symTable.unloadFile( treeFiles->selectedItems().at(i)->text(0), r == 0);
 
 	initFileList();
-	initAddressSymbolList();
+	initSymbolList();
+}
+
+void SymbolManager::fileSelectionChange()
+{
+	btnRemoveFile->setEnabled( treeFiles->selectedItems().size() );
 }
 
 void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 {
 	if( column > 1 ) return;
-
-	AddressSymbol *sym = (AddressSymbol *)(item->data(0, Qt::UserRole).toInt());
-	if( sym->getSource() == 0 ) {
+	
+	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).toInt());
+	if( sym->source() == 0 ) {
 		treeLabels->openPersistentEditor( item, column );
 	}
+}
+
+/*
+ * Symbol support functions
+ */
+
+void SymbolManager::initSymbolList()
+{
+	treeLabels->clear();
+	beginTreeLabelsUpdate();
+	Symbol *sym = symTable.findFirstAddressSymbol( 0 );
+	while( sym != 0 ) {
+		QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
+		item->setData(0, Qt::UserRole, int(sym) );
+		item->setText( 0, sym->text() );
+		item->setText( 1, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
+		switch( sym->status() ) {
+			case Symbol::HIDDEN:
+				item->setTextColor(0, QColor(128, 128, 128) );
+				break;
+			case Symbol::LOST:
+				item->setTextColor(0, QColor(128, 0, 0) );
+				break;
+			default:
+				break;
+		}
+		if( sym->source() )
+			item->setIcon( 0, QIcon(":/icons/symfil.png") );
+		else
+			item->setIcon( 0, QIcon(":/icons/symman.png") );
+		sym = symTable.findNextAddressSymbol();
+	}
+	endTreeLabelsUpdate();
+}
+
+void SymbolManager::beginTreeLabelsUpdate()
+{
+	treeLabelsUpdateCount++;
+}
+
+void SymbolManager::endTreeLabelsUpdate()
+{
+	if( treeLabelsUpdateCount > 0 )
+		treeLabelsUpdateCount--;
 }
 
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
-	AddressSymbol *sym = new AddressSymbol( tr("New symbol"), 0 );
-	symTable.addAddressSymbol( sym );
+	Symbol *sym = new Symbol( tr("New symbol"), 0 );
+	symTable.add( sym );
 
 	beginTreeLabelsUpdate();
 	QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
 	item->setData(0, Qt::UserRole, int(sym) );
-	item->setText( 0, sym->getText() );
-	item->setText( 1, QString("$%1").arg(sym->getAddress(), 4, 16, QChar('0')) );
+	item->setText( 0, sym->text() );
+	item->setText( 1, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
 	item->setIcon( 0, QIcon(":/icons/symman.png") );
 	endTreeLabelsUpdate();
 	treeLabels->scrollToItem(item);
@@ -163,14 +186,15 @@ void SymbolManager::addLabel()
 void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 {
 	if( !treeLabelsUpdateCount ) {
-		AddressSymbol *sym = (AddressSymbol *)(item->data(0, Qt::UserRole).toInt());
+		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).toInt());
 		// Todo: add validity checks
 		sym->setText( item->text(0) );
-		sym->setAddress( item->text(1).toInt() );
+		sym->setValue( item->text(1).toInt() );
 		treeLabels->closePersistentEditor( item, column );
 	}
 }
 
 void SymbolManager::labelSelectionChanged()
 {
+	//QList<QTreeWidgetItem *>
 }

@@ -1,5 +1,10 @@
 $Id$
 
+2006-09-09 Edwin Velds <e.velds@gmail.com>
+	* Symbol table rewrite
+	* Added initial Settings class
+	* Fixed widget colours
+
 2006-08-06 Maarten ter Huurne <maarten@treewalker.org>
 	* Implemented "make dist", which creates a source distribution tar.gz
 	  archive in the directory "derived/dist".

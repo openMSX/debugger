@@ -409,7 +409,12 @@
          </column>
          <column>
           <property name="text" >
-           <string>Address</string>
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Value</string>
           </property>
          </column>
          <column>
@@ -420,6 +425,16 @@
          <column>
           <property name="text" >
            <string>Segments</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Code range</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Source</string>
           </property>
          </column>
         </widget>

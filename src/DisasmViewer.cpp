@@ -112,9 +112,9 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	if (r.bottom() > height() - frameB - 1) r.setBottom(height() - frameB - 1);
 	p.setClipRect(r);
 
-	// draw icon column first
-	p.fillRect(frameL, frameT, 32, height() - frameT - frameB,
-	           QColor(224, 224, 224));
+	// draw background
+	p.fillRect(frameL + 32, frameT, width() - 32 - frameL - frameR,
+	           height() - frameT - frameB, palette().color(QPalette::Base) );
 	
 	// calc layout (not optimal)
 	int charWidth = fontMetrics().width("MULUW") / 5;
@@ -353,12 +353,22 @@ void DisasmViewer::setProgramCounter(quint16 pc)
 	setAddress(pc, MiddleAlways);
 }
 
-int DisasmViewer::findDisasmLine(quint16 lineAddr)
+int DisasmViewer::findDisasmLine(quint16 lineAddr, bool findDownward)
 {
-	int line = disasmLines.size();
-	while (--line >= 0) {
-		if (disasmLines[line].addr == lineAddr) {
-			break;
+	int line = 0;
+	if( findDownward ) {
+		line = disasmLines.size();
+		while (--line >= 0) {
+			if (disasmLines[line].addr == lineAddr) {
+				break;
+			}
+		}
+	} else {
+		while (line < disasmLines.size()) {
+			if (disasmLines[line].addr == lineAddr) {
+				break;
+			}
+			line++;
 		}
 	}
 	return line;
@@ -368,8 +378,11 @@ void DisasmViewer::scrollBarAction(int action)
 {
 	switch (action) {
 		case QScrollBar::SliderSingleStepAdd:
-			setAddress(disasmLines[disasmTopLine + 1].addr, TopAlways);
+		{
+			int line = findDisasmLine( disasmLines[disasmTopLine].addr, true );
+			setAddress(disasmLines[line + 1].addr, TopAlways);
 			break;
+		}
 		case QScrollBar::SliderSingleStepSub:
 			if (disasmTopLine > 0) {
 				setAddress(disasmLines[disasmTopLine - 1].addr, TopAlways);
@@ -444,7 +457,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 		break;
 	}
 	case Qt::Key_Down: {
-		int line = findDisasmLine(cursorAddr);
+		int line = findDisasmLine(cursorAddr, true);
 		if (line >= 0 && line < int(disasmLines.size()) - 1) {
 			cursorAddr = disasmLines[line + 1].addr;
 		}
