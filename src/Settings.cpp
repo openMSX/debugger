@@ -12,6 +12,11 @@ QString fontLocation( Settings::DebuggerFont f )
 	return QString("Fonts/").append(DebuggerFontNames[f]);
 }
 
+QString fontColorLocation( Settings::DebuggerFont f )
+{
+	return QString("Fonts/%1 Color").arg(DebuggerFontNames[f]);
+}
+
 Settings::Settings()
 	: QSettings( "openMSX", "debugger" )
 {
@@ -31,7 +36,7 @@ Settings& Settings::get()
 void Settings::getFontsFromSettings()
 {
 	// first get application default
-	QVariant v = value( DebuggerFontNames[APP_FONT] );
+	QVariant v = value( fontLocation(APP_FONT) );
 	if( v.type() == QVariant::Font ) {
 		fonts[APP_FONT] = v.value<QFont>();
 		fontTypes[APP_FONT] = CUSTOM;
@@ -40,7 +45,7 @@ void Settings::getFontsFromSettings()
 		fonts[APP_FONT] = qApp->font();
 	}
 	// then get default fixed spacing font
-	v = value( DebuggerFontNames[FIXED_FONT] );
+	v = value( fontLocation(FIXED_FONT) );
 	if( v.type() == QVariant::Font ) {
 		fonts[FIXED_FONT] = v.value<QFont>();
 		fontTypes[FIXED_FONT] = CUSTOM;
@@ -50,7 +55,7 @@ void Settings::getFontsFromSettings()
 	}
 	// then the rest
 	for( int f = CODE_FONT; f < FONT_END; f++ ) {
-		v = value( DebuggerFontNames[f] );
+		v = value( fontLocation( (DebuggerFont)f ) );
 		if( v.type() == QVariant::Font ) {
 			fonts[f] = v.value<QFont>();
 			fontTypes[f] = CUSTOM;
@@ -62,6 +67,9 @@ void Settings::getFontsFromSettings()
 			fontTypes[f] = CUSTOM;
 		}
 	}
+	// read colors
+	for( int f =CODE_FONT; f < FONT_END; f++ )
+		fontColors[f] = value( fontColorLocation( (DebuggerFont)f ), Qt::black ).value<QColor>();
 }
 
 QString Settings::fontName( DebuggerFont f ) const
@@ -110,6 +118,19 @@ void Settings::setFontType( DebuggerFont f, DebuggerFontType t )
 				break;
 		}
 		if( f > FIXED_FONT ) updateFonts();
+	}
+}
+
+const QColor& Settings::fontColor( DebuggerFont f ) const
+{
+	return fontColors[f];
+}
+
+void Settings::setFontColor( DebuggerFont f, const QColor& c )
+{
+	if( f > FIXED_FONT ) {
+		fontColors[f] = c;
+		setValue( fontColorLocation(f), c );
 	}
 }
 

@@ -1,5 +1,11 @@
 $Id$
 
+2006-09-11 Edwin Velds <e.velds@gmail.com>
+	* Added breakpoint addition dialog
+	* Added preferences dialog
+	* Added preferences for a few fonts
+	* Added proper conversion for numeric inputs
+
 2006-09-09 Edwin Velds <e.velds@gmail.com>
 	* Symbol table rewrite
 	* Added initial Settings class

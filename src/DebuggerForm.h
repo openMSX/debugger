@@ -42,6 +42,7 @@ private:
 	QAction* systemDisconnectAction;
 	QAction* systemPauseAction;
 	QAction* systemSymbolManagerAction;
+	QAction* systemPreferencesAction;
 	QAction* systemQuitAction;
 
 	QAction* executeBreakAction;
@@ -52,6 +53,7 @@ private:
 	QAction* executeStepOutAction;
 
 	QAction* breakpointToggleAction;
+	QAction* breakpointAddAction;
 
 	QAction* helpAboutAction;
 
@@ -91,6 +93,7 @@ private slots:
 	void systemDisconnect();
 	void systemPause();
 	void systemSymbolManager();
+	void systemPreferences();
 	void executeBreak();
 	void executeRun();
 	void executeStep();
@@ -98,6 +101,7 @@ private slots:
 	void executeRunTo();
 	void executeStepOut();
 	void breakpointToggle(int addr = -1);
+	void breakpointAdd();
 
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name, const QString& message);

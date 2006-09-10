@@ -4,6 +4,7 @@
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
 #include "DebuggerData.h"
+#include "Settings.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOptionFocusRect>
@@ -52,8 +53,6 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 
-	setFont(QFont("Verdana", 11));
-	
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
 	
@@ -100,10 +99,16 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
 
-	QPainter p(this);
-	int h = fontMetrics().height();
-	int d = fontMetrics().descent();
+	Settings& s = Settings::get();
 	
+	QPainter p(this);
+	p.setFont(s.font(Settings::LABEL_FONT));
+	int hl = p.fontMetrics().height();
+	int dl = p.fontMetrics().descent();
+	p.setFont(s.font(Settings::CODE_FONT));
+	int h = p.fontMetrics().height();
+	int d = p.fontMetrics().descent();
+
 	// calc and set drawing bounds
 	QRect r(e->rect());
 	if (r.left() < frameL) r.setLeft(frameL);
@@ -133,10 +138,8 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	const DisasmRow* row;
 	bool displayDisasm = memory != NULL && isEnabled();
 
+	p.setFont(s.font(Settings::CODE_FONT));
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
-		// default to text pen 
-		p.setPen(palette().color(QPalette::Text));
-
 		// fetch the data for this line
 		row = displayDisasm
 		    ? &disasmLines[i+disasmTopLine]
@@ -145,11 +148,17 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 		// if there is a label here, draw the label
 		if( row->rowType == DisasmRow::LABEL ) {
 			hexStr = QString("%1:").arg(row->instr.c_str());
-			p.drawText(xAddr, y - d, hexStr);
-			y += h;
+			p.setFont(s.font(Settings::LABEL_FONT));
+			p.setPen(s.fontColor(Settings::LABEL_FONT));
+			p.drawText(xAddr, y + hl - h - dl, hexStr);
+			y += hl;
+			p.setFont(s.font(Settings::CODE_FONT));
 			continue;
 		}
 		
+		// default to text pen 
+		p.setPen(s.fontColor(Settings::CODE_FONT));
+
 		// draw cursor line or breakpoint
 		if (row->addr == cursorAddr) {
 			p.fillRect(frameL + 32, y + 1 - h, 
@@ -364,7 +373,7 @@ int DisasmViewer::findDisasmLine(quint16 lineAddr, bool findDownward)
 			}
 		}
 	} else {
-		while (line < disasmLines.size()) {
+		while ( line < int(disasmLines.size()) ) {
 			if (disasmLines[line].addr == lineAddr) {
 				break;
 			}

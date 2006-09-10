@@ -4,6 +4,7 @@
 
 #include <QSettings>
 #include <QFont>
+#include <QColor>
 
 class Settings : public QSettings
 {
@@ -19,6 +20,8 @@ public:
 	void setFont( DebuggerFont f, const QFont& ft );
 	DebuggerFontType fontType( DebuggerFont f ) const;
 	void setFontType( DebuggerFont f, DebuggerFontType t );
+	const QColor& fontColor( DebuggerFont f ) const;
+	void setFontColor( DebuggerFont f, const QColor& c );
 
 private:
 	Settings();
@@ -26,6 +29,7 @@ private:
 
 	QFont fonts[FONT_END];
 	DebuggerFontType fontTypes[FONT_END];
+	QColor fontColors[FONT_END];
 
 	void getFontsFromSettings();
 	void updateFonts();

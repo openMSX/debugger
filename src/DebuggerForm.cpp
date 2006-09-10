@@ -11,6 +11,8 @@
 #include "OpenMSXConnection.h"
 #include "ConnectDialog.h"
 #include "SymbolManager.h"
+#include "PreferencesDialog.h"
+#include "BreakpointDialog.h"
 #include "Version.h"
 #include <QAction>
 #include <QMessageBox>
@@ -144,6 +146,9 @@ void DebuggerForm::createActions()
 	systemSymbolManagerAction->setStatusTip(tr("Start the symbol manager"));
 	systemSymbolManagerAction->setIcon(QIcon(":/icons/symmanager.png"));
 
+	systemPreferencesAction = new QAction(tr("Pre&ferences ..."), this);
+	systemPreferencesAction->setStatusTip(tr("Set the global debugger preferences"));
+
 	systemQuitAction = new QAction(tr("&Quit"), this);
 	systemQuitAction->setShortcut(tr("Ctrl+Q"));
 	systemQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
@@ -190,6 +195,11 @@ void DebuggerForm::createActions()
 	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
 	breakpointToggleAction->setEnabled(false);
 
+	breakpointAddAction = new QAction(tr("Add ..."), this);
+	breakpointAddAction->setShortcut(tr("CTRL+B"));
+	breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
+	breakpointAddAction->setEnabled(false);
+
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the appliction information"));
 
@@ -197,6 +207,7 @@ void DebuggerForm::createActions()
 	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
 	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
+	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
 	connect(systemQuitAction, SIGNAL(triggered()), this, SLOT(close()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
@@ -205,6 +216,7 @@ void DebuggerForm::createActions()
 	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
 	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
 	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(breakpointToggle()));
+	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(breakpointAdd()));
 	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 }
 
@@ -218,6 +230,8 @@ void DebuggerForm::createMenus()
 	systemMenu->addAction(systemPauseAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemSymbolManagerAction);
+	systemMenu->addSeparator();
+	systemMenu->addAction(systemPreferencesAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemQuitAction);
 
@@ -234,6 +248,7 @@ void DebuggerForm::createMenus()
 	// create breakpoint menu
 	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
 	breakpointMenu->addAction(breakpointToggleAction);
+	breakpointMenu->addAction(breakpointAddAction);
 
 	// create help menu
 	helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -518,6 +533,7 @@ void DebuggerForm::setBreakMode()
 	executeStepOutAction->setEnabled(true);
 	executeRunToAction->setEnabled(true);
 	breakpointToggleAction->setEnabled(true);
+	breakpointAddAction->setEnabled(true);
 }
 
 void DebuggerForm::setRunMode()
@@ -529,6 +545,7 @@ void DebuggerForm::setRunMode()
 	executeStepOutAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
 	breakpointToggleAction->setEnabled(false);
+	breakpointAddAction->setEnabled(false);
 }
 
 void DebuggerForm::systemConnect()
@@ -554,6 +571,12 @@ void DebuggerForm::systemSymbolManager()
 {
 	SymbolManager symManager( symTable, this );
 	symManager.exec();
+}
+
+void DebuggerForm::systemPreferences()
+{
+	PreferencesDialog prefs( this );
+	prefs.exec();
 }
 
 void DebuggerForm::executeBreak()
@@ -593,7 +616,7 @@ void DebuggerForm::executeStepOut()
 
 void DebuggerForm::breakpointToggle(int addr)
 {
-	// TODO move this test out of this function???
+	// toggle address unspecified, use cursor address
 	if (addr < 0) addr = disasmView->cursorAddr;
 
 	QString cmd;
@@ -609,6 +632,36 @@ void DebuggerForm::breakpointToggle(int addr)
 	comm.sendCommand(new SimpleCommand(cmd));
 
 	comm.sendCommand(new ListBreakPointsHandler(*this));
+}
+
+void DebuggerForm::breakpointAdd()
+{
+	BreakpointDialog bpd( memLayout, this );
+	if( bpd.exec() ) {
+		if( bpd.address() > 0 ) {
+			QString cmd("debug set_bp %1 { [ pc_in_slot %2 %3 %4 ] }");
+			cmd = cmd.arg( bpd.address() );
+			
+			if( bpd.slot() == -1 )
+				cmd = cmd.arg('X');
+			else
+				cmd = cmd.arg(bpd.slot());
+			
+			if( bpd.subslot() == -1 )
+				cmd = cmd.arg('X');
+			else
+				cmd = cmd.arg(bpd.subslot());
+			
+			if( bpd.segment() == -1 )
+				cmd = cmd.arg('X');
+			else
+				cmd = cmd.arg(bpd.segment());
+
+			comm.sendCommand(new SimpleCommand(cmd));
+
+			comm.sendCommand(new ListBreakPointsHandler(*this));
+		}
+	};
 }
 
 void DebuggerForm::showAbout()

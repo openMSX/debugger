@@ -1,5 +1,6 @@
 #include "SymbolManager.h"
 #include "Settings.h"
+#include "Convert.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
@@ -189,7 +190,8 @@ void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).toInt());
 		// Todo: add validity checks
 		sym->setText( item->text(0) );
-		sym->setValue( item->text(1).toInt() );
+		int value = stringToValue( item->text(1) );
+		if( value >= 0 ) sym->setValue( value );
 		treeLabels->closePersistentEditor( item, column );
 	}
 }
