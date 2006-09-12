@@ -45,7 +45,7 @@ MAKE_PATH:=build
 
 include $(MAKE_PATH)/version.mk
 CHANGELOG_REVISION:=\
-	$(shell sed -ne "s/\$$Id: ChangeLog,v \([^ ]*\).*/\1/p" ChangeLog)
+	$(shell sed -ne "s/\$$Id: ChangeLog \([^ ]*\).*/\1/p" ChangeLog)
 ifeq ($(RELEASE_FLAG),true)
 PACKAGE_DETAILED_VERSION:=$(PACKAGE_VERSION)
 else
