@@ -21,7 +21,7 @@ else
 	do
 		src="$src $1"
 		shift
-	done 
+	done
 fi
 dst="$1"
 
@@ -34,7 +34,7 @@ do
 		echo "skipping symbolic link: $path"
 	elif [ -d "$path" ]
 	then
-		if [ "$name" != CVS ]
+		if [ "$name" != .svn ]
 		then
 			$0 "$path" "$dst"
 		fi
