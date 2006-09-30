@@ -114,7 +114,7 @@ APP_PLIST:=$(APP_PATH)/Contents/Info.plist
 APP_ICON:=$(APP_PATH)/Contents/Resources/openmsx-logo.icns
 APP_RESOURCES:=$(APP_ICON)
 BINARY_PATH:=$(APP_PATH)/Contents/MacOS
-PKGINFO_FULL:=$(APP_PATH)/PkgInfo
+PKGINFO_FULL:=$(APP_PATH)/Contents/PkgInfo
 else
 BINARY_PATH:=$(BUILD_PATH)/bin
 endif
