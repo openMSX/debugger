@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QStyleOptionFocusRect>
 #include <QScrollBar>
+#include <QWheelEvent>
 #include <cmath>
 #include <cassert>
 
@@ -488,6 +489,25 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 		break;
 	default:
 		QFrame::keyReleaseEvent(e);
+	}
+}
+
+void DisasmViewer::wheelEvent(QWheelEvent *e)
+{
+	int step = e->delta() / 64;
+
+	if (e->orientation() == Qt::Vertical) {
+		if (step > 0) {
+			if (disasmTopLine > 0) {
+				setAddress(disasmLines[disasmTopLine - 1].addr, BottomAlways);
+			}
+		} else {
+			int newTop = disasmTopLine + int(ceil(visibleLines)) - 1;
+			if (newTop < int(disasmLines.size())) {
+				setAddress(disasmLines[newTop].addr, TopAlways);
+			}
+		}
+		e->accept();
 	}
 }
 

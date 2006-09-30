@@ -41,6 +41,7 @@ protected:
 	void paintEvent(QPaintEvent* e);
 	void keyPressEvent(QKeyEvent* e);
 	void mousePressEvent(QMouseEvent* e);
+	void wheelEvent(QWheelEvent* e);
 
 private:
 	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
