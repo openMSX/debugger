@@ -111,7 +111,7 @@ ifeq ($(OPENMSX_TARGET_OS),darwin)
 APP_SUPPORT_PATH:=build/package-darwin
 APP_PATH:=$(BUILD_PATH)/openMSX_Debugger.app
 APP_PLIST:=$(APP_PATH)/Contents/Info.plist
-APP_ICON:=$(APP_PATH)/Contents/Resources/openmsx-logo.icns
+APP_ICON:=$(APP_PATH)/Contents/Resources/debugger-logo.icns
 APP_RESOURCES:=$(APP_ICON)
 BINARY_PATH:=$(APP_PATH)/Contents/MacOS
 PKGINFO_FULL:=$(APP_PATH)/Contents/PkgInfo

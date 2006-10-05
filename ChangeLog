@@ -1,5 +1,12 @@
 $Id$
 
+2006-10-05 Maarten ter Huurne <maarten@treewalker.org>
+	* Use new icon by Eric Boon on OS X.
+
+2006-09-30 Maarten ter Huurne <maarten@treewalker.org>
+	* Committed mouse wheel scrolling support for disasm panel by BouKiCHi.
+	* Corrected location of PkgInfo file (OS X).
+
 2006-09-11 Edwin Velds <e.velds@gmail.com>
 	* Added breakpoint addition dialog
 	* Added preferences dialog
