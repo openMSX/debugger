@@ -302,6 +302,8 @@ QWidget* DebuggerForm::createNamedWidget(const QString& name, QWidget* widget)
 
 void DebuggerForm::createForm()
 {
+	setWindowTitle("openMSX Debugger");
+
 	mainSplitter = new QSplitter(Qt::Horizontal, this);
 	setCentralWidget(mainSplitter);
 
@@ -641,17 +643,17 @@ void DebuggerForm::breakpointAdd()
 		if( bpd.address() > 0 ) {
 			QString cmd("debug set_bp %1 { [ pc_in_slot %2 %3 %4 ] }");
 			cmd = cmd.arg( bpd.address() );
-			
+
 			if( bpd.slot() == -1 )
 				cmd = cmd.arg('X');
 			else
 				cmd = cmd.arg(bpd.slot());
-			
+
 			if( bpd.subslot() == -1 )
 				cmd = cmd.arg('X');
 			else
 				cmd = cmd.arg(bpd.subslot());
-			
+
 			if( bpd.segment() == -1 )
 				cmd = cmd.arg('X');
 			else
@@ -666,5 +668,7 @@ void DebuggerForm::breakpointAdd()
 
 void DebuggerForm::showAbout()
 {
-	QMessageBox::about(this, "openMSX", QString(Version::FULL_VERSION.c_str()));
+	QMessageBox::about(
+		this, "openMSX Debugger", QString(Version::FULL_VERSION.c_str())
+		);
 }
