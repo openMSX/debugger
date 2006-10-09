@@ -1,5 +1,9 @@
 $Id$
 
+2006-10-09 Manuel Bilderbeek <manuel@msxnet.org>
+	* Use new icon by Eric Boon also on Linux and Windows.
+	  TODO: in Windows also make it an appIcon via Windows resources.
+
 2006-10-05 Maarten ter Huurne <maarten@treewalker.org>
 	* Use new icon by Eric Boon on OS X.
 
