@@ -15,11 +15,10 @@ CPURegsViewer::CPURegsViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
+	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
 
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL;
-	
-	setSizes();
 }
 
 void CPURegsViewer::resizeEvent(QResizeEvent* e)
@@ -166,15 +165,10 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	drawValue(p, x, y, hexStr, regsChanged.IFF);
 }
 
-void CPURegsViewer::setSizes()
+QSize CPURegsViewer::sizeHint() const
 {
-	int v = frameT + 8 * fontMetrics().height() + frameB;
-	setMinimumHeight(v);
-	setMaximumHeight(v);
-
-	v = frameL + 4 + fontMetrics().width("HLWFFFFWWHLWFFFFW") + 4 + frameR;
-	setMinimumWidth(v);
-	setMaximumWidth(v);
+	return QSize( frameL + 4 + fontMetrics().width("HLWFFFFWWHLWFFFFW") + 4 + frameR,
+	              frameT + 8 * fontMetrics().height() + frameB );
 }
 
 void CPURegsViewer::drawValue(QPainter& p, const int x, const int y,

@@ -17,6 +17,8 @@ public:
 
 	void setData(unsigned char* memPtr, int memLength);
 
+	QSize sizeHint() const;
+
 public slots:
 	void setLocation(int addr);
 	void setStackPointer(quint16 addr);
@@ -26,7 +28,6 @@ protected:
 	void paintEvent(QPaintEvent* e);
 
 private:
-	void setSizes();
 	void setScrollBarValues();
 	void memdataTransfered(StackRequest* r);
 	void transferCancelled(StackRequest* r);

@@ -3,12 +3,13 @@
 include build/node-start.mk
 
 MOC_SRC_HDR:= \
+	DockableWidget DockableWidgetArea DockableWidgetLayout \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager \
 	Settings PreferencesDialog BreakpointDialog
 
 SRC_HDR:= \
-	Dasm DasmTables DebuggerData SymbolTable Convert Version
+	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version
 
 SRC_ONLY:= \
 	main

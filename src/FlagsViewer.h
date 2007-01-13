@@ -16,6 +16,8 @@ class FlagsViewer : public QFrame
 public:
 	FlagsViewer(QWidget* parent = 0);
 
+	QSize sizeHint() const;
+
 public slots:
 	void setFlags(quint8 newFlags);
 
@@ -29,7 +31,6 @@ private:
 	unsigned char flags;
 	unsigned char flagsChanged;
 
-	void setSizes();
 	void drawValue(QPainter& p, int x, int y, const QString& str,
 	               const bool changed);
 };

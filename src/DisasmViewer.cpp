@@ -53,7 +53,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-
+	setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred ) );
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
 	
@@ -71,12 +71,20 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + scrollBar->sizeHint().width();
+	setMinimumHeight( frameT + 5*fontMetrics().height() + frameB );
+
 
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 
 	// manual scrollbar handling routines (real size of the data is not known)
 	connect(scrollBar, SIGNAL(actionTriggered(int)), this, SLOT(scrollBarAction(int)));
 	connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
+}
+
+QSize DisasmViewer::sizeHint() const
+{
+	return QSize( frameL + 48 + 35*fontMetrics().width("X") + frameR,
+	              20*fontMetrics().height() );
 }
 
 void DisasmViewer::resizeEvent(QResizeEvent* e)

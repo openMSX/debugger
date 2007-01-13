@@ -44,6 +44,7 @@ StackViewer::StackViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
+	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
 
 	setFont(QFont("Courier New", 12));
 
@@ -57,16 +58,15 @@ StackViewer::StackViewer(QWidget* parent)
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
-	setSizes();
+	setMinimumHeight( frameT+frameB+fontMetrics().height() );
 
 	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
 }
 
-void StackViewer::setSizes()
+QSize StackViewer::sizeHint() const
 {
-	int v = frameL + 4 + fontMetrics().width("FFFFWFFFF ") + 4 + frameR;
-	setMinimumWidth(v);
-	setMaximumWidth(v);
+	return QSize( frameL + 4 + fontMetrics().width("FFFFWFFFF ") + 4 + frameR,
+	              frameT + 8*fontMetrics().height() + frameB );
 }
 
 void StackViewer::setScrollBarValues()

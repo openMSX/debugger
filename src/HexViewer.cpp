@@ -45,7 +45,8 @@ HexViewer::HexViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-
+	setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding ) );
+	
 	setFont(QFont("Courier New", 12));
 
 	horBytes = 16;
@@ -72,6 +73,12 @@ void HexViewer::setScrollBarValues()
 	vertScrollBar->setMaximum(maxLine);
 	vertScrollBar->setSingleStep(1);
 	vertScrollBar->setPageStep(int(visibleLines));
+}
+
+QSize HexViewer::sizeHint() const
+{
+	return QSize( frameL + 16 + (6+3*horBytes/2)*fontMetrics().width("A") + frameR,
+	              frameT + 10*fontMetrics().height() + frameB );
 }
 
 void HexViewer::resizeEvent(QResizeEvent* e)

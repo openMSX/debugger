@@ -13,11 +13,10 @@ FlagsViewer::FlagsViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-
+	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
+	
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL;
-
-	setSizes();
 }
 
 void FlagsViewer::resizeEvent(QResizeEvent* e)
@@ -68,15 +67,10 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	}
 }
 
-void FlagsViewer::setSizes()
+QSize FlagsViewer::sizeHint() const
 {
-	int v = frameT + 8 * fontMetrics().height() + frameB;
-	setMinimumHeight(v);
-	setMaximumHeight(v);
-	
-	v = frameL + 4 + fontMetrics().width("ZW0 (PE) ") + 4 + frameR;
-	setMinimumWidth(v);
-	setMaximumWidth(v);
+	return QSize( frameL + 4 + fontMetrics().width("ZW0 (PE) ") + 4 + frameR,
+	              frameT + 8 * fontMetrics().height() + frameB );
 }
 
 void FlagsViewer::drawValue(QPainter& p, int x, int y, const QString& str,

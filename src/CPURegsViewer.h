@@ -30,6 +30,8 @@ public:
 
 	void setData(unsigned char* datPtr);
 
+	QSize sizeHint() const;
+
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
@@ -40,7 +42,6 @@ private:
 	Z80Registers regs;
 	Z80RegisterChanges regsChanged;
 
-	void setSizes();
 	void drawValue(QPainter& p, int x, int y, const QString& str, bool changed);
 
 signals:

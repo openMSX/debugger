@@ -18,13 +18,13 @@ public:
 	void setMemoryLayout(MemoryLayout* ml);
 	void slotsUpdated(const QString& message);
 
+	QSize sizeHint() const;
+
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 
 private:
-	void setSizes();
-
 	int frameL, frameR, frameT, frameB;
 	int headerSize1, headerSize2, headerSize3, headerSize4;
 	int headerHeight;

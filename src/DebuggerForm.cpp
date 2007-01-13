@@ -1,6 +1,8 @@
 // $Id$
 
 #include "DebuggerForm.h"
+#include "DockableWidgetArea.h"
+#include "DockableWidget.h"
 #include "DisasmViewer.h"
 #include "HexViewer.h"
 #include "CPURegsViewer.h"
@@ -283,80 +285,80 @@ void DebuggerForm::createStatusbar()
 	statusBar()->showMessage("No emulation running.");
 }
 
-QWidget* DebuggerForm::createNamedWidget(const QString& name, QWidget* widget)
-{
-	QVBoxLayout* vboxLayout = new QVBoxLayout();
-	vboxLayout->setMargin(3);
-	vboxLayout->setSpacing(2);
-
-	QLabel* lbl = new QLabel(name);
-
-	vboxLayout->addWidget(lbl, 0);
-	vboxLayout->addWidget(widget, 1);
-
-	QWidget* combined = new QWidget();
-	combined->setLayout(vboxLayout);
-
-	return combined;
-}
-
 void DebuggerForm::createForm()
 {
 	setWindowTitle("openMSX Debugger");
 
-	mainSplitter = new QSplitter(Qt::Horizontal, this);
-	setCentralWidget(mainSplitter);
+	mainArea = new DockableWidgetArea;
+	dockMan.addDockArea( mainArea );
+	setCentralWidget(mainArea);
 
-	// create the left side of the gui
-	disasmSplitter = new QSplitter(Qt::Vertical, this);
-	mainSplitter->addWidget(disasmSplitter);
+	DockableWidget *dw = new DockableWidget( dockMan );
 
 	// create the disasm viewer widget
-	disasmView = new DisasmViewer();
-	disasmSplitter->addWidget(createNamedWidget(tr("Code view:"), disasmView));
+	disasmView = new DisasmViewer;
+	dw->setWidget(disasmView);
+	dw->setTitle(tr("Code view"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(false);
+	dw->setClosable(false);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
 
 	// create the memory view widget
-	hexView = new HexViewer();
-	disasmSplitter->addWidget(createNamedWidget(tr("Main memory:"), hexView));
-
-	// create the right side of the gui
-	QWidget* w = new QWidget;
-	mainSplitter->addWidget(w);
-	QVBoxLayout* rightLayout = new QVBoxLayout();
-	rightLayout->setMargin(0);
-	rightLayout->setSpacing(0);
-	w->setLayout(rightLayout);
-
-	QWidget* w2 = new QWidget();
-	rightLayout->addWidget(w2, 0);
-	QHBoxLayout* topLayout = new QHBoxLayout();
-	topLayout->setMargin(0);
-	topLayout->setSpacing(0);
-	w2->setLayout(topLayout);
-
+	hexView = new HexViewer;
+	dw = new DockableWidget( dockMan );
+	dw->setWidget(hexView);
+	dw->setTitle(tr("Main memory"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::BOTTOM, 0 );
+	
 	// create register viewer
-	regsView = new CPURegsViewer();
-	topLayout->addWidget(createNamedWidget(tr("CPU registers:"), regsView), 0);
-
+	regsView = new CPURegsViewer;
+	dw = new DockableWidget( dockMan );
+	dw->setWidget(regsView);
+	dw->setTitle(tr("CPU registers"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	
 	// create flags viewer
-	flagsView = new FlagsViewer();
-	topLayout->addWidget(createNamedWidget(tr("Flags:"), flagsView), 0);
+	flagsView = new FlagsViewer;
+	dw = new DockableWidget( dockMan );
+	dw->setWidget(flagsView);
+	dw->setTitle(tr("Flags"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
 
 	// create stack viewer
-	stackView = new StackViewer();
-	topLayout->addWidget(createNamedWidget(tr("Stack:"), stackView), 0);
+	stackView = new StackViewer;
+	dw = new DockableWidget( dockMan );
+	dw->setWidget(stackView);
+	dw->setTitle(tr("Stack"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
 
 	// create slot viewer
-	slotView = new SlotViewer();
-	topLayout->addWidget(createNamedWidget(tr("Memory layout:"), slotView), 0);
-
-	// create spacer on the right
-	QWidget* w3 = new QWidget();
-	topLayout->addWidget(w3, 1);
-
-	// create rest
-	QWidget* w4 = new QWidget();
-	rightLayout->addWidget(w4, 1);
+	slotView = new SlotViewer;
+	dw = new DockableWidget( dockMan );
+	dw->setWidget(slotView);
+	dw->setTitle(tr("Memory layout"));
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
 
 	disasmView->setEnabled(false);
 	hexView->setEnabled(false);

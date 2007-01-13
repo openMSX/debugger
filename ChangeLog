@@ -1,5 +1,18 @@
 $Id$
 
+2007-01-13 Edwin Velds <e.velds@gmail.com>
+	* New docking layout manager.
+	    Supports:
+	    - Dragging controls off the main window to a separate window.
+	    - Docking separate windows back in the main window. Docking
+	      occurs to the closest point on the closest edge. For
+	      resizable windows, extra resized docking options are
+	      available.
+	    TODO:
+	    - Finish support for multiple docking areas.
+	    - Allow resizing of widgets in the docking area.
+	    - Refine docking algorithm where needed.
+
 2006-10-09 Manuel Bilderbeek <manuel@msxnet.org>
 	* Use new icon by Eric Boon also on Linux and Windows.
 	  TODO: in Windows also make it an appIcon via Windows resources.

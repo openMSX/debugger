@@ -3,10 +3,12 @@
 #ifndef DEBUGGERFORM_H
 #define DEBUGGERFORM_H
 
+#include "DockManager.h"
 #include "DebuggerData.h"
 #include "SymbolTable.h"
 #include <QMainWindow>
 
+class DockableWidgetArea;
 class DisasmViewer;
 class HexViewer;
 class CPURegsViewer;
@@ -57,9 +59,9 @@ private:
 
 	QAction* helpAboutAction;
 
-	QSplitter* mainSplitter;
-	QSplitter* disasmSplitter;
-
+	DockManager dockMan;
+	DockableWidgetArea *mainArea;
+	
 	DisasmViewer* disasmView;
 	HexViewer* hexView;
 	CPURegsViewer* regsView;
@@ -78,7 +80,6 @@ private:
 	void createToolbars();
 	void createStatusbar();
 	void createForm();
-	QWidget* createNamedWidget(const QString& name, QWidget* widget);
 
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);

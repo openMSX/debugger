@@ -34,6 +34,7 @@ SlotViewer::SlotViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
+	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Minimum ) );
 
 	memLayout = NULL;
 	for (int p = 0; p < 4; ++p) {
@@ -44,12 +45,16 @@ SlotViewer::SlotViewer(QWidget* parent)
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL;
 
-	setSizes();
+	headerSize1 = 8 + fontMetrics().width("Page");
+	headerSize2 = 8 + fontMetrics().width("Address");
+	headerSize3 = 8 + fontMetrics().width("Slot");
+	headerSize4 = 8 + fontMetrics().width("Segment");
+	headerHeight = 8 + fontMetrics().height();
 }
 
 void SlotViewer::resizeEvent(QResizeEvent* e)
 {
-	QFrame::resizeEvent(e);
+	QFrame::resizeEvent(e);	
 }
 
 void SlotViewer::paintEvent(QPaintEvent* e)
@@ -170,17 +175,10 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	}
 }
 
-void SlotViewer::setSizes()
+QSize SlotViewer::sizeHint() const
 {
-	headerSize1 = 8 + fontMetrics().width("Page");
-	headerSize2 = 8 + fontMetrics().width("Address");
-	headerSize3 = 8 + fontMetrics().width("Slot");
-	headerSize4 = 8 + fontMetrics().width("Segment");
-	headerHeight = 8 + fontMetrics().height();
-	
-	int v = headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR;
-	setMinimumWidth(v);
-	setMaximumWidth(v);
+	return QSize( headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
+	              headerHeight + 4*fontMetrics().height() );
 }
 
 void SlotViewer::refresh()

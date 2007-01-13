@@ -26,6 +26,8 @@ public:
 	void memoryUpdated(CommMemoryRequest* req);
 	void updateCancelled(CommMemoryRequest* req);
 
+	QSize sizeHint() const;
+
 	// TODO get rid of public members
 	quint16 programCounter;
 	quint16 cursorAddr;

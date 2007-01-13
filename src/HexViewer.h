@@ -18,6 +18,8 @@ public:
 	void setData(const char* name, unsigned char* datPtr, int datLength);
 	void refresh();
 
+	QSize sizeHint() const;
+
 public slots:
 	void setLocation(int addr);
 
