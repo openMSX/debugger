@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 
 #ifndef _DOCKABLETWIDGETAREA_H
 #define _DOCKABLETWIDGETAREA_H

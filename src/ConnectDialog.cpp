@@ -170,7 +170,7 @@ QString ConnectionInfoRequest::getCommand() const
 {
 	switch (state) {
 	case GET_MACHINE:
-		return "openmsx_info version";
+		return "machine_info config_name";
 	case GET_TITLE:
 		return "guess_title";
 	default:
@@ -221,9 +221,9 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 {
 	ConnectDialog dialog(parent);
 
-	// delay for at most 200ms while checking the connections
+	// delay for at most 500ms while checking the connections
 	dialog.delay = 1;
-	dialog.startTimer( 200 );
+	dialog.startTimer( 500 );
 	while( dialog.pendingConnections.size() && dialog.delay ) 
 		qApp->processEvents( QEventLoop::AllEvents, 200 );
 

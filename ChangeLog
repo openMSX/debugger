@@ -12,6 +12,7 @@ $Id$
 	    - Finish support for multiple docking areas.
 	    - Allow resizing of widgets in the docking area.
 	    - Refine docking algorithm where needed.
+	* Updated commands to use machine_info where appropriate
 
 2006-10-09 Manuel Bilderbeek <manuel@msxnet.org>
 	* Use new icon by Eric Boon also on Linux and Windows.

@@ -437,7 +437,7 @@ void DebuggerForm::initConnection()
 		"    }\n"
 		"  }\n"
 		"  for { set ps 0 } { $ps &lt; 4 } { incr ps } {\n"
-		"    if [openmsx_info issubslotted $ps] {\n"
+		"    if [machine_info issubslotted $ps] {\n"
 		"      append result \"1\\n\"\n"
 		"      for { set ss 0 } { $ss &lt; 4 } { incr ss } {\n"
 		"        append result [get_mapper_size $ps $ss] \"\\n\"\n"

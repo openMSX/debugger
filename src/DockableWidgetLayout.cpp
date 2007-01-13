@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 
 #include "DockableWidgetLayout.h"
 #include "DockableWidget.h"
