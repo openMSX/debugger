@@ -15,6 +15,7 @@
 #include "SymbolManager.h"
 #include "PreferencesDialog.h"
 #include "BreakpointDialog.h"
+#include "Settings.h"
 #include "Version.h"
 #include <QAction>
 #include <QMessageBox>
@@ -155,6 +156,26 @@ void DebuggerForm::createActions()
 	systemQuitAction->setShortcut(tr("Ctrl+Q"));
 	systemQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
 
+	viewRegistersAction = new QAction(tr("CPU &Registers"), this);
+	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
+	viewRegistersAction->setCheckable(true);
+	
+	viewFlagsAction = new QAction(tr("CPU &Flags"), this);
+	viewFlagsAction->setStatusTip(tr("Toggle the cpu flags display"));
+	viewFlagsAction->setCheckable(true);
+	
+	viewStackAction = new QAction(tr("Stack"), this);
+	viewStackAction->setStatusTip(tr("Toggle the stack display"));
+	viewStackAction->setCheckable(true);
+	
+	viewSlotsAction = new QAction(tr("Slots"), this);
+	viewSlotsAction->setStatusTip(tr("Toggle the slots display"));
+	viewSlotsAction->setCheckable(true);
+	
+	viewMemoryAction = new QAction(tr("Memory"), this);
+	viewMemoryAction->setStatusTip(tr("Toggle the main memory display"));
+	viewMemoryAction->setCheckable(true);
+
 	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
@@ -211,6 +232,11 @@ void DebuggerForm::createActions()
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
 	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
 	connect(systemQuitAction, SIGNAL(triggered()), this, SLOT(close()));
+	connect(viewRegistersAction, SIGNAL(triggered()), this, SLOT(toggleRegisterDisplay()));
+	connect(viewFlagsAction, SIGNAL(triggered()), this, SLOT(toggleFlagsDisplay()));
+	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
+	connect(viewSlotsAction, SIGNAL(triggered()), this, SLOT(toggleSlotsDisplay()));
+	connect(viewMemoryAction, SIGNAL(triggered()), this, SLOT(toggleMemoryDisplay()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
 	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
@@ -237,6 +263,15 @@ void DebuggerForm::createMenus()
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemQuitAction);
 
+	// create execute menu
+	viewMenu = menuBar()->addMenu(tr("&View"));
+	viewMenu->addAction(viewRegistersAction);
+	viewMenu->addAction(viewFlagsAction);
+	viewMenu->addAction(viewStackAction);
+	viewMenu->addAction(viewSlotsAction);
+	viewMenu->addAction(viewMemoryAction);
+	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
+	
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
 	executeMenu->addAction(executeBreakAction);
@@ -293,73 +328,137 @@ void DebuggerForm::createForm()
 	dockMan.addDockArea( mainArea );
 	setCentralWidget(mainArea);
 
+	/*
+	 * Create main widgets and append them to the list first
+	 */
 	DockableWidget *dw = new DockableWidget( dockMan );
 
 	// create the disasm viewer widget
 	disasmView = new DisasmViewer;
 	dw->setWidget(disasmView);
 	dw->setTitle(tr("Code view"));
+	dw->setId("CODEVIEW");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(false);
 	dw->setClosable(false);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 
 	// create the memory view widget
 	hexView = new HexViewer;
 	dw = new DockableWidget( dockMan );
 	dw->setWidget(hexView);
 	dw->setTitle(tr("Main memory"));
+	dw->setId("MEMORY");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::BOTTOM, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 	
 	// create register viewer
 	regsView = new CPURegsViewer;
 	dw = new DockableWidget( dockMan );
 	dw->setWidget(regsView);
 	dw->setTitle(tr("CPU registers"));
+	dw->setId("REGISTERS");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 	
 	// create flags viewer
 	flagsView = new FlagsViewer;
 	dw = new DockableWidget( dockMan );
 	dw->setWidget(flagsView);
 	dw->setTitle(tr("Flags"));
+	dw->setId("FLAGS");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 
 	// create stack viewer
 	stackView = new StackViewer;
 	dw = new DockableWidget( dockMan );
 	dw->setWidget(stackView);
 	dw->setTitle(tr("Stack"));
+	dw->setId("STACK");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 
 	// create slot viewer
 	slotView = new SlotViewer;
 	dw = new DockableWidget( dockMan );
 	dw->setWidget(slotView);
 	dw->setTitle(tr("Memory layout"));
+	dw->setId("SLOTS");
 	dw->setFloating(false);
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	dockMan.insertWidget( dw, 0, DockableWidgetLayout::RIGHT, 0 );
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	dockWidgets.append( dw );
 
+	// restore layout
+	move( Settings::get().value( "Layout/WindowPos", pos() ).toPoint() );
+	resize( Settings::get().value( "Layout/WindowSize", size() ).toSize() );
+	
+	QStringList list = Settings::get().value( "Layout/WidgetLayout" ).toStringList();
+	// defaults needed?
+	if( !list.size() || !list.at(0).startsWith("CODEVIEW ") ) {
+		list.clear();
+		list.append( "CODEVIEW D V R 0 -1 -1" );
+		list.append( "REGISTERS D V R 0 -1 -1" );
+		list.append( "FLAGS D V R 0 -1 -1" );
+		list.append( "STACK D V R 0 -1 164" );
+		list.append( "SLOTS D V R 0 -1 164" );
+		list.append( "MEMORY D V B 341 576 356" );
+	}
+
+	// add widgets
+	for( int i = 0; i < list.size(); i++ ) {
+		QStringList s = list.at(i).split(" ", QString::SkipEmptyParts);
+		// get widget
+		if( (dw = findDockableWidget(s.at(0))) ) {
+			if( s.at(1) == "D" ) {
+				// dock widget
+				DockableWidgetLayout::DockSide side;
+				if( s.at(3) == "T" )
+					side = DockableWidgetLayout::TOP;
+				else if( s.at(3) == "L" )
+					side = DockableWidgetLayout::LEFT;
+				else if( s.at(3) == "R" )
+					side = DockableWidgetLayout::RIGHT;
+				else 
+					side = DockableWidgetLayout::BOTTOM;
+				dockMan.insertWidget( dw, 0, side, s.at(4).toInt(), s.at(5).toInt(), s.at(6).toInt() );
+				if( s.at(2) == "H" ) dw->hide();
+			} else if( s.at(1) == "F" ) {
+				//  float widget
+				dw->setFloating(true, s.at(2) == "V");
+				dw->resize(  s.at(5).toInt(), s.at(6).toInt() );
+				dw->move(  s.at(3).toInt(), s.at(4).toInt() );
+			}
+		}
+	}
+	
 	disasmView->setEnabled(false);
 	hexView->setEnabled(false);
 	regsView->setEnabled(false);
@@ -401,6 +500,32 @@ void DebuggerForm::createForm()
 DebuggerForm::~DebuggerForm()
 {
 	delete[] mainMemory;
+	
+	// store layout
+	Settings::get().setValue( "Layout/WindowPos", pos() );
+	Settings::get().setValue( "Layout/WindowSize", size() );
+
+	QStringList layoutList;
+	// fill layout list with docked widgets
+	dockMan.getConfig( 0, layoutList );
+	// append floating widgets
+	QList<DockableWidget*>::iterator it = dockWidgets.begin();
+	while( it != dockWidgets.end() ) {
+		if( (*it)->isFloating() ) {
+			QString s("%1 F %2 %3 %4 %5 %6");
+			s = s.arg( (*it)->id() );
+			if( (*it)->isHidden() )
+				s = s.arg("H");
+			else
+				s = s.arg("V");
+			s = s.arg( (*it)->x() ).arg( (*it)->y() )
+			     .arg( (*it)->width() ).arg( (*it)->height() );
+			layoutList.append( s );
+		}
+		it++;
+	}
+	Settings::get().setValue( "Layout/WidgetLayout", layoutList );
+	
 }
 
 void DebuggerForm::initConnection()
@@ -673,4 +798,64 @@ void DebuggerForm::showAbout()
 	QMessageBox::about(
 		this, "openMSX Debugger", QString(Version::FULL_VERSION.c_str())
 		);
+}
+
+void DebuggerForm::toggleRegisterDisplay()
+{
+	toggleView( qobject_cast<DockableWidget*>(regsView->parentWidget()));
+}
+
+void DebuggerForm::toggleFlagsDisplay()
+{
+	toggleView( qobject_cast<DockableWidget*>(flagsView->parentWidget()));
+}
+
+void DebuggerForm::toggleStackDisplay()
+{
+	toggleView( qobject_cast<DockableWidget*>(stackView->parentWidget()));
+}
+
+void DebuggerForm::toggleSlotsDisplay()
+{
+	toggleView( qobject_cast<DockableWidget*>(slotView->parentWidget()));
+}
+
+void DebuggerForm::toggleMemoryDisplay()
+{
+	toggleView( qobject_cast<DockableWidget*>(hexView->parentWidget()));
+}
+
+void DebuggerForm::toggleView( DockableWidget* widget )
+{
+	if( widget->isHidden() ) {
+		widget->show();
+	} else {
+		widget->hide();
+	}
+	dockMan.visibilityChanged( widget );
+}
+
+void DebuggerForm::dockWidgetVisibilityChanged( DockableWidget *w )
+{
+	dockMan.visibilityChanged( w );
+	updateViewMenu();
+}
+
+void DebuggerForm::updateViewMenu()
+{
+	viewRegistersAction->setChecked( regsView->parentWidget()->isVisible() );
+	viewFlagsAction->setChecked( flagsView->isVisible() );
+	viewStackAction->setChecked( stackView->isVisible() );
+	viewSlotsAction->setChecked( slotView->isVisible() );
+	viewMemoryAction->setChecked( hexView->isVisible() );
+}
+
+DockableWidget *DebuggerForm::findDockableWidget( const QString& id )
+{
+	QList<DockableWidget*>::iterator it = dockWidgets.begin();
+	while( it != dockWidgets.end() ) {
+		if( (*it)->id() == id ) return *it;
+		it++;
+	}
+	return 0;
 }

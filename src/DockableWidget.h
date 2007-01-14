@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #ifndef _DOCKABLEWIDGET_H
 #define _DOCKABLEWIDGET_H
@@ -22,27 +22,30 @@ public:
 
 	QWidget *widget() const;
 	void setWidget(QWidget *widget);
+	const QString& id() const;
+	void setId( const QString& str );
 
-	const QString title() const;
+	QString title() const;
 	void setTitle(const QString& title);
 
-	const bool isFloating() const;
-	void setFloating(bool enable);
-	const bool isMovable() const;
+	bool isFloating() const;
+	void setFloating(bool enable, bool showNow = true);
+	bool isMovable() const;
 	void setMovable(bool enable);
-	const bool isClosable() const;
+	bool isClosable() const;
 	void setClosable(bool enable);
-	const bool isDestroyable() const;
+	bool isDestroyable() const;
 	void setDestroyable(bool enable);
 
 protected:
-	//virtual void moveEvent ( QMoveEvent * event );
 	virtual void mousePressEvent ( QMouseEvent * event );
 	virtual void mouseMoveEvent ( QMouseEvent * event );
 	virtual void mouseReleaseEvent ( QMouseEvent * event );
+	virtual void closeEvent( QCloseEvent * event );
 
 private:
 	DockManager& dockManager;
+	QString widgetId;
 
 	bool floating;
 	bool closable, movable, destroyable;
@@ -56,6 +59,9 @@ private:
 	QWidget *headerWidget;
 	QLabel *titleLabel;
 	QToolButton *closeButton;
+	
+signals:
+	void visibilityChanged( DockableWidget *w );
 };
 
 #endif    // _DOCKABLEWIDGET_H

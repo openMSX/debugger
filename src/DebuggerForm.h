@@ -33,6 +33,7 @@ public slots:
 
 private:
 	QMenu* systemMenu;
+	QMenu* viewMenu;
 	QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
@@ -46,6 +47,12 @@ private:
 	QAction* systemSymbolManagerAction;
 	QAction* systemPreferencesAction;
 	QAction* systemQuitAction;
+
+	QAction* viewRegistersAction;
+	QAction* viewFlagsAction;
+	QAction* viewStackAction;
+	QAction* viewSlotsAction;
+	QAction* viewMemoryAction;
 
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
@@ -75,6 +82,8 @@ private:
 	SymbolTable symTable;
 	unsigned char* mainMemory;
 
+	QList<DockableWidget*> dockWidgets;
+
 	void createActions();
 	void createMenus();
 	void createToolbars();
@@ -88,6 +97,7 @@ private:
 	void setRunMode();
 
 	void refreshBreakpoints();
+	DockableWidget *findDockableWidget( const QString& id );
 
 private slots:
 	void systemConnect();
@@ -95,6 +105,11 @@ private slots:
 	void systemPause();
 	void systemSymbolManager();
 	void systemPreferences();
+	void toggleRegisterDisplay();
+	void toggleFlagsDisplay();
+	void toggleStackDisplay();
+	void toggleSlotsDisplay();
+	void toggleMemoryDisplay();
 	void executeBreak();
 	void executeRun();
 	void executeStep();
@@ -104,9 +119,12 @@ private slots:
 	void breakpointToggle(int addr = -1);
 	void breakpointAdd();
 
+	void toggleView( DockableWidget* widget );
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name, const QString& message);
 	void connectionClosed();
+	void dockWidgetVisibilityChanged( DockableWidget *w );
+	void updateViewMenu();
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;

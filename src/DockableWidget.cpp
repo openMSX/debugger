@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #include <QLabel>
 #include <QToolButton>
@@ -22,6 +22,7 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 	closable = true;
 	destroyable = true;
 	dragging = false;
+	setAttribute( Qt::WA_DeleteOnClose, true );
 	
 	titleLabel = new QLabel;
 	closeButton = new QToolButton;
@@ -30,7 +31,8 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 	int sz = style()->pixelMetric(QStyle::PM_SmallIconSize);
 	closeButton->setIconSize( style()->standardIcon(QStyle::SP_TitleBarCloseButton).actualSize(QSize(sz, sz)) );
 	closeButton->setAutoRaise(true);
-	 
+	connect( closeButton, SIGNAL( clicked() ), this, SLOT( close() ) );
+	
 	headerLayout = new QHBoxLayout;
 	headerLayout->setMargin(0);
 	headerLayout->addWidget( titleLabel, 1 );
@@ -73,7 +75,17 @@ void DockableWidget::setWidget(QWidget *widget)
 	}
 }
 
-const QString DockableWidget::title() const
+const QString& DockableWidget::id() const
+{
+	return widgetId;
+}
+
+void DockableWidget::setId( const QString& str )
+{
+	widgetId = str;
+}
+
+QString DockableWidget::title() const
 {
 	return windowTitle();
 }
@@ -84,24 +96,24 @@ void DockableWidget::setTitle(const QString& title)
 	titleLabel->setText( title + ':' );
 }
 
-const bool DockableWidget::isFloating() const
+bool DockableWidget::isFloating() const
 {
 	return floating;
 }
 
-void DockableWidget::setFloating(bool enable)
+void DockableWidget::setFloating(bool enable, bool showNow)
 {
 	if( floating != enable ) {
 		floating = enable;
 	
 		setWindowFlags( floating ? Qt::Tool : Qt::Widget );
-		if( floating ) {
+		if( floating && showNow ) {
 			show();
 		}
 	}
 }
 
-const bool DockableWidget::isMovable() const
+bool DockableWidget::isMovable() const
 {
 	return movable;
 }
@@ -113,7 +125,7 @@ void DockableWidget::setMovable(bool enable)
 	}
 }
 
-const bool DockableWidget::isClosable() const
+bool DockableWidget::isClosable() const
 {
 	return closable;
 }
@@ -134,7 +146,7 @@ void DockableWidget::setClosable(bool enable)
 	}
 }
 
-const bool DockableWidget::isDestroyable() const
+bool DockableWidget::isDestroyable() const
 {
 	return destroyable;
 }
@@ -142,21 +154,23 @@ const bool DockableWidget::isDestroyable() const
 void DockableWidget::setDestroyable(bool enable)
 {
 	destroyable = enable;
+	setAttribute( Qt::WA_DeleteOnClose, enable );
 }
-/*
-void DockableWidget::moveEvent ( QMoveEvent * event )
+
+void DockableWidget::closeEvent( QCloseEvent * event )
 {
-	if( floating ) {
-		// the window was moved
-		QRect r( event->pos().x(), event->pos().y(), width(), height() );
-		if( dockManager.insertLocation( r ) ) {
-			rubberBand->resize( r.width(), r.height() );
-			rubberBand->move( r.x(), r.y() );
-			rubberBand->show();
-		} else
-			rubberBand->hide();
-	}
-}*/
+	if( closable || destroyable ) {
+		if( destroyable && floating ) {
+			dockManager.undockWidget(this);
+			event->accept();
+		} else {
+			hide();
+			event->ignore();
+			emit visibilityChanged( this );
+		}
+	} else
+		event->ignore();
+}
 
 void DockableWidget::mousePressEvent ( QMouseEvent * event )
 {

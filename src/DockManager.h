@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #ifndef _DOCKMANAGER_H
 #define _DOCKMANAGER_H
@@ -29,7 +29,10 @@ public:
 	void undockWidget( DockableWidget *widget );
 
 	bool insertLocation( QRect& r, const QSizePolicy& sizePol );
-	
+
+	void visibilityChanged( DockableWidget *widget );
+	void getConfig( int index, QStringList& list );
+
 private:
 	QList<DockableWidgetArea*> areas;
 	QMap<DockableWidget*, DockableWidgetArea*> areaMap;

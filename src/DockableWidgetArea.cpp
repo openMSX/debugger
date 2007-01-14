@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #include "DockableWidgetArea.h"
 #include "DockableWidgetLayout.h"
@@ -43,4 +43,9 @@ bool DockableWidgetArea::insertLocation( QRect& r, const QSizePolicy& sizePol )
 	bool ok = layout->insertLocation( r, sizePol );
 	r.moveTopLeft( mapToGlobal( r.topLeft() ) );
 	return ok;
+}
+
+void DockableWidgetArea::getConfig( QStringList& list )
+{
+	layout->getConfig( list );
 }

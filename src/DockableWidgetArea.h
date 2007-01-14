@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #ifndef _DOCKABLETWIDGETAREA_H
 #define _DOCKABLETWIDGETAREA_H
@@ -29,6 +29,7 @@ private:
 	void addWidget( DockableWidget *widget, DockableWidgetLayout::DockSide side,
 	                int distance, int width = -1, int height = -1 );
 	bool insertLocation( QRect& r, const QSizePolicy& sizePol );
+	void getConfig( QStringList& list );
 };
 
 #endif    // _DOCKABLETWIDGETAREA_H

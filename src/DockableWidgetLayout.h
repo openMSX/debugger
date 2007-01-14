@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #ifndef _DOCKABLEWIDGETLAYOUT_H
 #define _DOCKABLEWIDGETLAYOUT_H
@@ -8,6 +8,7 @@
 
 class QLayoutItem;
 class DockableWidget;
+class QStringList;
 
 class DockableWidgetLayout : public QLayout
 {
@@ -52,12 +53,16 @@ public:
 	void setGeometry(const QRect &rect);
 
 	QSize sizeHint() const;
-
+	void changed();
+	
+	void getConfig( QStringList& list );
+	
 private:
 	QList<DockInfo *> dockedWidgets;
 	int layoutWidth, layoutHeight;
 	int minWidth, minHeight;
 	int minBaseWidgetWidth, minBaseWidgetHeight;
+	bool minValid;
 	
 	void calcMinimumSize();
 	void sizeMove( int dx, int dy );

@@ -1,5 +1,9 @@
 $Id$
 
+2007-01-14 Edwin Velds <e.velds@gmail.com>
+	* Added a menu for hiding/showing controls.
+	* Added storing and restoring of window layout in the settings.
+
 2007-01-13 Edwin Velds <e.velds@gmail.com>
 	* New docking layout manager.
 	    Supports:

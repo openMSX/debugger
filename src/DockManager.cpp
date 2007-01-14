@@ -1,4 +1,4 @@
-// $Id$
+// $Id:  $
 
 #include "DockManager.h"
 #include "DockableWidget.h"
@@ -57,4 +57,17 @@ bool DockManager::insertLocation( QRect& r, const QSizePolicy& sizePol )
 		return it.value()->insertLocation( r, sizePol );
 	}
 	return false;
+}
+
+void DockManager::visibilityChanged( DockableWidget *widget )
+{
+	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.find( widget );
+	if( it != areaMap.end() ) {
+		it.value()->layout->changed();
+	}
+}
+
+void DockManager::getConfig( int index, QStringList& list )
+{
+	areas[index]->getConfig( list );
 }
