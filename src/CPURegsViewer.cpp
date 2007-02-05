@@ -159,10 +159,10 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	drawValue(p, x, y, hexStr, regsChanged.IM);
 	x += valWidth;
 
-	p.drawText(x, y, "IFF");
-	x += regWidth;
-	hexStr.sprintf("%02X", regs.IFF);
-	drawValue(p, x, y, hexStr, regsChanged.IFF);
+	if( regs.IFF & 1 )
+		drawValue(p, x, y, "EI", regsChanged.IFF);
+	else
+		drawValue(p, x, y, "DI", regsChanged.IFF);
 }
 
 QSize CPURegsViewer::sizeHint() const
@@ -221,7 +221,7 @@ void CPURegsViewer::setData(unsigned char* datPtr)
 	regs.R = newRegs->R;
 	regsChanged.IM = regs.IM != newRegs->IM;
 	regs.IM = newRegs->IM;
-	regsChanged.IFF = regs.IFF != newRegs->IFF;
+	regsChanged.IFF = (regs.IFF & 1) != (newRegs->IFF & 1);
 	regs.IFF = newRegs->IFF;
 
 	update();
