@@ -15,10 +15,13 @@ struct DisasmRow {
 	RowType rowType;
 	unsigned short addr;
 	char numBytes;
+	int infoLine;
 	std::string instr;
 };
 
-static const DisasmRow DISABLED_ROW = {DisasmRow::INSTRUCTION, 0, 1, "-       "};
+static const DisasmRow DISABLED_ROW = {DisasmRow::INSTRUCTION, 0, 1, 0, "-       "};
+static const int FIRST_INFO_LINE = 1;
+static const int LAST_INFO_LINE = -65536;
 
 typedef std::vector<DisasmRow> DisasmLines;
 

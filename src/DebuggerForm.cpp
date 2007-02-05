@@ -604,6 +604,7 @@ void DebuggerForm::finalizeConnection(bool halted)
 		breakOccured();
 	} else {
 		setRunMode();
+		updateData();
 	}
 
 	disasmView->setEnabled(true);
@@ -638,6 +639,11 @@ void DebuggerForm::pauseStatusChanged(bool isPaused)
 void DebuggerForm::breakOccured()
 {
 	setBreakMode();
+	updateData();
+}
+
+void DebuggerForm::updateData()
+{
 	comm.sendCommand(new ListBreakPointsHandler(*this));
 
 	// update registers
@@ -734,7 +740,7 @@ void DebuggerForm::executeStepOver()
 void DebuggerForm::executeRunTo()
 {
 	comm.sendCommand(new SimpleCommand(
-	                  "run_to " + QString::number(disasmView->cursorAddr)));
+	                  "run_to " + QString::number(disasmView->cursorAddress())));
 	setRunMode();
 }
 
@@ -746,7 +752,7 @@ void DebuggerForm::executeStepOut()
 void DebuggerForm::breakpointToggle(int addr)
 {
 	// toggle address unspecified, use cursor address
-	if (addr < 0) addr = disasmView->cursorAddr;
+	if (addr < 0) addr = disasmView->cursorAddress();
 
 	QString cmd;
 	if (breakpoints.isBreakpoint(addr)) {

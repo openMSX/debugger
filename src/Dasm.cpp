@@ -32,6 +32,7 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 	const char* s;
 	const char* r = 0;
 	int pc = startAddr;
+	int labelCount;
 	DisasmRow dest;
 	Symbol *symbol;
 	
@@ -42,7 +43,9 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 		if( symbol ) {
 			if( symbol->value() == pc ) {
 				dest.rowType = DisasmRow::LABEL;
+				labelCount++;
 				dest.numBytes = 0;
+				dest.infoLine = labelCount;
 				dest.addr = pc;
 				dest.instr = symbol->text().toAscii().data();
 				disasm.push_back(dest);
@@ -50,9 +53,11 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 			}
 		}
 		
+		labelCount = 0;
 		dest.rowType = DisasmRow::INSTRUCTION;
 		dest.addr = pc;
 		dest.numBytes = 0;
+		dest.infoLine = 0;
 		dest.instr.clear();
 		switch (membuf[pc]) {
 			case 0xCB:

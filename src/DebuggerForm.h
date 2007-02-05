@@ -95,7 +95,8 @@ private:
 	void breakOccured();
 	void setBreakMode();
 	void setRunMode();
-
+	void updateData();
+	
 	void refreshBreakpoints();
 	DockableWidget *findDockableWidget( const QString& id );
 

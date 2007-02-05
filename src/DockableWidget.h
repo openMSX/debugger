@@ -1,4 +1,4 @@
-// $Id:  $
+// $Id$
 
 #ifndef _DOCKABLEWIDGET_H
 #define _DOCKABLEWIDGET_H

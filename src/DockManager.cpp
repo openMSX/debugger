@@ -1,4 +1,4 @@
-// $Id:  $
+// $Id$
 
 #include "DockManager.h"
 #include "DockableWidget.h"

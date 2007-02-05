@@ -1,4 +1,4 @@
-// $Id:  $
+// $Id$
 
 #ifndef _DOCKMANAGER_H
 #define _DOCKMANAGER_H

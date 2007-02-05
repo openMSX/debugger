@@ -25,19 +25,18 @@ public:
 	void setSymbolTable(SymbolTable* st);
 	void memoryUpdated(CommMemoryRequest* req);
 	void updateCancelled(CommMemoryRequest* req);
+	quint16 programCounter() const;
+	quint16 cursorAddress() const;
 
 	QSize sizeHint() const;
 
-	// TODO get rid of public members
-	quint16 programCounter;
-	quint16 cursorAddr;
-
 public slots:
-	void setAddress(quint16 addr, int method = Top);
+	void setAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setProgramCounter(quint16 pc);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
-
+	void settingsChanged();
+	
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
@@ -53,10 +52,20 @@ private:
 	QPixmap breakMarker;
 	QPixmap pcMarker;
 
+	quint16 programAddr;
+	quint16 cursorAddr;
+	int	cursorLine;
+	
+	// layout information
 	int frameL, frameR, frameT, frameB;
-	double visibleLines;
+	int labelFontHeight, labelFontAscent;
+	int codeFontHeight,  codeFontAscent;
+	int xAddr, xMCode[4], xMnem, xMnemArg;
+	int visibleLines, partialBottomLine;
 	int disasmTopLine;
 	DisasmLines disasmLines;
+	
+	// display data
 	unsigned char* memory;
 	int waitingForData;
 	CommMemoryRequest* nextRequest;
@@ -64,8 +73,9 @@ private:
 	MemoryLayout *memLayout;
 	SymbolTable *symTable;
 
-	int findDisasmLine(quint16 lineAddr, bool findDownward = false);
-
+	int findDisasmLine(quint16 lineAddr, int infoLine = 0);
+	int lineAtPos( const QPoint& pos );
+	
 signals:
 	void toggleBreakpoint(int addr);
 };

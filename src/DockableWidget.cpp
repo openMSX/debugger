@@ -1,4 +1,4 @@
-// $Id:  $
+// $Id$
 
 #include <QLabel>
 #include <QToolButton>
