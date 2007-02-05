@@ -270,19 +270,16 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 		     disasmLines.back().addr+disasmLines.back().numBytes == 0x10000))
 		{
 			// line is within existing disasm'd data. Find where to put it.
-			if (method == Top || method == TopAlways || 
-			    (method == Closest && addr < disasmLines[disasmTopLine].addr)) {
+			if ( method == Top || method == TopAlways || 
+			    (method == Closest && line < disasmTopLine)) {
 				// Move line to top
 				disasmTopLine = line;
-			} else if (method == Bottom || method == BottomAlways || 
-			           (method == Closest &&
-				    addr >= disasmLines[disasmTopLine + visibleLines - 1].addr)) {
+			} else if ( method == Bottom || method == BottomAlways || 
+			           (method == Closest && line >= disasmTopLine+visibleLines )) {
 				// Move line to bottom
 				disasmTopLine = line - visibleLines + 1;
-			} else if (method == MiddleAlways ||
-			           (method == Middle &&
-				    addr < disasmLines[disasmTopLine].addr &&
-				    addr > disasmLines[disasmTopLine + visibleLines - 1].addr)) {
+			} else if ( method == MiddleAlways ||
+			           (method == Middle && (line < disasmTopLine || line >= disasmTopLine+visibleLines))) {
 				// Move line to middle
 				disasmTopLine = line - visibleLines / 2;
 			}

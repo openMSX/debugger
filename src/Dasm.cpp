@@ -40,17 +40,15 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 	symbol = symTable->findFirstAddressSymbol( pc, memLayout );
 	while (pc <= int(endAddr)) {
 		// check for a label
-		if( symbol ) {
-			if( symbol->value() == pc ) {
-				dest.rowType = DisasmRow::LABEL;
-				labelCount++;
-				dest.numBytes = 0;
-				dest.infoLine = labelCount;
-				dest.addr = pc;
-				dest.instr = symbol->text().toAscii().data();
-				disasm.push_back(dest);
-				symbol = symTable->findNextAddressSymbol( memLayout );
-			}
+		while( symbol && symbol->value() == pc ) {
+			dest.rowType = DisasmRow::LABEL;
+			labelCount++;
+			dest.numBytes = 0;
+			dest.infoLine = labelCount;
+			dest.addr = pc;
+			dest.instr = symbol->text().toAscii().data();
+			disasm.push_back(dest);
+			symbol = symTable->findNextAddressSymbol( memLayout );
 		}
 		
 		labelCount = 0;
@@ -142,25 +140,31 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 				break;
 			}
 		}
-		// handle overflow
-		if(pc+dest.numBytes>endAddr) {
-			switch(endAddr-pc) {
-				case 1:
-					dest.instr = "db     #" + toHex(membuf[pc + 0], 2);
-					dest.numBytes = 1;
-					break;
-				case 2:
-					dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
-					                   ",#" + toHex(membuf[pc + 1], 2);
-					dest.numBytes = 2;
-					break;
-				case 3:
-					dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
-					                   ",#" + toHex(membuf[pc + 1], 2);
-					                   ",#" + toHex(membuf[pc + 2], 2);
-					dest.numBytes = 3;
-					break;
-			}
+		// handle overflow at end or label
+		int dataBytes = 0;
+		if(symbol && pc+dest.numBytes>symbol->value())
+			dataBytes = symbol->value() - pc;
+		else if( pc+dest.numBytes>endAddr )
+			dataBytes = endAddr-pc;
+			
+		switch(dataBytes) {
+			case 1:
+				dest.instr = "db     #" + toHex(membuf[pc + 0], 2);
+				dest.numBytes = 1;
+				break;
+			case 2:
+				dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
+				                   ",#" + toHex(membuf[pc + 1], 2);
+				dest.numBytes = 2;
+				break;
+			case 3:
+				dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
+				                   ",#" + toHex(membuf[pc + 1], 2);
+				                   ",#" + toHex(membuf[pc + 2], 2);
+				dest.numBytes = 3;
+				break;
+			default:
+				break;
 		}
 		dest.instr.resize(19, ' ');
 		disasm.push_back(dest);

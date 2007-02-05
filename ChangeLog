@@ -2,6 +2,7 @@ $Id$
 
 2007-02-05 Edwin Velds <e.velds@gmail.com>
 	* Revised the disasm viewer navigation and display code.
+	* Fixed some label handling issues.
 
 2007-01-14 Edwin Velds <e.velds@gmail.com>
 	* Added a menu for hiding/showing controls.
