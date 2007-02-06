@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>ConnectDialog</class>
  <widget class="QDialog" name="ConnectDialog" >
   <property name="geometry" >
@@ -59,13 +56,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="launchButton" >
-       <property name="text" >
-        <string>Launch New</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Vertical</enum>
@@ -89,7 +79,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections>
   <connection>

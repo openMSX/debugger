@@ -1,5 +1,8 @@
 $Id$
 
+2007-02-06 Edwin Velds <e.velds@gmail.com>
+	* Removed launch button in connect dialog.
+
 2007-02-05 Edwin Velds <e.velds@gmail.com>
 	* Revised the disasm viewer navigation and display code.
 	* Fixed some label handling issues.

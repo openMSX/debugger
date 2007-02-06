@@ -289,11 +289,6 @@ void ConnectDialog::on_rescanButton_clicked()
 	}
 }
 
-void ConnectDialog::on_launchButton_clicked()
-{
-	QProcess::startDetached("openmsx");
-}
-
 void ConnectDialog::connectionOk(OpenMSXConnection& connection,
                                  const QString& title)
 {

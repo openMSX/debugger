@@ -24,7 +24,6 @@ protected:
 private slots:
 	void on_connectButton_clicked();
 	void on_rescanButton_clicked();
-	void on_launchButton_clicked();
 
 private:
 	ConnectDialog(QWidget* parent);
