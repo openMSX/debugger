@@ -342,6 +342,10 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(false);
 	dw->setClosable(false);
+	connect( this, SIGNAL( settingsChanged() ),
+	         disasmView, SLOT( settingsChanged() ) );
+	connect( this, SIGNAL( symbolsChanged() ),
+	         disasmView, SLOT( symbolsChanged() ) );
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
 	dockWidgets.append( dw );
@@ -706,12 +710,14 @@ void DebuggerForm::systemSymbolManager()
 {
 	SymbolManager symManager( symTable, this );
 	symManager.exec();
+	emit symbolsChanged();
 }
 
 void DebuggerForm::systemPreferences()
 {
 	PreferencesDialog prefs( this );
 	prefs.exec();
+	emit settingsChanged();
 }
 
 void DebuggerForm::executeBreak()

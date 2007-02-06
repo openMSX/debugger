@@ -39,6 +39,7 @@ public:
 	unsigned offset;
 	unsigned size;
 	int address;
+	int line;
 	int method;
 
 private:
@@ -120,6 +121,26 @@ void DisasmViewer::settingsChanged()
 	xMnemArg = xMnem  + 7 * charWidth;
 
 	update();
+}
+
+void DisasmViewer::symbolsChanged()
+{
+	int disasmStart = disasmLines.front().addr;
+	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
+	
+	CommMemoryRequest* req = new CommMemoryRequest(
+		disasmStart, disasmEnd - disasmStart, &memory[disasmStart], *this);
+	req->address = disasmLines[disasmTopLine].addr;
+	req->line = disasmLines[disasmTopLine].infoLine;
+	req->method = TopAlways;
+	
+	if (waitingForData) {
+		if (nextRequest) delete nextRequest;
+		nextRequest = req;
+	} else {
+		CommClient::instance().sendCommand(req);
+		waitingForData = true;
+	}
 }
 
 void DisasmViewer::paintEvent(QPaintEvent* e)
@@ -328,6 +349,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	CommMemoryRequest* req = new CommMemoryRequest(
 		disasmStart, disasmEnd - disasmStart + 1, &memory[disasmStart], *this);
 	req->address = addr;
+	req->line = infoLine;
 	req->method = method;
 	
 	if (waitingForData) {
@@ -345,11 +367,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines, memLayout, symTable);
 
 	// locate the requested line 
-	disasmTopLine = 0;
-	while (disasmLines[disasmTopLine].addr < req->address &&
-	       int(disasmLines.size() - disasmTopLine) > visibleLines) {
-		++disasmTopLine;
-	}
+	disasmTopLine = findDisasmLine( req->address, req->line );
 
 	switch (req->method) {
 		case Middle:
@@ -362,10 +380,17 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 			break;
 	}
 	if (disasmTopLine < 0) disasmTopLine = 0;
-	
+	if (disasmTopLine + visibleLines > int(disasmLines.size()) )
+		disasmTopLine = disasmLines.size() - disasmTopLine;
+
 	// sync the scrollbar with the actual address reached
 	if (!nextRequest) {
-		scrollBar->setValue(disasmLines[disasmTopLine].addr);
+		// set the slider with without the signal
+		scrollBar->setTracking(false);
+		scrollBar->setSliderPosition(disasmLines[disasmTopLine].addr);
+		scrollBar->setTracking(true);
+		// set the line
+		setAddress(disasmLines[disasmTopLine].addr, disasmLines[disasmTopLine].infoLine);
 	}
 
 	update();

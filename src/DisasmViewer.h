@@ -36,6 +36,7 @@ public slots:
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
 	void settingsChanged();
+	void symbolsChanged();
 	
 protected:
 	void resizeEvent(QResizeEvent* e);

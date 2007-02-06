@@ -131,6 +131,10 @@ private slots:
 	friend class QueryBreakedHandler;
 	friend class ListBreakPointsHandler;
 	friend class CPURegRequest;
+	
+signals:
+	void settingsChanged();
+	void symbolsChanged();
 };
 
 #endif // DEBUGGERFORM_H
