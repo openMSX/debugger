@@ -4,7 +4,7 @@
 #include <QApplication>
 
 static const char *DebuggerFontNames[Settings::FONT_END] = {
-	"Application Font", "Default Fixed Font", "Code Font", "Label Font"
+	"Application Font", "Default Fixed Font", "Code Font", "Label Font", "Hex viewer font"
 };
 
 QString fontLocation( Settings::DebuggerFont f )

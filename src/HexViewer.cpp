@@ -3,11 +3,13 @@
 #include "HexViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
+#include "Settings.h"
 #include <QScrollBar>
 #include <QPaintEvent>
 #include <QPainter>
 #include <cmath>
 
+static const int EXTRA_SPACING = 4;
 
 class HexRequest : public ReadDebugBlockCommand
 {
@@ -31,7 +33,6 @@ public:
 		viewer.transferCancelled(this);
 	}
 
-	// TODO public data is ugly!!
 	unsigned offset;
 
 private:
@@ -47,32 +48,76 @@ HexViewer::HexViewer(QWidget* parent)
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding ) );
 	
-	setFont(QFont("Courier New", 12));
-
 	horBytes = 16;
 	hexTopAddress = 0;
+	hexData = 0;
+	debuggableSize = 0;
 	waitingForData = false;
+	adjustToWidth = true;
 	
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
-	vertScrollBar->hide();
-	
+	vertScrollBar->setMinimum(0);
+	vertScrollBar->setSingleStep(1);
+
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
+	settingsChanged();
+	
 	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
 }
 
-void HexViewer::setScrollBarValues()
+void HexViewer::settingsChanged()
 {
-	vertScrollBar->setMinimum(0);
-
-	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
+	QFontMetrics fm( Settings::get().font( Settings::HEX_FONT ) );
 	
-	int maxLine = int(ceil(double(hexDataLength) / horBytes)) - int(visibleLines);
-	if (maxLine < 0) maxLine = 0;
-	vertScrollBar->setMaximum(maxLine);
-	vertScrollBar->setSingleStep(1);
-	vertScrollBar->setPageStep(int(visibleLines));
+	lineHeight = fm.height();
+	charWidth = fm.width("W");
+	xAddr = frameL + 8;
+	xData = xAddr + addressLength*charWidth + charWidth;
+	dataWidth = 5*charWidth/2;
+	setSizes();
+}
+
+void HexViewer::setSizes()
+{
+	visibleLines = (height() - frameT - frameB) / lineHeight;
+	partialBottomLine = (height() - frameT - frameB) != lineHeight*visibleLines;
+	
+	frameR = frameL;
+	int w;
+	// fit display to width
+	if( adjustToWidth ) {
+		horBytes = 1;
+		w = width() - frameL - frameR - xData - dataWidth - 2*charWidth - 8;
+		// calculate how many additional bytes can by displayed
+		while( w >= dataWidth+charWidth ) {
+			horBytes++;
+			w -= dataWidth+charWidth;
+			if( (horBytes&3) == 0 ) w -= EXTRA_SPACING;
+			if( (horBytes&7) == 0 ) w -= EXTRA_SPACING;
+		}
+	}
+	
+	// check if a scrollbar is needed
+	if( horBytes*visibleLines < debuggableSize ) {
+		if( adjustToWidth && w < vertScrollBar->sizeHint().width() ) horBytes--;
+		int maxLine = int(ceil(double(debuggableSize)/horBytes)) - visibleLines;
+		if( maxLine < 0 ) maxLine = 0;
+		vertScrollBar->setMaximum(maxLine);
+		vertScrollBar->setPageStep(visibleLines);
+		frameR += vertScrollBar->sizeHint().width();
+		vertScrollBar->setGeometry(width() - frameR, frameT,
+		                           vertScrollBar->sizeHint().width(),
+	    	                       height() - frameT - frameB);
+		vertScrollBar->show();
+	} else {
+		vertScrollBar->hide();
+		hexTopAddress = 0;
+	}
+
+	if( isEnabled() ) 
+		vertScrollBar->setValue(hexTopAddress/horBytes);
 }
 
 QSize HexViewer::sizeHint() const
@@ -85,13 +130,7 @@ void HexViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 
-	setScrollBarValues();
-	vertScrollBar->setGeometry(width() - frameR, frameT,
-	                           vertScrollBar->sizeHint().width(),
-	                           height() - frameT - frameB);
-	vertScrollBar->show();
-	// calc the number of lines that can be displayed
-	// partial lines count as a whole
+	setSizes();
 }
 
 void HexViewer::paintEvent(QPaintEvent* e)
@@ -99,12 +138,17 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
 
-	QPainter p(this);
-	int h = fontMetrics().height();
-	int d = fontMetrics().descent();
+	// exit if no debuggable is set
+	if( debuggableName.isEmpty() ) return;
 
-	// set font
-	p.setPen(Qt::black);
+	QPainter p(this);
+	
+	// set font info
+	p.setFont( Settings::get().font( Settings::HEX_FONT ) );
+	QColor fc( Settings::get().fontColor( Settings::HEX_FONT ) );
+	int a = p.fontMetrics().ascent();
+
+	p.setPen( fc );
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
@@ -117,72 +161,70 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	// redraw background
 	p.fillRect( r, palette().color(QPalette::Base) );
 
-	// calc layout (not optimal)
-	int charWidth = fontMetrics().width("A");
-	int spacing = charWidth / 2;
-	int xAddr = frameL + 8;
-	int xHex1 = xAddr + 6 * charWidth;
-	int dHex = 2 * charWidth + spacing;
-
-	int y = frameT + h - 1;
+	int y = frameT;
 	
 	int address = hexTopAddress;
 
-	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
+	for (int i = 0; i < visibleLines+partialBottomLine; ++i) {
 		// print address
-		QString hexStr;
-		hexStr.sprintf("%04X", address);
-		p.drawText(xAddr, y - d, hexStr);
+		QString hexStr = QString("%1").arg(address, addressLength, 16, QChar('0'));
+		p.drawText(xAddr, y + a, hexStr.toUpper());
+
 		// print bytes
-		int x = xHex1;
-		for (int addr = address; addr < address + horBytes; ++addr) {
-			// at extra spacing halfway
-			if (!(horBytes & 1)) {
-				if (addr - address == horBytes / 2) {
-					x += spacing;
-				}
+		int x = xData;
+		for( int j = 0; j < horBytes; j++ ) {
+			// print data
+			if (address + j < debuggableSize) {
+				hexStr.sprintf("%02X", hexData[address + j]);
+				p.drawText(x, y + a, hexStr);
 			}
-			// print data (if there still is any)
-			if (addr < hexDataLength) {
-				hexStr.sprintf("%02X", hexData[addr]);
-				p.drawText(x, y - d, hexStr);
-			}
-			x += dHex;
+			x += dataWidth;
+			// at extra spacing
+			if( (j&3) == 3 ) x += EXTRA_SPACING;
+			if( (j&7) == 7 ) x += EXTRA_SPACING;
 		}
-		x += 2 * spacing;
-		hexStr.clear();
-		for (int addr = address; addr < address + horBytes; ++addr) {
-			if (addr >= hexDataLength) break;
-			unsigned char chr = hexData[addr];
+
+		// print characters
+		x += charWidth;
+		for( int j = 0; j < horBytes; j++ ) {
+			if (address + j >= debuggableSize) break;
+			unsigned char chr = hexData[address + j];
 			if (chr < 32 || chr > 127) chr = '.';
 			hexStr += chr;
+			p.drawText(x, y + a, QString(chr));
+			x += charWidth;
 		}
-		p.drawText(x, y - d, hexStr);
-		y += h;
+		
+		y += lineHeight;
 		address += horBytes;
-		if (address >= hexDataLength) break;
+		if (address >= debuggableSize) break;
 	}
 }
 
-void HexViewer::setData(const char* name, unsigned char* datPtr, int datLength)
+void HexViewer::setDebuggable( const QString& name, int size )
 {
-	dataName = name;
-	hexData = datPtr;
-	hexDataLength = datLength;
-	setScrollBarValues();
+	debuggableName = name;
+	debuggableSize = size;
+	addressLength = 2 * int(ceil( log(size) / log(2) / 8 ));
+	hexTopAddress = 0;
+	hexData = new unsigned char[size];
+	memset( hexData, 0, size );
+	settingsChanged();
 }
 
 void HexViewer::setLocation(int addr)
 {	
-	if (!waitingForData) {
+	if (!waitingForData && !debuggableName.isEmpty()) {
+		// calculate data request
 		int start = addr * horBytes;
-		int size = horBytes * int(ceil(visibleLines));
+		int size = horBytes * (visibleLines+partialBottomLine);
 
-		if (start + size > hexDataLength) {
-			size = hexDataLength - start;
+		if (start + size > debuggableSize) {
+			size = debuggableSize - start;
 		}
+		// send data request
 		HexRequest* req = new HexRequest(
-			dataName, start, size, &hexData[start], *this);
+			debuggableName, start, size, hexData + start, *this);
 		CommClient::instance().sendCommand(req);
 		waitingForData = TRUE;
 	}
@@ -191,8 +233,8 @@ void HexViewer::setLocation(int addr)
 void HexViewer::hexdataTransfered(HexRequest* r)
 {
 	hexTopAddress = r->offset;
-	update();
 	transferCancelled(r);
+	update();
 }
 
 void HexViewer::transferCancelled(HexRequest* r)

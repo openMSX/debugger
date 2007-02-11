@@ -12,7 +12,7 @@ class Settings : public QSettings
 public:
 	static Settings& get();
 
-	enum DebuggerFont { APP_FONT, FIXED_FONT, CODE_FONT, LABEL_FONT, FONT_END };
+	enum DebuggerFont { APP_FONT, FIXED_FONT, CODE_FONT, LABEL_FONT, HEX_FONT, FONT_END };
 	enum DebuggerFontType { APPLICATION_DEFAULT, FIXED_DEFAULT, CUSTOM };
 
 	QString fontName( DebuggerFont f ) const;

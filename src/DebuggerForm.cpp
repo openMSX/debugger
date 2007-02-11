@@ -496,7 +496,7 @@ void DebuggerForm::createForm()
 	disasmView->setBreakpoints(&breakpoints);
 	disasmView->setMemoryLayout(&memLayout);
 	disasmView->setSymbolTable(&symTable);
-	hexView->setData("memory", mainMemory, 65536);
+	hexView->setDebuggable("memory", 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);
 }
