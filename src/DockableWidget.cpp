@@ -47,6 +47,8 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 	widgetLayout->addWidget( headerWidget );
 	setLayout( widgetLayout );
 	
+	dockManager.attachWidget( this );
+	
 	rubberBand = new QRubberBand( QRubberBand::Rectangle );
 }
 
@@ -54,6 +56,7 @@ DockableWidget::~DockableWidget()
 {
 	if(mainWidget) delete mainWidget;
 	delete rubberBand;
+	dockManager.detachWidget( this );
 }
 
 QWidget *DockableWidget::widget() const

@@ -53,7 +53,8 @@ private:
 	QAction* viewStackAction;
 	QAction* viewSlotsAction;
 	QAction* viewMemoryAction;
-
+	QAction* viewDebuggableViewerAction;
+	
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
 	QAction* executeStepAction;
@@ -82,8 +83,8 @@ private:
 	SymbolTable symTable;
 	unsigned char* mainMemory;
 
-	QList<DockableWidget*> dockWidgets;
-
+	QMap<QString, int> debuggables;
+	
 	void createActions();
 	void createMenus();
 	void createToolbars();
@@ -98,7 +99,6 @@ private:
 	void updateData();
 	
 	void refreshBreakpoints();
-	DockableWidget *findDockableWidget( const QString& id );
 
 private slots:
 	void systemConnect();
@@ -111,6 +111,7 @@ private slots:
 	void toggleStackDisplay();
 	void toggleSlotsDisplay();
 	void toggleMemoryDisplay();
+	void addDebuggableViewer();
 	void executeBreak();
 	void executeRun();
 	void executeStep();
@@ -123,6 +124,8 @@ private slots:
 	void toggleView( DockableWidget* widget );
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name, const QString& message);
+	void setDebuggables( const QString& list );
+	void setDebuggableSize(  const QString& debuggable, int size );
 	void connectionClosed();
 	void dockWidgetVisibilityChanged( DockableWidget *w );
 	void updateViewMenu();
@@ -131,10 +134,14 @@ private slots:
 	friend class QueryBreakedHandler;
 	friend class ListBreakPointsHandler;
 	friend class CPURegRequest;
+	friend class ListDebuggablesHandler;
+	friend class DebuggableSizeHandler;
 	
 signals:
 	void settingsChanged();
 	void symbolsChanged();
+	void debuggablesChanged( const QMap<QString,int>& list );
+	void emulationChanged();
 };
 
 #endif // DEBUGGERFORM_H

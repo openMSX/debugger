@@ -1,5 +1,10 @@
 $Id$
 
+2007-02-15 Edwin Velds <e.velds@gmail.com>
+	* Added a generic debuggable viewer.
+	* Reworked some of the dock widget code to support multiple
+	  viewers.
+
 2007-02-11 Edwin Velds <e.velds@gmail.com>
 	* Made the HexViewer code usable to view any debuggable.
 

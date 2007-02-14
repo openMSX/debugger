@@ -33,9 +33,15 @@ public:
 	void visibilityChanged( DockableWidget *widget );
 	void getConfig( int index, QStringList& list );
 
+	void attachWidget( DockableWidget* widget );
+	void detachWidget( DockableWidget* widget );
+	const QList<DockableWidget*>& managedWidgets() const;
+	DockableWidget *findDockableWidget( const QString& id );
+
 private:
 	QList<DockableWidgetArea*> areas;
 	QMap<DockableWidget*, DockableWidgetArea*> areaMap;
+	QList<DockableWidget*> dockWidgets;
 };
 
 #endif    // _DOCKMANAGER_H

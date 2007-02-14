@@ -15,6 +15,7 @@
 #include "SymbolManager.h"
 #include "PreferencesDialog.h"
 #include "BreakpointDialog.h"
+#include "DebuggableViewer.h"
 #include "Settings.h"
 #include "Version.h"
 #include <QAction>
@@ -91,7 +92,6 @@ private:
 	DebuggerForm& form;
 };
 
-
 class CPURegRequest : public ReadDebugBlockCommand
 {
 public:
@@ -111,6 +111,44 @@ public:
 private:
 	DebuggerForm& form;
 	unsigned char buf[28];
+};
+
+class ListDebuggablesHandler : public SimpleCommand
+{
+public:
+	ListDebuggablesHandler(DebuggerForm& form_)
+		: SimpleCommand("debug list")
+		, form(form_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		form.setDebuggables(message);
+		delete this;
+	}
+private:
+	DebuggerForm& form;
+};
+
+class DebuggableSizeHandler : public SimpleCommand
+{
+public:
+	DebuggableSizeHandler(const QString& debuggable_, DebuggerForm& form_)
+		: SimpleCommand(QString("debug size %1").arg(debuggable_))
+		, debuggable(debuggable_)
+		, form(form_)
+	{
+	}
+
+	virtual void replyOk(const QString& message)
+	{
+		form.setDebuggableSize(debuggable, message.toInt());
+		delete this;
+	}
+private:
+	QString debuggable;
+	DebuggerForm& form;
 };
 
 
@@ -176,6 +214,9 @@ void DebuggerForm::createActions()
 	viewMemoryAction->setStatusTip(tr("Toggle the main memory display"));
 	viewMemoryAction->setCheckable(true);
 
+	viewDebuggableViewerAction = new QAction(tr("Add debuggable viewer"), this);
+	viewDebuggableViewerAction->setStatusTip(tr("Add a hex viewer for debuggables"));
+
 	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
@@ -237,6 +278,7 @@ void DebuggerForm::createActions()
 	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
 	connect(viewSlotsAction, SIGNAL(triggered()), this, SLOT(toggleSlotsDisplay()));
 	connect(viewMemoryAction, SIGNAL(triggered()), this, SLOT(toggleMemoryDisplay()));
+	connect(viewDebuggableViewerAction, SIGNAL(triggered()), this, SLOT(addDebuggableViewer()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
 	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
@@ -270,6 +312,8 @@ void DebuggerForm::createMenus()
 	viewMenu->addAction(viewStackAction);
 	viewMenu->addAction(viewSlotsAction);
 	viewMenu->addAction(viewMemoryAction);
+	viewMenu->addSeparator();
+	viewMenu->addAction(viewDebuggableViewerAction);
 	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
 	
 	// create execute menu
@@ -348,7 +392,6 @@ void DebuggerForm::createForm()
 	         disasmView, SLOT( symbolsChanged() ) );
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 
 	// create the memory view widget
 	hexView = new HexViewer;
@@ -362,7 +405,6 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 	
 	// create register viewer
 	regsView = new CPURegsViewer;
@@ -376,7 +418,6 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 	
 	// create flags viewer
 	flagsView = new FlagsViewer;
@@ -390,7 +431,6 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 
 	// create stack viewer
 	stackView = new StackViewer;
@@ -404,7 +444,6 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 
 	// create slot viewer
 	slotView = new SlotViewer;
@@ -418,7 +457,6 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	dockWidgets.append( dw );
 
 	// restore layout
 	move( Settings::get().value( "Layout/WindowPos", pos() ).toPoint() );
@@ -440,7 +478,7 @@ void DebuggerForm::createForm()
 	for( int i = 0; i < list.size(); i++ ) {
 		QStringList s = list.at(i).split(" ", QString::SkipEmptyParts);
 		// get widget
-		if( (dw = findDockableWidget(s.at(0))) ) {
+		if( (dw = dockMan.findDockableWidget(s.at(0))) ) {
 			if( s.at(1) == "D" ) {
 				// dock widget
 				DockableWidgetLayout::DockSide side;
@@ -462,13 +500,9 @@ void DebuggerForm::createForm()
 			}
 		}
 	}
-	
-	disasmView->setEnabled(false);
-	hexView->setEnabled(false);
-	regsView->setEnabled(false);
-	flagsView->setEnabled(false);
-	stackView->setEnabled(false);
-	slotView->setEnabled(false);
+
+	// disable all widgets
+	connectionClosed();
 
 	connect(regsView,   SIGNAL(pcChanged(quint16)),
 	        disasmView, SLOT(setProgramCounter(quint16)));
@@ -513,8 +547,8 @@ DebuggerForm::~DebuggerForm()
 	// fill layout list with docked widgets
 	dockMan.getConfig( 0, layoutList );
 	// append floating widgets
-	QList<DockableWidget*>::iterator it = dockWidgets.begin();
-	while( it != dockWidgets.end() ) {
+	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	while( it != dockMan.managedWidgets().end() ) {
 		if( (*it)->isFloating() ) {
 			QString s("%1 F %2 %3 %4 %5 %6");
 			s = s.arg( (*it)->id() );
@@ -541,6 +575,8 @@ void DebuggerForm::initConnection()
 	comm.sendCommand(new QueryBreakedHandler(*this));
 
 	comm.sendCommand(new SimpleCommand("update enable status"));
+
+	comm.sendCommand(new ListDebuggablesHandler(*this));
 
 	// define 'debug_bin2hex' proc for internal use
 	comm.sendCommand(new SimpleCommand(
@@ -592,12 +628,11 @@ void DebuggerForm::connectionClosed()
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
 
-	disasmView->setEnabled(false);
-	hexView->setEnabled(false);
-	regsView->setEnabled(false);
-	flagsView->setEnabled(false);
-	stackView->setEnabled(false);
-	slotView->setEnabled(false);
+	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	while( it != dockMan.managedWidgets().end() ) {
+		(*it)->widget()->setEnabled(false);
+		it++;
+	}
 }
 
 void DebuggerForm::finalizeConnection(bool halted)
@@ -611,12 +646,11 @@ void DebuggerForm::finalizeConnection(bool halted)
 		updateData();
 	}
 
-	disasmView->setEnabled(true);
-	hexView->setEnabled(true);
-	regsView->setEnabled(true);
-	flagsView->setEnabled(true);
-	stackView->setEnabled(true);
-	slotView->setEnabled(true);
+	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	while( it != dockMan.managedWidgets().end() ) {
+		(*it)->widget()->setEnabled(true);
+		it++;
+	}
 }
 
 void DebuggerForm::handleUpdate(const QString& type, const QString& name,
@@ -661,6 +695,8 @@ void DebuggerForm::updateData()
 
 	// refresh slot viewer
 	slotView->refresh();
+	
+	emit emulationChanged();
 }
 
 void DebuggerForm::setBreakMode()
@@ -847,6 +883,28 @@ void DebuggerForm::toggleView( DockableWidget* widget )
 	dockMan.visibilityChanged( widget );
 }
 
+void DebuggerForm::addDebuggableViewer()
+{
+	// create new debuggable viewer window
+	DebuggableViewer *viewer = new DebuggableViewer;
+	DockableWidget *dw = new DockableWidget( dockMan );
+	dw->setWidget(viewer);
+	dw->setTitle(tr("Debuggable hex view"));
+	dw->setId("DEBUGVIEW");
+	dw->setFloating(true);
+	dw->setDestroyable(true);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect( this, SIGNAL( debuggablesChanged(const QMap<QString,int>&) ),
+	         viewer, SLOT( setDebuggables(const QMap<QString,int>&) ) );
+	connect( this, SIGNAL( emulationChanged() ),
+	         viewer, SLOT( refresh() ) );
+	viewer->setDebuggables( debuggables );
+	viewer->setEnabled( disasmView->isEnabled() );
+}
+
 void DebuggerForm::dockWidgetVisibilityChanged( DockableWidget *w )
 {
 	dockMan.visibilityChanged( w );
@@ -862,12 +920,37 @@ void DebuggerForm::updateViewMenu()
 	viewMemoryAction->setChecked( hexView->isVisible() );
 }
 
-DockableWidget *DebuggerForm::findDockableWidget( const QString& id )
+void DebuggerForm::setDebuggables( const QString& list )
 {
-	QList<DockableWidget*>::iterator it = dockWidgets.begin();
-	while( it != dockWidgets.end() ) {
-		if( (*it)->id() == id ) return *it;
+	debuggables.clear();
+
+	// process result string
+	QStringList l = list.split(" ", QString::SkipEmptyParts);
+	QString d;
+	for( int i = 0; i < l.size(); i++ ) {
+		d = l[i];
+		// combine multiple words
+		if( d[0] == '{' ) {
+			while( !d.endsWith("}") ) {
+				d.push_back(' ');
+				d.append( l[++i] );
+			}
+		}
+		// set initial size to zero
+		debuggables[d] = 0;
+	}
+	// find the size for all debuggables
+	QMap<QString,int>::iterator it = debuggables.begin();
+	while( it != debuggables.end() ) {
+		comm.sendCommand(new DebuggableSizeHandler(it.key(), *this));
 		it++;
 	}
-	return 0;
+}
+
+void DebuggerForm::setDebuggableSize(  const QString& debuggable, int size )
+{
+	debuggables[debuggable] = size;
+	// emit update if size of last debuggable was set
+	if( debuggable == debuggables.keys().last() )
+		emit debuggablesChanged( debuggables );
 }

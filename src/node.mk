@@ -6,7 +6,7 @@ MOC_SRC_HDR:= \
 	DockableWidget DockableWidgetArea DockableWidgetLayout \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager \
-	Settings PreferencesDialog BreakpointDialog
+	Settings PreferencesDialog BreakpointDialog DebuggableViewer
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version

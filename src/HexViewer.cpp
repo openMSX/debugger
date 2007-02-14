@@ -67,6 +67,11 @@ HexViewer::HexViewer(QWidget* parent)
 	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
 }
 
+HexViewer::~HexViewer()
+{
+	if( hexData ) delete hexData;
+}
+
 void HexViewer::settingsChanged()
 {
 	QFontMetrics fm( Settings::get().font( Settings::HEX_FONT ) );
@@ -116,8 +121,12 @@ void HexViewer::setSizes()
 		hexTopAddress = 0;
 	}
 
-	if( isEnabled() ) 
+	if( isEnabled() ) {
 		vertScrollBar->setValue(hexTopAddress/horBytes);
+		setLocation(hexTopAddress/horBytes);
+	} else {
+		update();
+	}
 }
 
 QSize HexViewer::sizeHint() const
@@ -203,17 +212,27 @@ void HexViewer::paintEvent(QPaintEvent* e)
 
 void HexViewer::setDebuggable( const QString& name, int size )
 {
-	debuggableName = name;
-	debuggableSize = size;
-	addressLength = 2 * int(ceil( log(size) / log(2) / 8 ));
-	hexTopAddress = 0;
-	hexData = new unsigned char[size];
-	memset( hexData, 0, size );
-	settingsChanged();
+	if( hexData ) {
+		delete hexData;
+		hexData = 0;
+	}
+	if( size ) {
+		debuggableName = name;
+		debuggableSize = size;
+		addressLength = 2 * int(ceil( log(size) / log(2) / 8 ));
+		hexTopAddress = 0;
+		hexData = new unsigned char[size];
+		memset( hexData, 0, size );
+		settingsChanged();
+	} else {
+		debuggableName.clear();
+		debuggableSize = 0;
+	}
 }
 
 void HexViewer::setLocation(int addr)
-{	
+{
+
 	if (!waitingForData && !debuggableName.isEmpty()) {
 		// calculate data request
 		int start = addr * horBytes;
@@ -222,6 +241,7 @@ void HexViewer::setLocation(int addr)
 		if (start + size > debuggableSize) {
 			size = debuggableSize - start;
 		}
+
 		// send data request
 		HexRequest* req = new HexRequest(
 			debuggableName, start, size, hexData + start, *this);

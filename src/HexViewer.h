@@ -14,15 +14,16 @@ class HexViewer : public QFrame
 	Q_OBJECT
 public:
 	HexViewer(QWidget* parent = 0);
-
+	~HexViewer();
+	
 	void setDebuggable( const QString& name, int size );
-	void refresh();
 
 	QSize sizeHint() const;
 
 public slots:
 	void setLocation(int addr);
 	void settingsChanged();
+	void refresh();
 	
 protected:
 	void resizeEvent(QResizeEvent* e);

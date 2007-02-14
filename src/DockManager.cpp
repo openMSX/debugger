@@ -71,3 +71,29 @@ void DockManager::getConfig( int index, QStringList& list )
 {
 	areas[index]->getConfig( list );
 }
+
+void DockManager::attachWidget( DockableWidget* widget )
+{
+	dockWidgets.append( widget );
+}
+
+void DockManager::detachWidget( DockableWidget* widget )
+{
+	dockWidgets.removeAll( widget );
+}
+
+const QList<DockableWidget*>& DockManager::managedWidgets() const
+{
+	return dockWidgets;
+}
+
+DockableWidget *DockManager::findDockableWidget( const QString& id )
+{
+	QList<DockableWidget*>::iterator it = dockWidgets.begin();
+	while( it != dockWidgets.end() ) {
+		if( (*it)->id() == id ) return *it;
+		it++;
+	}
+	return 0;
+}
+
