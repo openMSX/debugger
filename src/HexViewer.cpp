@@ -69,7 +69,7 @@ HexViewer::HexViewer(QWidget* parent)
 
 HexViewer::~HexViewer()
 {
-	if( hexData ) delete hexData;
+	delete[] hexData;
 }
 
 void HexViewer::settingsChanged()
@@ -212,10 +212,8 @@ void HexViewer::paintEvent(QPaintEvent* e)
 
 void HexViewer::setDebuggable( const QString& name, int size )
 {
-	if( hexData ) {
-		delete hexData;
-		hexData = 0;
-	}
+	delete[] hexData;
+	hexData = 0;
 	if( size ) {
 		debuggableName = name;
 		debuggableSize = size;
