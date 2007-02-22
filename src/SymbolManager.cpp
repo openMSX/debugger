@@ -134,7 +134,7 @@ void SymbolManager::initSymbolList()
 	Symbol *sym = symTable.findFirstAddressSymbol( 0 );
 	while( sym != 0 ) {
 		QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
-		item->setData(0L, Qt::UserRole, qlonglong(sym) );
+		item->setData(0L, Qt::UserRole, quintptr(sym) );
 		item->setText( 0, sym->text() );
 		item->setText( 1, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
 		switch( sym->status() ) {
@@ -175,7 +175,7 @@ void SymbolManager::addLabel()
 
 	beginTreeLabelsUpdate();
 	QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
-	item->setData(0, Qt::UserRole, qlonglong(sym) );
+	item->setData(0, Qt::UserRole, quintptr(sym) );
 	item->setText( 0, sym->text() );
 	item->setText( 1, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
 	item->setIcon( 0, QIcon(":/icons/symman.png") );
