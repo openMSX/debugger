@@ -1,5 +1,8 @@
 $Id$
 
+2007-02-23 Edwin Velds <e.velds@gmail.com>
+	* Additional 64-bit fix in SymbolManager.
+
 2007-02-22 Edwin Velds <e.velds@gmail.com>
 	* changed 64-bit compilation error to one that does not warn
 	  on 32-bit systems.

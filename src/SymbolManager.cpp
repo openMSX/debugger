@@ -117,7 +117,7 @@ void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 {
 	if( column > 1 ) return;
 	
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).toInt());
+	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
 	if( sym->source() == 0 ) {
 		treeLabels->openPersistentEditor( item, column );
 	}
@@ -187,7 +187,7 @@ void SymbolManager::addLabel()
 void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 {
 	if( !treeLabelsUpdateCount ) {
-		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).toInt());
+		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
 		// Todo: add validity checks
 		sym->setText( item->text(0) );
 		int value = stringToValue( item->text(1) );
