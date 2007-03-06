@@ -33,7 +33,6 @@ public:
 		int	top;
 		int width;
 		int height;
-		int distExtra;
 	};
 
 	void addItem( QLayoutItem *item );
@@ -50,6 +49,7 @@ public:
 	bool hasHeightForWidth() const;
 
 	QSize minimumSize() const;
+	QSize maximumSize() const;
 	void setGeometry(const QRect &rect);
 
 	QSize sizeHint() const;
@@ -61,12 +61,12 @@ private:
 	QList<DockInfo *> dockedWidgets;
 	int layoutWidth, layoutHeight;
 	int minWidth, minHeight;
-	int minBaseWidgetWidth, minBaseWidgetHeight;
-	bool minValid;
+	int maxWidth, maxHeight;
+	int checkWidth, checkHeight;
 	
-	void calcMinimumSize();
+	void calcSizeLimits();
 	void sizeMove( int dx, int dy );
-	void doLayout( bool calcMin = false );
+	void doLayout( bool check = false );
 	bool insertLocation( QRect& rect, int& index, DockSide& side, const QSizePolicy& sizePol );
 };
 

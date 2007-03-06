@@ -1,5 +1,8 @@
 $Id$
 
+2007-03-06 Edwin Velds <e.velds@gmail.com>
+	* Changed resize handling of dock layout.
+
 2007-02-23 Edwin Velds <e.velds@gmail.com>
 	* Additional 64-bit fix in SymbolManager.
 

@@ -15,11 +15,14 @@ DockableWidgetLayout::DockableWidgetLayout(QWidget *parent, int margin, int spac
 	setMargin(margin);
 	setSpacing(spacing);
 	minWidth = minHeight = 0;
+	maxWidth = maxHeight = 0;
 }
 
 DockableWidgetLayout::DockableWidgetLayout(int spacing)
 {
 	setSpacing(spacing);
+	minWidth = minHeight = 0;
+	maxWidth = maxHeight = 0;
 }
 
 DockableWidgetLayout::~DockableWidgetLayout()
@@ -51,7 +54,6 @@ void DockableWidgetLayout::addItem( QLayoutItem *item, int index, DockSide side,
 	info->height = -1;
 	info->useHintWidth = true;
 	info->useHintHeight = true;
-	info->distExtra = 0;
 	
 	if( info->widget->sizePolicy().horizontalPolicy() != QSizePolicy::Fixed && w > 0 ) {
 		info->width = w;
@@ -79,7 +81,7 @@ void DockableWidgetLayout::addItem( QLayoutItem *item, int index, DockSide side,
 		dockedWidgets.append( info );
 
 	// recalculate size limits		
-	minValid = false;
+	calcSizeLimits();
 }
 
 void DockableWidgetLayout::addWidget( DockableWidget *widget, const QRect& rect )
@@ -114,7 +116,7 @@ void DockableWidgetLayout::addWidget( DockableWidget *widget, DockSide side, int
 
 void DockableWidgetLayout::changed()
 {
-	minValid = false;
+	calcSizeLimits();
 	update();
 }
 
@@ -141,7 +143,7 @@ QLayoutItem *DockableWidgetLayout::takeAt(int index)
 	QLayoutItem *item = info->item;
 	delete info;
 	
-	minValid = false;
+	calcSizeLimits();
 	return item;
 }
 
@@ -158,66 +160,121 @@ QSize DockableWidgetLayout::minimumSize() const
 	return QSize( minWidth, minHeight );
 }
 
+QSize DockableWidgetLayout::maximumSize() const
+{
+	return QSize( maxWidth, maxHeight );
+}
+
 QSize DockableWidgetLayout::sizeHint() const
 {
-	return QSize( 700, 500 );
+	return QSize( layoutWidth, layoutHeight );
 }
 
 void DockableWidgetLayout::setGeometry(const QRect &rect)
 {
 	QLayout::setGeometry( rect );
 	
-	if( !minValid ) calcMinimumSize();
-	// set reasonable start size
-	DockInfo *d = dockedWidgets[0];
-	int dx = minBaseWidgetWidth + rect.width() - minWidth - d->width;
-	int dy = minBaseWidgetHeight + rect.height() - minHeight - d->height;
-	sizeMove( dx, dy );
-	doLayout();
-	if( layoutWidth != rect.width() || layoutHeight != rect.height() ) {
-		// second iteration to account for odd effects
-		dx = rect.width() - layoutWidth;
-		dy = rect.height() - layoutHeight;
+	// Qt sometimes sets the geometry outside the minimumSize/maximumSize range. :/
+	int W = rect.width();
+	if( W < minWidth )
+		W = minWidth;
+	else if( W > maxWidth )
+		W = maxWidth;
+	int H = rect.height();
+	if( H < minHeight )
+		H = minHeight;
+	else if( H > maxHeight )
+		H = maxHeight;
+	// set main widget size
+	int dx = W - layoutWidth;
+	int dy = H - layoutHeight;
+	
+	if( dx != 0 || dy != 0 ) {
 		sizeMove( dx, dy );
-		doLayout();
+		calcSizeLimits();
 	}
+
 	// resize the widgets
 	for ( int i = 0; i < dockedWidgets.size(); i++ ) {
 		DockInfo *d = dockedWidgets[i];
-		if( d->widget->isVisible() ) 
+		if( !d->widget->isHidden() ) 
 			d->item->setGeometry( QRect( d->left, d->top, d->width, d->height ) );
 	}
 }
 
-void DockableWidgetLayout::calcMinimumSize()
+void DockableWidgetLayout::calcSizeLimits()
 {
+	if( !dockedWidgets.size() ) return;
+	
+	// layout with current sizes
+	doLayout();
 	DockInfo *d = dockedWidgets.at(0);
-	int storeWidth = d->width;
-	int storeHeight = d->height;
-	// calculating the minimum size requires three trials.
-	// small
-	sizeMove( d->item->minimumSize().width() - d->width, d->item->minimumSize().height() - d->height );
-	doLayout(true);
-	int w0 = minWidth;
-	int h0 = minHeight;
-	// large horizontal base size
-	sizeMove( 2048 - d->width, 0 );
-	doLayout(true);
-	int w1 = minWidth;
-	int h1 = minHeight;
-	// large vertical base size
-	sizeMove( d->item->minimumSize().width() - d->width, 2048 - d->height );
-	doLayout(true);
-	int w2 = minWidth;
-	int h2 = minHeight;
-	// calculate size limits
-	minWidth = qMax( w0, w2 );
-	minHeight = qMax( h0, h1 );
-	minBaseWidgetWidth = 2048 - (w1 - w0);
-	minBaseWidgetHeight = 2048 - (h2 - h0);
-	// restore base widget size and normal layout
-	sizeMove( storeWidth - d->width, storeHeight - d->height );
-	minValid = true;
+
+	// store current size
+	int curWidth = d->width;
+	int curHeight = d->height;
+	QVector<int> distStore;
+	for( int i  = 0; i < dockedWidgets.size(); i++)
+		distStore.push_back( dockedWidgets.at(i)->dockDistance );
+	
+	// first check minimum width (blunt method)
+	for( int i = d->widget->minimumWidth(); i <= curWidth; i++ ) {
+		// trial layout
+		sizeMove( i - d->width, 0 );
+		doLayout(true);
+		// restore
+		d->width = curWidth;
+		for( int j = 1; j < dockedWidgets.size(); j++)
+			dockedWidgets.at(j)->dockDistance = distStore.at(j);
+		// check result
+		if( layoutHeight == checkHeight && layoutWidth-checkWidth == d->width-i ) break;
+	}
+	minWidth = checkWidth;
+
+	// first check maximum width (blunt method)
+	for( int i = d->widget->maximumWidth(); i >= curWidth; i-- ) {
+		// trial layout
+		sizeMove( i - d->width, 0 );
+		doLayout(true);
+		// restore
+		d->width = curWidth;
+		for( int j = 1; j < dockedWidgets.size(); j++)
+			dockedWidgets.at(j)->dockDistance = distStore.at(j);
+		// check result
+		if( layoutHeight == checkHeight && layoutWidth-checkWidth == d->width-i ) break;
+	}
+	maxWidth = checkWidth;
+
+	// first check minimum height (blunt method)
+	for( int i = d->widget->minimumHeight(); i <= curHeight; i++ ) {
+		// trial layout
+		sizeMove( 0, i - d->height );
+		doLayout(true);
+		// restore
+		d->height = curHeight;
+		for( int j = 1; j < dockedWidgets.size(); j++)
+			dockedWidgets.at(j)->dockDistance = distStore.at(j);
+		// check result
+		if( layoutWidth == checkWidth && layoutHeight-checkHeight == d->height-i ) break;
+	}
+	minHeight = checkHeight;
+
+	// first check maximum width (blunt method)
+	for( int i = d->widget->maximumHeight(); i >= curHeight; i-- ) {
+		// trial layout
+		sizeMove( 0, i - d->height );
+		doLayout(true);
+		// restore
+		d->height = curHeight;
+		for( int j = 1; j < dockedWidgets.size(); j++)
+			dockedWidgets.at(j)->dockDistance = distStore.at(j);
+		// check result
+		if( layoutWidth == checkWidth && layoutHeight-checkHeight == d->height-i ) break;
+	}
+	maxHeight = checkHeight;
+
+	// restore layout
+	doLayout();
 }
 
 void DockableWidgetLayout::sizeMove( int dx, int dy )
@@ -226,37 +283,13 @@ void DockableWidgetLayout::sizeMove( int dx, int dy )
 	for( int i = 1; i < dockedWidgets.size(); i++ ) {
 		DockInfo *d = dockedWidgets.at(i);
 		if( d->dockSide == TOP || d->dockSide == BOTTOM ) {
-			if( d->dockDistance > 0 || d->distExtra != 0 ) {
+			if( d->dockDistance >= d0->width) {
 				d->dockDistance += dx;
-				if( d->dockDistance < 0 ) {
-					d->distExtra += d->dockDistance;
-					d->dockDistance = 0;
-				} else if( d->distExtra < 0 ) {
-					if( -d->distExtra <= d->dockDistance ) {
-						d->dockDistance += d->distExtra;
-						d->distExtra = 0;
-					} else {
-						d->distExtra += d->dockDistance;
-						d->dockDistance = 0;
-					}
-				}
 			}
 		}
 		if( d->dockSide == LEFT || d->dockSide == RIGHT ) {
-			if( d->dockDistance > 0 || d->distExtra != 0 ) {
+			if( d->dockDistance >= d0->height ) {
 				d->dockDistance += dy;
-				if( d->dockDistance < 0 ) {
-					d->distExtra += d->dockDistance;
-					d->dockDistance = 0;
-				} else if( d->distExtra < 0 ) {
-					if( -d->distExtra <= d->dockDistance ) {
-						d->dockDistance += d->distExtra;
-						d->distExtra = 0;
-					} else {
-						d->distExtra += d->dockDistance;
-						d->dockDistance = 0;
-					}
-				}
 			}
 		}
 	}
@@ -264,7 +297,7 @@ void DockableWidgetLayout::sizeMove( int dx, int dy )
 	d0->height += dy;
 }
 
-void DockableWidgetLayout::doLayout( bool calcMin )
+void DockableWidgetLayout::doLayout( bool check )
 {
 	if( dockedWidgets.size() == 0 ) return;
 
@@ -362,18 +395,22 @@ void DockableWidgetLayout::doLayout( bool calcMin )
 	}	
 	
 	// translate widgets and calculate size
-	if( calcMin ) {
-		minWidth = minHeight = 0;
+	if( check ) {
+		checkWidth = checkHeight = 0;
 		for ( int i = 0; i < dockedWidgets.size(); i++ ) {
 			DockInfo *d = dockedWidgets[i];
-			if( d->left-dx+d->width > minWidth ) minWidth = d->left - dx + d->width;
-			if( d->top-dy+d->height > minHeight ) minHeight = d->top - dy + d->height;
+			if( !d->widget->isHidden() ) {
+				d->left -= dx;
+				d->top -= dy;
+				if( d->left+d->width > checkWidth ) checkWidth = d->left + d->width;
+				if( d->top+d->height > checkHeight ) checkHeight = d->top + d->height;
+			}
 		}
 	} else {
 		layoutWidth = layoutHeight = 0;
 		for ( int i = 0; i < dockedWidgets.size(); i++ ) {
 			DockInfo *d = dockedWidgets[i];
-			if( d->widget->isVisible() ) {
+			if( !d->widget->isHidden() ) {
 				d->left -= dx;
 				d->top -= dy;
 				if( d->left+d->width > layoutWidth ) layoutWidth = d->left + d->width;

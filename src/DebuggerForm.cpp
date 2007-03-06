@@ -469,9 +469,17 @@ void DebuggerForm::createForm()
 		list.append( "CODEVIEW D V R 0 -1 -1" );
 		list.append( "REGISTERS D V R 0 -1 -1" );
 		list.append( "FLAGS D V R 0 -1 -1" );
-		list.append( "STACK D V R 0 -1 164" );
-		list.append( "SLOTS D V R 0 -1 164" );
-		list.append( "MEMORY D V B 341 576 356" );
+		int regW = dockMan.findDockableWidget("REGISTERS")->sizeHint().width();
+		int regH = dockMan.findDockableWidget("REGISTERS")->sizeHint().height();
+		int codeW = dockMan.findDockableWidget("CODEVIEW")->sizeHint().width();
+		int codeH = dockMan.findDockableWidget("CODEVIEW")->sizeHint().height();
+		int flagW = dockMan.findDockableWidget("FLAGS")->sizeHint().width();
+		int slotW = dockMan.findDockableWidget("SLOTS")->sizeHint().width();
+		list.append( QString("SLOTS D V R 0 -1 %1").arg(regH) );
+		list.append( QString("STACK D V R 0 -1 %1").arg(codeH) );
+		list.append( QString("MEMORY D V B %1 %2 %3").arg(codeW)
+		                                             .arg(regW + flagW + slotW)
+		                                             .arg(codeH - regH) );
 	}
 
 	// add widgets

@@ -10,6 +10,8 @@
 #include <QStyleOptionFocusRect>
 #include <QScrollBar>
 #include <QWheelEvent>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <cmath>
 #include <cassert>
 
@@ -119,6 +121,9 @@ void DisasmViewer::settingsChanged()
 	xMCode[3] = xMCode[2] + 3 * charWidth;
 	xMnem = xMCode[3] + 4 * charWidth;
 	xMnemArg = xMnem  + 7 * charWidth;
+
+	setMinimumSize( xMCode[0], 2*codeFontHeight );
+	setMaximumSize( QApplication::desktop()->width(), QApplication::desktop()->height() );
 
 	update();
 }
