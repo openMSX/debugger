@@ -75,6 +75,10 @@ void DockableWidgetLayout::addItem( QLayoutItem *item, int index, DockSide side,
 		info->useHintHeight = false;
 	}
 
+for( int i = 0; i < dockedWidgets.size(); i++ )
+	if( dockedWidgets.at(i)->widget == item->widget() )
+		Q_ASSERT( true );
+
 	if( index > -1 && index < dockedWidgets.size() )
 		dockedWidgets.insert( index, info );
 	else
@@ -138,7 +142,7 @@ int DockableWidgetLayout::count() const
 QLayoutItem *DockableWidgetLayout::takeAt(int index)
 {
 	if( index<0 || index>=dockedWidgets.size() ) return 0;
-	
+
 	DockInfo *info = dockedWidgets.takeAt( index );
 	QLayoutItem *item = info->item;
 	delete info;

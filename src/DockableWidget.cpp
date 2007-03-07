@@ -74,10 +74,14 @@ void DockableWidget::setWidget(QWidget *widget)
 	
 	if( widget ) {
 		widgetLayout->addWidget( widget, 1 );
-		setMinimumSize( sizeHint().width() - widget->sizeHint().width() + widget->minimumWidth(),
-		                sizeHint().height() - widget->sizeHint().height() + widget->minimumHeight() );
-		setMaximumSize( sizeHint().width() - widget->sizeHint().width() + widget->maximumWidth(),
-		                sizeHint().height() - widget->sizeHint().height() + widget->maximumHeight() );
+		int minW = sizeHint().width() - widget->sizeHint().width() + widget->minimumWidth();
+		int minH = sizeHint().height() - widget->sizeHint().height() + widget->minimumHeight();
+		int maxW = sizeHint().width() - widget->sizeHint().width() + widget->maximumWidth();
+		int maxH = sizeHint().height() - widget->sizeHint().height() + widget->maximumHeight();
+		if( maxW > 16777215 ) maxW = 16777215;
+		if( maxH > 16777215 ) maxH = 16777215;
+		setMinimumSize( minW, minH );
+		setMaximumSize( maxW, maxH );
 		setSizePolicy( widget->sizePolicy() );
 	}
 }

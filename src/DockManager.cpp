@@ -27,6 +27,7 @@ void DockManager::dockWidget( DockableWidget *widget, const QPoint& p, const QRe
 {
 	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.begin(); // TODO
 	if( it != areaMap.end() ) {
+		areaMap[widget] = it.value();	
 		return it.value()->addWidget( widget, r );
 	}
 }
@@ -45,7 +46,7 @@ void DockManager::insertWidget( DockableWidget *widget, int index,
 	if( index<0 || index>=areas.size() ) return;
 
 	Q_ASSERT( areaMap.find(widget) == areaMap.end() );
-	
+
 	areas[index]->addWidget( widget, side, distance, w, h );
 	areaMap[widget] = areas[index];
 }

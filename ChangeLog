@@ -1,5 +1,8 @@
 $Id$
 
+2007-03-07 Edwin Velds <e.velds@gmail.com>
+	* Fixed dock widget insert bug that lead to crashes on exit.
+
 2007-03-06 Edwin Velds <e.velds@gmail.com>
 	* Changed resize handling of dock layout.
 
