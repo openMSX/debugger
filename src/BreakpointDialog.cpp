@@ -1,4 +1,5 @@
 #include "BreakpointDialog.h"
+#include "DebuggerData.h"
 #include "Convert.h"
 
 BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, QWidget *parent)

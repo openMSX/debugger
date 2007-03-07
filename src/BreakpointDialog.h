@@ -2,7 +2,8 @@
 #define BREAKPOINTDIALOG_H
 
 #include "ui_BreakpointDialog.h"
-#include "DebuggerData.h"
+
+class MemoryLayout;
 
 class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 {

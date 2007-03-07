@@ -1,4 +1,5 @@
 #include "SymbolManager.h"
+#include "SymbolTable.h"
 #include "Settings.h"
 #include "Convert.h"
 #include <QFileDialog>

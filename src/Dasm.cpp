@@ -2,7 +2,6 @@
 
 #include "Dasm.h"
 #include "DasmTables.h"
-#include "DebuggerData.h"
 #include "SymbolTable.h"
 #include <sstream>
 #include <iomanip>

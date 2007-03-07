@@ -10,7 +10,6 @@
 #include "StackViewer.h"
 #include "SlotViewer.h"
 #include "CommClient.h"
-#include "OpenMSXConnection.h"
 #include "ConnectDialog.h"
 #include "SymbolManager.h"
 #include "PreferencesDialog.h"

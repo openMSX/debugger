@@ -7,7 +7,6 @@
 #include "OpenMSXConnection.h"
 #include <QDialog>
 #include <QList>
-#include <QTimer>
 
 class QString;
 class ConnectionInfoRequest;

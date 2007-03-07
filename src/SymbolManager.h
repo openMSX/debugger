@@ -2,8 +2,8 @@
 #define SYMBOLMANAGER_H
 
 #include "ui_SymbolManager.h"
-#include "SymbolTable.h"
 
+class SymbolTable;
 class QTreeWidgetItem;
 
 class SymbolManager : public QDialog, private Ui::SymbolManager
