@@ -175,14 +175,18 @@ void StackViewer::memdataTransfered(StackRequest* r)
 {
 	topAddress = r->offset;
 	update();
-	transferCancelled(r);
+
+	waitingForData = false;
+	delete r;
+	
+	// check whether a new value is available
+	if ((topAddress & ~1) != (vertScrollBar->value() & ~1)) {
+		setLocation(vertScrollBar->value());
+	}
 }
 
 void StackViewer::transferCancelled(StackRequest* r)
 {
 	waitingForData = false;
-	// check whether a new value is available
-	if ((topAddress & ~1) != (vertScrollBar->value() & ~1)) {
-		setLocation(vertScrollBar->value());
-	}
+	delete r;
 }
