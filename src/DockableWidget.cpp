@@ -78,8 +78,8 @@ void DockableWidget::setWidget(QWidget *widget)
 		int minH = sizeHint().height() - widget->sizeHint().height() + widget->minimumHeight();
 		int maxW = sizeHint().width() - widget->sizeHint().width() + widget->maximumWidth();
 		int maxH = sizeHint().height() - widget->sizeHint().height() + widget->maximumHeight();
-		if( maxW > 16777215 ) maxW = 16777215;
-		if( maxH > 16777215 ) maxH = 16777215;
+		if( maxW > QWIDGETSIZE_MAX ) maxW = QWIDGETSIZE_MAX;
+		if( maxH > QWIDGETSIZE_MAX ) maxH = QWIDGETSIZE_MAX;
 		setMinimumSize( minW, minH );
 		setMaximumSize( maxW, maxH );
 		setSizePolicy( widget->sizePolicy() );
@@ -198,8 +198,8 @@ void DockableWidget::mouseMoveEvent ( QMouseEvent * event )
 		if( event->buttons() & Qt::LeftButton ) {
 			// dragging of widget in progress, update rubberband
 			if( !rubberBand->isVisible() ) {
-				if( abs( event->globalX()-dragStart.x() ) > 10 ||
-					 abs( event->globalY()-dragStart.y() ) > 10 ) {
+				if( abs( event->globalX()-dragStart.x() ) > 20 ||
+					 abs( event->globalY()-dragStart.y() ) > 20 ) {
 					rubberBand->resize( width(), height() );
 					rubberBand->move( event->globalX()-dragOffset.x(), event->globalY()-dragOffset.y() );
 					rubberBand->show();
@@ -232,8 +232,8 @@ void DockableWidget::mouseReleaseEvent ( QMouseEvent * event )
 			rubberBand->hide();
 		}
 		// only do anything if this was a meaningful drag
-		if( abs( event->globalX()-dragStart.x() ) > 10 ||
-		    abs( event->globalY()-dragStart.y() ) > 10 ) {
+		if( abs( event->globalX()-dragStart.x() ) > 20 ||
+		    abs( event->globalY()-dragStart.y() ) > 20 ) {
 			if( movable ) {
 				if( floating ) {
 					QRect mouseRect( event->globalX() - dragOffset.x(), event->globalY() - dragOffset.y(), width(), height() );

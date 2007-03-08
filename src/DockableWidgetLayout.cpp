@@ -338,8 +338,8 @@ void DockableWidgetLayout::doLayout( bool check )
 				// adjust position until it doesn't overlap  other widgets
 				for( int j = 1; j < i; j++ ) {
 					DockInfo *d2 = dockedWidgets[j];
-					if( QRect(d->left,d->top,d->width,d->height)
-					              .intersects(QRect(d2->left,d2->top,d2->width,d2->height)) )
+					if( QRect(d->left, d->top - QWIDGETSIZE_MAX, d->width, d->height + QWIDGETSIZE_MAX)
+					              .intersects(QRect(d2->left, d2->top, d2->width, d2->height)) )
 						d->top = d2->top - d->height;
 				}
 				break;
@@ -354,8 +354,8 @@ void DockableWidgetLayout::doLayout( bool check )
 				// adjust position until it doesn't overlap  other widgets
 				for( int j = 1; j < i; j++ ) {
 					DockInfo *d2 = dockedWidgets[j];
-					if( QRect(d->left,d->top,d->width,d->height)
-					              .intersects(QRect(d2->left,d2->top,d2->width,d2->height)) )
+					if( QRect(d->left - QWIDGETSIZE_MAX, d->top, d->width + QWIDGETSIZE_MAX, d->height)
+					              .intersects(QRect(d2->left, d2->top, d2->width, d2->height)) )
 						d->left = d2->left - d->width;
 				}
 				break;
@@ -370,8 +370,8 @@ void DockableWidgetLayout::doLayout( bool check )
 				// adjust position until it doesn't overlap  other widgets
 				for( int j = 1; j < i; j++ ) {
 					DockInfo *d2 = dockedWidgets[j];
-					if( QRect(d->left,d->top,d->width,d->height)
-					              .intersects(QRect(d2->left,d2->top,d2->width,d2->height)) )
+					if( QRect(d->left, d->top, d->width + QWIDGETSIZE_MAX, d->height)
+					              .intersects(QRect(d2->left, d2->top, d2->width, d2->height)) )
 						d->left = d2->left + d2->width;
 				}
 				break;
@@ -386,8 +386,8 @@ void DockableWidgetLayout::doLayout( bool check )
 				// adjust position until it doesn't overlap  other widgets
 				for( int j = 1; j < i; j++ ) {
 					DockInfo *d2 = dockedWidgets[j];
-					if( QRect(d->left,d->top,d->width,d->height)
-					              .intersects(QRect(d2->left,d2->top,d2->width,d2->height)) )
+					if( QRect(d->left, d->top, d->width, d->height + QWIDGETSIZE_MAX)
+					              .intersects(QRect(d2->left, d2->top, d2->width, d2->height)) )
 						d->top = d2->top + d2->height;
 				}
 				break;
