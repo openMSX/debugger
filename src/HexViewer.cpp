@@ -54,6 +54,7 @@ HexViewer::HexViewer(QWidget* parent)
 	debuggableSize = 0;
 	waitingForData = false;
 	adjustToWidth = true;
+	addressLength = 4;
 	
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->setMinimum(0);
