@@ -9,9 +9,9 @@ int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 // Don't set the icon on OS X, because it will replace the high-res version
-// with a lower resolution one, even though logo.png is 128x128.
+// with a lower resolution one, even though openMSX-debugger-logo-128.png is 128x128.
 #ifndef __APPLE__
-	app.setWindowIcon(QIcon::QIcon(":icons/logo.png"));
+	app.setWindowIcon(QIcon::QIcon(":icons/openMSX-debugger-logo-128.png"));
 #endif
 	// restore main settings
 	app.setFont( Settings::get().font( Settings::APP_FONT ) );
