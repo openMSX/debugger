@@ -1,5 +1,8 @@
 $Id$
 
+2007-05-15 Edwin Velds <e.velds@gmail.com>
+	* Fixed a bug that caused the disasm view to stop responding.
+
 2007-03-08 Edwin Velds <e.velds@gmail.com>
 	* Fixed communication bug in stack viewer.
 	* Fixed layout bug that caused overlaps.

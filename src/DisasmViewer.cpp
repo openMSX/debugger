@@ -143,8 +143,8 @@ void DisasmViewer::symbolsChanged()
 		if (nextRequest) delete nextRequest;
 		nextRequest = req;
 	} else {
-		CommClient::instance().sendCommand(req);
 		waitingForData = true;
+		CommClient::instance().sendCommand(req);
 	}
 }
 
@@ -361,8 +361,8 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 		if (nextRequest) delete nextRequest;
 		nextRequest = req;
 	} else {
-		CommClient::instance().sendCommand(req);
 		waitingForData = true;
+		CommClient::instance().sendCommand(req);
 	}
 }
 
@@ -388,6 +388,8 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	if (disasmTopLine + visibleLines > int(disasmLines.size()) )
 		disasmTopLine = disasmLines.size() - disasmTopLine;
 
+	updateCancelled(req);
+
 	// sync the scrollbar with the actual address reached
 	if (!nextRequest) {
 		// set the slider with without the signal
@@ -399,7 +401,6 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	}
 
 	update();
-	updateCancelled(req);
 }
 
 void DisasmViewer::updateCancelled(CommMemoryRequest* req)

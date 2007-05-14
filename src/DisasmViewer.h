@@ -68,7 +68,7 @@ private:
 	
 	// display data
 	unsigned char* memory;
-	int waitingForData;
+	bool waitingForData;
 	CommMemoryRequest* nextRequest;
 	Breakpoints* breakpoints;
 	MemoryLayout *memLayout;
