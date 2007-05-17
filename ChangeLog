@@ -1,5 +1,8 @@
 $Id$
 
+2007-05-17 Edwin Velds <e.velds@gmail.com>
+	* Improved scrollbar handling in disasm view.
+
 2007-05-15 Edwin Velds <e.velds@gmail.com>
 	* Fixed a bug that caused the disasm view to stop responding.
 

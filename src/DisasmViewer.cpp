@@ -94,7 +94,8 @@ void DisasmViewer::resizeEvent(QResizeEvent* e)
 	                       height() - frameT - frameB);
 	
 	// reset the address in order to trigger a check on the disasmLines
-	setAddress(scrollBar->value());
+	if( !waitingForData )
+		setAddress(scrollBar->value());
 }
 
 void DisasmViewer::settingsChanged()
@@ -293,7 +294,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	
 		if ((line > dt || disasmLines[0].addr == 0) &&
 		    (line < int(disasmLines.size()) - db ||
-		     disasmLines.back().addr+disasmLines.back().numBytes == 0x10000))
+		     disasmLines.back().addr+disasmLines.back().numBytes > 0xFFFF))
 		{
 			// line is within existing disasm'd data. Find where to put it.
 			if ( method == Top || method == TopAlways || 
@@ -309,8 +310,8 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 				// Move line to middle
 				disasmTopLine = line - visibleLines / 2;
 			}
+			if (disasmTopLine+visibleLines > int(disasmLines.size())) disasmTopLine = disasmLines.size() - visibleLines;
 			if (disasmTopLine < 0) disasmTopLine = 0;
-			if (disasmTopLine >= int(disasmLines.size())) disasmTopLine = disasmLines.size() - 1;
 			update();
 			return;
 		}
@@ -350,7 +351,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	}
 	if (disasmStart < 0) disasmStart = 0;
 	if (disasmEnd > 0xFFFF) disasmEnd = 0xFFFF;
-	
+
 	CommMemoryRequest* req = new CommMemoryRequest(
 		disasmStart, disasmEnd - disasmStart + 1, &memory[disasmStart], *this);
 	req->address = addr;
@@ -384,23 +385,24 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 			disasmTopLine -= visibleLines - 1;
 			break;
 	}
+
 	if (disasmTopLine < 0) disasmTopLine = 0;
 	if (disasmTopLine + visibleLines > int(disasmLines.size()) )
-		disasmTopLine = disasmLines.size() - disasmTopLine;
+		disasmTopLine = disasmLines.size() - visibleLines;
 
 	updateCancelled(req);
 
 	// sync the scrollbar with the actual address reached
-	if (!nextRequest) {
+	if( !waitingForData ) {
 		// set the slider with without the signal
-		scrollBar->setTracking(false);
+		disconnect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
 		scrollBar->setSliderPosition(disasmLines[disasmTopLine].addr);
-		scrollBar->setTracking(true);
+		connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
 		// set the line
 		setAddress(disasmLines[disasmTopLine].addr, disasmLines[disasmTopLine].infoLine);
+		update();
 	}
 
-	update();
 }
 
 void DisasmViewer::updateCancelled(CommMemoryRequest* req)
@@ -483,11 +485,7 @@ void DisasmViewer::scrollBarAction(int action)
 				setAddress(disasmLines[disasmTopLine-1].addr, disasmLines[disasmTopLine-1].infoLine, BottomAlways);
 			}
 			break;
-		case QScrollBar::SliderToMinimum:
-			setAddress(0, FIRST_INFO_LINE, TopAlways);
-			break;
-		case QScrollBar::SliderToMaximum:
-			setAddress(0xFFFF, LAST_INFO_LINE, BottomAlways);
+		default:
 			break;
 	}
 }
@@ -496,7 +494,7 @@ void DisasmViewer::scrollBarAction(int action)
 // the SliderMoved action won't catch the extreme values
 void DisasmViewer::scrollBarChanged(int value)
 {
-	setAddress(value, TopAlways);
+	setAddress(value, FIRST_INFO_LINE, TopAlways);
 }
 
 void DisasmViewer::setMemory(unsigned char* memPtr)
