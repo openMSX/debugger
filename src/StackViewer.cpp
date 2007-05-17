@@ -77,8 +77,8 @@ void StackViewer::setScrollBarValues()
 
 	int lines = (memoryLength-stackPointer) / 2;
 	vertScrollBar->setMaximum(stackPointer + 2 * (lines - int(visibleLines)));
-	vertScrollBar->setSingleStep(1);
-	vertScrollBar->setPageStep(int(visibleLines));
+	vertScrollBar->setSingleStep(2);
+	vertScrollBar->setPageStep(2*int(visibleLines));
 }
 
 void StackViewer::resizeEvent(QResizeEvent* e)
