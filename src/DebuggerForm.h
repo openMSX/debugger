@@ -28,6 +28,9 @@ public:
 	DebuggerForm(QWidget* parent = 0);
 	~DebuggerForm();
 
+protected:
+	void closeEvent( QCloseEvent *e );
+
 public slots:
 	void showAbout();
 

@@ -1,5 +1,8 @@
 $Id$
 
+2007-05-18 Edwin Velds <e.velds@gmail.com>
+	* Fixed saving and restoring of window size and position.
+
 2007-05-17 Edwin Velds <e.velds@gmail.com>
 	* Improved scrollbar handling in disasm view.
 	* Fixed scrollbar stepping in stack view.

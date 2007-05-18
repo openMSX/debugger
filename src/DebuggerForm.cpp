@@ -458,8 +458,7 @@ void DebuggerForm::createForm()
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
 
 	// restore layout
-	move( Settings::get().value( "Layout/WindowPos", pos() ).toPoint() );
-	resize( Settings::get().value( "Layout/WindowSize", size() ).toSize() );
+	restoreGeometry( Settings::get().value( "Layout/WindowGeometry", saveGeometry() ).toByteArray() );
 	
 	QStringList list = Settings::get().value( "Layout/WidgetLayout" ).toStringList();
 	// defaults needed?
@@ -545,10 +544,12 @@ void DebuggerForm::createForm()
 DebuggerForm::~DebuggerForm()
 {
 	delete[] mainMemory;
-	
+}
+
+void DebuggerForm::closeEvent( QCloseEvent *e )
+{
 	// store layout
-	Settings::get().setValue( "Layout/WindowPos", pos() );
-	Settings::get().setValue( "Layout/WindowSize", size() );
+	Settings::get().setValue( "Layout/WindowGeometry", saveGeometry() );
 
 	QStringList layoutList;
 	// fill layout list with docked widgets
@@ -571,6 +572,7 @@ DebuggerForm::~DebuggerForm()
 	}
 	Settings::get().setValue( "Layout/WidgetLayout", layoutList );
 	
+	QMainWindow::closeEvent(e);
 }
 
 void DebuggerForm::initConnection()

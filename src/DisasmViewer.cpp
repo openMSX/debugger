@@ -72,7 +72,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	scrollBar->setMaximum(0xFFFF);
 	scrollBar->setSingleStep(0);
 	scrollBar->setPageStep(0);
-
+	
 	settingsChanged();
 
 	// manual scrollbar handling routines (real size of the data is not known)
