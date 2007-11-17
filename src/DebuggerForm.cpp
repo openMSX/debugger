@@ -182,6 +182,10 @@ void DebuggerForm::createActions()
 	systemPauseAction->setCheckable(true);
 	systemPauseAction->setEnabled(false);
 
+	systemRebootAction = new QAction(tr("&Reboot emulator"), this);
+	systemRebootAction->setStatusTip(tr("Reboot the emulation and start if needed"));
+	systemRebootAction->setEnabled(false);
+
 	systemSymbolManagerAction = new QAction(tr("&Symbol mananger ..."), this);
 	systemSymbolManagerAction->setStatusTip(tr("Start the symbol manager"));
 	systemSymbolManagerAction->setIcon(QIcon(":/icons/symmanager.png"));
@@ -269,6 +273,7 @@ void DebuggerForm::createActions()
 	connect(systemConnectAction, SIGNAL(triggered()), this, SLOT(systemConnect()));
 	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
 	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
+	connect(systemRebootAction, SIGNAL(triggered()), this, SLOT(systemReboot()));
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
 	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
 	connect(systemQuitAction, SIGNAL(triggered()), this, SLOT(close()));
@@ -297,6 +302,8 @@ void DebuggerForm::createMenus()
 	systemMenu->addAction(systemDisconnectAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemPauseAction);
+	systemMenu->addSeparator();
+	systemMenu->addAction(systemRebootAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemSymbolManagerAction);
 	systemMenu->addSeparator();
@@ -628,6 +635,7 @@ void DebuggerForm::initConnection()
 void DebuggerForm::connectionClosed()
 {
 	systemPauseAction->setEnabled(false);
+	systemRebootAction->setEnabled(false);
 	executeBreakAction->setEnabled(false);
 	executeRunAction->setEnabled(false);
 	executeStepAction->setEnabled(false);
@@ -647,6 +655,7 @@ void DebuggerForm::connectionClosed()
 void DebuggerForm::finalizeConnection(bool halted)
 {
 	systemPauseAction->setEnabled(true);
+	systemRebootAction->setEnabled(true);
 	if (halted) {
 		setBreakMode();
 		breakOccured();
@@ -749,6 +758,15 @@ void DebuggerForm::systemPause()
 {
 	comm.sendCommand(new SimpleCommand(QString("set pause ") +
 	                    (systemPauseAction->isChecked() ? "true" : "false")));
+}
+
+void DebuggerForm::systemReboot()
+{
+	if( systemPauseAction->isChecked() )
+		systemPauseAction->trigger();
+	if( executeRunAction->isEnabled() )
+		executeRun();
+	comm.sendCommand(new SimpleCommand("reset"));
 }
 
 void DebuggerForm::systemSymbolManager()

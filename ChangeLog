@@ -1,5 +1,8 @@
 $Id$
 
+2007-11-17 Edwin Velds <e.velds@gmail.com>
+	* Added menu item for emulator reboot.
+
 2007-05-18 Edwin Velds <e.velds@gmail.com>
 	* Fixed saving and restoring of window size and position.
 

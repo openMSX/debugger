@@ -47,6 +47,7 @@ private:
 	QAction* systemConnectAction;
 	QAction* systemDisconnectAction;
 	QAction* systemPauseAction;
+	QAction* systemRebootAction;
 	QAction* systemSymbolManagerAction;
 	QAction* systemPreferencesAction;
 	QAction* systemQuitAction;
@@ -107,6 +108,7 @@ private slots:
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();
+	void systemReboot();
 	void systemSymbolManager();
 	void systemPreferences();
 	void toggleRegisterDisplay();
