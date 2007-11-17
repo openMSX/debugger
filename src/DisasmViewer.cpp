@@ -252,7 +252,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 
 			// print the instruction and arguments
 			p.drawText(xMnem,    y + a, row->instr.substr(0,  7).c_str());
-			p.drawText(xMnemArg, y + a, row->instr.substr(7, 20).c_str());
+			p.drawText(xMnemArg, y + a, row->instr.substr(7).c_str());
 		}
 		// next line
 		y += h;
@@ -506,7 +506,7 @@ void DisasmViewer::setMemory(unsigned char* memPtr)
 	newRow.numBytes = 1;
 	newRow.infoLine = 0;
 	newRow.instr = "nop";
-	newRow.instr.resize(18, ' ');
+	newRow.instr.resize(8, ' ');
 	for (int i = 0; i < 150; ++i) {
 		newRow.addr = i;
 		disasmLines.push_back(newRow);

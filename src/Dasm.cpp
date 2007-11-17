@@ -45,7 +45,7 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 			dest.numBytes = 0;
 			dest.infoLine = labelCount;
 			dest.addr = pc;
-			dest.instr = symbol->text().toAscii().data();
+			dest.instr = symbol->text().toStdString();
 			disasm.push_back(dest);
 			symbol = symTable->findNextAddressSymbol( memLayout );
 		}
@@ -92,26 +92,46 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 
 		for (int j = 0; s[j]; ++j) {
 			switch (s[j]) {
+			case 'A':
+			{			
+				int address = membuf[pc + dest.numBytes] + membuf[pc + dest.numBytes + 1] * 256;
+				Symbol *label = symTable->getAddressSymbol( address, memLayout );
+				if( label )
+					dest.instr += label->text().toStdString();
+				else
+					dest.instr += '#' + toHex( address, 4 );
+				dest.numBytes += 2;
+				break;
+			}
 			case 'B':
 				dest.instr += '#' + toHex(membuf[pc + dest.numBytes], 2);
 				dest.numBytes += 1;
 				break;
 			case 'R':
-				dest.instr += '#' + toHex((pc + 2 + (signed char)membuf[pc + dest.numBytes]) & 0xFFFF, 4);
+			{
+				int address = (pc + 2 + (signed char)membuf[pc + dest.numBytes]) & 0xFFFF;
+				Symbol *label = symTable->getAddressSymbol( address, memLayout );
+				if( label )
+					dest.instr += label->text().toStdString();
+				else
+					dest.instr += '#' + toHex( address, 4 );
 				dest.numBytes += 1;
 				break;
+			}
 			case 'W':
 				dest.instr += '#' + toHex(membuf[pc + dest.numBytes] + membuf[pc + dest.numBytes + 1] * 256, 4);
 				dest.numBytes += 2;
 				break;
-			case 'X': {
+			case 'X':
+			{
 				unsigned char offset = membuf[pc + dest.numBytes];
 				dest.instr += '(' + std::string(r) + sign(offset)
 				           +  '#' + toHex(abs(offset), 2) + ')';
 				dest.numBytes += 1;
 				break;
 			}
-			case 'Y': {
+			case 'Y':
+			{
 				unsigned char offset = membuf[pc + 2];
 				dest.instr += '(' + std::string(r) + sign(offset)
 				           +  '#' + toHex(abs(offset), 2) + ')';
@@ -130,7 +150,8 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 				dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
 				                "#CB,#" + toHex(membuf[pc + 2], 2);
 				dest.numBytes = 2;
-			case ' ': {
+			case ' ':
+			{
 				dest.instr.resize(7, ' ');
 				break;
 			}
@@ -165,7 +186,7 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 			default:
 				break;
 		}
-		dest.instr.resize(19, ' ');
+		if( dest.instr.size() < 8 ) dest.instr.resize(8, ' ');
 		disasm.push_back(dest);
 		pc += dest.numBytes;
 	}

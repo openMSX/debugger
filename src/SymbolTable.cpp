@@ -104,6 +104,29 @@ Symbol *SymbolTable::findNextAddressSymbol( MemoryLayout *ml )
 	}
 }
 
+Symbol *SymbolTable::getValueSymbol( int val, Symbol::Register reg, MemoryLayout *ml )
+{
+	QMultiHash<int, Symbol*>::iterator it = valueSymbols.find( val );
+	while( it != valueSymbols.end() &&  it.key() == val ) {
+		if( it.value()->validRegisters() & reg )
+			if( it.value()->isSlotValid( ml ) )
+				return it.value();
+		it++;
+	}
+	return 0;
+}
+
+Symbol *SymbolTable::getAddressSymbol( int addr, MemoryLayout *ml )
+{
+	QMultiMap<int, Symbol*>::iterator it = addressSymbols.find( addr );
+	while( it != addressSymbols.end() && it.key() == addr ) {
+		if( it.value()->isSlotValid( ml ) ) 
+			return it.value();
+		it++;
+	}
+	return 0;
+}
+
 int SymbolTable::symbolFilesSize() const
 {
 	return symbolFiles.size();
@@ -226,7 +249,10 @@ Symbol::Symbol( const QString& str, int addr, int val )
 	symStatus = ACTIVE;
 	symType = JUMPLABEL;
 	symSource = 0;
-	symRegisters = 0;
+	if( val > 255 )
+		symRegisters = REG_ALL16;
+	else
+		symRegisters = REG_ALL;
 	table = 0;
 }
 
