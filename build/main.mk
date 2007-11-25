@@ -225,14 +225,17 @@ ifeq ($(OPENMSX_TARGET_OS),mingw32)
 QT_INSTALL_HEADERS:=$(subst \,/,$(QT_INSTALL_HEADERS))
 QT_INSTALL_LIBS:=$(subst \,/,$(QT_INSTALL_LIBS))
 endif
-QT_INSTALL_BINS:=$(QT_INSTALL_LIBS)/../bin
+QT_INSTALL_BINS:=$(shell qmake -query QT_INSTALL_BINS)
 QT_COMPONENTS:=Core Gui Network Xml
+QT_HEADER_DIRS:=$(addprefix $(QT_INSTALL_HEADERS)/Qt,$(QT_COMPONENTS))
+QT_HEADER_DIRS+=$(QT_INSTALL_HEADERS)
+ifeq ($(OPENMSX_TARGET_OS),darwin)
+QT_HEADER_DIRS+=$(patsubst %,/Library/Frameworks/Qt%.framework/Headers,$(QT_COMPONENTS))
+endif
+
 CXX:=g++
 CXXFLAGS:= -g
-COMPILE_FLAGS:= \
-	$(addprefix -I$(QT_INSTALL_HEADERS)/Qt,$(QT_COMPONENTS)) \
-	-I$(QT_INSTALL_HEADERS) \
-	-I$(GEN_SRC_PATH)
+COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(GEN_SRC_PATH))
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 else
