@@ -52,7 +52,8 @@ void SymbolManager::addFile()
 	QStringList types;
 	types << "Symbol files (*.sym)"
 	      << "TNIASM 0.x symbol files (*.sym)"
-	      << "asMSX 0.x symbol files (*.sym)";
+	      << "asMSX 0.x symbol files (*.sym)"
+	      << "HiTech link map files (*.map)";
 	d->setFilters( types );
 	d->setAcceptMode( QFileDialog::AcceptOpen );
 	d->setFileMode( QFileDialog::ExistingFile );
@@ -81,7 +82,10 @@ void SymbolManager::addFile()
 					else
 						read = symTable.readTNIASM0File( n );
 				}
-			}
+			} else if ( n.endsWith(".map") ) {
+				// HiTech link map file
+				read = symTable.readLinkMapFile( n );
+			} 
 		}
 		// if read succesful, add it to the list
 		if( read ) {

@@ -1,5 +1,9 @@
 $Id$
 
+2007-12-03 Arnold Metselaar <arnold.metselaar@planet.nl>
+	* Added support for link map files like those produced by HiTech's
+	  linker to the SymbolManager.
+
 2007-11-17 Edwin Velds <e.velds@gmail.com>
 	* Added menu item for emulator reboot.
 	* Made address labels visible in disassembled code.

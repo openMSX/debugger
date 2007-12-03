@@ -83,6 +83,7 @@ public:
 
 	bool readTNIASM0File( const QString& filename );
 	bool readASMSXFile( const QString& filename );
+	bool readLinkMapFile( const QString& filename );
 	void reloadFiles();
 	void unloadFile( const QString& file, bool keepSymbols = false );
 

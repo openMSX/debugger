@@ -5,6 +5,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <QRegExp>
+#include "assert.h"
 
 /*
  * SymbolTable member functions
@@ -189,6 +191,72 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 				} else if( filePart == 2 ) {
 					
 				}
+			}
+		}
+	}
+	return true;
+}
+
+bool SymbolTable::readLinkMapFile( const QString& filename )
+{
+	QFile file( filename );
+	QString magic("Machine type");
+	QString tableStart("*\tSymbol Table");
+	QRegExp rx(" [0-9A-Fa-f]{4}  (?![ 0-9])");
+	QRegExp rp("^([^ ]+) +[^ ]* +([0-9A-Fa-f]{4})  $");
+	
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return false;
+
+	QString *symSource = new QString(filename);
+	symbolFiles.append(symSource);
+	QTextStream in(&file);
+    QString line;
+	if (! in.atEnd()) {
+		line = in.readLine();
+		if (!line.startsWith(magic))
+			return false;
+	} else return false;
+	while (!in.atEnd()) {
+		line = in.readLine();
+		if (line.startsWith(tableStart))
+			break;
+	}
+	if (!line.startsWith(tableStart))
+		return false;
+
+    while (! in.atEnd()) {
+		line = in.readLine();
+		assert (!line.endsWith("\r"));
+		if (0 == line.length())
+			continue;
+		line += "  ";
+		int len = line.length();
+		int l;
+		int pos = 0;
+		bool ok = false;
+		// HiTech uses multiple columns of non-fixed width and
+		// a column for psect may be blank so the address may in the first or second match.
+		for (int tries = 0 ; (tries < 2) && ! ok ; tries ++) {
+			pos = rx.indexIn(line, pos);
+			l = pos + rx.matchedLength();
+			if ((l>0) && (len % l) == 0) {
+				ok = true;
+				for (int posn = pos+l; (posn < len) && ok ; posn += l) {
+					ok = (posn == rx.indexIn(line, posn));
+				}
+			}
+			pos = l-1;
+		}
+		if (! ok) continue; 
+
+		for (pos = 0 ; pos <len ; pos+= l) {
+			QString part = line.mid( pos, l );
+			if ( 0 == rp.indexIn( part ) ) {
+				QStringList l = rp.capturedTexts();
+				Symbol *sym =new Symbol( l.at(1), l.last().toInt(0, 16) );
+				sym->setSource( symSource );
+				add( sym );
 			}
 		}
 	}
