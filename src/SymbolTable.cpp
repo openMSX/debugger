@@ -34,7 +34,7 @@ void SymbolTable::add( Symbol *symbol )
 void SymbolTable::removeAt( int index )
 {
 	Symbol *symbol = symbols.takeAt( index );
-	
+
 	unmapSymbol( symbol );
 }
 
@@ -122,7 +122,7 @@ Symbol *SymbolTable::getAddressSymbol( int addr, MemoryLayout *ml )
 {
 	QMultiMap<int, Symbol*>::iterator it = addressSymbols.find( addr );
 	while( it != addressSymbols.end() && it.key() == addr ) {
-		if( it.value()->isSlotValid( ml ) ) 
+		if( it.value()->isSlotValid( ml ) )
 			return it.value();
 		it++;
 	}
@@ -142,7 +142,7 @@ const QString& SymbolTable::symbolFile( int index ) const
 bool SymbolTable::readTNIASM0File( const QString& filename )
 {
 	QFile file( filename );
-	
+
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
@@ -165,7 +165,7 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 bool SymbolTable::readASMSXFile( const QString& filename )
 {
 	QFile file( filename );
-	
+
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
@@ -182,14 +182,23 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 				filePart = 2;
 			}
 		} else {
-			if( line[0] == '$' ) {
+			if(( line[0] == '$' ) || ( line[4] == 'h' ) || ( line[5] == 'h' ) || ( line[8] == 'h' )) {
 				if( filePart == 1 ) {
 					QStringList l = line.split(" ");
-					Symbol *sym = new Symbol( l.at(1).trimmed(), l.at(0).right(4).toInt(0, 16) );
+					Symbol *sym;
+					if( line[0] == '$' ) {
+						sym = new Symbol( l.at(1).trimmed(), l.at(0).right(4).toInt(0, 16) );
+					} else if(( line[4] == 'h' ) || ( line[5] == 'h' )) {
+						sym = new Symbol( l.at(1).trimmed(), l.at(0).mid( l.at(0).indexOf('h') - 4,4 ).toInt(0, 16) );
+					} else {
+						QString m = l.at(0);
+						QStringList n = m.split(":"); // n.at(0) = MegaROM page
+						sym = new Symbol( l.at(1).trimmed(), n.at(1).left(4).toInt(0, 16) );
+					}
 					sym->setSource( symSource );
 					add( sym );
 				} else if( filePart == 2 ) {
-					
+
 				}
 			}
 		}
@@ -204,7 +213,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 	QString tableStart("*\tSymbol Table");
 	QRegExp rx(" [0-9A-Fa-f]{4}  (?![ 0-9])");
 	QRegExp rp("^([^ ]+) +[^ ]* +([0-9A-Fa-f]{4})  $");
-	
+
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
@@ -248,7 +257,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 			}
 			pos = l-1;
 		}
-		if (! ok) continue; 
+		if (! ok) continue;
 
 		for (pos = 0 ; pos <len ; pos+= l) {
 			QString part = line.mid( pos, l );
@@ -265,7 +274,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 
 void SymbolTable::reloadFiles()
 {
-	
+
 }
 
 void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
@@ -276,7 +285,7 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 			index = i;
 			break;
 		}
-	
+
 	if( index >= 0 ) {
 		QString *name = symbolFiles.takeAt(index);
 
@@ -298,7 +307,7 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 		QMutableListIterator<Symbol*> i(symbols);
 		while (i.hasNext()) {
 			i.next();
-			if( i.value()->source() == name ) 
+			if( i.value()->source() == name )
 				if( keepSymbols )
 					i.value()->setSource(0);
 				else
@@ -311,7 +320,7 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
  * Symbol member functions
  */
 
-Symbol::Symbol( const QString& str, int addr, int val ) 
+Symbol::Symbol( const QString& str, int addr, int val )
 	: symText( str ), symValue( addr ), symSlots( val )
 {
 	symStatus = ACTIVE;
