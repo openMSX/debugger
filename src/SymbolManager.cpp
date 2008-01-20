@@ -51,7 +51,7 @@ void SymbolManager::addFile()
 	QFileDialog *d = new QFileDialog(this);
 	QStringList types;
 	types << "Symbol files (*.sym)"
-	      << "TNIASM 0.x symbol files (*.sym)"
+	      << "tniASM 0.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech link map files (*.map)";
 	d->setFilters( types );
@@ -65,7 +65,7 @@ void SymbolManager::addFile()
 		QString n = d->selectedFiles().at(0);
 		// load file from the correct type
 		bool read = false;
-		if( f.startsWith( "TNIASM 0" ) ) {
+		if( f.startsWith( "tniASM 0" ) ) {
 			read = symTable.readTNIASM0File( n );
 		} else if( f.startsWith( "asMSX" ) ) {
 			read = symTable.readASMSXFile( n );
@@ -85,7 +85,7 @@ void SymbolManager::addFile()
 			} else if ( n.endsWith(".map") ) {
 				// HiTech link map file
 				read = symTable.readLinkMapFile( n );
-			} 
+			}
 		}
 		// if read succesful, add it to the list
 		if( read ) {
@@ -121,7 +121,7 @@ void SymbolManager::fileSelectionChange()
 void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 {
 	if( column > 1 ) return;
-	
+
 	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
 	if( sym->source() == 0 ) {
 		treeLabels->openPersistentEditor( item, column );
