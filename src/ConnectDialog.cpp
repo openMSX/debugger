@@ -109,7 +109,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	if (sd != -1) {
 		sockaddr_un addr;
 		addr.sun_family = AF_UNIX;
-		strcpy(addr.sun_path, info.absoluteFilePath().toAscii().data()); 
+		strcpy(addr.sun_path, info.absoluteFilePath().toAscii().data());
 		if (connect(sd, (sockaddr*)&addr, sizeof(addr)) != -1) {
 			socket = new QTcpSocket();
 			if (!socket->setSocketDescriptor(sd)) {
@@ -136,7 +136,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 
 static void collectServers(QList<OpenMSXConnection*>& servers)
 {
-	QDir dir(QDir::tempPath());
+	QDir dir((getenv("TMPDIR")) ? getenv("TMPDIR") : QDir::tempPath());
 	dir.cd("openmsx-" + getUserName());
 	if (!checkSocketDir(dir)) {
 		// no correct socket directory
@@ -156,7 +156,7 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 }
 
 
-// ConnectionInfoRequest class 
+// ConnectionInfoRequest class
 
 ConnectionInfoRequest::ConnectionInfoRequest(
 		ConnectDialog& dialog_, OpenMSXConnection& connection_)
@@ -224,7 +224,7 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 	// delay for at most 500ms while checking the connections
 	dialog.delay = 1;
 	dialog.startTimer( 500 );
-	while( dialog.pendingConnections.size() && dialog.delay ) 
+	while( dialog.pendingConnections.size() && dialog.delay )
 		qApp->processEvents( QEventLoop::AllEvents, 200 );
 
 	// if there is only one valid connection, use it immediately,
