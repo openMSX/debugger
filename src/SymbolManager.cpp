@@ -50,7 +50,7 @@ void SymbolManager::addFile()
 	// create dialog
 	QFileDialog *d = new QFileDialog(this);
 	QStringList types;
-	types << "Symbol files (*.sym)"
+	types << "All supported files (*.sym *.map)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech link map files (*.map)";

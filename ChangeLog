@@ -1,5 +1,9 @@
 $Id$
 
+2008-01-27 Arnold Metselaar <arnold.metselaar@planet.nl>
+	* Change the first file type option in the load symbolfile dialog 
+	  to show all supported file types.
+
 2007-12-03 Arnold Metselaar <arnold.metselaar@planet.nl>
 	* Added support for link map files like those produced by HiTech's
 	  linker to the SymbolManager.
