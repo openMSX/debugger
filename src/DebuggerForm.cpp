@@ -186,7 +186,7 @@ void DebuggerForm::createActions()
 	systemRebootAction->setStatusTip(tr("Reboot the emulation and start if needed"));
 	systemRebootAction->setEnabled(false);
 
-	systemSymbolManagerAction = new QAction(tr("&Symbol mananger ..."), this);
+	systemSymbolManagerAction = new QAction(tr("&Symbol manager ..."), this);
 	systemSymbolManagerAction->setStatusTip(tr("Start the symbol manager"));
 	systemSymbolManagerAction->setIcon(QIcon(":/icons/symmanager.png"));
 
@@ -200,19 +200,19 @@ void DebuggerForm::createActions()
 	viewRegistersAction = new QAction(tr("CPU &Registers"), this);
 	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
 	viewRegistersAction->setCheckable(true);
-	
+
 	viewFlagsAction = new QAction(tr("CPU &Flags"), this);
 	viewFlagsAction->setStatusTip(tr("Toggle the cpu flags display"));
 	viewFlagsAction->setCheckable(true);
-	
+
 	viewStackAction = new QAction(tr("Stack"), this);
 	viewStackAction->setStatusTip(tr("Toggle the stack display"));
 	viewStackAction->setCheckable(true);
-	
+
 	viewSlotsAction = new QAction(tr("Slots"), this);
 	viewSlotsAction->setStatusTip(tr("Toggle the slots display"));
 	viewSlotsAction->setCheckable(true);
-	
+
 	viewMemoryAction = new QAction(tr("Memory"), this);
 	viewMemoryAction->setStatusTip(tr("Toggle the main memory display"));
 	viewMemoryAction->setCheckable(true);
@@ -321,7 +321,7 @@ void DebuggerForm::createMenus()
 	viewMenu->addSeparator();
 	viewMenu->addAction(viewDebuggableViewerAction);
 	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
-	
+
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
 	executeMenu->addAction(executeBreakAction);
@@ -411,7 +411,7 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	
+
 	// create register viewer
 	regsView = new CPURegsViewer;
 	dw = new DockableWidget( dockMan );
@@ -424,7 +424,7 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	
+
 	// create flags viewer
 	flagsView = new FlagsViewer;
 	dw = new DockableWidget( dockMan );
@@ -466,7 +466,7 @@ void DebuggerForm::createForm()
 
 	// restore layout
 	restoreGeometry( Settings::get().value( "Layout/WindowGeometry", saveGeometry() ).toByteArray() );
-	
+
 	QStringList list = Settings::get().value( "Layout/WidgetLayout" ).toStringList();
 	// defaults needed?
 	if( !list.size() || !list.at(0).startsWith("CODEVIEW ") ) {
@@ -501,7 +501,7 @@ void DebuggerForm::createForm()
 					side = DockableWidgetLayout::LEFT;
 				else if( s.at(3) == "R" )
 					side = DockableWidgetLayout::RIGHT;
-				else 
+				else
 					side = DockableWidgetLayout::BOTTOM;
 				dockMan.insertWidget( dw, 0, side, s.at(4).toInt(), s.at(5).toInt(), s.at(6).toInt() );
 				if( s.at(2) == "H" ) dw->hide();
@@ -578,7 +578,7 @@ void DebuggerForm::closeEvent( QCloseEvent *e )
 		it++;
 	}
 	Settings::get().setValue( "Layout/WidgetLayout", layoutList );
-	
+
 	QMainWindow::closeEvent(e);
 }
 
@@ -713,7 +713,7 @@ void DebuggerForm::updateData()
 
 	// refresh slot viewer
 	slotView->refresh();
-	
+
 	emit emulationChanged();
 }
 
