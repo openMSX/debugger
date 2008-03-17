@@ -44,7 +44,10 @@ public:
 
 	virtual void replyOk(const QString& message)
 	{
-		bool checked = message.trimmed() == "on";
+		// old openmsx versions returned 'on','false'
+		// new versions return 'true','false'
+		// so check for 'false'
+		bool checked = message.trimmed() != "false";
 		form.systemPauseAction->setChecked(checked);
 		delete this;
 	}
