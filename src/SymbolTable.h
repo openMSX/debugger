@@ -6,6 +6,8 @@
 #include <QList>
 #include <QMultiMap>
 #include <QMultiHash>
+#include <QDateTime>
+
 
 struct MemoryLayout;
 
@@ -18,6 +20,12 @@ public:
 	
 	friend class SymbolTable;
 
+	// ACTIVE status is for regular symbols. HIDDEN is for symbols
+	// that are in the list but not shown anywhere. LOST is a special
+	// status for symbols that were once loaded from a symbol file, but
+	// weren't found later. These aren't deleted immediately because
+	// the possible custom settings would be lost even if the reload
+	// was of a bad file (after a failed assembler run for instance).
 	enum SymbolStatus { ACTIVE, HIDDEN, LOST };
 	enum SymbolType { JUMPLABEL, VARIABLELABEL, VALUE };
 	enum Register { REG_A = 1, REG_B = 2, REG_C = 4, REG_D = 8, REG_E = 16,
@@ -80,6 +88,7 @@ public:
 
 	int symbolFilesSize() const;
 	const QString& symbolFile( int index ) const;
+	const QDateTime& symbolFileRefresh( int index ) const;
 
 	bool readTNIASM0File( const QString& filename );
 	bool readASMSXFile( const QString& filename );
@@ -92,7 +101,9 @@ private:
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
 	QMultiMap<int, Symbol*>::iterator currentAddress;
-	QList<QString*> symbolFiles;
+	QList< QPair<QString*, QDateTime> > symbolFiles;
+	
+	void appendFile( const QString& file );
 
 	void mapSymbol( Symbol *symbol );
 	void unmapSymbol( Symbol *symbol );

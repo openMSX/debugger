@@ -6,7 +6,7 @@
 #include <QTextStream>
 #include <QStringList>
 #include <QRegExp>
-#include "assert.h"
+
 
 /*
  * SymbolTable member functions
@@ -136,7 +136,21 @@ int SymbolTable::symbolFilesSize() const
 
 const QString& SymbolTable::symbolFile( int index ) const
 {
-	return *symbolFiles.at(index);
+	return *symbolFiles.at(index).first;
+}
+
+const QDateTime& SymbolTable::symbolFileRefresh( int index ) const
+{
+	return symbolFiles.at(index).second;
+}
+
+void SymbolTable::appendFile( const QString& file )
+{
+	QPair<QString*, QDateTime> rec;
+	QString *name = new QString(file);
+	rec.first = name;
+	rec.second = QDateTime::currentDateTime();
+	symbolFiles.append(rec);
 }
 
 bool SymbolTable::readTNIASM0File( const QString& filename )
@@ -146,8 +160,7 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	QString *symSource = new QString(filename);
-	symbolFiles.append(symSource);
+	appendFile(filename);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
@@ -156,7 +169,7 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 		QStringList a = l.at(1).split( "h ;" );
 		if( a.size() != 2 ) continue;
 		Symbol *sym = new Symbol( l.at(0), a.at(0).toInt(0, 16) );
-		sym->setSource( symSource );
+		sym->setSource( symbolFiles.back().first );
 		add( sym );
 	}
 	return true;
@@ -169,8 +182,7 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	QString *symSource = new QString(filename);
-	symbolFiles.append(symSource);
+	appendFile(filename);
 	QTextStream in(&file);
 	int filePart = 0;
 	while (!in.atEnd()) {
@@ -195,7 +207,7 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 						QStringList n = m.split(":"); // n.at(0) = MegaROM page
 						sym = new Symbol( l.at(1).trimmed(), n.at(1).left(4).toInt(0, 16) );
 					}
-					sym->setSource( symSource );
+					sym->setSource( symbolFiles.back().first );
 					add( sym );
 				} else if( filePart == 2 ) {
 
@@ -217,10 +229,9 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	QString *symSource = new QString(filename);
-	symbolFiles.append(symSource);
+	appendFile(filename);
 	QTextStream in(&file);
-    QString line;
+	QString line;
 	if (! in.atEnd()) {
 		line = in.readLine();
 		if (!line.startsWith(magic))
@@ -234,9 +245,9 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 	if (!line.startsWith(tableStart))
 		return false;
 
-    while (! in.atEnd()) {
+	while (! in.atEnd()) {
 		line = in.readLine();
-		assert (!line.endsWith("\r"));
+		Q_ASSERT(!line.endsWith("\r"));
 		if (0 == line.length())
 			continue;
 		line += "  ";
@@ -264,7 +275,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 			if ( 0 == rp.indexIn( part ) ) {
 				QStringList l = rp.capturedTexts();
 				Symbol *sym =new Symbol( l.at(1), l.last().toInt(0, 16) );
-				sym->setSource( symSource );
+				sym->setSource( symbolFiles.back().first );
 				add( sym );
 			}
 		}
@@ -281,13 +292,13 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 {
 	int index = -1;
 	for( int i = 0; i < symbolFiles.size(); i++ )
-		if( *symbolFiles[i] == file ) {
+		if( *(symbolFiles[i].first) == file ) {
 			index = i;
 			break;
 		}
 
 	if( index >= 0 ) {
-		QString *name = symbolFiles.takeAt(index);
+		QString *name = symbolFiles.takeAt(index).first;
 
 		if( !keepSymbols ) {
 			// remove symbols from address map

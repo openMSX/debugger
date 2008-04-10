@@ -1,5 +1,11 @@
 $Id$
 
+2008-04-10 Edwin Velds <e.velds@gmail.com>
+	* Update to symbol table gui:
+		- Better handling of edits.
+		- Changing of label slot locations.
+		- GUI (re)stores size of window and columns.
+
 2008-01-27 Arnold Metselaar <arnold.metselaar@planet.nl>
 	* Change the first file type option in the load symbolfile dialog 
 	  to show all supported file types.
