@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QStringList>
 #include <QRegExp>
+#include <QFileInfo>
 
 
 /*
@@ -36,6 +37,14 @@ void SymbolTable::removeAt( int index )
 	Symbol *symbol = symbols.takeAt( index );
 
 	unmapSymbol( symbol );
+	delete symbol;
+}
+
+void SymbolTable::remove( Symbol *symbol )
+{
+	symbols.removeAll( symbol );
+	unmapSymbol( symbol );
+	delete symbol;
 }
 
 void SymbolTable::mapSymbol( Symbol *symbol )
@@ -136,20 +145,54 @@ int SymbolTable::symbolFilesSize() const
 
 const QString& SymbolTable::symbolFile( int index ) const
 {
-	return *symbolFiles.at(index).first;
+	return symbolFiles.at(index).fileName;
 }
 
 const QDateTime& SymbolTable::symbolFileRefresh( int index ) const
 {
-	return symbolFiles.at(index).second;
+	return symbolFiles.at(index).refreshTime;
 }
 
-void SymbolTable::appendFile( const QString& file )
+bool SymbolTable::readFile( const QString& filename, FileType type )
 {
-	QPair<QString*, QDateTime> rec;
-	QString *name = new QString(file);
-	rec.first = name;
-	rec.second = QDateTime::currentDateTime();
+	if( type == DETECT_FILE ) {
+		if ( filename.endsWith(".map") ) {
+			// HiTech link map file
+			type = LINKMAP_FILE;
+		} else if( filename.endsWith(".sym") ) {
+			// auto detect which sym file
+			QFile file( filename );
+			if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+				QTextStream in(&file);
+				QString line = in.readLine();
+				file.close();
+				if( line[0] == ';' )
+					type = ASMSX_FILE;
+				else if( line.contains( ": equ " ) )
+					type = TNIASM_FILE;
+			}
+		}
+	}
+		
+	switch( type ) {
+		case TNIASM_FILE:
+			return readTNIASM0File( filename );
+		case ASMSX_FILE:
+			return readASMSXFile( filename );
+		case LINKMAP_FILE:
+			return readLinkMapFile( filename );
+		default:
+			return false;
+	}	
+	
+}
+
+void SymbolTable::appendFile( const QString& file, FileType type )
+{
+	SymbolFileRecord rec;
+	rec.fileName = file;
+	rec.fileType = type;
+	rec.refreshTime = QDateTime::currentDateTime();
 	symbolFiles.append(rec);
 }
 
@@ -160,7 +203,7 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	appendFile(filename);
+	appendFile(filename, TNIASM_FILE);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
@@ -169,7 +212,7 @@ bool SymbolTable::readTNIASM0File( const QString& filename )
 		QStringList a = l.at(1).split( "h ;" );
 		if( a.size() != 2 ) continue;
 		Symbol *sym = new Symbol( l.at(0), a.at(0).toInt(0, 16) );
-		sym->setSource( symbolFiles.back().first );
+		sym->setSource( &symbolFiles.back().fileName );
 		add( sym );
 	}
 	return true;
@@ -182,7 +225,7 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	appendFile(filename);
+	appendFile(filename, ASMSX_FILE);
 	QTextStream in(&file);
 	int filePart = 0;
 	while (!in.atEnd()) {
@@ -207,7 +250,7 @@ bool SymbolTable::readASMSXFile( const QString& filename )
 						QStringList n = m.split(":"); // n.at(0) = MegaROM page
 						sym = new Symbol( l.at(1).trimmed(), n.at(1).left(4).toInt(0, 16) );
 					}
-					sym->setSource( symbolFiles.back().first );
+					sym->setSource( &symbolFiles.back().fileName );
 					add( sym );
 				} else if( filePart == 2 ) {
 
@@ -229,7 +272,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	appendFile(filename);
+	appendFile(filename, LINKMAP_FILE);
 	QTextStream in(&file);
 	QString line;
 	if (! in.atEnd()) {
@@ -275,7 +318,7 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 			if ( 0 == rp.indexIn( part ) ) {
 				QStringList l = rp.capturedTexts();
 				Symbol *sym =new Symbol( l.at(1), l.last().toInt(0, 16) );
-				sym->setSource( symbolFiles.back().first );
+				sym->setSource( &symbolFiles.back().fileName );
 				add( sym );
 			}
 		}
@@ -285,20 +328,71 @@ bool SymbolTable::readLinkMapFile( const QString& filename )
 
 void SymbolTable::reloadFiles()
 {
-
+	for( int i = 0; i < symbolFiles.size(); i++ ) {
+		// check if file is newer
+		QFileInfo fi = QFileInfo(symbolFiles[i].fileName);
+		if( fi.lastModified() > symbolFiles[i].refreshTime ) {
+			// file info
+			QString name = symbolFiles[i].fileName;
+			FileType type = symbolFiles[i].fileType;
+			// symbol file is newer
+			QMap<QString, Symbol> symCopy;
+			// copy all symbols originating from this file
+			QMutableListIterator<Symbol*> si(symbols);
+			while (si.hasNext()) {
+				si.next();
+				if( si.value()->source() == &symbolFiles[i].fileName )
+					symCopy.insert( si.value()->text(), Symbol(*(si.value())) );
+			}
+			// remove existing file
+			unloadFile( name );
+			// read the new file
+			readFile( name, type );
+			// find old symbols in newly loaded file
+			QMutableListIterator<Symbol*> ni(symbols);
+			QString *newFile = &symbolFiles.back().fileName;
+			while (ni.hasNext()) {
+				ni.next();
+				if( ni.value()->source() == newFile ) {
+					// find symbol in old list
+					QMap<QString, Symbol>::iterator sit = symCopy.find( ni.value()->text() );
+					if( sit != symCopy.end() ) {
+						// symbol existed before, copy settings
+						ni.value()->setValidSlots( sit->validSlots() );
+						ni.value()->setValidRegisters( sit->validRegisters() );
+						ni.value()->setType( sit->type() );
+						if( sit->status() == Symbol::LOST )
+							ni.value()->setStatus( Symbol::ACTIVE );
+						else
+							ni.value()->setStatus( sit->status() );
+						symCopy.erase(sit);
+					}
+				}
+			}
+			// all symbols left in map are lost
+			QMap<QString, Symbol>::iterator sit = symCopy.begin();
+			while( sit != symCopy.end() ) {
+				Symbol *sym = new Symbol( sit.value() );
+				sym->setStatus( Symbol::LOST );
+				sym->setSource( newFile );
+				add(sym);
+				sit++;
+			}
+		}
+	}
 }
 
 void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 {
 	int index = -1;
 	for( int i = 0; i < symbolFiles.size(); i++ )
-		if( *(symbolFiles[i].first) == file ) {
+		if( symbolFiles[i].fileName == file ) {
 			index = i;
 			break;
 		}
 
 	if( index >= 0 ) {
-		QString *name = symbolFiles.takeAt(index).first;
+		QString *name = &symbolFiles[index].fileName;
 
 		if( !keepSymbols ) {
 			// remove symbols from address map
@@ -318,12 +412,17 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 		QMutableListIterator<Symbol*> i(symbols);
 		while (i.hasNext()) {
 			i.next();
-			if( i.value()->source() == name )
-				if( keepSymbols )
-					i.value()->setSource(0);
-				else
+			Symbol *sym = i.value();
+			if( sym->source() == name )
+				if( keepSymbols ) {
+					sym->setSource(0);
+				} else {
 					i.remove();
+					delete sym;
+				}
 		}
+		// remove record
+		symbolFiles.removeAt(index);
 	}
 }
 
@@ -342,6 +441,20 @@ Symbol::Symbol( const QString& str, int addr, int val )
 	else
 		symRegisters = REG_ALL;
 	table = 0;
+}
+
+Symbol::Symbol( const Symbol& symbol )
+{
+	table = 0;
+	symStatus = symbol.symStatus;
+	symText = symbol.symText;
+	symValue = symbol.symValue;
+	symSlots = symbol.symSlots;
+	symSegments = symbol.symSegments;
+	symRegisters = symbol.symRegisters;
+	symSource = symbol.symSource;
+	symStatus = symbol.symStatus;
+	symType = symbol.symType;
 }
 
 const QString& Symbol::text() const

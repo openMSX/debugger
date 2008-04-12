@@ -38,7 +38,9 @@ private slots:
 	void fileSelectionChange();
 	void addFile();
 	void removeFile();
+	void reloadFiles();
 	void addLabel();
+	void removeLabel();
 	void labelEdit( QTreeWidgetItem * item, int column );
 	void labelChanged( QTreeWidgetItem *item, int column );
 	void labelSelectionChanged();

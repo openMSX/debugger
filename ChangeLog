@@ -1,5 +1,9 @@
 $Id$
 
+2008-04-12 Edwin Velds <e.velds@gmail.com>
+	* Implemented reload function in symbol manager.
+	* Several fixes fixes to symbol manager.
+
 2008-04-10 Edwin Velds <e.velds@gmail.com>
 	* Update to symbol table gui:
 		- Better handling of edits.

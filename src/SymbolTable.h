@@ -17,6 +17,7 @@ class Symbol
 {
 public:
 	Symbol( const QString& str, int addr, int val = 0xFFFF );
+	Symbol( const Symbol& symbol );
 	
 	friend class SymbolTable;
 
@@ -75,6 +76,7 @@ public:
 
 	void add( Symbol *symbol );
 	void removeAt( int index );
+	void remove( Symbol *symbol );
 
 	/* Symbol access functions */
 	Symbol *findFirstAddressSymbol( int addr, MemoryLayout *ml = 0 );
@@ -90,9 +92,9 @@ public:
 	const QString& symbolFile( int index ) const;
 	const QDateTime& symbolFileRefresh( int index ) const;
 
-	bool readTNIASM0File( const QString& filename );
-	bool readASMSXFile( const QString& filename );
-	bool readLinkMapFile( const QString& filename );
+	enum FileType { DETECT_FILE, TNIASM_FILE, ASMSX_FILE, LINKMAP_FILE };
+
+	bool readFile( const QString& filename, FileType type = DETECT_FILE );
 	void reloadFiles();
 	void unloadFile( const QString& file, bool keepSymbols = false );
 
@@ -101,9 +103,18 @@ private:
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
 	QMultiMap<int, Symbol*>::iterator currentAddress;
-	QList< QPair<QString*, QDateTime> > symbolFiles;
 	
-	void appendFile( const QString& file );
+	typedef struct {
+		QString fileName;
+		QDateTime refreshTime;
+		FileType fileType;
+	} SymbolFileRecord;
+	QList<SymbolFileRecord> symbolFiles;
+	
+	void appendFile( const QString& file, FileType type );
+	bool readTNIASM0File( const QString& filename );
+	bool readASMSXFile( const QString& filename );
+	bool readLinkMapFile( const QString& filename );
 
 	void mapSymbol( Symbol *symbol );
 	void unmapSymbol( Symbol *symbol );

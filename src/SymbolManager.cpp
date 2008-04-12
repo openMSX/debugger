@@ -40,12 +40,14 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	connect( treeFiles, SIGNAL( itemSelectionChanged() ), this, SLOT( fileSelectionChange() ) );
 	connect( btnAddFile, SIGNAL( clicked() ), this, SLOT( addFile() ) );
 	connect( btnRemoveFile, SIGNAL( clicked() ), this, SLOT( removeFile() ) );
+	connect( btnReloadFiles, SIGNAL( clicked() ), this, SLOT( reloadFiles() ) );
 	connect( treeLabels, SIGNAL( itemSelectionChanged() ), this, SLOT( labelSelectionChanged() ) );
 	connect( treeLabels, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 	         this, SLOT( labelEdit( QTreeWidgetItem*, int ) ) );
 	connect( treeLabels, SIGNAL( itemChanged( QTreeWidgetItem *, int ) ),
 	         this, SLOT( labelChanged( QTreeWidgetItem*, int ) ) );
 	connect( btnAddSymbol, SIGNAL( clicked() ), this, SLOT( addLabel() ) );
+	connect( btnRemoveSymbol, SIGNAL( clicked() ), this, SLOT( removeLabel() ) );
 	connect( chk00, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot00(int) ) );
 	connect( chk01, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot01(int) ) );
 	connect( chk02, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot02(int) ) );
@@ -128,26 +130,13 @@ void SymbolManager::addFile()
 		// load file from the correct type
 		bool read = false;
 		if( f.startsWith( "tniASM 0" ) ) {
-			read = symTable.readTNIASM0File( n );
+			read = symTable.readFile( n, SymbolTable::TNIASM_FILE );
 		} else if( f.startsWith( "asMSX" ) ) {
-			read = symTable.readASMSXFile( n );
+			read = symTable.readFile( n, SymbolTable::ASMSX_FILE );
+		} else if( f.startsWith( "HiTech" ) ) {
+			read = symTable.readFile( n, SymbolTable::LINKMAP_FILE );
 		} else {
-			if( n.endsWith(".sym") ) {
-				// auto detect which sym file
-				QFile file( n );
-				if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-					QTextStream in(&file);
-					QString line = in.readLine();
-					file.close();
-					if( line[0] == ';' )
-						read = symTable.readASMSXFile( n );
-					else
-						read = symTable.readTNIASM0File( n );
-				}
-			} else if ( n.endsWith(".map") ) {
-				// HiTech link map file
-				read = symTable.readLinkMapFile( n );
-			}
+			read = symTable.readFile( n );
 		}
 		// if read succesful, add it to the list
 		if( read ) {
@@ -174,6 +163,13 @@ void SymbolManager::removeFile()
 	initSymbolList();
 }
 
+void SymbolManager::reloadFiles()
+{
+	symTable.reloadFiles();
+	initFileList();
+	initSymbolList();
+}
+
 void SymbolManager::fileSelectionChange()
 {
 	btnRemoveFile->setEnabled( treeFiles->selectedItems().size() );
@@ -182,16 +178,12 @@ void SymbolManager::fileSelectionChange()
 void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 {
 	// only symbol name and value are editable
-	if( column == 0 || column == 2 ) {;
+	if( column == 0 || column == 2 ) {
 		// open editor if manually added symbol
 		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
-		if( sym->source() == 0 ) {
+		if( sym->source() == 0 ) { qWarning("1");
 			treeLabels->openPersistentEditor( item, column );
 		}
-		if( column == 0 )
-			updateItemName( item );
-		else
-			updateItemValue( item );
 	}
 }
 
@@ -241,15 +233,38 @@ void SymbolManager::addLabel()
 	beginTreeLabelsUpdate();
 	QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
 	item->setData(0, Qt::UserRole, quintptr(sym) );
-	item->setText( 0, sym->text() );
-	item->setIcon( 0, QIcon(":/icons/symman.png") );
-	item->setText( 1, tr("Active") );
-	item->setText( 2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
+	updateItemName( item );
+	updateItemType( item );
+	updateItemValue( item );
+	updateItemSlots( item );
+	updateItemSegments( item );
+	updateItemCodeRange( item );
 	endTreeLabelsUpdate();
 	treeLabels->setFocus();
 	treeLabels->setCurrentItem( item, 0 );
-	treeLabels->openPersistentEditor( item, 0 );
 	treeLabels->scrollToItem(item);
+	treeLabels->openPersistentEditor( item, 0 );
+}
+
+void SymbolManager::removeLabel()
+{
+	QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	// check for selection
+	if( !selection.size() ) return;
+	// remove selected items
+	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
+	while( selit != selection.end() ) {
+		// get symbol
+		Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		// check if symbol is from symbol file
+		if( !sym->source() ) {
+			// remove from table
+			symTable.remove(sym);
+		}
+		selit++;
+	}
+	// refresh tree
+	initSymbolList();
 }
 
 void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
