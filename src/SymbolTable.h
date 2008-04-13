@@ -33,9 +33,10 @@ public:
 	                REG_H = 32, REG_L = 64, REG_BC = 128, REG_DE = 256,
 	                REG_HL = 512, REG_IX = 1024, REG_IY = 2048, REG_IXL = 4096,
 	                REG_IXH = 8192, REG_IYL = 16384, REG_IYH = 32768,
-	                REG_ALL8 = 1+2+4+8+16+32+64+4096+8192+16384+32768,
+	                REG_OFFSET = 65536, REG_I = 131072, 
+	                REG_ALL8 = 1+2+4+8+16+32+64+4096+8192+16384+32768+65536+131072,
 	                REG_ALL16 = 128+256+512+1024+2048,
-	                REG_ALL = 65535 };
+	                REG_ALL = 0x3FFFF };
 	
 	const QString& text() const;
 	void setText( const QString& str );

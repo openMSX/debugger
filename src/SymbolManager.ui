@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
-    <height>431</height>
+    <width>760</width>
+    <height>577</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -107,178 +107,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" >
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QGroupBox" name="groupSlots" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title" >
-            <string>Active slots</string>
-           </property>
-           <layout class="QHBoxLayout" >
-            <item>
-             <layout class="QVBoxLayout" >
-              <item>
-               <widget class="QCheckBox" name="chk00" >
-                <property name="text" >
-                 <string>0-0</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk01" >
-                <property name="text" >
-                 <string>0-1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk02" >
-                <property name="text" >
-                 <string>0-2</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk03" >
-                <property name="text" >
-                 <string>0-3</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" >
-              <item>
-               <widget class="QCheckBox" name="chk10" >
-                <property name="text" >
-                 <string>1-0</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk11" >
-                <property name="text" >
-                 <string>1-1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk12" >
-                <property name="text" >
-                 <string>1-2</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk13" >
-                <property name="text" >
-                 <string>1-3</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" >
-              <item>
-               <widget class="QCheckBox" name="chk20" >
-                <property name="text" >
-                 <string>2-0</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk21" >
-                <property name="text" >
-                 <string>2-1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk22" >
-                <property name="text" >
-                 <string>2-2</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk23" >
-                <property name="text" >
-                 <string>2-3</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" >
-              <item>
-               <widget class="QCheckBox" name="chk30" >
-                <property name="text" >
-                 <string>3-0</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk31" >
-                <property name="text" >
-                 <string>3-1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk32" >
-                <property name="text" >
-                 <string>3-2</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="chk33" >
-                <property name="text" >
-                 <string>3-3</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupSegments" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title" >
-            <string>Active segments</string>
-           </property>
-           <layout class="QVBoxLayout" >
-            <item>
-             <widget class="QLineEdit" name="txtSegments" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="1" column="1" >
         <layout class="QVBoxLayout" >
          <item>
@@ -357,7 +185,7 @@
          </column>
          <column>
           <property name="text" >
-           <string>Code range</string>
+           <string>Registers</string>
           </property>
          </column>
          <column>
@@ -365,6 +193,386 @@
            <string>Source</string>
           </property>
          </column>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QTabWidget" name="tabWidgetSymbols" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="currentIndex" >
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tabLocations" >
+          <attribute name="title" >
+           <string>Locations</string>
+          </attribute>
+          <layout class="QHBoxLayout" >
+           <item>
+            <widget class="QGroupBox" name="groupSlots" >
+             <property name="sizePolicy" >
+              <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title" >
+              <string>Active slots</string>
+             </property>
+             <layout class="QHBoxLayout" >
+              <item>
+               <layout class="QVBoxLayout" >
+                <item>
+                 <widget class="QCheckBox" name="chk00" >
+                  <property name="text" >
+                   <string>0-0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk01" >
+                  <property name="text" >
+                   <string>0-1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk02" >
+                  <property name="text" >
+                   <string>0-2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk03" >
+                  <property name="text" >
+                   <string>0-3</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" >
+                <item>
+                 <widget class="QCheckBox" name="chk10" >
+                  <property name="text" >
+                   <string>1-0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk11" >
+                  <property name="text" >
+                   <string>1-1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk12" >
+                  <property name="text" >
+                   <string>1-2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk13" >
+                  <property name="text" >
+                   <string>1-3</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" >
+                <item>
+                 <widget class="QCheckBox" name="chk20" >
+                  <property name="text" >
+                   <string>2-0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk21" >
+                  <property name="text" >
+                   <string>2-1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk22" >
+                  <property name="text" >
+                   <string>2-2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk23" >
+                  <property name="text" >
+                   <string>2-3</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" >
+                <item>
+                 <widget class="QCheckBox" name="chk30" >
+                  <property name="text" >
+                   <string>3-0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk31" >
+                  <property name="text" >
+                   <string>3-1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk32" >
+                  <property name="text" >
+                   <string>3-2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="chk33" >
+                  <property name="text" >
+                   <string>3-3</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupSegments" >
+             <property name="sizePolicy" >
+              <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title" >
+              <string>Active segments</string>
+             </property>
+             <layout class="QVBoxLayout" >
+              <item>
+               <widget class="QLineEdit" name="txtSegments" >
+                <property name="sizePolicy" >
+                 <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabUsage" >
+          <attribute name="title" >
+           <string>Usage</string>
+          </attribute>
+          <layout class="QHBoxLayout" >
+           <item>
+            <widget class="QGroupBox" name="groupType" >
+             <property name="title" >
+              <string>Symbol type</string>
+             </property>
+             <layout class="QVBoxLayout" >
+              <item>
+               <widget class="QRadioButton" name="radioButton" >
+                <property name="text" >
+                 <string>Jump label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_2" >
+                <property name="text" >
+                 <string>Variable label</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_3" >
+                <property name="text" >
+                 <string>Value</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupRegs8" >
+             <property name="title" >
+              <string>8 bit registers</string>
+             </property>
+             <layout class="QHBoxLayout" >
+              <item>
+               <layout class="QGridLayout" >
+                <property name="horizontalSpacing" >
+                 <number>16</number>
+                </property>
+                <item row="0" column="0" >
+                 <widget class="QCheckBox" name="chkRegA" >
+                  <property name="text" >
+                   <string>A</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1" >
+                 <widget class="QCheckBox" name="chkRegI" >
+                  <property name="text" >
+                   <string>I</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2" colspan="2" >
+                 <widget class="QCheckBox" name="chkRegOffset" >
+                  <property name="text" >
+                   <string>Offset value</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" >
+                 <widget class="QCheckBox" name="chkRegB" >
+                  <property name="text" >
+                   <string>B</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1" >
+                 <widget class="QCheckBox" name="chkRegC" >
+                  <property name="text" >
+                   <string>C</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0" >
+                 <widget class="QCheckBox" name="chkRegD" >
+                  <property name="text" >
+                   <string>D</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1" >
+                 <widget class="QCheckBox" name="chkRegE" >
+                  <property name="text" >
+                   <string>E</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2" >
+                 <widget class="QCheckBox" name="chkRegIXH" >
+                  <property name="text" >
+                   <string>IXH</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3" >
+                 <widget class="QCheckBox" name="chkRegIXL" >
+                  <property name="text" >
+                   <string>IXL</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" >
+                 <widget class="QCheckBox" name="chkRegH" >
+                  <property name="text" >
+                   <string>H</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1" >
+                 <widget class="QCheckBox" name="chkRegL" >
+                  <property name="text" >
+                   <string>L</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2" >
+                 <widget class="QCheckBox" name="chkRegIYH" >
+                  <property name="text" >
+                   <string>IYH</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3" >
+                 <widget class="QCheckBox" name="chkRegIYL" >
+                  <property name="text" >
+                   <string>IYL</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupRegs16" >
+             <property name="title" >
+              <string>16 bit registers</string>
+             </property>
+             <layout class="QHBoxLayout" >
+              <item>
+               <layout class="QGridLayout" >
+                <item row="0" column="0" >
+                 <widget class="QCheckBox" name="chkRegBC" >
+                  <property name="text" >
+                   <string>BC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" >
+                 <widget class="QCheckBox" name="chkRegDE" >
+                  <property name="text" >
+                   <string>DE</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0" >
+                 <widget class="QCheckBox" name="chkRegHL" >
+                  <property name="text" >
+                   <string>HL</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" >
+                 <widget class="QCheckBox" name="chkRegIX" >
+                  <property name="text" >
+                   <string>IX</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1" >
+                 <widget class="QCheckBox" name="chkRegIY" >
+                  <property name="text" >
+                   <string>IY</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>

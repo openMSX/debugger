@@ -436,7 +436,7 @@ Symbol::Symbol( const QString& str, int addr, int val )
 	symStatus = ACTIVE;
 	symType = JUMPLABEL;
 	symSource = 0;
-	if( val > 255 )
+	if( addr & 0xFF00 )
 		symRegisters = REG_ALL16;
 	else
 		symRegisters = REG_ALL;
@@ -498,6 +498,8 @@ int Symbol::validRegisters() const
 void Symbol::setValidRegisters( int regs )
 {
 	symRegisters = regs;
+	if( symValue & 0xFF00 )
+		symRegisters &= REG_ALL16;
 }
 
 const QString *Symbol::source() const
@@ -552,3 +554,4 @@ bool Symbol::isSlotValid( MemoryLayout *ml )
 		return true;
 	return false;
 }
+

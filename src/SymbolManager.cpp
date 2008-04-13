@@ -1,3 +1,5 @@
+// $Id$
+
 #include "SymbolManager.h"
 #include "SymbolTable.h"
 #include "Settings.h"
@@ -16,18 +18,10 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	// restore layout
 	Settings &s = Settings::get();
 	restoreGeometry( s.value( "SymbolManager/WindowGeometry", saveGeometry() ).toByteArray() );
-
-	QHeaderView *header = treeFiles->header();
-	header->resizeSection( 0, s.value( "SymbolManager/HeaderFileSize", 320 ).toInt() );
-	header->resizeSection( 1, s.value( "SymbolManager/HeaderRefreshSize", header->sectionSize(1) ).toInt() );
-	header = treeLabels->header();
-	header->resizeSection( 0, s.value( "SymbolManager/HeaderSymbolSize", 150 ).toInt() );
-	header->resizeSection( 1, s.value( "SymbolManager/HeaderTypeSize", header->sectionSize(1) ).toInt() );
-	header->resizeSection( 2, s.value( "SymbolManager/HeaderValueSize", header->sectionSize(2) ).toInt() );
-	header->resizeSection( 3, s.value( "SymbolManager/HeaderSlotsSize", header->sectionSize(3) ).toInt() );
-	header->resizeSection( 4, s.value( "SymbolManager/HeaderSegmentsSize", header->sectionSize(4) ).toInt() );
-	header->resizeSection( 5, s.value( "SymbolManager/HeaderRangeSize", header->sectionSize(5) ).toInt() );
-	header->resizeSection( 6, s.value( "SymbolManager/HeaderSourceSize", header->sectionSize(6) ).toInt() );
+	treeFiles->header()->restoreState( s.value( "SymbolManager/HeaderFiles",
+	                                   treeFiles->header()->saveState() ).toByteArray() );
+	treeLabels->header()->restoreState( s.value( "SymbolManager/HeaderSymbols",
+	                                   treeLabels->header()->saveState() ).toByteArray() );
 
 	treeLabelsUpdateCount = 0;
 
@@ -36,7 +30,12 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	chkSlots[ 4] = chk10; chkSlots[ 5] = chk11; chkSlots[ 6] = chk12; chkSlots[ 7] = chk13;
 	chkSlots[ 8] = chk20; chkSlots[ 9] = chk21; chkSlots[10] = chk22; chkSlots[11] = chk23;
 	chkSlots[12] = chk30; chkSlots[13] = chk31; chkSlots[14] = chk32; chkSlots[15] = chk33;
-
+	chkRegs[ 0] = chkRegA ; chkRegs[ 1] = chkRegB ; chkRegs[ 2] = chkRegC ; chkRegs[ 3] = chkRegD ;
+	chkRegs[ 4] = chkRegE ; chkRegs[ 5] = chkRegH ; chkRegs[ 6] = chkRegL ; chkRegs[ 7] = chkRegBC;
+	chkRegs[ 8] = chkRegDE; chkRegs[ 9] = chkRegHL; chkRegs[10] = chkRegIX; chkRegs[11] = chkRegIY;
+	chkRegs[12] = chkRegIXL;chkRegs[13] = chkRegIXH;chkRegs[14] = chkRegIYL;chkRegs[15] = chkRegIYH;
+	chkRegs[16] = chkRegOffset ; chkRegs[17] = chkRegI;
+	
 	connect( treeFiles, SIGNAL( itemSelectionChanged() ), this, SLOT( fileSelectionChange() ) );
 	connect( btnAddFile, SIGNAL( clicked() ), this, SLOT( addFile() ) );
 	connect( btnRemoveFile, SIGNAL( clicked() ), this, SLOT( removeFile() ) );
@@ -64,6 +63,24 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	connect( chk31, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot31(int) ) );
 	connect( chk32, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot32(int) ) );
 	connect( chk33, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot33(int) ) );
+	connect( chkRegA, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterA(int) ) );
+	connect( chkRegB, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterB(int) ) );
+	connect( chkRegC, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterC(int) ) );
+	connect( chkRegD, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterD(int) ) );
+	connect( chkRegE, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterE(int) ) );
+	connect( chkRegH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterH(int) ) );
+	connect( chkRegL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterL(int) ) );
+	connect( chkRegBC, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterBC(int) ) );
+	connect( chkRegDE, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterDE(int) ) );
+	connect( chkRegHL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterHL(int) ) );
+	connect( chkRegIX, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIX(int) ) );
+	connect( chkRegIY, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIY(int) ) );
+	connect( chkRegIXL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIXL(int) ) );
+	connect( chkRegIXH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIXH(int) ) );
+	connect( chkRegIYL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIYL(int) ) );
+	connect( chkRegIYH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIYH(int) ) );
+	connect( chkRegOffset, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterOffset(int) ) );
+	connect( chkRegI, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterI(int) ) );
 
 	groupSlots->setEnabled(false);
 	groupSegments->setEnabled(false);
@@ -80,18 +97,8 @@ void SymbolManager::closeEvent( QCloseEvent *e )
 	// store layout
 	Settings &s = Settings::get();
 	s.setValue( "SymbolManager/WindowGeometry", saveGeometry() );
-	QHeaderView *header = treeFiles->header();
-	s.setValue( "SymbolManager/HeaderFileSize", header->sectionSize(0) );
-	s.setValue( "SymbolManager/HeaderRefreshSize", header->sectionSize(1) );
-	header = treeLabels->header();
-	s.setValue( "SymbolManager/HeaderSymbolSize", header->sectionSize(0) );
-	s.setValue( "SymbolManager/HeaderTypeSize", header->sectionSize(1) );
-	s.setValue( "SymbolManager/HeaderValueSize", header->sectionSize(2) );
-	s.setValue( "SymbolManager/HeaderSlotsSize", header->sectionSize(3) );
-	s.setValue( "SymbolManager/HeaderSegmentsSize", header->sectionSize(4) );
-	s.setValue( "SymbolManager/HeaderRangeSize", header->sectionSize(5) );
-	s.setValue( "SymbolManager/HeaderSourceSize", header->sectionSize(6) );
-
+	s.setValue( "SymbolManager/HeaderFiles", treeFiles->header()->saveState() );
+	s.setValue( "SymbolManager/HeaderSymbols", treeLabels->header()->saveState() );
 	QDialog::closeEvent(e);
 }
 
@@ -206,7 +213,7 @@ void SymbolManager::initSymbolList()
 		updateItemValue( item );
 		updateItemSlots( item );
 		updateItemSegments( item );
-		updateItemCodeRange( item );
+		updateItemRegisters( item );
 		
 		sym = symTable.findNextAddressSymbol();
 	}
@@ -238,7 +245,7 @@ void SymbolManager::addLabel()
 	updateItemValue( item );
 	updateItemSlots( item );
 	updateItemSegments( item );
-	updateItemCodeRange( item );
+	updateItemRegisters( item );
 	endTreeLabelsUpdate();
 	treeLabels->setFocus();
 	treeLabels->setCurrentItem( item, 0 );
@@ -296,11 +303,15 @@ void SymbolManager::labelSelectionChanged()
 		btnRemoveSymbol->setEnabled(false);
 		groupSlots->setEnabled(false);
 		groupSegments->setEnabled(false);
+		groupType->setEnabled(false);
+		groupRegs8->setEnabled(false);
+		groupRegs16->setEnabled(false);
 		return;
 	}
 	// check selection for "manual insertion", identical slot mask
-	bool removeButActive = true;
+	bool removeButActive = true, anyEight = false;
 	int slotMask, slotMaskMultiple = 0;
+	int regMask, regMaskMultiple = 0;
 	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
 	while( selit != selection.end() ) {
 		// get symbol
@@ -315,14 +326,30 @@ void SymbolManager::labelSelectionChanged()
 			// other, set all different bits
 			slotMaskMultiple |= slotMask ^ sym->validSlots();
 		}
+
+		// check for 8 bit values
+		if( (sym->value() & 0xFF00) == 0 )
+			anyEight = true;
 		
+		if( selit == selection.begin() ) {
+			// first item, reference for regMask
+			regMask = sym->validRegisters();
+		} else {
+			// other, set all different bits
+			regMaskMultiple |= regMask ^ sym->validRegisters();
+		}
+
 		// next
 		selit++;
 	}
 
 	btnRemoveSymbol->setEnabled(removeButActive);
 	groupSlots->setEnabled(true);
+	groupType->setEnabled(true);
+	groupRegs8->setEnabled(anyEight);
+	groupRegs16->setEnabled(true);
 	beginTreeLabelsUpdate();
+	// set slot selection
 	for( int i = 0; i < 16; i++ ) {
 		chkSlots[i]->setTristate(false);
 		if( slotMaskMultiple & 1 )
@@ -333,6 +360,18 @@ void SymbolManager::labelSelectionChanged()
 			chkSlots[i]->setCheckState(Qt::Unchecked);
 		slotMask >>= 1;
 		slotMaskMultiple >>= 1;
+	}
+	// set register selection
+	for( int i = 0; i < 18; i++ ) {
+		chkRegs[i]->setTristate(false);
+		if( regMaskMultiple & 1 )
+			chkRegs[i]->setCheckState(Qt::PartiallyChecked);
+		else if( regMask & 1 )
+			chkRegs[i]->setCheckState(Qt::Checked);
+		else
+			chkRegs[i]->setCheckState(Qt::Unchecked);
+		regMask >>= 1;
+		regMaskMultiple >>= 1;
 	}
 	endTreeLabelsUpdate();
 }
@@ -366,84 +405,33 @@ void SymbolManager::changeSlot( int id, int state )
 	}
 }
 
-void SymbolManager::changeSlot00( int state )
+void SymbolManager::changeRegister( int id, int state )
 {
-	changeSlot( 0, state );
-}
+	if( !treeLabelsUpdateCount ) {
+		// disallow another tristate selection
+		chkRegs[id]->setTristate(false);
+		// get selected items
+		QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
 
-void SymbolManager::changeSlot01( int state )
-{
-	changeSlot( 1, state );
-}
-
-void SymbolManager::changeSlot02( int state )
-{
-	changeSlot( 2, state );
-}
-
-void SymbolManager::changeSlot03( int state )
-{
-	changeSlot( 3, state );
-}
-
-void SymbolManager::changeSlot10( int state )
-{
-	changeSlot( 4, state );
-}
-
-void SymbolManager::changeSlot11( int state )
-{
-	changeSlot( 5, state );
-}
-
-void SymbolManager::changeSlot12( int state )
-{
-	changeSlot( 6, state );
-}
-
-void SymbolManager::changeSlot13( int state )
-{
-	changeSlot( 7, state );
-}
-
-void SymbolManager::changeSlot20( int state )
-{
-	changeSlot( 8, state );
-}
-
-void SymbolManager::changeSlot21( int state )
-{
-	changeSlot( 9, state );
-}
-
-void SymbolManager::changeSlot22( int state )
-{
-	changeSlot( 10, state );
-}
-
-void SymbolManager::changeSlot23( int state )
-{
-	changeSlot( 11, state );
-}
-
-void SymbolManager::changeSlot30( int state )
-{
-	changeSlot( 12, state );
-}
-
-void SymbolManager::changeSlot31( int state )
-{
-	changeSlot( 13, state );
-}
-
-void SymbolManager::changeSlot32( int state )
-{
-	changeSlot( 14, state );
-}
-
-void SymbolManager::changeSlot33( int state )
-{
-	changeSlot( 15, state );
+		// update items		
+		beginTreeLabelsUpdate();
+		QList<QTreeWidgetItem *>::iterator selit = selection.begin();
+		int bit = 1<<id;
+		while( selit != selection.end() ) {
+			// get symbol
+			Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+			// set or clear bit
+			if( state == Qt::Checked )
+				sym->setValidRegisters( sym->validRegisters() | bit );
+			else
+				sym->setValidRegisters( sym->validRegisters() & (~bit) );
+			// update item in treewidget
+			updateItemRegisters( *selit );
+			// next
+			selit++;
+		}
+		endTreeLabelsUpdate();
+	}
 }
 
 
@@ -549,8 +537,214 @@ void SymbolManager::updateItemSegments( QTreeWidgetItem *item )
 	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
 }
 
-void SymbolManager::updateItemCodeRange( QTreeWidgetItem *item )
+void SymbolManager::updateItemRegisters( QTreeWidgetItem *item )
 {
 	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+
+	QString regText;
+	int regmask = sym->validRegisters();
+	// value represents 16 bits for 4 subslots in 4 slots
+	if( regmask == 0x3FFFF ) {
+		regText = tr("All");
+	} else if( regmask == 0 ) {
+		regText = tr("None");
+	} else {
+		if( (regmask & Symbol::REG_ALL8) == Symbol::REG_ALL8 ) {
+			// all 8 bit registers selected
+			regText = "All 8 bit, ";
+			regmask ^= Symbol::REG_ALL8;
+		} else if( (regmask & Symbol::REG_ALL16) == Symbol::REG_ALL16 ) {
+			// all 16 bit registers selected
+			regText = "All 16 bit, ";
+			regmask ^= Symbol::REG_ALL16;
+		}
+		// register list for remaining registers
+		static const char *registers[] = { "A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL",
+		                                   "IX", "IY", "IXL", "IXH", "IYL", "IYH", "Offset", "I" };
+		for( int i = 0; i < 18; i++ ) {
+			if( regmask & 1 )
+				regText += QString("%1, ").arg(registers[i]);
+			regmask >>= 1;
+		}
+		regText.chop(2);
+	}
+
+	// valid slots in 4th column
+	item->setText( 5, regText );
 }
 
+
+
+
+
+// load of functions that shouldn't really be necessary
+
+void SymbolManager::changeSlot00( int state )
+{
+	changeSlot( 0, state );
+}
+
+void SymbolManager::changeSlot01( int state )
+{
+	changeSlot( 1, state );
+}
+
+void SymbolManager::changeSlot02( int state )
+{
+	changeSlot( 2, state );
+}
+
+void SymbolManager::changeSlot03( int state )
+{
+	changeSlot( 3, state );
+}
+
+void SymbolManager::changeSlot10( int state )
+{
+	changeSlot( 4, state );
+}
+
+void SymbolManager::changeSlot11( int state )
+{
+	changeSlot( 5, state );
+}
+
+void SymbolManager::changeSlot12( int state )
+{
+	changeSlot( 6, state );
+}
+
+void SymbolManager::changeSlot13( int state )
+{
+	changeSlot( 7, state );
+}
+
+void SymbolManager::changeSlot20( int state )
+{
+	changeSlot( 8, state );
+}
+
+void SymbolManager::changeSlot21( int state )
+{
+	changeSlot( 9, state );
+}
+
+void SymbolManager::changeSlot22( int state )
+{
+	changeSlot( 10, state );
+}
+
+void SymbolManager::changeSlot23( int state )
+{
+	changeSlot( 11, state );
+}
+
+void SymbolManager::changeSlot30( int state )
+{
+	changeSlot( 12, state );
+}
+
+void SymbolManager::changeSlot31( int state )
+{
+	changeSlot( 13, state );
+}
+
+void SymbolManager::changeSlot32( int state )
+{
+	changeSlot( 14, state );
+}
+
+void SymbolManager::changeSlot33( int state )
+{
+	changeSlot( 15, state );
+}
+
+void SymbolManager::changeRegisterA( int state )
+{
+	changeRegister( 0, state );
+}
+
+void SymbolManager::changeRegisterB( int state )
+{
+	changeRegister( 1, state );
+}
+
+void SymbolManager::changeRegisterC( int state )
+{
+	changeRegister( 2, state );
+}
+
+void SymbolManager::changeRegisterD( int state )
+{
+	changeRegister( 3, state );
+}
+
+void SymbolManager::changeRegisterE( int state )
+{
+	changeRegister( 4, state );
+}
+
+void SymbolManager::changeRegisterH( int state )
+{
+	changeRegister( 5, state );
+}
+
+void SymbolManager::changeRegisterL( int state )
+{
+	changeRegister( 6, state );
+}
+
+void SymbolManager::changeRegisterBC( int state )
+{
+	changeRegister( 7, state );
+}
+
+void SymbolManager::changeRegisterDE( int state )
+{
+	changeRegister( 8, state );
+}
+
+void SymbolManager::changeRegisterHL( int state )
+{
+	changeRegister( 9, state );
+}
+
+void SymbolManager::changeRegisterIX( int state )
+{
+	changeRegister( 10, state );
+}
+
+void SymbolManager::changeRegisterIY( int state )
+{
+	changeRegister( 11, state );
+}
+
+void SymbolManager::changeRegisterIXL( int state )
+{
+	changeRegister( 12, state );
+}
+
+void SymbolManager::changeRegisterIXH( int state )
+{
+	changeRegister( 13, state );
+}
+
+void SymbolManager::changeRegisterIYL( int state )
+{
+	changeRegister( 14, state );
+}
+
+void SymbolManager::changeRegisterIYH( int state )
+{
+	changeRegister( 15, state );
+}
+
+void SymbolManager::changeRegisterOffset( int state )
+{
+	changeRegister( 16, state );
+}
+
+void SymbolManager::changeRegisterI( int state )
+{
+	changeRegister( 17, state );
+}

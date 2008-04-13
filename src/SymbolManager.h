@@ -1,3 +1,4 @@
+// $Id$
 #ifndef SYMBOLMANAGER_H
 #define SYMBOLMANAGER_H
 
@@ -18,7 +19,7 @@ protected:
 private:
 	SymbolTable& symTable;
 	int treeLabelsUpdateCount;
-	QCheckBox *chkSlots[16];
+	QCheckBox *chkSlots[16], *chkRegs[18];
 
 	void initFileList();
 	void initSymbolList();
@@ -29,7 +30,7 @@ private:
 	void updateItemValue( QTreeWidgetItem *item );
 	void updateItemSlots( QTreeWidgetItem *item );
 	void updateItemSegments( QTreeWidgetItem *item );
-	void updateItemCodeRange( QTreeWidgetItem *item );
+	void updateItemRegisters( QTreeWidgetItem *item );
 
 	void beginTreeLabelsUpdate();
 	void endTreeLabelsUpdate();
@@ -61,6 +62,26 @@ private slots:
 	void changeSlot31( int state );
 	void changeSlot32( int state );
 	void changeSlot33( int state );
+	void changeRegister( int id, int state );
+	void changeRegisterA( int state );
+	void changeRegisterB( int state );
+	void changeRegisterC( int state );
+	void changeRegisterD( int state );
+	void changeRegisterE( int state );
+	void changeRegisterH( int state );
+	void changeRegisterL( int state );
+	void changeRegisterBC( int state );
+	void changeRegisterDE( int state );
+	void changeRegisterHL( int state );
+	void changeRegisterIX( int state );
+	void changeRegisterIY( int state );
+	void changeRegisterIXL( int state );
+	void changeRegisterIXH( int state );
+	void changeRegisterIYL( int state );
+	void changeRegisterIYH( int state );
+	void changeRegisterOffset( int state );
+	void changeRegisterI( int state );
+	
 };
 
 #endif /* SYMBOLMANAGER_H */
