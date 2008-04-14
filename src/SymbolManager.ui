@@ -393,21 +393,21 @@
              </property>
              <layout class="QVBoxLayout" >
               <item>
-               <widget class="QRadioButton" name="radioButton" >
+               <widget class="QRadioButton" name="radJump" >
                 <property name="text" >
                  <string>Jump label</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="radioButton_2" >
+               <widget class="QRadioButton" name="radVar" >
                 <property name="text" >
                  <string>Variable label</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="radioButton_3" >
+               <widget class="QRadioButton" name="radValue" >
                 <property name="text" >
                  <string>Value</string>
                 </property>

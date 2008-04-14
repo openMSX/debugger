@@ -1,5 +1,9 @@
 $Id$
 
+2008-04-15 Edwin Velds <e.velds@gmail.com>
+	* Added type selection to symbol manager.
+	* Changed name/value editing behaviour to allow only a single editor.
+
 2008-04-14 Edwin Velds <e.velds@gmail.com>
 	* Added register selection to symbol manager.
 

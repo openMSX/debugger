@@ -20,9 +20,13 @@ private:
 	SymbolTable& symTable;
 	int treeLabelsUpdateCount;
 	QCheckBox *chkSlots[16], *chkRegs[18];
+	QTreeWidgetItem *editItem;
+	int editColumn;
 
 	void initFileList();
 	void initSymbolList();
+
+	void closeEditor();
 
 	// formatting functions
 	void updateItemName( QTreeWidgetItem *item );
@@ -45,6 +49,7 @@ private slots:
 	void labelEdit( QTreeWidgetItem * item, int column );
 	void labelChanged( QTreeWidgetItem *item, int column );
 	void labelSelectionChanged();
+	void changeType( bool checked );
 	void changeSlot( int id, int state );
 	void changeSlot00( int state );
 	void changeSlot01( int state );

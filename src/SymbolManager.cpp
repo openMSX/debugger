@@ -24,7 +24,8 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	                                   treeLabels->header()->saveState() ).toByteArray() );
 
 	treeLabelsUpdateCount = 0;
-
+	editColumn = -1;
+	
 	// put slot checkboxes in a convenience array
 	chkSlots[ 0] = chk00; chkSlots[ 1] = chk01; chkSlots[ 2] = chk02; chkSlots[ 3] = chk03;
 	chkSlots[ 4] = chk10; chkSlots[ 5] = chk11; chkSlots[ 6] = chk12; chkSlots[ 7] = chk13;
@@ -47,6 +48,9 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	         this, SLOT( labelChanged( QTreeWidgetItem*, int ) ) );
 	connect( btnAddSymbol, SIGNAL( clicked() ), this, SLOT( addLabel() ) );
 	connect( btnRemoveSymbol, SIGNAL( clicked() ), this, SLOT( removeLabel() ) );
+	connect( radJump, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
+	connect( radVar, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
+	connect( radValue, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
 	connect( chk00, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot00(int) ) );
 	connect( chk01, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot01(int) ) );
 	connect( chk02, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot02(int) ) );
@@ -188,8 +192,13 @@ void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
 	if( column == 0 || column == 2 ) {
 		// open editor if manually added symbol
 		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
-		if( sym->source() == 0 ) { qWarning("1");
+		if( sym->source() == 0 ) {
+			// first close possible existing editor
+			closeEditor();
+			// open new editor
 			treeLabels->openPersistentEditor( item, column );
+			editItem = item;
+			editColumn = column;
 		}
 	}
 }
@@ -231,6 +240,14 @@ void SymbolManager::endTreeLabelsUpdate()
 		treeLabelsUpdateCount--;
 }
 
+void SymbolManager::closeEditor()
+{
+	if( editColumn >= 0 ) {
+		treeLabels->closePersistentEditor( editItem, editColumn );
+		editColumn = -1;
+	}
+}
+
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
@@ -247,10 +264,13 @@ void SymbolManager::addLabel()
 	updateItemSegments( item );
 	updateItemRegisters( item );
 	endTreeLabelsUpdate();
+	closeEditor();
 	treeLabels->setFocus();
 	treeLabels->setCurrentItem( item, 0 );
 	treeLabels->scrollToItem(item);
 	treeLabels->openPersistentEditor( item, 0 );
+	editItem = item;
+	editColumn = 0;
 }
 
 void SymbolManager::removeLabel()
@@ -286,6 +306,7 @@ void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 		int value = stringToValue( item->text(2) );
 		if( value >= 0 && value < 65536 ) sym->setValue( value );
 		treeLabels->closePersistentEditor( item, column );
+		editColumn = -1;
 		// update item name and value
 		beginTreeLabelsUpdate();
 		updateItemName(item);
@@ -296,6 +317,9 @@ void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 
 void SymbolManager::labelSelectionChanged()
 {
+	// remove possible editor
+	closeEditor();
+	
 	QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
 	// check if is available at all
 	if( !selection.size() ) {
@@ -308,8 +332,11 @@ void SymbolManager::labelSelectionChanged()
 		groupRegs16->setEnabled(false);
 		return;
 	}
-	// check selection for "manual insertion", identical slot mask
+	// check selection for "manual insertion", identical slot mask,
+	// identical register mask, identical types and value size
 	bool removeButActive = true, anyEight = false;
+	bool sameType = true;
+	Symbol::SymbolType type;
 	int slotMask, slotMaskMultiple = 0;
 	int regMask, regMaskMultiple = 0;
 	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
@@ -320,25 +347,22 @@ void SymbolManager::labelSelectionChanged()
 		if( sym->source() ) removeButActive = false;
 		
 		if( selit == selection.begin() ) {
-			// first item, reference for slotMask
+			// first item, reference for slotMask and regMask
 			slotMask = sym->validSlots();
+			regMask = sym->validRegisters();
+			type = sym->type();
 		} else {
 			// other, set all different bits
 			slotMaskMultiple |= slotMask ^ sym->validSlots();
+			regMaskMultiple |= regMask ^ sym->validRegisters();
+			// check for different type
+			if( type != sym->type() ) sameType = false;
 		}
 
 		// check for 8 bit values
 		if( (sym->value() & 0xFF00) == 0 )
 			anyEight = true;
 		
-		if( selit == selection.begin() ) {
-			// first item, reference for regMask
-			regMask = sym->validRegisters();
-		} else {
-			// other, set all different bits
-			regMaskMultiple |= regMask ^ sym->validRegisters();
-		}
-
 		// next
 		selit++;
 	}
@@ -373,6 +397,20 @@ void SymbolManager::labelSelectionChanged()
 		regMask >>= 1;
 		regMaskMultiple >>= 1;
 	}
+	// temporarily disable exclusive radiobuttons to be able to
+	// deselect them all.
+	radJump->setAutoExclusive(false);
+	radVar->setAutoExclusive(false);
+	radValue->setAutoExclusive(false);
+	// set type radio buttons
+	radJump->setChecked( sameType && type == Symbol::JUMPLABEL );
+	radVar->setChecked( sameType && type == Symbol::VARIABLELABEL );
+	radValue->setChecked( sameType && type == Symbol::VALUE );
+	// enable exclusive radiobuttons (this won't immediately activate
+	// one if none are active).
+	radJump->setAutoExclusive(true);
+	radVar->setAutoExclusive(true);
+	radValue->setAutoExclusive(true);
 	endTreeLabelsUpdate();
 }
 
@@ -434,6 +472,37 @@ void SymbolManager::changeRegister( int id, int state )
 	}
 }
 
+void SymbolManager::changeType( bool /* checked */ )
+{
+	if( !treeLabelsUpdateCount ) {
+		// determine selected type
+		Symbol::SymbolType newType = Symbol::JUMPLABEL;
+		if( radVar->isChecked() )
+			newType = Symbol::VARIABLELABEL;
+		else if( radValue->isChecked() )
+			newType = Symbol::VALUE;
+		
+		// get selected items
+		QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+
+		// update items		
+		beginTreeLabelsUpdate();
+		QList<QTreeWidgetItem *>::iterator selit = selection.begin();
+		while( selit != selection.end() ) {
+			// get symbol
+			Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+			// set type
+			sym->setType( newType );
+			// update item in treewidget
+			updateItemType( *selit );
+			// next
+			selit++;
+		}
+		endTreeLabelsUpdate();
+	}
+	
+}
+
 
 /*
  * Symbol tree layout functions
@@ -471,7 +540,7 @@ void SymbolManager::updateItemType( QTreeWidgetItem *item )
 			item->setText( 1, tr("Jump label") );
 			break;
 		case Symbol::VARIABLELABEL:
-			item->setText( 1, tr("Variabel label") );
+			item->setText( 1, tr("Variable label") );
 			break;
 		case Symbol::VALUE:
 			item->setText( 1, tr("Value") );
