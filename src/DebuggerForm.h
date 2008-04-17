@@ -143,6 +143,7 @@ private slots:
 	void connectionClosed();
 	void dockWidgetVisibilityChanged( DockableWidget *w );
 	void updateViewMenu();
+	void updateWindowTitle();
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;

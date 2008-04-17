@@ -20,6 +20,11 @@ bool DebugSession::existsAsFile() const
 	return !fileName.isEmpty();
 }
 
+const QString& DebugSession::filename() const
+{
+	return fileName;
+}
+
 bool DebugSession::isModified() const
 {
 	return modified;

@@ -94,10 +94,14 @@ public:
 				form.comm.sendCommand(new ListBreakPointsHandler(form, false));
 			} else {
 				form.disasmView->update();
+				form.session.sessionModified();
+				form.updateWindowTitle();
 			}
 		} else {
 			form.session.breakpoints().setBreakpoints(message);
 			form.disasmView->update();
+			form.session.sessionModified();
+			form.updateWindowTitle();
 		}
 		delete this;
 	}
@@ -412,7 +416,7 @@ void DebuggerForm::createStatusbar()
 
 void DebuggerForm::createForm()
 {
-	setWindowTitle("openMSX Debugger");
+	updateWindowTitle();
 
 	mainArea = new DockableWidgetArea;
 	dockMan.addDockArea( mainArea );
@@ -630,6 +634,22 @@ void DebuggerForm::closeEvent( QCloseEvent *e )
 	QMainWindow::closeEvent(e);
 }
 
+void DebuggerForm::updateWindowTitle()
+{
+	QString title = "openMSX debugger [%1%2]";
+	if( session.existsAsFile() )
+		title = title.arg( session.filename() );
+	else
+		title = title.arg( "unnamed session" );
+	
+	if( session.isModified() )
+		title = title.arg('*');
+	else
+		title = title.arg("");
+	
+	setWindowTitle(title);
+}
+
 void DebuggerForm::initConnection()
 {
 	systemConnectAction->setEnabled(false);
@@ -812,6 +832,7 @@ void DebuggerForm::fileNewSession()
 		}
 	}
 	session.clear();
+	updateWindowTitle();
 }
 
 void DebuggerForm::fileOpenSession()
@@ -829,6 +850,7 @@ void DebuggerForm::fileOpenSession()
 			comm.sendCommand(new ListBreakPointsHandler(*this, true));
 		}
 	}
+	updateWindowTitle();
 }
 
 void DebuggerForm::fileSaveSession()
@@ -837,6 +859,7 @@ void DebuggerForm::fileSaveSession()
 		session.save();
 	else
 		fileSaveSessionAs();
+	updateWindowTitle();
 }
 
 void DebuggerForm::fileSaveSessionAs()
@@ -850,6 +873,7 @@ void DebuggerForm::fileSaveSessionAs()
 	if( d.exec() ) {
 		session.saveAs( d.selectedFiles().at(0) );
 	}
+	updateWindowTitle();
 }
 
 void DebuggerForm::systemConnect()
@@ -886,6 +910,7 @@ void DebuggerForm::systemSymbolManager()
 	connect( &symManager, SIGNAL( symbolTableChanged() ), &session, SLOT( sessionModified() ) );
 	symManager.exec();
 	emit symbolsChanged();
+	updateWindowTitle();	
 }
 
 void DebuggerForm::systemPreferences()

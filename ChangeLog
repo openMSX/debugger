@@ -3,6 +3,7 @@ $Id$
 2008-04-18 Edwin Velds <e.velds@gmail.com>
 	* Added saving op breakpoints.
 	* Added restoring session breakpoints after connect.
+	* Show session file in window title.
 
 2008-04-17 Edwin Velds <e.velds@gmail.com>
 	* Added preliminary support for saving debug sessions.

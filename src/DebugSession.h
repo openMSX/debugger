@@ -21,6 +21,7 @@ public:
 	bool save();
 	void saveAs( const QString& file );
 	bool existsAsFile() const;
+	const QString& filename() const;
 	bool isModified() const;
 	
 	Breakpoints& breakpoints();
