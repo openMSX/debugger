@@ -32,6 +32,7 @@
 #include <QSplitter>
 #include <QPixmap>
 #include <QFileDialog>
+#include <QCloseEvent>
 
 class QueryPauseHandler : public SimpleCommand
 {
@@ -583,6 +584,14 @@ DebuggerForm::~DebuggerForm()
 
 void DebuggerForm::closeEvent( QCloseEvent *e )
 {
+	// handle unsaved session
+	fileNewSession();
+	// cancel if session is still modified
+	if( session.isModified() ) {
+		e->ignore();
+		return;
+	}
+	
 	// store layout
 	Settings::get().setValue( "Layout/WindowGeometry", saveGeometry() );
 
@@ -772,10 +781,19 @@ void DebuggerForm::setRunMode()
 void DebuggerForm::fileNewSession()
 {
 	if( session.isModified() ) {
-		if( session.existsAsFile() ) {
-			// save current file?
-		} else {
-			// save new session
+		// save current session?
+		int choice = QMessageBox::warning(this, tr("Unsaved session"),
+		                tr("The current session has unsaved data.\n"
+		                   "Do you want to save your changes?"),
+		                QMessageBox::Save | QMessageBox::Discard |
+		                QMessageBox::Cancel, QMessageBox::Save);
+		
+		if( choice == QMessageBox::Cancel )
+			return;
+		else if( choice == QMessageBox::Save ) {
+			fileSaveSession();
+			// skip new if session is still modified (save was cancelled)
+			if( session.isModified() ) return;
 		}
 	}
 	session.clear();
@@ -804,14 +822,14 @@ void DebuggerForm::fileSaveSession()
 
 void DebuggerForm::fileSaveSessionAs()
 {
-	QString fileName =
-		QFileDialog::getSaveFileName(this, tr("Save debug session"),
-		                             QDir::currentPath(),
-		                             tr("Debug Session Files (*.omds)"));
-
-	if( !fileName.isEmpty() ) {
-		if( !fileName.endsWith(".omds") ) fileName += ".omds";
-		session.saveAs(fileName);
+	QFileDialog d(this, tr("Save debug session"));
+	d.setFilter( tr("Debug Session Files (*.omds)") );
+	d.setDefaultSuffix("omds");
+	d.setDirectory( QDir::currentPath() );
+	d.setAcceptMode( QFileDialog::AcceptSave );
+	d.setFileMode( QFileDialog::AnyFile );
+	if( d.exec() ) {
+		session.saveAs( d.selectedFiles().at(0) );
 	}
 }
 

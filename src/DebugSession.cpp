@@ -1,4 +1,4 @@
-// $Id: $
+// $Id$
 
 #include "DebugSession.h"
 #include <QXmlStreamReader>
@@ -40,6 +40,8 @@ void DebugSession::clear()
 	// clear everything
 	symTable.clear();
 	//breaks.clear();
+	fileName.clear();
+	modified = false;
 }
 
 void DebugSession::open( const QString& file )

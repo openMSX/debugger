@@ -1,4 +1,4 @@
-// $Id: $
+// $Id$
 #ifndef _DEBUGSESSION_H
 #define _DEBUGSESSION_H
 

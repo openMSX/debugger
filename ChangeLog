@@ -4,6 +4,7 @@ $Id$
 	* Added preliminary support for saving debug sessions.
 	  Only symbols currently supported. Note that file format may change
 	  without prior notification or support for older files.
+	* Added checks for modified sessions in new/open/quit.
 
 2008-04-15 Edwin Velds <e.velds@gmail.com>
 	* Added type selection to symbol manager.
