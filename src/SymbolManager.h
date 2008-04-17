@@ -86,7 +86,9 @@ private slots:
 	void changeRegisterIYH( int state );
 	void changeRegisterOffset( int state );
 	void changeRegisterI( int state );
-	
+
+signals:
+	void symbolTableChanged();
 };
 
 #endif /* SYMBOLMANAGER_H */

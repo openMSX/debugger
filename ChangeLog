@@ -1,5 +1,10 @@
 $Id$
 
+2008-04-17 Edwin Velds <e.velds@gmail.com>
+	* Added preliminary support for saving debug sessions.
+	  Only symbols currently supported. Note that file format may change
+	  without prior notification or support for older files.
+
 2008-04-15 Edwin Velds <e.velds@gmail.com>
 	* Added type selection to symbol manager.
 	* Changed name/value editing behaviour to allow only a single editor.

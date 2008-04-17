@@ -12,6 +12,8 @@
 struct MemoryLayout;
 
 class SymbolTable;
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 class Symbol
 {
@@ -78,6 +80,11 @@ public:
 	void add( Symbol *symbol );
 	void removeAt( int index );
 	void remove( Symbol *symbol );
+	void clear();
+
+	/* xml session file functions */
+	void saveSymbols( QXmlStreamWriter& xml );
+	void loadSymbols( QXmlStreamReader& xml );
 
 	/* Symbol access functions */
 	Symbol *findFirstAddressSymbol( int addr, MemoryLayout *ml = 0 );

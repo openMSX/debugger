@@ -153,6 +153,7 @@ void SymbolManager::addFile()
 		if( read ) {
 			initFileList();
 			initSymbolList();
+			emit symbolTableChanged();
 		}
 	}
 	// store last used path
@@ -172,6 +173,7 @@ void SymbolManager::removeFile()
 
 	initFileList();
 	initSymbolList();
+	emit symbolTableChanged();
 }
 
 void SymbolManager::reloadFiles()
@@ -179,6 +181,7 @@ void SymbolManager::reloadFiles()
 	symTable.reloadFiles();
 	initFileList();
 	initSymbolList();
+	emit symbolTableChanged();
 }
 
 void SymbolManager::fileSelectionChange()
@@ -271,6 +274,9 @@ void SymbolManager::addLabel()
 	treeLabels->openPersistentEditor( item, 0 );
 	editItem = item;
 	editColumn = 0;
+	
+	// emit notification that something has changed
+	emit symbolTableChanged();
 }
 
 void SymbolManager::removeLabel()
@@ -280,6 +286,7 @@ void SymbolManager::removeLabel()
 	if( !selection.size() ) return;
 	// remove selected items
 	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
+	bool deleted = false;
 	while( selit != selection.end() ) {
 		// get symbol
 		Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
@@ -287,11 +294,15 @@ void SymbolManager::removeLabel()
 		if( !sym->source() ) {
 			// remove from table
 			symTable.remove(sym);
+			deleted = true;			
 		}
 		selit++;
 	}
-	// refresh tree
-	initSymbolList();
+	if( deleted ) {
+		// refresh tree
+		initSymbolList();
+		emit symbolTableChanged();
+	}
 }
 
 void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
@@ -312,6 +323,8 @@ void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
 		updateItemName(item);
 		updateItemValue(item);
 		endTreeLabelsUpdate();
+		// notify change
+		emit symbolTableChanged();
 	}
 }
 
@@ -440,6 +453,8 @@ void SymbolManager::changeSlot( int id, int state )
 			selit++;
 		}
 		endTreeLabelsUpdate();
+		// notify change
+		emit symbolTableChanged();
 	}
 }
 
@@ -469,6 +484,8 @@ void SymbolManager::changeRegister( int id, int state )
 			selit++;
 		}
 		endTreeLabelsUpdate();
+		// notify change
+		emit symbolTableChanged();
 	}
 }
 
@@ -499,6 +516,8 @@ void SymbolManager::changeType( bool /* checked */ )
 			selit++;
 		}
 		endTreeLabelsUpdate();
+		// notify change
+		emit symbolTableChanged();
 	}
 	
 }

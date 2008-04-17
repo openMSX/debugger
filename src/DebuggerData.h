@@ -25,6 +25,9 @@ class Breakpoints
 public:
 	Breakpoints();
 
+	enum Type { BREAKPOINT, WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE,
+	            WATCHPOINT_MEMREAD, WATCHPOINT_MEMWRITE };
+
 	void setMemoryLayout(MemoryLayout *ml);
 	void setBreakpoints(const QString& str);
 	int breakpointCount();
@@ -36,11 +39,16 @@ public:
 
 private:
 	struct Breakpoint {
+		Type type;
 		QString id;
 		quint16 address;
+		// end for watchpoint region
+		quint16 regionEnd;
+		// gui specific condition variables
 		char ps;
 		char ss;
 		qint16 segment;
+		// general condition
 		QString condition;
 	};
 	typedef QLinkedList<Breakpoint> BreakpointList;

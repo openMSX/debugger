@@ -31,7 +31,7 @@
 #include <QStringList>
 #include <QSplitter>
 #include <QPixmap>
-
+#include <QFileDialog>
 
 class QueryPauseHandler : public SimpleCommand
 {
@@ -86,7 +86,7 @@ public:
 
 	virtual void replyOk(const QString& message)
 	{
-		form.breakpoints.setBreakpoints(message);
+		form.session.breakpoints().setBreakpoints(message);
 		form.disasmView->update();
 		delete this;
 	}
@@ -167,6 +167,24 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 
 void DebuggerForm::createActions()
 {
+	fileNewSessionAction = new QAction(tr("&New Session"), this);
+	fileNewSessionAction->setStatusTip(tr("Clear the current session."));
+
+	fileOpenSessionAction = new QAction(tr("&Open Session ..."), this);
+	fileOpenSessionAction->setShortcut(tr("Ctrl+O"));
+	fileOpenSessionAction->setStatusTip(tr("Clear the current session."));
+
+	fileSaveSessionAction = new QAction(tr("&Save Session"), this);
+	fileSaveSessionAction->setShortcut(tr("Ctrl+S"));
+	fileSaveSessionAction->setStatusTip(tr("Save the the current debug session"));
+
+	fileSaveSessionAsAction = new QAction(tr("Save Session &As"), this);
+	fileSaveSessionAsAction->setStatusTip(tr("Save the debug session in a selected file"));
+
+	fileQuitAction = new QAction(tr("&Quit"), this);
+	fileQuitAction->setShortcut(tr("Ctrl+Q"));
+	fileQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
+
 	systemConnectAction = new QAction(tr("&Connect"), this);
 	systemConnectAction->setShortcut(tr("Ctrl+C"));
 	systemConnectAction->setStatusTip(tr("Connect to openMSX"));
@@ -195,10 +213,6 @@ void DebuggerForm::createActions()
 
 	systemPreferencesAction = new QAction(tr("Pre&ferences ..."), this);
 	systemPreferencesAction->setStatusTip(tr("Set the global debugger preferences"));
-
-	systemQuitAction = new QAction(tr("&Quit"), this);
-	systemQuitAction->setShortcut(tr("Ctrl+Q"));
-	systemQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
 
 	viewRegistersAction = new QAction(tr("CPU &Registers"), this);
 	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
@@ -273,13 +287,17 @@ void DebuggerForm::createActions()
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the appliction information"));
 
+	connect(fileNewSessionAction, SIGNAL(triggered()), this, SLOT(fileNewSession()));
+	connect(fileOpenSessionAction, SIGNAL(triggered()), this, SLOT(fileOpenSession()));
+	connect(fileSaveSessionAction, SIGNAL(triggered()), this, SLOT(fileSaveSession()));
+	connect(fileSaveSessionAsAction, SIGNAL(triggered()), this, SLOT(fileSaveSessionAs()));
+	connect(fileQuitAction, SIGNAL(triggered()), this, SLOT(close()));
 	connect(systemConnectAction, SIGNAL(triggered()), this, SLOT(systemConnect()));
 	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
 	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
 	connect(systemRebootAction, SIGNAL(triggered()), this, SLOT(systemReboot()));
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
 	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
-	connect(systemQuitAction, SIGNAL(triggered()), this, SLOT(close()));
 	connect(viewRegistersAction, SIGNAL(triggered()), this, SLOT(toggleRegisterDisplay()));
 	connect(viewFlagsAction, SIGNAL(triggered()), this, SLOT(toggleFlagsDisplay()));
 	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
@@ -299,6 +317,15 @@ void DebuggerForm::createActions()
 
 void DebuggerForm::createMenus()
 {
+	// create file menu
+	systemMenu = menuBar()->addMenu(tr("&File"));
+	systemMenu->addAction(fileNewSessionAction);
+	systemMenu->addAction(fileOpenSessionAction);
+	systemMenu->addAction(fileSaveSessionAction);
+	systemMenu->addAction(fileSaveSessionAsAction);
+	systemMenu->addSeparator();
+	systemMenu->addAction(fileQuitAction);
+
 	// create system menu
 	systemMenu = menuBar()->addMenu(tr("&System"));
 	systemMenu->addAction(systemConnectAction);
@@ -311,8 +338,6 @@ void DebuggerForm::createMenus()
 	systemMenu->addAction(systemSymbolManagerAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemPreferencesAction);
-	systemMenu->addSeparator();
-	systemMenu->addAction(systemQuitAction);
 
 	// create execute menu
 	viewMenu = menuBar()->addMenu(tr("&View"));
@@ -539,13 +564,13 @@ void DebuggerForm::createForm()
 	// init main memory
 	// added four bytes as runover buffer for dasm
 	// otherwise dasm would need to check the buffer end continously.
-	breakpoints.setMemoryLayout(&memLayout);
+	session.breakpoints().setMemoryLayout(&memLayout);
 	mainMemory = new unsigned char[65536 + 4];
 	memset(mainMemory, 0, 65536 + 4);
 	disasmView->setMemory(mainMemory);
-	disasmView->setBreakpoints(&breakpoints);
+	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
-	disasmView->setSymbolTable(&symTable);
+	disasmView->setSymbolTable(&session.symbolTable());
 	hexView->setDebuggable("memory", 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);
@@ -744,6 +769,52 @@ void DebuggerForm::setRunMode()
 	breakpointAddAction->setEnabled(false);
 }
 
+void DebuggerForm::fileNewSession()
+{
+	if( session.isModified() ) {
+		if( session.existsAsFile() ) {
+			// save current file?
+		} else {
+			// save new session
+		}
+	}
+	session.clear();
+}
+
+void DebuggerForm::fileOpenSession()
+{
+	QString fileName =
+		QFileDialog::getOpenFileName(this, tr("Open debug session"),
+		                             QDir::currentPath(),
+		                             tr("Debug Session Files (*.omds)"));
+
+	if( !fileName.isEmpty() ) {
+		fileNewSession();
+		session.open(fileName);
+	}
+}
+
+void DebuggerForm::fileSaveSession()
+{
+	if( session.existsAsFile() )
+		session.save();
+	else
+		fileSaveSessionAs();
+}
+
+void DebuggerForm::fileSaveSessionAs()
+{
+	QString fileName =
+		QFileDialog::getSaveFileName(this, tr("Save debug session"),
+		                             QDir::currentPath(),
+		                             tr("Debug Session Files (*.omds)"));
+
+	if( !fileName.isEmpty() ) {
+		if( !fileName.endsWith(".omds") ) fileName += ".omds";
+		session.saveAs(fileName);
+	}
+}
+
 void DebuggerForm::systemConnect()
 {
 	OpenMSXConnection* connection = ConnectDialog::getConnection(this);
@@ -774,7 +845,8 @@ void DebuggerForm::systemReboot()
 
 void DebuggerForm::systemSymbolManager()
 {
-	SymbolManager symManager( symTable, this );
+	SymbolManager symManager( session.symbolTable(), this );
+	connect( &symManager, SIGNAL( symbolTableChanged() ), &session, SLOT( sessionModified() ) );
 	symManager.exec();
 	emit symbolsChanged();
 }
@@ -827,8 +899,8 @@ void DebuggerForm::breakpointToggle(int addr)
 	if (addr < 0) addr = disasmView->cursorAddress();
 
 	QString cmd;
-	if (breakpoints.isBreakpoint(addr)) {
-		cmd = "debug remove_bp " + breakpoints.idString(addr);
+	if (session.breakpoints().isBreakpoint(addr)) {
+		cmd = "debug remove_bp " + session.breakpoints().idString(addr);
 	} else {
 		int p = (addr & 0xC000) >> 14;
 		cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }",

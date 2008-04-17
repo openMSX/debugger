@@ -7,7 +7,7 @@
 #include <QStringList>
 #include <QRegExp>
 #include <QFileInfo>
-
+#include <QXmlStreamWriter>
 
 /*
  * SymbolTable member functions
@@ -19,10 +19,7 @@ SymbolTable::SymbolTable()
 
 SymbolTable::~SymbolTable()
 {
-	addressSymbols.clear();
-	valueSymbols.clear();
-	qDeleteAll( symbols );
-	symbols.clear();
+	clear();
 }
 
 void SymbolTable::add( Symbol *symbol )
@@ -45,6 +42,14 @@ void SymbolTable::remove( Symbol *symbol )
 	symbols.removeAll( symbol );
 	unmapSymbol( symbol );
 	delete symbol;
+}
+
+void SymbolTable::clear()
+{
+	addressSymbols.clear();
+	valueSymbols.clear();
+	qDeleteAll( symbols );
+	symbols.clear();
 }
 
 void SymbolTable::mapSymbol( Symbol *symbol )
@@ -427,6 +432,151 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 }
 
 /*
+ * Session loading/saving
+ */
+
+void SymbolTable::saveSymbols( QXmlStreamWriter& xml )
+{
+	// write files
+	QMap<const QString*, int> fileIds;
+	for( int i = 0; i < symbolFiles.size(); i++ ) {
+		// add id mapping
+		fileIds[&symbolFiles[i].fileName] = i;
+		// write element
+		xml.writeStartElement("SymbolFile");
+		switch( symbolFiles[i].fileType ) {
+			case TNIASM_FILE:
+				xml.writeAttribute("type","tniasm");
+				break;
+			case ASMSX_FILE:
+				xml.writeAttribute("type","asmsx");
+				break;
+			case LINKMAP_FILE:
+				xml.writeAttribute("type","linkmap");
+				break;
+			default:
+				break;
+		}
+		xml.writeAttribute("refreshTime", QString::number(symbolFiles[i].refreshTime.toTime_t()) );
+		xml.writeCharacters( symbolFiles[i].fileName );
+		xml.writeEndElement();
+	}
+	// write symbols
+	QList<Symbol*>::iterator sit = symbols.begin();
+	while( sit != symbols.end() ) {
+		Symbol *sym = *sit;
+		xml.writeStartElement("Symbol");
+		// status
+		if( sym->status() == Symbol::HIDDEN )
+			xml.writeAttribute("status", "hidden");
+		else if( sym->status() == Symbol::LOST )
+			xml.writeAttribute("status", "lost");
+		// type
+		if( sym->type() == Symbol::JUMPLABEL )
+			xml.writeTextElement("type", "jump");
+		else if( sym->type() == Symbol::VARIABLELABEL )
+			xml.writeTextElement("type", "variable");
+		else
+			xml.writeTextElement("type", "value");
+		// text, value, slots and registers
+		xml.writeTextElement("name", sym->text());
+		xml.writeTextElement("value", QString::number( sym->value() ));
+		xml.writeTextElement("validSlots", QString::number( sym->validSlots() ));
+		xml.writeTextElement("validRegisters", QString::number( sym->validRegisters() ));
+		// write source filename
+		if( sym->source() ) {
+			xml.writeTextElement("source", QString::number( fileIds[sym->source()] ) );
+		}
+		// complete
+		xml.writeEndElement();
+		sit++;
+	}
+}
+
+void SymbolTable::loadSymbols( QXmlStreamReader& xml )
+{
+	Symbol *sym;
+	while( !xml.atEnd() ) {
+		xml.readNext();
+		// exit if closing of main tag
+		if( xml.isEndElement() && xml.name() == "Symbols" )
+				break;
+		// begin tag
+		if( xml.isStartElement() ) {
+			if( xml.name() == "SymbolFile" ) {
+
+				// read attributes and text
+				QString ftype = xml.attributes().value("type").toString().toLower();
+				QString rtime = xml.attributes().value("refreshTime").toString();
+				QString fname = xml.readElementText();
+				// check type
+				FileType type = TNIASM_FILE;
+				if( ftype == "asmsx" )
+					type = ASMSX_FILE;
+				else if( ftype == "linkmap" )
+					type = LINKMAP_FILE;
+				// append file
+				appendFile( fname, type );
+				// change time
+				symbolFiles.back().refreshTime.setTime_t( rtime.toUInt() );
+
+			} else if( xml.name() == "Symbol" ) {
+
+				// add empty symbol
+				sym = new Symbol( "", 0 );
+				add( sym );
+				// get status attribute
+				QString stat = xml.attributes().value("status").toString().toLower();
+				if( stat == "hidden" )
+					sym->setStatus( Symbol::HIDDEN );
+				else if( stat == "lost" )
+					sym->setStatus( Symbol::LOST );
+				
+			} else if( xml.name() == "type" ) {
+				
+				// read symbol type element
+				QString type = xml.readElementText().trimmed().toLower();
+				if( type == "jump" )
+					sym->setType( Symbol::JUMPLABEL );
+				else if( type == "variable" )
+					sym->setType( Symbol::VARIABLELABEL );
+				else if( type == "value" )
+					sym->setType( Symbol::VALUE );
+					
+			} else if( xml.name() == "name" ) {
+				
+				// read symbol name
+				sym->setText( xml.readElementText() );
+				
+			} else if( xml.name() == "value" ) {
+				
+				// read symbol value
+				sym->setValue( xml.readElementText().toInt() );
+				
+			} else if( xml.name() == "validSlots" ) {
+				
+				// read numeric valid slot mask
+				sym->setValidSlots( xml.readElementText().toInt() );
+				
+			} else if( xml.name() == "validRegisters" ) {
+				
+				// read numeric valid registers mask
+				sym->setValidRegisters( xml.readElementText().toInt() );
+				
+			} else if( xml.name() == "source" ) {
+				
+				// read source file id
+				int id = xml.readElementText().toInt();
+				if( id >= 0 && id < symbolFiles.size() )
+					sym->setSource( &symbolFiles[id].fileName );
+			}
+		}
+	}
+}
+
+
+
+/*
  * Symbol member functions
  */
 
@@ -453,7 +603,6 @@ Symbol::Symbol( const Symbol& symbol )
 	symSegments = symbol.symSegments;
 	symRegisters = symbol.symRegisters;
 	symSource = symbol.symSource;
-	symStatus = symbol.symStatus;
 	symType = symbol.symType;
 }
 

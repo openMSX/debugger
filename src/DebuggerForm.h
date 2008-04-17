@@ -4,8 +4,7 @@
 #define DEBUGGERFORM_H
 
 #include "DockManager.h"
-#include "DebuggerData.h"
-#include "SymbolTable.h"
+#include "DebugSession.h"
 #include <QMainWindow>
 
 class DockableWidgetArea;
@@ -35,6 +34,7 @@ public slots:
 	void showAbout();
 
 private:
+	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* viewMenu;
 	QMenu* executeMenu;
@@ -44,13 +44,18 @@ private:
 	QToolBar* systemToolbar;
 	QToolBar* executeToolbar;
 
+	QAction* fileNewSessionAction;
+	QAction* fileOpenSessionAction;
+	QAction* fileSaveSessionAction;
+	QAction* fileSaveSessionAsAction;
+	QAction* fileQuitAction;
+
 	QAction* systemConnectAction;
 	QAction* systemDisconnectAction;
 	QAction* systemPauseAction;
 	QAction* systemRebootAction;
 	QAction* systemSymbolManagerAction;
 	QAction* systemPreferencesAction;
-	QAction* systemQuitAction;
 
 	QAction* viewRegistersAction;
 	QAction* viewFlagsAction;
@@ -82,9 +87,8 @@ private:
 	SlotViewer* slotView;
 
 	CommClient& comm;
-	Breakpoints breakpoints;
+	DebugSession session;
 	MemoryLayout memLayout;
-	SymbolTable symTable;
 	unsigned char* mainMemory;
 
 	QMap<QString, int> debuggables;
@@ -105,6 +109,10 @@ private:
 	void refreshBreakpoints();
 
 private slots:
+	void fileNewSession();
+	void fileOpenSession();
+	void fileSaveSession();
+	void fileSaveSessionAs();
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();
