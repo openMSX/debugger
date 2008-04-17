@@ -6,6 +6,8 @@
 #include <QLinkedList>
 #include <QString>
 
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 struct MemoryLayout
 {
@@ -28,11 +30,18 @@ public:
 	enum Type { BREAKPOINT, WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE,
 	            WATCHPOINT_MEMREAD, WATCHPOINT_MEMWRITE };
 
+	void clear();
+
 	void setMemoryLayout(MemoryLayout *ml);
 	void setBreakpoints(const QString& str);
+	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
 	bool isBreakpoint(quint16 addr);
 	const QString idString(quint16 addr);
+
+	/* xml session file functions */
+	void saveBreakpoints( QXmlStreamWriter& xml );
+	void loadBreakpoints( QXmlStreamReader& xml );
 
 	int findBreakpoint(quint16 addr);
 	int findNextBreakpoint();

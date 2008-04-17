@@ -91,6 +91,7 @@ private:
 	MemoryLayout memLayout;
 	unsigned char* mainMemory;
 
+	bool mergeBreakpoints;
 	QMap<QString, int> debuggables;
 	
 	void createActions();

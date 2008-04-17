@@ -79,20 +79,31 @@ private:
 class ListBreakPointsHandler : public SimpleCommand
 {
 public:
-	ListBreakPointsHandler(DebuggerForm& form_)
+	ListBreakPointsHandler(DebuggerForm& form_, bool merge_ = false)
 		: SimpleCommand("debug list_bp")
-		, form(form_)
+		, form(form_), merge(merge_)
 	{
 	}
 
 	virtual void replyOk(const QString& message)
 	{
-		form.session.breakpoints().setBreakpoints(message);
-		form.disasmView->update();
+		if( merge ) {
+			QString bps = form.session.breakpoints().mergeBreakpoints(message);
+			if( !bps.isEmpty() ) {
+				form.comm.sendCommand(new SimpleCommand(bps));
+				form.comm.sendCommand(new ListBreakPointsHandler(form, false));
+			} else {
+				form.disasmView->update();
+			}
+		} else {
+			form.session.breakpoints().setBreakpoints(message);
+			form.disasmView->update();
+		}
 		delete this;
 	}
 private:
 	DebuggerForm& form;
+	bool merge;
 };
 
 class CPURegRequest : public ReadDebugBlockCommand
@@ -693,6 +704,8 @@ void DebuggerForm::finalizeConnection(bool halted)
 {
 	systemPauseAction->setEnabled(true);
 	systemRebootAction->setEnabled(true);
+	// merge breakpoints on connect
+	mergeBreakpoints = true;
 	if (halted) {
 		setBreakMode();
 		breakOccured();
@@ -737,7 +750,9 @@ void DebuggerForm::breakOccured()
 
 void DebuggerForm::updateData()
 {
-	comm.sendCommand(new ListBreakPointsHandler(*this));
+	comm.sendCommand(new ListBreakPointsHandler(*this, mergeBreakpoints));
+	// only merge the first time after connect
+	mergeBreakpoints = false;
 
 	// update registers
 	// note that a register update is processed, a signal is sent to other
@@ -809,6 +824,10 @@ void DebuggerForm::fileOpenSession()
 	if( !fileName.isEmpty() ) {
 		fileNewSession();
 		session.open(fileName);
+		if( systemDisconnectAction->isEnabled() ) {
+			// active connection, merge loaded breakpoints
+			comm.sendCommand(new ListBreakPointsHandler(*this, true));
+		}
 	}
 }
 

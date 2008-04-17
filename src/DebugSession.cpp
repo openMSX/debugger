@@ -39,7 +39,7 @@ void DebugSession::clear()
 {
 	// clear everything
 	symTable.clear();
-	//breaks.clear();
+	breaks.clear();
 	fileName.clear();
 	modified = false;
 }
@@ -77,7 +77,7 @@ void DebugSession::open( const QString& file )
 						if( ses.name() == "Symbols" )
 							symTable.loadSymbols(ses);
 						else if( ses.name() == "Breakpoints" )
-							;// breaks.loadBreakpoints(ses)
+							breaks.loadBreakpoints(ses);
 						else
 							skipUnknownElement(ses);
 					}
@@ -115,7 +115,7 @@ bool DebugSession::save()
 	ses.writeEndElement();
 	// write breakpoints
 	ses.writeStartElement("Breakpoints");
-	//breaks.saveBreakpoints(ses);
+	breaks.saveBreakpoints(ses);
 	ses.writeEndElement();
 	// end
 	ses.writeEndDocument();
