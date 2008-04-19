@@ -7,21 +7,6 @@
 
 class QPaintEvent;
 
-
-struct Z80Registers {
-	quint16 AF,BC,DE,HL;
-	quint16 AF2,BC2,DE2,HL2;
-	quint16 IX,IY,PC,SP;
-	quint8  I,R,IM,IFF;
-};
-
-struct Z80RegisterChanges {
-	bool AF,BC,DE,HL;
-	bool AF2,BC2,DE2,HL2;
-	bool IX,IY,PC,SP;
-	bool I,R,IM,IFF;
-};
-
 class CPURegsViewer : public QFrame
 {
 	Q_OBJECT;
@@ -35,14 +20,29 @@ public:
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
-
+	void mousePressEvent(QMouseEvent *e);
+	//void mouseMoveEvent(QMouseEvent *e);
+	//void mouseReleaseEvent(QMouseEvent *e);
+	void keyPressEvent(QKeyEvent *e);
+	void focusOutEvent(QFocusEvent *e);
+	bool event(QEvent *e);
+	
 private:
+	// layout
 	int frameL, frameR, frameT, frameB;
+	int leftRegPos, leftValuePos, rightRegPos, rightValuePos;
+	int rowHeight;
 
-	Z80Registers regs;
-	Z80RegisterChanges regsChanged;
+	int regs[16], regsCopy[16];
+	bool regsModified[16];
+	bool regsChanged[16];
+	int cursorLoc;
 
-	void drawValue(QPainter& p, int x, int y, const QString& str, bool changed);
+	void drawValue( QPainter& p, int id, int x, int y );
+	void setRegister( int id, int value );
+	void getRegister( int id, unsigned char* data );
+	void applyModifications();
+	void cancelModifications();
 
 signals:
 	void pcChanged(quint16);

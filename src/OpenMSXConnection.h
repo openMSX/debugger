@@ -45,6 +45,13 @@ private:
 	unsigned char* target;
 };
 
+class WriteDebugBlockCommand : public SimpleCommand
+{
+public:
+	WriteDebugBlockCommand(const QString& debuggable, unsigned offset, unsigned size,
+	                      unsigned char* source);
+};
+
 class OpenMSXConnection : public QObject, private QXmlDefaultHandler
 {
 	Q_OBJECT

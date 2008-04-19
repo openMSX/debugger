@@ -672,6 +672,16 @@ void DebuggerForm::initConnection()
 		"  return $result\n"
 		"}\n"));
 
+	// define 'debug_hex2bin' proc for internal use
+	comm.sendCommand(new SimpleCommand(
+		"proc debug_hex2bin { input } {\n"
+		"  set result \"\"\n"
+		"  foreach {h l} [split $input {}] {\n"
+		"    append result [binary format H2 $h$l] \"\"\n"
+		"  }\n"
+		"  return $result\n"
+		"}\n"));
+
 	// define 'debug_memmapper' proc for internal use
 	comm.sendCommand(new SimpleCommand(
 		"proc debug_memmapper { } {\n"

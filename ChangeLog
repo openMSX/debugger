@@ -1,5 +1,11 @@
 $Id$
 
+2008-04-19 Edwin Velds <e.velds@gmail.com>
+	* Nearly full rewrite of CPU regs viewer.
+	* Register values editor implemented.
+	* Tooltip for values in binary and decimal.
+	* Added class for writing values back to openmsx.
+
 2008-04-18 Edwin Velds <e.velds@gmail.com>
 	* Added saving op breakpoints.
 	* Added restoring session breakpoints after connect.

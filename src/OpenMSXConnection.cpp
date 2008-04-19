@@ -45,6 +45,24 @@ ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& debuggable,
 {
 }
 
+static QString createDebugWriteCommand(const QString& debuggable,
+		unsigned offset, unsigned size, unsigned char *data )
+{
+	QString cmd = QString("debug write_block %1 %2 [ debug_hex2bin \"")
+	                  .arg(debuggable).arg(offset);
+	for( unsigned i = offset; i < offset+size; i++ )
+		cmd += QString("%1").arg(int(data[i]), 2, 16, QChar('0')).toUpper();
+	
+	cmd += "\" ]";
+	return cmd;
+}
+WriteDebugBlockCommand::WriteDebugBlockCommand(const QString& debuggable,
+		unsigned offset, unsigned size_, unsigned char* source_)
+	: SimpleCommand(createDebugWriteCommand(debuggable, offset, size_, source_))
+{
+}
+
+
 static unsigned char hex2val(char c)
 {
 	return (c <= '9') ? (c - '0') : (c - 'A' + 10);
