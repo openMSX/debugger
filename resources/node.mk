@@ -6,7 +6,7 @@ SUBDIRS:=\
 	icons
 
 DIST:= \
-	resources.qrc
+	resources.qrc openmsx-debugger.rc
 
 include build/node-end.mk
 
