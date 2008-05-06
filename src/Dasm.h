@@ -27,6 +27,6 @@ typedef std::vector<DisasmRow> DisasmLines;
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
           unsigned short endAddr, DisasmLines& disasm, 
-          MemoryLayout *memLayout, SymbolTable *symTable);
+          MemoryLayout *memLayout, SymbolTable *symTable, int currentPC );
 
 #endif // _DASM_H

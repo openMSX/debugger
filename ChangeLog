@@ -1,5 +1,8 @@
 $Id$
 
+2008-05-06 Edwin Velds <e.velds@gmail.com>
+	* Added disassemble restart at PC.
+
 2008-04-19 Edwin Velds <e.velds@gmail.com>
 	* Nearly full rewrite of CPU regs viewer.
 	* Register values editor implemented.

@@ -26,7 +26,7 @@ static std::string toHex(unsigned value, unsigned width)
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
           unsigned short endAddr, DisasmLines& disasm, 
-          MemoryLayout *memLayout, SymbolTable *symTable)
+          MemoryLayout *memLayout, SymbolTable *symTable, int currentPC )
 {
 	const char* s;
 	const char* r = 0;
@@ -162,10 +162,12 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 		}
 		// handle overflow at end or label
 		int dataBytes = 0;
-		if(symbol && pc+dest.numBytes>symbol->value())
+		if( symbol && pc+dest.numBytes>symbol->value())
 			dataBytes = symbol->value() - pc;
 		else if( pc+dest.numBytes>endAddr )
 			dataBytes = endAddr-pc;
+		else if( pc+dest.numBytes>currentPC )
+			dataBytes = currentPC-pc;
 			
 		switch(dataBytes) {
 			case 1:

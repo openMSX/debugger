@@ -370,7 +370,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 {
 	// disassemble the newly received memory
-	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines, memLayout, symTable);
+	dasm(memory, req->offset, req->offset+req->size - 1, disasmLines, memLayout, symTable, programAddr);
 
 	// locate the requested line 
 	disasmTopLine = findDisasmLine( req->address, req->line );
