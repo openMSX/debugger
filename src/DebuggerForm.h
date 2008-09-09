@@ -10,6 +10,7 @@
 class DockableWidgetArea;
 class DisasmViewer;
 class HexViewer;
+class MainMemoryViewer;
 class CPURegsViewer;
 class FlagsViewer;
 class StackViewer;
@@ -80,7 +81,8 @@ private:
 	DockableWidgetArea *mainArea;
 	
 	DisasmViewer* disasmView;
-	HexViewer* hexView;
+	//HexViewer* hexView;
+	MainMemoryViewer* mainMemoryView;
 	CPURegsViewer* regsView;
 	FlagsViewer* flagsView;
 	StackViewer* stackView;

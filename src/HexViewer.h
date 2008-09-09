@@ -22,9 +22,11 @@ public:
 
 public slots:
 	void setLocation(int addr);
+	void scrollBarChanged(int addr);
 	void settingsChanged();
 	void refresh();
-	
+
+
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
@@ -52,6 +54,9 @@ private:
 	bool waitingForData;
 
 	friend class HexRequest;
+
+signals:
+	void locationChanged(int addr);
 };
 
 #endif // HEXVIEWER_H

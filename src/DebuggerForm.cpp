@@ -5,6 +5,7 @@
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
 #include "HexViewer.h"
+#include "MainMemoryViewer.h"
 #include "CPURegsViewer.h"
 #include "FlagsViewer.h"
 #include "StackViewer.h"
@@ -444,9 +445,9 @@ void DebuggerForm::createForm()
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
 
 	// create the memory view widget
-	hexView = new HexViewer;
+	mainMemoryView = new MainMemoryViewer; //HexViewer;
 	dw = new DockableWidget( dockMan );
-	dw->setWidget(hexView);
+	dw->setWidget(mainMemoryView);
 	dw->setTitle(tr("Main memory"));
 	dw->setId("MEMORY");
 	dw->setFloating(false);
@@ -587,7 +588,7 @@ void DebuggerForm::createForm()
 	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
 	disasmView->setSymbolTable(&session.symbolTable());
-	hexView->setDebuggable("memory", 65536);
+	mainMemoryView->setDebuggable("memory", 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);
 }
@@ -791,7 +792,7 @@ void DebuggerForm::updateData()
 	comm.sendCommand(regs);
 
 	// refresh memory viewer
-	hexView->refresh();
+	mainMemoryView->refresh();
 
 	// refresh slot viewer
 	slotView->refresh();
@@ -1044,7 +1045,7 @@ void DebuggerForm::toggleSlotsDisplay()
 
 void DebuggerForm::toggleMemoryDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(hexView->parentWidget()));
+	toggleView( qobject_cast<DockableWidget*>(mainMemoryView->parentWidget()));
 }
 
 void DebuggerForm::toggleView( DockableWidget* widget )
@@ -1091,7 +1092,7 @@ void DebuggerForm::updateViewMenu()
 	viewFlagsAction->setChecked( flagsView->isVisible() );
 	viewStackAction->setChecked( stackView->isVisible() );
 	viewSlotsAction->setChecked( slotView->isVisible() );
-	viewMemoryAction->setChecked( hexView->isVisible() );
+	viewMemoryAction->setChecked( mainMemoryView->isVisible() );
 }
 
 void DebuggerForm::setDebuggables( const QString& list )

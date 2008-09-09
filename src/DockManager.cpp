@@ -45,7 +45,7 @@ void DockManager::insertWidget( DockableWidget *widget, int index,
 {
 	if( index<0 || index>=areas.size() ) return;
 
-	Q_ASSERT( areaMap.find(widget) == areaMap.end() );
+	//Q_ASSERT( areaMap.find(widget) == areaMap.end() );
 
 	areas[index]->addWidget( widget, side, distance, w, h );
 	areaMap[widget] = areas[index];

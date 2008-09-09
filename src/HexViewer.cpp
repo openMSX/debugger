@@ -65,7 +65,7 @@ HexViewer::HexViewer(QWidget* parent)
 
 	settingsChanged();
 	
-	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
+	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
 }
 
 HexViewer::~HexViewer()
@@ -124,7 +124,7 @@ void HexViewer::setSizes()
 
 	if( isEnabled() ) {
 		vertScrollBar->setValue(hexTopAddress/horBytes);
-		setLocation(hexTopAddress/horBytes);
+		setLocation(horBytes*int(hexTopAddress/horBytes));
 	} else {
 		update();
 	}
@@ -214,7 +214,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 void HexViewer::setDebuggable( const QString& name, int size )
 {
 	delete[] hexData;
-	hexData = 0;
+	hexData = NULL;
 	if( size ) {
 		debuggableName = name;
 		debuggableSize = size;
@@ -229,12 +229,18 @@ void HexViewer::setDebuggable( const QString& name, int size )
 	}
 }
 
+void HexViewer::scrollBarChanged(int addr)
+{
+	setLocation(addr * horBytes);
+	emit locationChanged(addr * horBytes);
+}
+
 void HexViewer::setLocation(int addr)
 {
 
 	if (!waitingForData && !debuggableName.isEmpty()) {
 		// calculate data request
-		int start = addr * horBytes;
+		int start = addr;
 		int size = horBytes * (visibleLines+partialBottomLine);
 
 		if (start + size > debuggableSize) {
@@ -262,11 +268,11 @@ void HexViewer::transferCancelled(HexRequest* r)
 	waitingForData = false;
 	// check whether a new value is available
 	if (hexTopAddress != vertScrollBar->value() * horBytes) {
-		setLocation(vertScrollBar->value());
+		vertScrollBar->setValue(hexTopAddress / horBytes);
 	}
 }
 
 void HexViewer::refresh()
 {
-	setLocation(vertScrollBar->value());
+	setLocation( vertScrollBar->value() * horBytes);
 }
