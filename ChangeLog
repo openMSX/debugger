@@ -1,5 +1,8 @@
 $Id$
 
+2009-09-10 David Heremans <david.heremans@gnu-linux.net>
+	* You can now select the cpu register to follow.
+
 2009-09-09 David Heremans <david.heremans@gnu-linux.net>
 	* First steps towards MainMemoryViewer with Compass like
 	  'Linked-to-register' functionality. For now at least 

@@ -7,30 +7,7 @@
 #include <QPaintEvent>
 #include <QMessageBox>
 #include <QToolTip>
-
-const int REG_AF  = 0;
-const int REG_AF2 = 1;
-const int REG_BC  = 2;
-const int REG_BC2 = 3;
-const int REG_DE  = 4;
-const int REG_DE2 = 5;
-const int REG_HL  = 6;
-const int REG_HL2 = 7;
-const int REG_IX  = 8;
-const int REG_IY  = 9;
-const int REG_PC  = 10;
-const int REG_SP  = 11;
-const int REG_I   = 12;
-const int REG_R   = 13;
-const int REG_IM  = 14;
-const int REG_IFF = 15;
-
-const char* regNames[14] = {
-	"AF", "AF'", "BC", "BC'",
-	"DE", "DE'", "HL", "HL'",
-	"IX", "IY", "PC", "SP",
-	"I", "R"
-};
+#include "CPURegs.h"
 
 CPURegsViewer::CPURegsViewer(QWidget* parent)
 	: QFrame(parent)
@@ -88,9 +65,9 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	int y = frameT + rowHeight - 1 - d;
 
 	for( int r = 0; r < 14; r+=2 ) {
-		p.drawText( leftRegPos , y, regNames[r] ); 
+		p.drawText( leftRegPos , y, CpuRegs::regNames[r] ); 
 		drawValue( p, r, leftValuePos, y );
-		p.drawText( rightRegPos, y, regNames[r+1] ); 
+		p.drawText( rightRegPos, y, CpuRegs::regNames[r+1] ); 
 		drawValue( p, r+1, rightValuePos, y );
 		y += rowHeight;
 	}
@@ -100,9 +77,9 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	drawValue( p, 14, leftValuePos, y );
 	
 	// draw interrupt state
-	if( regsChanged[REG_IFF] & 1 )
+	if( regsChanged[CpuRegs::REG_IFF] & 1 )
 		p.setPen(Qt::red);
-	if( regs[REG_IFF] )
+	if( regs[CpuRegs::REG_IFF] )
 		p.drawText( rightRegPos, y, "EI");
 	else
 		p.drawText( rightRegPos, y, "DI" );
@@ -128,9 +105,9 @@ void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
 	if( (cursorLoc>>2) == id ) {
 		// cursor is in this value, print separate digits
 		int digit = 3;
-		if( id < REG_I )
+		if( id < CpuRegs::REG_I )
 			digit = 0;
-		else if( id < REG_IM )
+		else if( id < CpuRegs::REG_IM )
 			digit = 2;
 		// write all digit
 		while( digit < 4 ) {
@@ -157,9 +134,9 @@ void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
 		p.setPen( penClr );
 		// create string
 		QString str;
-		if( id < REG_I )
+		if( id < CpuRegs::REG_I )
 			str.sprintf( "%04X", regs[id] );
-		else if( id < REG_IM )
+		else if( id < CpuRegs::REG_IM )
 			str.sprintf( "%02X", regs[id] );
 		else
 			str.sprintf( "%01X", regs[id] );
@@ -174,28 +151,31 @@ void CPURegsViewer::setRegister( int id, int value )
 {
 	regsChanged[id] = regs[id] != value;
 	regs[id] = value;
+	if (regsChanged[id]){
+		emit registerChanged(id,value);
+	};
 }
 
 void CPURegsViewer::setData(unsigned char* datPtr)
 {
-	setRegister( REG_AF , datPtr[ 0] * 256 + datPtr[ 1] );
-	setRegister( REG_BC , datPtr[ 2] * 256 + datPtr[ 3] );
-	setRegister( REG_DE , datPtr[ 4] * 256 + datPtr[ 5] );
-	setRegister( REG_HL , datPtr[ 6] * 256 + datPtr[ 7] );
-	setRegister( REG_AF2, datPtr[ 8] * 256 + datPtr[ 9] );
-	setRegister( REG_BC2, datPtr[10] * 256 + datPtr[11] );
-	setRegister( REG_DE2, datPtr[12] * 256 + datPtr[13] );
-	setRegister( REG_HL2, datPtr[14] * 256 + datPtr[15] );
-	setRegister( REG_IX , datPtr[16] * 256 + datPtr[17] );
-	setRegister( REG_IY , datPtr[18] * 256 + datPtr[19] );
-	setRegister( REG_PC , datPtr[20] * 256 + datPtr[21] );
-	setRegister( REG_SP , datPtr[22] * 256 + datPtr[23] );
-	setRegister( REG_I  , datPtr[24] );
-	setRegister( REG_R  , datPtr[25] );
-	setRegister( REG_IM , datPtr[26] );
+	setRegister( CpuRegs::REG_AF , datPtr[ 0] * 256 + datPtr[ 1] );
+	setRegister( CpuRegs::REG_BC , datPtr[ 2] * 256 + datPtr[ 3] );
+	setRegister( CpuRegs::REG_DE , datPtr[ 4] * 256 + datPtr[ 5] );
+	setRegister( CpuRegs::REG_HL , datPtr[ 6] * 256 + datPtr[ 7] );
+	setRegister( CpuRegs::REG_AF2, datPtr[ 8] * 256 + datPtr[ 9] );
+	setRegister( CpuRegs::REG_BC2, datPtr[10] * 256 + datPtr[11] );
+	setRegister( CpuRegs::REG_DE2, datPtr[12] * 256 + datPtr[13] );
+	setRegister( CpuRegs::REG_HL2, datPtr[14] * 256 + datPtr[15] );
+	setRegister( CpuRegs::REG_IX , datPtr[16] * 256 + datPtr[17] );
+	setRegister( CpuRegs::REG_IY , datPtr[18] * 256 + datPtr[19] );
+	setRegister( CpuRegs::REG_PC , datPtr[20] * 256 + datPtr[21] );
+	setRegister( CpuRegs::REG_SP , datPtr[22] * 256 + datPtr[23] );
+	setRegister( CpuRegs::REG_I  , datPtr[24] );
+	setRegister( CpuRegs::REG_R  , datPtr[25] );
+	setRegister( CpuRegs::REG_IM , datPtr[26] );
 	// IFF separately to only check bit 0 for change
-	regsChanged[REG_IFF] = (regs[REG_IFF] & 1) != (datPtr[27] & 1);
-	regs[REG_IFF] = datPtr[27];
+	regsChanged[CpuRegs::REG_IFF] = (regs[CpuRegs::REG_IFF] & 1) != (datPtr[27] & 1);
+	regs[CpuRegs::REG_IFF] = datPtr[27];
 
 	// reset modifications
 	cursorLoc = -1;
@@ -204,9 +184,9 @@ void CPURegsViewer::setData(unsigned char* datPtr)
 	
 	update();
 
-	emit pcChanged(regs[REG_PC]);
-	emit spChanged(regs[REG_SP]);
-	emit flagsChanged(regs[REG_AF] & 0xFF);
+	emit pcChanged(regs[CpuRegs::REG_PC]);
+	emit spChanged(regs[CpuRegs::REG_SP]);
+	emit flagsChanged(regs[CpuRegs::REG_AF] & 0xFF);
 }
 
 void CPURegsViewer::focusOutEvent(QFocusEvent *e)
@@ -261,48 +241,48 @@ void CPURegsViewer::keyPressEvent(QKeyEvent *e)
 	
 	if( move == Qt::Key_Right ) {
 		cursorLoc++;
-		if( cursorLoc == 4*REG_I || cursorLoc == 4*REG_R )
+		if( cursorLoc == 4*CpuRegs::REG_I || cursorLoc == 4*CpuRegs::REG_R )
 			cursorLoc += 2;
-		else if( cursorLoc == 4*REG_IM )
+		else if( cursorLoc == 4*CpuRegs::REG_IM )
 			cursorLoc = 0;
 	} else if( move == Qt::Key_Left ) {
 		cursorLoc--;
 		if( cursorLoc == -1 )
-			cursorLoc = 4*REG_R+3;
-		else if( cursorLoc == 4*REG_R+1 || cursorLoc == 4*REG_I+1)
+			cursorLoc = 4*CpuRegs::REG_R+3;
+		else if( cursorLoc == 4*CpuRegs::REG_R+1 || cursorLoc == 4*CpuRegs::REG_I+1)
 			cursorLoc -= 2;
 	} else if( move == Qt::Key_Up ) {
 		cursorLoc -= 8;
 		if( cursorLoc < 0 ) {
-			cursorLoc += 4*REG_IM;
+			cursorLoc += 4*CpuRegs::REG_IM;
 			// move to lowest row
-			if( cursorLoc == 4*REG_I )
-				cursorLoc = 4*REG_I+2;
-			else if( cursorLoc < 4*REG_R )
-				cursorLoc = 4*REG_I+3;
-			else if( cursorLoc == 4*REG_R )
-				cursorLoc = 4*REG_R+2;
+			if( cursorLoc == 4*CpuRegs::REG_I )
+				cursorLoc = 4*CpuRegs::REG_I+2;
+			else if( cursorLoc < 4*CpuRegs::REG_R )
+				cursorLoc = 4*CpuRegs::REG_I+3;
+			else if( cursorLoc == 4*CpuRegs::REG_R )
+				cursorLoc = 4*CpuRegs::REG_R+2;
 			else
-				cursorLoc = 4*REG_R+3;
-		} else if( cursorLoc >= 4*REG_PC ) {
+				cursorLoc = 4*CpuRegs::REG_R+3;
+		} else if( cursorLoc >= 4*CpuRegs::REG_PC ) {
 			// move from lowest row
 			cursorLoc -= 2;
 		}
 	} else if( move == Qt::Key_Down ) {
 		cursorLoc += 8;
-		if( cursorLoc >= 4*REG_IM ) {
+		if( cursorLoc >= 4*CpuRegs::REG_IM ) {
 			// move from lowest row
-			cursorLoc -= 4*REG_IM+2;
-		} else if( cursorLoc >= 4*REG_I ) {
+			cursorLoc -= 4*CpuRegs::REG_IM+2;
+		} else if( cursorLoc >= 4*CpuRegs::REG_I ) {
 			// move to lowest row
-			if( cursorLoc == 4*REG_I )
-				cursorLoc = 4*REG_I+2;
-			else if( cursorLoc < 4*REG_R )
-				cursorLoc = 4*REG_I+3;
-			else if( cursorLoc == 4*REG_R )
-				cursorLoc = 4*REG_R+2;
+			if( cursorLoc == 4*CpuRegs::REG_I )
+				cursorLoc = 4*CpuRegs::REG_I+2;
+			else if( cursorLoc < 4*CpuRegs::REG_R )
+				cursorLoc = 4*CpuRegs::REG_I+3;
+			else if( cursorLoc == 4*CpuRegs::REG_R )
+				cursorLoc = 4*CpuRegs::REG_R+2;
 			else
-				cursorLoc = 4*REG_R+3;
+				cursorLoc = 4*CpuRegs::REG_R+3;
 		}
 	} else if( move == Qt::Key_Escape ) {
 		// cancel changes
@@ -334,20 +314,20 @@ void CPURegsViewer::getRegister( int id, unsigned char* data )
 void CPURegsViewer::applyModifications()
 {
 	unsigned char data[26];
-	getRegister( REG_AF, &data[0] );
-	getRegister( REG_BC, &data[2] );
-	getRegister( REG_DE, &data[4] );
-	getRegister( REG_HL, &data[6] );
-	getRegister( REG_AF2, &data[8] );
-	getRegister( REG_BC2, &data[10] );
-	getRegister( REG_DE2, &data[12] );
-	getRegister( REG_HL2, &data[14] );
-	getRegister( REG_IX, &data[16] );
-	getRegister( REG_IY, &data[18] );
-	getRegister( REG_PC, &data[20] );
-	getRegister( REG_SP, &data[22] );
-	data[24] = regs[REG_I];
-	data[25] = regs[REG_R];
+	getRegister( CpuRegs::REG_AF, &data[0] );
+	getRegister( CpuRegs::REG_BC, &data[2] );
+	getRegister( CpuRegs::REG_DE, &data[4] );
+	getRegister( CpuRegs::REG_HL, &data[6] );
+	getRegister( CpuRegs::REG_AF2, &data[8] );
+	getRegister( CpuRegs::REG_BC2, &data[10] );
+	getRegister( CpuRegs::REG_DE2, &data[12] );
+	getRegister( CpuRegs::REG_HL2, &data[14] );
+	getRegister( CpuRegs::REG_IX, &data[16] );
+	getRegister( CpuRegs::REG_IY, &data[18] );
+	getRegister( CpuRegs::REG_PC, &data[20] );
+	getRegister( CpuRegs::REG_SP, &data[22] );
+	data[24] = regs[CpuRegs::REG_I];
+	data[25] = regs[CpuRegs::REG_R];
 		
 	// send new data to openmsx
 	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
@@ -401,7 +381,7 @@ bool CPURegsViewer::event(QEvent *e)
 		
 		if( pos >= 0 && pos != 10 && pos != 11 ) {
 			// create text with binary and decimal values
-			QString text(regNames[pos]);
+			QString text(CpuRegs::regNames[pos]);
 			text += "\nBinary: ";
 			if( pos < 12 ) {
 				text += QString("%1 ").arg( (regs[pos] & 0xF000) >> 12, 4, 2, QChar('0') );
@@ -414,14 +394,14 @@ bool CPURegsViewer::event(QEvent *e)
 			text += QString::number(regs[pos]) ;
 			// print 8 bit values
 			if( pos < 8 )
-				text += QString("\n%1: %2  %3: %4").arg(regNames[pos][0])
+				text += QString("\n%1: %2  %3: %4").arg(CpuRegs::regNames[pos][0])
 				                                   .arg(regs[pos]>>8)
-				                                   .arg(regNames[pos][1])
+				                                   .arg(CpuRegs::regNames[pos][1])
 				                                   .arg(regs[pos]&255);
 			else if( pos < 10 )
-				text += QString("\nI%1H: %2  I%3L: %4").arg(regNames[pos][1])
+				text += QString("\nI%1H: %2  I%3L: %4").arg(CpuRegs::regNames[pos][1])
 				                                       .arg(regs[pos]>>8)
-				                                       .arg(regNames[pos][1])
+				                                       .arg(CpuRegs::regNames[pos][1])
 				                                       .arg(regs[pos]&255);
 			QToolTip::showText(helpEvent->globalPos(), text);
 		} else

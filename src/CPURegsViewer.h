@@ -45,6 +45,7 @@ private:
 	void cancelModifications();
 
 signals:
+	void registerChanged(int id, int value);
 	void pcChanged(quint16);
 	void flagsChanged(quint8);
 	void spChanged(quint16);

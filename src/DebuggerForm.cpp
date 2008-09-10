@@ -470,6 +470,11 @@ void DebuggerForm::createForm()
 	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
 	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
 
+	// Hook up the register viewer with the MainMemory viewer
+	connect( regsView, SIGNAL( registerChanged(int,int) ),
+		mainMemoryView, SLOT( registerChanged(int,int) ));
+
+
 	// create flags viewer
 	flagsView = new FlagsViewer;
 	dw = new DockableWidget( dockMan );

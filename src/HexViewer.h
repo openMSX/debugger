@@ -51,7 +51,9 @@ private:
 	int debuggableSize;
 	int hexTopAddress;
 	unsigned char* hexData;
+	unsigned char* previousHexData;
 	bool waitingForData;
+	bool highlitChanges;
 
 	friend class HexRequest;
 

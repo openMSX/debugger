@@ -50,10 +50,12 @@ HexViewer::HexViewer(QWidget* parent)
 	
 	horBytes = 16;
 	hexTopAddress = 0;
-	hexData = 0;
+	hexData = NULL;
+	previousHexData = NULL;
 	debuggableSize = 0;
 	waitingForData = false;
 	adjustToWidth = true;
+	highlitChanges = true;
 	addressLength = 4;
 	
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
@@ -71,6 +73,7 @@ HexViewer::HexViewer(QWidget* parent)
 HexViewer::~HexViewer()
 {
 	delete[] hexData;
+	delete[] previousHexData;
 }
 
 void HexViewer::settingsChanged()
@@ -123,7 +126,7 @@ void HexViewer::setSizes()
 	}
 
 	if( isEnabled() ) {
-		vertScrollBar->setValue(hexTopAddress/horBytes);
+		///vertScrollBar->setValue(hexTopAddress/horBytes);
 		setLocation(horBytes*int(hexTopAddress/horBytes));
 	} else {
 		update();
@@ -178,6 +181,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	for (int i = 0; i < visibleLines+partialBottomLine; ++i) {
 		// print address
 		QString hexStr = QString("%1").arg(address, addressLength, 16, QChar('0'));
+		p.setPen( palette().color(QPalette::Text) );
 		p.drawText(xAddr, y + a, hexStr.toUpper());
 
 		// print bytes
@@ -186,6 +190,14 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			// print data
 			if (address + j < debuggableSize) {
 				hexStr.sprintf("%02X", hexData[address + j]);
+				// determine value colour
+				if (highlitChanges) {
+					QColor penClr = palette().color(QPalette::Text);
+					if (hexData[address + j] != previousHexData[address + j]){
+						penClr = Qt::red;
+					}
+					p.setPen( penClr );
+				};
 				p.drawText(x, y + a, hexStr);
 			}
 			x += dataWidth;
@@ -200,7 +212,14 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			if (address + j >= debuggableSize) break;
 			unsigned char chr = hexData[address + j];
 			if (chr < 32 || chr > 127) chr = '.';
-			hexStr += chr;
+			// determine value colour
+			if (highlitChanges) {
+				QColor penClr = palette().color(QPalette::Text);
+				if (hexData[address + j] != previousHexData[address + j]){
+					penClr = Qt::red;
+				}
+				p.setPen( penClr );
+			}
 			p.drawText(x, y + a, QString(chr));
 			x += charWidth;
 		}
@@ -209,12 +228,17 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		address += horBytes;
 		if (address >= debuggableSize) break;
 	}
+	// copy the new values to the old-values buffer
+	memcpy( previousHexData, hexData, debuggableSize );
 }
 
 void HexViewer::setDebuggable( const QString& name, int size )
 {
 	delete[] hexData;
 	hexData = NULL;
+	delete[] previousHexData;
+	previousHexData = NULL;
+
 	if( size ) {
 		debuggableName = name;
 		debuggableSize = size;
@@ -222,6 +246,8 @@ void HexViewer::setDebuggable( const QString& name, int size )
 		hexTopAddress = 0;
 		hexData = new unsigned char[size];
 		memset( hexData, 0, size );
+		previousHexData = new unsigned char[size];
+		memset( previousHexData, 0, size );
 		settingsChanged();
 	} else {
 		debuggableName.clear();
@@ -251,7 +277,7 @@ void HexViewer::setLocation(int addr)
 		HexRequest* req = new HexRequest(
 			debuggableName, start, size, hexData + start, *this);
 		CommClient::instance().sendCommand(req);
-		waitingForData = TRUE;
+		waitingForData = true;
 	}
 }
 
@@ -267,12 +293,13 @@ void HexViewer::transferCancelled(HexRequest* r)
 	delete r;
 	waitingForData = false;
 	// check whether a new value is available
-	if (hexTopAddress != vertScrollBar->value() * horBytes) {
+	if (int(hexTopAddress / horBytes) != vertScrollBar->value() ) {
 		vertScrollBar->setValue(hexTopAddress / horBytes);
 	}
 }
 
 void HexViewer::refresh()
 {
-	setLocation( vertScrollBar->value() * horBytes);
+	//setLocation( vertScrollBar->value() * horBytes);
+	setLocation( hexTopAddress);
 }
