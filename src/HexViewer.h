@@ -17,11 +17,14 @@ public:
 	~HexViewer();
 	
 	void setDebuggable( const QString& name, int size );
+	void setEnabledScrollBar( bool enabled );
+	void setUseMarker( bool enabled );
 
 	QSize sizeHint() const;
 
 public slots:
 	void setLocation(int addr);
+	void setTopLocation(int addr);
 	void scrollBarChanged(int addr);
 	void settingsChanged();
 	void refresh();
@@ -50,10 +53,12 @@ private:
 	QString debuggableName;
 	int debuggableSize;
 	int hexTopAddress;
+	int hexMarkAddress;
 	unsigned char* hexData;
 	unsigned char* previousHexData;
 	bool waitingForData;
 	bool highlitChanges;
+	bool useMarker;
 
 	friend class HexRequest;
 

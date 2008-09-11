@@ -50,6 +50,7 @@ HexViewer::HexViewer(QWidget* parent)
 	
 	horBytes = 16;
 	hexTopAddress = 0;
+	hexMarkAddress = 0;
 	hexData = NULL;
 	previousHexData = NULL;
 	debuggableSize = 0;
@@ -74,6 +75,23 @@ HexViewer::~HexViewer()
 {
 	delete[] hexData;
 	delete[] previousHexData;
+}
+
+void HexViewer::setUseMarker(bool enabled)
+{
+	useMarker = enabled;
+	// below we should check if current marker is visible etc
+	// but since in the debugger we will set this at instanciation
+	// and then never change it again this is a quicky in case we do later on
+	if (useMarker){
+		hexMarkAddress = hexTopAddress;
+	}
+	update();
+}
+
+void HexViewer::setEnabledScrollBar(bool enabled)
+{
+	vertScrollBar->setEnabled( enabled );
 }
 
 void HexViewer::settingsChanged()
@@ -123,11 +141,12 @@ void HexViewer::setSizes()
 	} else {
 		vertScrollBar->hide();
 		hexTopAddress = 0;
+		hexMarkAddress = 0;
 	}
 
 	if( isEnabled() ) {
 		///vertScrollBar->setValue(hexTopAddress/horBytes);
-		setLocation(horBytes*int(hexTopAddress/horBytes));
+		setTopLocation(horBytes*int(hexTopAddress/horBytes));
 	} else {
 		update();
 	}
@@ -190,6 +209,11 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			// print data
 			if (address + j < debuggableSize) {
 				hexStr.sprintf("%02X", hexData[address + j]);
+				// draw marker if needed
+				if (useMarker && ((address + j) == hexMarkAddress)){
+					QRect b(x,y,dataWidth,lineHeight);
+					p.fillRect( b, Qt::lightGray);
+				};
 				// determine value colour
 				if (highlitChanges) {
 					QColor penClr = palette().color(QPalette::Text);
@@ -212,6 +236,11 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			if (address + j >= debuggableSize) break;
 			unsigned char chr = hexData[address + j];
 			if (chr < 32 || chr > 127) chr = '.';
+			// draw marker if needed
+			if (useMarker && ((address + j) == hexMarkAddress)){
+				QRect b(x,y,charWidth,lineHeight);
+				p.fillRect( b, Qt::lightGray);
+			};
 			// determine value colour
 			if (highlitChanges) {
 				QColor penClr = palette().color(QPalette::Text);
@@ -244,6 +273,7 @@ void HexViewer::setDebuggable( const QString& name, int size )
 		debuggableSize = size;
 		addressLength = 2 * int(ceil( log(size) / log(2) / 8 ));
 		hexTopAddress = 0;
+		hexMarkAddress = 0;
 		hexData = new unsigned char[size];
 		memset( hexData, 0, size );
 		previousHexData = new unsigned char[size];
@@ -257,33 +287,59 @@ void HexViewer::setDebuggable( const QString& name, int size )
 
 void HexViewer::scrollBarChanged(int addr)
 {
-	setLocation(addr * horBytes);
-	emit locationChanged(addr * horBytes);
+	int start = addr * horBytes;
+	if (start == hexTopAddress){
+		// nothing changed or a callback since we changed the value to
+		// the current hexTopAddress
+		return;
+	};
+
+	if (!useMarker){
+		setTopLocation(addr * horBytes);
+		emit locationChanged(addr * horBytes);
+	} else {
+		//maybe marker is still visible ?
+		int size = horBytes * (visibleLines+partialBottomLine);
+		hexTopAddress = start;
+		if ((start > hexMarkAddress) || ((start + size -1) < hexMarkAddress) ){
+			hexMarkAddress = (start<hexMarkAddress)?(size-1):0;
+			hexMarkAddress += start;
+			emit locationChanged(hexMarkAddress);
+		}
+		refresh();
+	}
 }
 
 void HexViewer::setLocation(int addr)
 {
-
-	if (!waitingForData && !debuggableName.isEmpty()) {
-		// calculate data request
-		int start = addr;
-		int size = horBytes * (visibleLines+partialBottomLine);
-
-		if (start + size > debuggableSize) {
-			size = debuggableSize - start;
+	if (!useMarker){
+		setTopLocation(addr);
+	} else {
+		//check if newmarker is in first 1/3th of hexviewer if so we do not change hexTopAddress
+		hexMarkAddress = addr;
+		int size = horBytes * int ((visibleLines+partialBottomLine)/3);
+		if ((addr < hexTopAddress) || (addr>(hexTopAddress+size))){
+			setTopLocation(addr);
 		}
+		refresh();
+	}
+}
 
-		// send data request
-		HexRequest* req = new HexRequest(
-			debuggableName, start, size, hexData + start, *this);
-		CommClient::instance().sendCommand(req);
-		waitingForData = true;
+void HexViewer::setTopLocation(int addr)
+{
+
+	if (debuggableName.isEmpty()) {
+		return;
+	};
+	int start = horBytes * int(addr/horBytes);
+	if ((!waitingForData) || (start != hexTopAddress )) {
+		hexTopAddress = start;
+		refresh();
 	}
 }
 
 void HexViewer::hexdataTransfered(HexRequest* r)
 {
-	hexTopAddress = r->offset;
 	transferCancelled(r);
 	update();
 }
@@ -300,6 +356,16 @@ void HexViewer::transferCancelled(HexRequest* r)
 
 void HexViewer::refresh()
 {
-	//setLocation( vertScrollBar->value() * horBytes);
-	setLocation( hexTopAddress);
+	// calculate data request
+	int size = horBytes * (visibleLines+partialBottomLine);
+
+	if (hexTopAddress + size > debuggableSize) {
+		size = debuggableSize - hexTopAddress;
+	}
+
+	// send data request
+	HexRequest* req = new HexRequest(
+			debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
+	CommClient::instance().sendCommand(req);
+	waitingForData = true;
 }

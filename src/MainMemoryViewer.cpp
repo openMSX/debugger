@@ -30,6 +30,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
         //addressValue->setEditable(false);
 
         hexView = new HexViewer;
+	hexView->setUseMarker(true);
         QHBoxLayout *hbox = new QHBoxLayout;
         hbox->setMargin(0);
         hbox->addWidget( addressSourceList );
@@ -42,8 +43,8 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 
         setLayout( vbox );
 
-	isLinked=true; 
-	linkedId=CpuRegs::REG_PC;
+	isLinked=false; 
+	linkedId=0;
 
 	connect( hexView, SIGNAL(locationChanged(int) ), this, SLOT(hexViewChanged(int) ) );
 	connect( addressValue, SIGNAL(returnPressed() ), this, SLOT(addressValueChanged() ) );
@@ -96,9 +97,12 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 	if ( index == 0 ){
 		isLinked = false;
 		addressValue->setReadOnly(false);
+		hexView->setEnabledScrollBar(true);
 	} else {
 		isLinked = true;
 		linkedId = linkRegisters[ index -1 ];
 		addressValue->setReadOnly(true);
+		hexView->setEnabledScrollBar(false);
+		
 	}
 }
