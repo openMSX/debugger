@@ -473,6 +473,7 @@ void DebuggerForm::createForm()
 	// Hook up the register viewer with the MainMemory viewer
 	connect( regsView, SIGNAL( registerChanged(int,int) ),
 		mainMemoryView, SLOT( registerChanged(int,int) ));
+	mainMemoryView->setRegsView(regsView);
 
 
 	// create flags viewer
@@ -790,14 +791,14 @@ void DebuggerForm::updateData()
 	// only merge the first time after connect
 	mergeBreakpoints = false;
 
+	// refresh memory viewer
+	mainMemoryView->refresh();
+
 	// update registers
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
 	CPURegRequest* regs = new CPURegRequest(*this);
 	comm.sendCommand(regs);
-
-	// refresh memory viewer
-	mainMemoryView->refresh();
 
 	// refresh slot viewer
 	slotView->refresh();

@@ -9,6 +9,8 @@
 #include <QComboBox>
 #include <QLineEdit>
 
+class CPURegsViewer;
+
 class MainMemoryViewer : public QWidget
 {
 	Q_OBJECT
@@ -17,6 +19,7 @@ public:
 	~MainMemoryViewer();
 
 	void setDebuggable( const QString& name, int size );
+	void setRegsView( CPURegsViewer* viewer );
 
 
 public slots:
@@ -37,6 +40,7 @@ private:
 	bool isLinked;
 	int linkedId;
 	static const int linkRegisters[];
+	CPURegsViewer* regsViewer;
 };
 
 

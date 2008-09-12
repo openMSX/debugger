@@ -7,6 +7,7 @@
 #include <QScrollBar>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QToolTip>
 #include <cmath>
 
 static const int EXTRA_SPACING = 4;
@@ -58,7 +59,10 @@ HexViewer::HexViewer(QWidget* parent)
 	adjustToWidth = true;
 	highlitChanges = true;
 	addressLength = 4;
-	
+	isEditable = false;
+	beingEdited = false;
+	useMarker = false;
+
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->setMinimum(0);
 	vertScrollBar->setSingleStep(1);
@@ -75,6 +79,11 @@ HexViewer::~HexViewer()
 {
 	delete[] hexData;
 	delete[] previousHexData;
+}
+
+void HexViewer::setIsEditable(bool enabled)
+{
+	isEditable=enabled;
 }
 
 void HexViewer::setUseMarker(bool enabled)
@@ -143,6 +152,11 @@ void HexViewer::setSizes()
 		hexTopAddress = 0;
 		hexMarkAddress = 0;
 	}
+	
+	//now see were the chars are drawn
+	rightValuePos =  xData + horBytes * dataWidth ;
+	xChar = rightValuePos + charWidth +  EXTRA_SPACING * ( int(horBytes/4) + int(horBytes/8) );
+	rightCharPos = xChar + horBytes * charWidth ;
 
 	if( isEnabled() ) {
 		///vertScrollBar->setValue(hexTopAddress/horBytes);
@@ -214,11 +228,18 @@ void HexViewer::paintEvent(QPaintEvent* e)
 					QRect b(x,y,dataWidth,lineHeight);
 					p.fillRect( b, Qt::lightGray);
 				};
+				// or are we being edited ??
+				if (beingEdited && ((address + j) == hexMarkAddress)){
+					QRect b(x,y,dataWidth,lineHeight);
+					p.fillRect( b, Qt::darkGreen);
+					hexStr.sprintf("%2X", editValue);
+				};
+
 				// determine value colour
 				if (highlitChanges) {
 					QColor penClr = palette().color(QPalette::Text);
-					if (hexData[address + j] != previousHexData[address + j]){
-						penClr = Qt::red;
+					if ( hexData[address + j] != previousHexData[address + j]){
+						if ((address + j) != hexMarkAddress || !beingEdited ) penClr = Qt::red;
 					}
 					p.setPen( penClr );
 				};
@@ -315,9 +336,9 @@ void HexViewer::setLocation(int addr)
 	if (!useMarker){
 		setTopLocation(addr);
 	} else {
-		//check if newmarker is in first 1/3th of hexviewer if so we do not change hexTopAddress
+		//check if newmarker is in first 2/3th of hexviewer if so we do not change hexTopAddress
 		hexMarkAddress = addr;
-		int size = horBytes * int ((visibleLines+partialBottomLine)/3);
+		int size = horBytes * int (2*(visibleLines+partialBottomLine)/3);
 		if ((addr < hexTopAddress) || (addr>(hexTopAddress+size))){
 			setTopLocation(addr);
 		}
@@ -368,4 +389,126 @@ void HexViewer::refresh()
 			debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
+}
+
+void HexViewer::keyPressEvent(QKeyEvent *e)
+{
+	// don't hanlde if not being edited
+	if (! beingEdited){
+		//quickhack to start testing WIP edit routines
+		if (e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9){
+			beingEdited=true;
+			cursorPosition=0;
+			}
+		// end-of-quick-hack
+		QFrame::keyPressEvent(e);
+		return;
+	};
+
+	bool setValue=false;
+	int newAddress=hexMarkAddress;
+	//entering a new digit ?
+	// for now hex only, do we need decimal entry also ??
+	if( (e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
+	           (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F) ) {
+		// calculate numercial value
+		int v = e->key() - Qt::Key_0;
+		if( v > 9 ) v -= Qt::Key_A-Qt::Key_0-10;
+		editValue = (editValue << 4) + v;
+		cursorPosition++;
+		if (cursorPosition==2){
+			setValue = true;
+			newAddress++;
+		};
+	} else if ( e->key() == Qt::Key_Right ) {
+		setValue = true;
+		newAddress++;
+	} else if ( e->key() == Qt::Key_Left ) {
+		setValue = true;
+		newAddress--;
+	} else if ( e->key() == Qt::Key_Up ) {
+		setValue = true;
+		newAddress -= horBytes;
+	} else if ( e->key() == Qt::Key_Down ) {
+		setValue = true;
+		newAddress += horBytes;
+	} else if ( e->key() == Qt::Key_Right ) {
+		setValue = true;
+		newAddress++;
+	} else if ( e->key() == Qt::Key_Return ||  e->key() == Qt::Key_Enter ) {
+		setValue = true;
+	} else if ( e->key() == Qt::Key_Escape ) {
+		beingEdited = false;
+		e->accept();
+		return;
+	} else {
+		QFrame::keyPressEvent(e);
+		return;
+	}
+
+	//apply changes
+	if (setValue){
+		editValue = 0;
+		cursorPosition=0;
+		//TODO actually write the values to openMSX memory
+	}
+
+	// indicate key Event handled
+	e->accept();
+
+	//Move Marker if needed
+	if ( hexMarkAddress != newAddress){
+		if (newAddress < 0 ) newAddress += debuggableSize;
+		if (newAddress >= debuggableSize) newAddress -= debuggableSize;
+		setLocation(newAddress);
+	} else {
+		update();
+	};
+}
+
+bool HexViewer::event(QEvent *e)
+{
+	if (e->type() == QEvent::ToolTip) {
+		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+		// calculate address for tooltip
+		int offset = -1;
+		if( helpEvent->x() >= xData && helpEvent->x() < rightValuePos )
+			offset = (helpEvent->x() - xData) / dataWidth ;
+		if( helpEvent->x() >= xChar &&  helpEvent->x() < rightCharPos )
+			offset = (helpEvent->x() - xChar) / charWidth ;
+
+		int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
+		if( offset >= 0 && helpEvent->y() < yMaxOffset)
+			offset += horBytes*((helpEvent->y() - frameT)/lineHeight);
+		
+		if( offset >= 0 && (hexTopAddress + offset)< debuggableSize) {
+			// create text with binary and decimal values
+			int address = hexTopAddress + offset;
+			unsigned char chr = hexData[address];
+			QString text = QString("Address: %1").arg(address, addressLength, 16, QChar('0'));
+			// print 8 bit values
+			text += "\nBinary: ";
+			text += QString("%1 ").arg( chr >> 4, 4, 2, QChar('0') );
+			text += QString("%1") .arg( chr  & 0x000F , 4, 2, QChar('0') );
+			text += "\nDecimal: ";
+			text += QString::number(chr) ;
+			// print 16 bit values if possible
+			if ((address+1)< debuggableSize) {
+				unsigned int wd = chr;
+				wd += 256 * hexData[address + 1];
+				text += QString("\n\nWord: %1").arg(wd, 4, 16, QChar('0'));
+				text += "\nBinary: ";
+
+				text += QString("%1 ").arg( wd >> 12, 4, 2, QChar('0') );
+				text += QString("%1 ").arg( (wd & 0x0F00) >>  8, 4, 2, QChar('0') );
+				text += QString("%1 ").arg( (wd & 0x00F0) >>  4, 4, 2, QChar('0') );
+				text += QString("%1 ").arg( (wd & 0x000F) , 4, 2, QChar('0') );
+				text += "\nDecimal: ";
+				text += QString::number(wd) ;
+			}
+			QToolTip::showText(helpEvent->globalPos(), text);
+		} else
+			QToolTip::hideText();
+	}
+	return QWidget::event(e);
 }

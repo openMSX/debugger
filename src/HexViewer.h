@@ -19,6 +19,7 @@ public:
 	void setDebuggable( const QString& name, int size );
 	void setEnabledScrollBar( bool enabled );
 	void setUseMarker( bool enabled );
+	void setIsEditable( bool enabled );
 
 	QSize sizeHint() const;
 
@@ -29,10 +30,11 @@ public slots:
 	void settingsChanged();
 	void refresh();
 
-
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
+	bool event(QEvent *e);
+	void keyPressEvent(QKeyEvent *e);
 
 private:
 	void setSizes();
@@ -43,10 +45,11 @@ private:
 
 	// layout
 	int frameL, frameR, frameT, frameB;
+	int leftCharPos, leftValuePos, rightValuePos, rightCharPos ;
 	bool adjustToWidth;
 	short horBytes;
 	int visibleLines, partialBottomLine;
-	int	lineHeight, xAddr, xData, dataWidth, charWidth;
+	int	lineHeight, xAddr, xData, xChar, dataWidth, charWidth;
 	int addressLength;
 	
 	// data
@@ -59,6 +62,9 @@ private:
 	bool waitingForData;
 	bool highlitChanges;
 	bool useMarker;
+	bool isEditable;
+	bool beingEdited;
+	int cursorPosition,editValue;
 
 	friend class HexRequest;
 

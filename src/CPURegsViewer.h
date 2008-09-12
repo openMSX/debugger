@@ -14,6 +14,7 @@ public:
 	CPURegsViewer(QWidget* parent = 0);
 
 	void setData(unsigned char* datPtr);
+	int readRegister(int id);
 
 	QSize sizeHint() const;
 

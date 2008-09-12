@@ -305,6 +305,11 @@ void CPURegsViewer::keyPressEvent(QKeyEvent *e)
 	//QFrame::mouseMoveEvent(e);
 //}
 
+int CPURegsViewer::readRegister( int id )
+{
+	return regs[id];
+}
+
 void CPURegsViewer::getRegister( int id, unsigned char* data )
 {
 	data[0]  = regs[id] >> 8;

@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "CPURegs.h"
+#include "CPURegsViewer.h"
 
 
 const int MainMemoryViewer::linkRegisters[] = {
@@ -27,10 +28,12 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	};
 	
 	addressValue = new QLineEdit;
+        addressValue->setText("0000");
         //addressValue->setEditable(false);
 
         hexView = new HexViewer;
 	hexView->setUseMarker(true);
+	hexView->setIsEditable(true);
         QHBoxLayout *hbox = new QHBoxLayout;
         hbox->setMargin(0);
         hbox->addWidget( addressSourceList );
@@ -45,6 +48,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 
 	isLinked=false; 
 	linkedId=0;
+	regsViewer=NULL;
 
 	connect( hexView, SIGNAL(locationChanged(int) ), this, SLOT(hexViewChanged(int) ) );
 	connect( addressValue, SIGNAL(returnPressed() ), this, SLOT(addressValueChanged() ) );
@@ -62,6 +66,7 @@ void MainMemoryViewer::settingsChanged()
 
 void MainMemoryViewer::setLocation(int addr)
 {
+	addressValue->setText(QString().sprintf("%04X",addr));
 	hexView->setLocation(addr);
 }
 
@@ -70,6 +75,12 @@ void MainMemoryViewer::setDebuggable( const QString& name, int size )
 {
 	hexView->setDebuggable(name,size);
 }
+
+void MainMemoryViewer::setRegsView( CPURegsViewer* viewer )
+{
+	regsViewer=viewer;
+}
+
 void MainMemoryViewer::refresh()
 {
 	hexView->refresh();
@@ -103,6 +114,8 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 		linkedId = linkRegisters[ index -1 ];
 		addressValue->setReadOnly(true);
 		hexView->setEnabledScrollBar(false);
-		
+		if (regsViewer){
+			setLocation(regsViewer->readRegister(linkedId));
+		}		
 	}
 }
