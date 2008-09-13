@@ -60,7 +60,9 @@ HexViewer::HexViewer(QWidget* parent)
 	highlitChanges = true;
 	addressLength = 4;
 	isEditable = false;
+	isInteractive = false;
 	beingEdited = false;
+	editedChars = false;
 	useMarker = false;
 
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
@@ -100,6 +102,7 @@ void HexViewer::setUseMarker(bool enabled)
 
 void HexViewer::setEnabledScrollBar(bool enabled)
 {
+	isInteractive = enabled;
 	vertScrollBar->setEnabled( enabled );
 }
 
@@ -229,10 +232,18 @@ void HexViewer::paintEvent(QPaintEvent* e)
 					p.fillRect( b, Qt::lightGray);
 				};
 				// or are we being edited ??
-				if (beingEdited && ((address + j) == hexMarkAddress)){
+				if (isEditable && !editedChars&& ((address + j) == hexMarkAddress)){
 					QRect b(x,y,dataWidth,lineHeight);
-					p.fillRect( b, Qt::darkGreen);
-					hexStr.sprintf("%2X", editValue);
+					if (beingEdited ){
+						p.fillRect( b, Qt::darkGreen);
+						if (cursorPosition){
+							hexStr.sprintf("%2X", editValue);
+						//}else{
+						//	hexStr.clear();
+						}
+					} else {
+						p.drawRect( b );
+					}
 				};
 
 				// determine value colour
@@ -241,6 +252,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 					if ( hexData[address + j] != previousHexData[address + j]){
 						if ((address + j) != hexMarkAddress || !beingEdited ) penClr = Qt::red;
 					}
+					if (((address + j) == hexMarkAddress ) && beingEdited && (cursorPosition == 0)) penClr = Qt::white;
 					p.setPen( penClr );
 				};
 				p.drawText(x, y + a, hexStr);
@@ -261,6 +273,16 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			if (useMarker && ((address + j) == hexMarkAddress)){
 				QRect b(x,y,charWidth,lineHeight);
 				p.fillRect( b, Qt::lightGray);
+			};
+			// or are we being edited ??
+			if (isEditable && editedChars && ((address + j) == hexMarkAddress)){
+				QRect b(x,y,charWidth,lineHeight);
+				if (beingEdited){
+					p.fillRect( b, Qt::darkGreen);
+					chr='?';
+				} else {
+					p.drawRect( b );
+				}
 			};
 			// determine value colour
 			if (highlitChanges) {
@@ -336,9 +358,11 @@ void HexViewer::setLocation(int addr)
 	if (!useMarker){
 		setTopLocation(addr);
 	} else {
-		//check if newmarker is in first 2/3th of hexviewer if so we do not change hexTopAddress
+		//check if newmarker is in fully visible lines if so we do not change hexTopAddress
+		if (addr != hexMarkAddress)
+			emit locationChanged(addr);
 		hexMarkAddress = addr;
-		int size = horBytes * int (2*(visibleLines+partialBottomLine)/3);
+		int size = horBytes * visibleLines;
 		if ((addr < hexTopAddress) || (addr>(hexTopAddress+size))){
 			setTopLocation(addr);
 		}
@@ -393,54 +417,62 @@ void HexViewer::refresh()
 
 void HexViewer::keyPressEvent(QKeyEvent *e)
 {
-	// don't hanlde if not being edited
-	if (! beingEdited){
-		//quickhack to start testing WIP edit routines
-		if (e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9){
-			beingEdited=true;
-			cursorPosition=0;
-			}
-		// end-of-quick-hack
+	// don't hanlde if not interactive
+	if (! isInteractive){
 		QFrame::keyPressEvent(e);
 		return;
-	};
+	}
 
 	bool setValue=false;
 	int newAddress=hexMarkAddress;
 	//entering a new digit ?
 	// for now hex only, do we need decimal entry also ??
-	if( (e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
-	           (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F) ) {
+	if( !editedChars && ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
+	           (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F) )) {
 		// calculate numercial value
 		int v = e->key() - Qt::Key_0;
 		if( v > 9 ) v -= Qt::Key_A-Qt::Key_0-10;
-		editValue = (editValue << 4) + v;
-		cursorPosition++;
-		if (cursorPosition==2){
-			setValue = true;
-			newAddress++;
-		};
+		if (beingEdited){
+			editValue = (editValue << 4) + v;
+			cursorPosition++;
+			if (cursorPosition==2){
+				setValue = true;
+				newAddress++;
+			};
+		} else {
+			editValue = v;
+			beingEdited = true;
+			cursorPosition=1;
+		}
 	} else if ( e->key() == Qt::Key_Right ) {
-		setValue = true;
+		setValue = beingEdited & !editedChars;
 		newAddress++;
+		cursorPosition=0;
 	} else if ( e->key() == Qt::Key_Left ) {
-		setValue = true;
+		setValue = beingEdited & !editedChars;
 		newAddress--;
+		cursorPosition=0;
 	} else if ( e->key() == Qt::Key_Up ) {
-		setValue = true;
+		setValue = beingEdited & !editedChars;
 		newAddress -= horBytes;
+		cursorPosition=0;
 	} else if ( e->key() == Qt::Key_Down ) {
-		setValue = true;
+		setValue = beingEdited & !editedChars;
 		newAddress += horBytes;
-	} else if ( e->key() == Qt::Key_Right ) {
-		setValue = true;
-		newAddress++;
-	} else if ( e->key() == Qt::Key_Return ||  e->key() == Qt::Key_Enter ) {
+		cursorPosition=0;
+	} else if ( e->key() == Qt::Key_Backspace ) {
+		editedChars = !editedChars;
+	} else if (!editedChars && ( e->key() == Qt::Key_Return ||  e->key() == Qt::Key_Enter)) {
 		setValue = true;
 	} else if ( e->key() == Qt::Key_Escape ) {
 		beingEdited = false;
 		e->accept();
+		update();
 		return;
+	} else if( editedChars ) {
+		editValue = (e->text().toAscii())[0];
+		setValue = true;
+		newAddress++;
 	} else {
 		QFrame::keyPressEvent(e);
 		return;
@@ -448,9 +480,19 @@ void HexViewer::keyPressEvent(QKeyEvent *e)
 
 	//apply changes
 	if (setValue){
+		//TODO actually write the values to openMSX memory
+		//for now we change the value in out local buffer
+		unsigned char data[2];
+		data[0]=editValue;
+		WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
+			debuggableName, 0, 1, data);
+		CommClient::instance().sendCommand(req);
+
+		previousHexData[hexMarkAddress]=char(editValue);
 		editValue = 0;
 		cursorPosition=0;
-		//TODO actually write the values to openMSX memory
+		beingEdited = editedChars; //keep editing if inputing chars
+		refresh();
 	}
 
 	// indicate key Event handled
@@ -466,21 +508,26 @@ void HexViewer::keyPressEvent(QKeyEvent *e)
 	};
 }
 
+int HexViewer::coorToOffset(int x, int y)
+{
+	int offset = -1;
+	if( x >= xData && x < rightValuePos )
+		offset = (x - xData) / dataWidth ;
+	if( x >= xChar &&  x < rightCharPos )
+		offset = (x - xChar) / charWidth ;
+	int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
+	if( offset >= 0 && y < yMaxOffset)
+		offset += horBytes*((y - frameT)/lineHeight);
+	return offset;
+}
+
 bool HexViewer::event(QEvent *e)
 {
 	if (e->type() == QEvent::ToolTip) {
 		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
 		// calculate address for tooltip
-		int offset = -1;
-		if( helpEvent->x() >= xData && helpEvent->x() < rightValuePos )
-			offset = (helpEvent->x() - xData) / dataWidth ;
-		if( helpEvent->x() >= xChar &&  helpEvent->x() < rightCharPos )
-			offset = (helpEvent->x() - xChar) / charWidth ;
+		int offset = coorToOffset(helpEvent->x(), helpEvent->y() );
 
-		int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
-		if( offset >= 0 && helpEvent->y() < yMaxOffset)
-			offset += horBytes*((helpEvent->y() - frameT)/lineHeight);
-		
 		if( offset >= 0 && (hexTopAddress + offset)< debuggableSize) {
 			// create text with binary and decimal values
 			int address = hexTopAddress + offset;
@@ -511,4 +558,32 @@ bool HexViewer::event(QEvent *e)
 			QToolTip::hideText();
 	}
 	return QWidget::event(e);
+}
+
+void HexViewer::mousePressEvent(QMouseEvent *e)
+{
+	if( e->button() == Qt::LeftButton && isInteractive) {
+		int offset=coorToOffset(e->x(),e->y());
+		if (offset >=0 ){
+			int addr=hexTopAddress+offset;
+			if (hexMarkAddress != addr){
+				setLocation(addr);
+			} else {
+				editValue = 0;
+				cursorPosition=0;
+				beingEdited=isEditable;
+				editedChars = (e->x() >= xChar);
+			}
+		}
+		update();
+	}
+}
+
+void HexViewer::focusOutEvent(QFocusEvent *e)
+{
+	if( e->lostFocus() ) {
+		editValue = 0;
+		cursorPosition=0;
+		beingEdited=false;
+	}
 }

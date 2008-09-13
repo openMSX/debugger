@@ -1,5 +1,10 @@
 $Id$
 
+2009-09-13 David Heremans <david.heremans@gnu-linux.net>
+	* More mousesupport in HexViewer
+	* Differentiate between data- vs charbased input.
+	  And of course visual indication for this feature.
+
 2009-09-12 David Heremans <david.heremans@gnu-linux.net>
 	* Added tooltips to HexViewer.
 	* Directly update memoryviewer after linking to a register.

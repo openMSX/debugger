@@ -33,13 +33,16 @@ public slots:
 protected:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
+	void mousePressEvent(QMouseEvent *e);
 	bool event(QEvent *e);
 	void keyPressEvent(QKeyEvent *e);
+	void focusOutEvent(QFocusEvent *e);
 
 private:
 	void setSizes();
 	void hexdataTransfered(HexRequest* r);
 	void transferCancelled(HexRequest* r);
+	int coorToOffset(int x,int y);
 
 	QScrollBar* vertScrollBar;
 
@@ -62,8 +65,10 @@ private:
 	bool waitingForData;
 	bool highlitChanges;
 	bool useMarker;
+	bool isInteractive;
 	bool isEditable;
 	bool beingEdited;
+	bool editedChars;
 	int cursorPosition,editValue;
 
 	friend class HexRequest;
