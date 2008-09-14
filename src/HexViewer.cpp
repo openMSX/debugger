@@ -482,13 +482,11 @@ void HexViewer::keyPressEvent(QKeyEvent *e)
 	if (setValue){
 		//TODO actually write the values to openMSX memory
 		//for now we change the value in out local buffer
-		unsigned char data[2];
-		data[0]=editValue;
+		previousHexData[hexMarkAddress]=char(editValue);
 		WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
-			debuggableName, 0, 1, data);
+			debuggableName, hexMarkAddress, 1, previousHexData);
 		CommClient::instance().sendCommand(req);
 
-		previousHexData[hexMarkAddress]=char(editValue);
 		editValue = 0;
 		cursorPosition=0;
 		beingEdited = editedChars; //keep editing if inputing chars
