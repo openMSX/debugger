@@ -17,7 +17,7 @@ public:
 	~HexViewer();
 	
 	void setDebuggable( const QString& name, int size );
-	void setEnabledScrollBar( bool enabled );
+	void setIsInteractive( bool enabled );
 	void setUseMarker( bool enabled );
 	void setIsEditable( bool enabled );
 
@@ -36,6 +36,7 @@ protected:
 	void mousePressEvent(QMouseEvent *e);
 	bool event(QEvent *e);
 	void keyPressEvent(QKeyEvent *e);
+	void focusInEvent(QFocusEvent *e);
 	void focusOutEvent(QFocusEvent *e);
 
 private:
@@ -69,6 +70,7 @@ private:
 	bool isEditable;
 	bool beingEdited;
 	bool editedChars;
+	bool hasFocus;
 	int cursorPosition,editValue;
 
 	friend class HexRequest;

@@ -1,5 +1,11 @@
 $Id$
 
+2009-09-15 David Heremans <david.heremans@gnu-linux.net>
+	* Added visual indication to show focus on HexViewer widget.
+	* More special keys handling.
+	* All debuggable views are now editable.A single value OR a
+	  chain of characters depending on where you click.
+
 2009-09-14 David Heremans <david.heremans@gnu-linux.net>
 	* HexViewer now correctly writes new values to the originatin
 	  debugable.

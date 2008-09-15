@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 
 #ifndef DEBUGGABLEVIEWER_H
 #define DEBUGGABLEVIEWER_H

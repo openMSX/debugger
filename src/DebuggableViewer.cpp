@@ -12,6 +12,8 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	debuggableList = new QComboBox;
 	debuggableList->setEditable(false);
 	hexView = new HexViewer;
+	hexView->setIsInteractive(true);
+	hexView->setIsEditable(true);
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->setMargin(0);
 	vbox->addWidget( debuggableList );
