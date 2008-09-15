@@ -418,13 +418,14 @@ void SymbolTable::unloadFile( const QString& file, bool keepSymbols )
 		while (i.hasNext()) {
 			i.next();
 			Symbol *sym = i.value();
-			if( sym->source() == name )
-				if( keepSymbols ) {
+			if (sym->source() == name) {
+				if (keepSymbols) {
 					sym->setSource(0);
 				} else {
 					i.remove();
 					delete sym;
 				}
+			}
 		}
 		// remove record
 		symbolFiles.removeAt(index);

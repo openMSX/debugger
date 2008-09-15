@@ -279,11 +279,13 @@ void Breakpoints::loadBreakpoints( QXmlStreamReader& xml )
 	while( !xml.atEnd() ) {
 		xml.readNext();
 		// exit if closing of main tag
-		if( xml.isEndElement() )
-			if( xml.name() == "Breakpoints" )
+		if (xml.isEndElement()) {
+			if (xml.name() == "Breakpoints") {
 				break;
-			else if( xml.name() == "Breakpoint" )
+			} else if (xml.name() == "Breakpoint") {
 				insertBreakpoint(bp);
+			}
+		}
 		// begin tag
 		if( xml.isStartElement() ) {
 			if( xml.name() == "Breakpoint" ) {
