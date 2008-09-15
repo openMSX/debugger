@@ -34,7 +34,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
         hexView = new HexViewer;
 	hexView->setUseMarker(true);
 	hexView->setIsEditable(true);
-	hexView->setEnabledScrollBar(true);
+	hexView->setIsInteractive(true);
         QHBoxLayout *hbox = new QHBoxLayout;
         hbox->setMargin(0);
         hbox->addWidget( addressSourceList );
@@ -109,12 +109,12 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 	if ( index == 0 ){
 		isLinked = false;
 		addressValue->setReadOnly(false);
-		hexView->setEnabledScrollBar(true);
+		hexView->setIsInteractive(true);
 	} else {
 		isLinked = true;
 		linkedId = linkRegisters[ index -1 ];
 		addressValue->setReadOnly(true);
-		hexView->setEnabledScrollBar(false);
+		hexView->setIsInteractive(false);
 		if (regsViewer){
 			setLocation(regsViewer->readRegister(linkedId));
 		}		
