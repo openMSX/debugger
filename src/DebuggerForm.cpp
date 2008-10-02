@@ -602,6 +602,7 @@ void DebuggerForm::createForm()
 DebuggerForm::~DebuggerForm()
 {
 	delete[] mainMemory;
+	delete mainArea;
 }
 
 void DebuggerForm::closeEvent( QCloseEvent *e )
