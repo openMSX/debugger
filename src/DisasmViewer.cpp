@@ -63,6 +63,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	memory = NULL;
 	cursorAddr = 0;
 	cursorLine = 0;
+	visibleLines = 0;
 	programAddr = 0xFFFF;
 	waitingForData = false;
 	nextRequest = NULL;
