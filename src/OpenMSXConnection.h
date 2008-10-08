@@ -36,6 +36,8 @@ private:
 class ReadDebugBlockCommand : public SimpleCommand
 {
 public:
+	ReadDebugBlockCommand(const QString& commandString, unsigned size,
+	                      unsigned char* target);
 	ReadDebugBlockCommand(const QString& debuggable, unsigned offset, unsigned size,
 	                      unsigned char* target);
 protected:

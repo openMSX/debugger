@@ -38,6 +38,14 @@ static QString createDebugCommand(const QString& debuggable,
 	return QString("debug_bin2hex [ debug read_block %1 %2 %3 ]")
 	               .arg(debuggable).arg(offset).arg(size);
 }
+
+ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& commandString,
+		unsigned size_, unsigned char* target_)
+	: SimpleCommand(commandString)
+	, size(size_), target(target_)
+{
+}
+
 ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& debuggable,
 		unsigned offset, unsigned size_, unsigned char* target_)
 	: SimpleCommand(createDebugCommand(debuggable, offset, size_))

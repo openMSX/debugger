@@ -1,5 +1,6 @@
 // $Id$
 
+#include "BitMapViewer.h"
 #include "DebuggerForm.h"
 #include "DockableWidgetArea.h"
 #include "DockableWidget.h"
@@ -16,6 +17,8 @@
 #include "PreferencesDialog.h"
 #include "BreakpointDialog.h"
 #include "DebuggableViewer.h"
+#include "VDPRegViewer.h"
+#include "VDPStatusRegViewer.h"
 #include "Settings.h"
 #include "Version.h"
 #include <QAction>
@@ -175,6 +178,11 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
 	, comm(CommClient::instance())
 {
+	//simply making sure that the pointers are NULL
+	// TODO: Is this done by GCC by default ?
+	VDPRegView = NULL;
+	VDPStatusRegView = NULL;
+	
 	createActions();
 	createMenus();
 	createToolbars();
@@ -254,6 +262,16 @@ void DebuggerForm::createActions()
 	viewDebuggableViewerAction = new QAction(tr("Add debuggable viewer"), this);
 	viewDebuggableViewerAction->setStatusTip(tr("Add a hex viewer for debuggables"));
 
+	viewVDPStatusRegsAction = new QAction(tr("VDP status register viewer"), this);
+	viewVDPStatusRegsAction->setStatusTip(tr("The VDP status registers interpreted"));
+	viewVDPStatusRegsAction->setCheckable(true);
+	viewVDPRegsAction = new QAction(tr("VDP register viewer"), this);
+	viewVDPRegsAction->setStatusTip(tr("Interact with the VDP registers"));
+	viewVDPRegsAction->setCheckable(true);
+	viewBitMappedAction = new QAction(tr("Add bitmapped vram viewer"), this);
+	viewBitMappedAction->setStatusTip(tr("Decode vram as screen 5/6/7/8 image"));
+	//viewBitMappedAction->setCheckable(true);
+
 	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
@@ -321,6 +339,9 @@ void DebuggerForm::createActions()
 	connect(viewSlotsAction, SIGNAL(triggered()), this, SLOT(toggleSlotsDisplay()));
 	connect(viewMemoryAction, SIGNAL(triggered()), this, SLOT(toggleMemoryDisplay()));
 	connect(viewDebuggableViewerAction, SIGNAL(triggered()), this, SLOT(addDebuggableViewer()));
+	connect(viewBitMappedAction, SIGNAL(triggered()), this, SLOT(toggleBitMappedDisplay()));
+	connect(viewVDPRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPRegsDisplay()));
+	connect(viewVDPStatusRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPStatusRegsDisplay()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
 	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
@@ -364,8 +385,16 @@ void DebuggerForm::createMenus()
 	viewMenu->addAction(viewSlotsAction);
 	viewMenu->addAction(viewMemoryAction);
 	viewMenu->addSeparator();
+	viewVDPDialogsMenu = viewMenu->addMenu("view VDP Dialogs");
 	viewMenu->addAction(viewDebuggableViewerAction);
 	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
+
+	// create VDP dialogs menu
+	viewVDPDialogsMenu->addAction(viewVDPRegsAction);
+	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
+	viewVDPDialogsMenu->addAction(viewBitMappedAction);
+	connect( viewVDPDialogsMenu, SIGNAL( aboutToShow() ), this, SLOT( updateVDPViewMenu() ) );
+
 
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
@@ -1050,6 +1079,78 @@ void DebuggerForm::toggleSlotsDisplay()
 	toggleView( qobject_cast<DockableWidget*>(slotView->parentWidget()));
 }
 
+void DebuggerForm::toggleBitMappedDisplay()
+{
+	//toggleView( qobject_cast<DockableWidget*>(slotView->parentWidget()));
+	// not sure if this a good idea for a docable widget
+
+	// create new debuggable viewer window
+	BitMapViewer *viewer = new BitMapViewer();
+	DockableWidget *dw = new DockableWidget( dockMan );
+	dw->setWidget(viewer);
+	dw->setTitle(tr("bitmapped vram view"));
+	dw->setId("BITMAPVRAMVIEW");
+	dw->setFloating(true);
+	dw->setDestroyable(true);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	/*
+	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
+	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect( this, SIGNAL( debuggablesChanged(const QMap<QString,int>&) ),
+	         viewer, SLOT( setDebuggables(const QMap<QString,int>&) ) );
+	*/
+
+	// TODO: refresh should be being hanled by VDPDataStore...
+	connect( this, SIGNAL( emulationChanged() ),
+	         viewer, SLOT( refresh() ) );
+
+	/*
+	viewer->setDebuggables( debuggables );
+	viewer->setEnabled( disasmView->isEnabled() );
+	*/
+}
+
+void DebuggerForm::toggleVDPRegsDisplay()
+{
+	if (VDPRegView == NULL){
+		VDPRegView = new VDPRegViewer();
+		DockableWidget *dw = new DockableWidget( dockMan );
+		dw->setWidget(VDPRegView);
+		dw->setTitle(tr("VDP registers view"));
+		dw->setId("VDPREGVIEW");
+		dw->setFloating(true);
+		dw->setDestroyable(true);
+		dw->setMovable(true);
+		dw->setClosable(true);
+		// TODO: refresh should be being hanled by VDPDataStore...
+		connect( this, SIGNAL( emulationChanged() ),
+		         VDPRegView, SLOT( refresh() ) );
+	} else {
+		toggleView( qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
+	}
+}
+
+void DebuggerForm::toggleVDPStatusRegsDisplay()
+{
+	if (VDPStatusRegView == NULL){
+		VDPStatusRegView = new VDPStatusRegViewer();
+		DockableWidget *dw = new DockableWidget( dockMan );
+		dw->setWidget(VDPStatusRegView);
+		dw->setTitle(tr("VDP status registers view"));
+		dw->setId("VDPSTATUSREGVIEW");
+		dw->setFloating(true);
+		dw->setDestroyable(true);
+		dw->setMovable(true);
+		dw->setClosable(true);
+		// TODO: refresh should be being hanled by VDPDataStore...
+		connect( this, SIGNAL( emulationChanged() ),
+		         VDPStatusRegView, SLOT( refresh() ) );
+	} else {
+		toggleView( qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
+	}
+}
+
 void DebuggerForm::toggleMemoryDisplay()
 {
 	toggleView( qobject_cast<DockableWidget*>(mainMemoryView->parentWidget()));
@@ -1100,6 +1201,14 @@ void DebuggerForm::updateViewMenu()
 	viewStackAction->setChecked( stackView->isVisible() );
 	viewSlotsAction->setChecked( slotView->isVisible() );
 	viewMemoryAction->setChecked( mainMemoryView->isVisible() );
+}
+
+void DebuggerForm::updateVDPViewMenu()
+{
+	if (VDPRegView)
+		viewVDPRegsAction->setChecked( VDPRegView->isVisible() );
+	if (VDPStatusRegView)
+		viewVDPStatusRegsAction->setChecked( VDPStatusRegView->isVisible() );
 }
 
 void DebuggerForm::setDebuggables( const QString& list )

@@ -141,6 +141,7 @@ SOURCES_FULL:=
 HEADERS_FULL:=
 MOC_HDR_FULL:=
 UI_FULL:=
+UI_PROMO_HDR_FULL:=
 DIST_FULL:=
 # Include root node.
 CURDIR:=
@@ -151,6 +152,7 @@ SOURCES_FULL:=$(SOURCES_FULL:./%=%)
 HEADERS_FULL:=$(HEADERS_FULL:./%=%)
 MOC_HDR_FULL:=$(MOC_HDR_FULL:./%=%)
 UI_FULL:=$(UI_FULL:./%=%)
+UI_PROMO_HDR_FULL:=$(UI_PROMO_HDR_FULL:./%=%)
 DIST_FULL:=$(DIST_FULL:./%=%)
 # Apply subset to sources list.
 SOURCES_FULL:=$(filter $(SOURCES_PATH)/$(OPENMSX_SUBSET)%,$(SOURCES_FULL))
@@ -291,6 +293,11 @@ $(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
 	@echo "Generating $(@F)..."
 	@mkdir -p $(@D)
 	@$(QT_INSTALL_BINS)/uic -o $@ $<
+	@echo cp headerfile: A quick and dirty hack!
+	@cp $(SOURCES_PATH)/InteractiveLabel.h $(GEN_SRC_PATH)/InteractiveLabel.h
+	@cp $(SOURCES_PATH)/InteractiveButton.h $(GEN_SRC_PATH)/InteractiveButton.h
+#	quick and dirty hack!
+
 # This is a workaround for the lack of order-only dependencies in GNU Make
 # versions before than 3.80 (for example Mac OS X 10.3 still ships with 3.79).
 # It creates a dummy file, which is never modified after its initial creation.
@@ -299,7 +306,14 @@ $(UI_HDR_FULL): $(GEN_SRC_PATH)/ui_%.h: $(SOURCES_PATH)/%.ui
 # will always be checked before compilation, but they will not cause all object
 # files to be considered outdated.
 GEN_DUMMY_FILE:=$(GEN_SRC_PATH)/dummy-file
-$(GEN_DUMMY_FILE): $(UI_HDR_FULL) $(GENERATED_HEADERS)
+
+$(UI_PROMO_HDR_FULL): $(SOURCES_PATH)/%.h: $(GEN_SRC_PATH)/%.h
+	@echo "Copying header files needed for promoted widgets..."
+	@echo cp $< $@
+	@cp $< $@
+
+#$(GEN_DUMMY_FILE): $(UI_PROMO_HDR_FULL) $(UI_HDR_FULL) $(GENERATED_HEADERS) 
+$(GEN_DUMMY_FILE): $(UI_HDR_FULL) $(GENERATED_HEADERS) 
 	@test -e $@ || touch $@
 
 # Compile and generate dependency files in one go.

@@ -20,6 +20,8 @@ class QAction;
 class QMenu;
 class QToolBar;
 class QSplitter;
+class VDPStatusRegViewer;
+class VDPRegViewer;
 
 class DebuggerForm : public QMainWindow
 {
@@ -38,6 +40,7 @@ private:
 	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* viewMenu;
+	QMenu* viewVDPDialogsMenu;
 	QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
@@ -64,7 +67,11 @@ private:
 	QAction* viewSlotsAction;
 	QAction* viewMemoryAction;
 	QAction* viewDebuggableViewerAction;
-	
+
+	QAction* viewBitMappedAction;
+	QAction* viewVDPStatusRegsAction;
+	QAction* viewVDPRegsAction;
+
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
 	QAction* executeStepAction;
@@ -87,6 +94,8 @@ private:
 	FlagsViewer* flagsView;
 	StackViewer* stackView;
 	SlotViewer* slotView;
+	VDPStatusRegViewer* VDPStatusRegView;
+	VDPRegViewer* VDPRegView;
 
 	CommClient& comm;
 	DebugSession session;
@@ -127,6 +136,9 @@ private slots:
 	void toggleStackDisplay();
 	void toggleSlotsDisplay();
 	void toggleMemoryDisplay();
+	void toggleBitMappedDisplay();
+	void toggleVDPRegsDisplay();
+	void toggleVDPStatusRegsDisplay();
 	void addDebuggableViewer();
 	void executeBreak();
 	void executeRun();
@@ -145,6 +157,7 @@ private slots:
 	void connectionClosed();
 	void dockWidgetVisibilityChanged( DockableWidget *w );
 	void updateViewMenu();
+	void updateVDPViewMenu();
 	void updateWindowTitle();
 
 	friend class QueryPauseHandler;
