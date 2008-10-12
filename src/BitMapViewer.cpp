@@ -40,6 +40,9 @@ BitMapViewer::BitMapViewer( QWidget *parent)
 	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
 	connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
 
+	connect( imageWidget,  SIGNAL( imagePosition (int,int,int,unsigned int,int) ), this, SLOT( imagePositionUpdate(int,int,int,unsigned int,int) ) );
+	connect( imageWidget,  SIGNAL( imageClicked (int,int,int,int) ), this, SLOT( imagePositionUpdate(int,int,int,unsigned int,int) ) );
+
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
 }
@@ -234,6 +237,7 @@ void BitMapViewer::on_showPage_currentIndexChanged( int index )
 	//if this is the consequence of a a .clear() in the on_screenMode_currentIndexChanged
 	// then we do nothing!
 	if (index == -1) return;
+	showpage=index;
 
 	int m1[] = {0x00000 , 0x08000, 0x10000, 0x18000 };
 	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged( int %i);\n",index);
@@ -304,4 +308,14 @@ void BitMapViewer::on_refreshButton_clicked( bool checked )
 void BitMapViewer::on_VDPDataStore_dataRefreshed()
 {
 	decodeVDPregs();
+}
+
+void BitMapViewer::imagePositionUpdate(int x,int y,int color, unsigned addr, int byteValue)
+{
+	labelX->setText(QString("%1").arg(x,3,10,QChar('0')));
+	labelY->setText(QString("%1").arg(y,3,10,QChar('0')));
+	labelColor->setText(QString("%1").arg(color,3,10,QChar('0')));
+	labelByte->setText(QString("0x%1").arg(byteValue,2,16,QChar('0')));
+	labelVramAddr->setText(QString("0x%1").arg(addr,5,16,QChar('0')));
+
 }

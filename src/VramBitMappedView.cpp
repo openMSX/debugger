@@ -26,6 +26,10 @@ VramBitMappedView::VramBitMappedView(QWidget *parent) : QWidget(parent),image(51
 			msxpallet[i] = qRgb(80,80,80);
   }
   setZoom(1.0);
+
+  // mouse update events when mouse is moved over the image, Quibus likes this
+  // better then my preferd click-on-the-image
+  setMouseTracking(true);
 }
 
 void VramBitMappedView::setZoom(float zoom) 
@@ -319,8 +323,80 @@ void VramBitMappedView::refresh()
 	update();
 }
 
+void VramBitMappedView::mouseMoveEvent ( QMouseEvent * e )
+{
+	const unsigned int bytes_a_line[]={0,	//screen 0
+					1,	//screen 1
+					2,	// 2
+					3,	// 3
+					4,	
+					128,	// 5
+					128,
+					256,	// 7
+					256,
+					256,	// 9
+					256,
+					256,
+					256 };
+	const unsigned int pixels_per_byte[]={0,1,2,3,4,
+					2,	// 5
+					4,
+					2,	// 7
+					1,
+					1,	//9
+					1,
+					1,
+					1 };
+	/*
+	const unsigned int bytes_a_page[]={0,1,2,3,4,
+					256*128, // 5
+					256*128,
+					256*256, // 7
+					256*256,
+					256*256, // 9
+					256*256,
+					256*256,
+					256*256 };
+	*/
+
+	int x = int(e->x()/zoomFactor);
+	int y = int(e->y()/zoomFactor) >> 1;
+	if (!( (screenMode==6) || (screenMode==7) )){
+		x=x>>1;
+	};
+
+	unsigned int offset = bytes_a_line[screenMode] * y + \
+			x/pixels_per_byte[screenMode];
+	unsigned int addr = offset + vramAddress ;
+	unsigned char* val =vramBase + ( (screenMode<8)?
+			addr:
+			(((addr>>1)|(addr<<16)) & 0x1FFFF ) );
+
+	int byteval = *val;
+	int color;
+	switch (screenMode){
+		case 5:
+		case 7:
+			color = 15 & ((x&1)?byteval:(byteval>>4));
+			break;;
+		case 6:
+			color = 3 & (byteval>>(2*(3-(x&3))));
+			break;;
+		case 8:
+		case 10:
+		case 11:
+		case 12:
+			color=byteval;
+
+	}
+	emit imagePosition(x,y,color,addr,byteval);
+}
+
 void VramBitMappedView::mousePressEvent ( QMouseEvent * e )
 {
+	// since mouseMove only emits the correct signal we reuse/abuse that method
+	mouseMoveEvent(e);
+
 	decodePallet();
 	decode();
 	update();

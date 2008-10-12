@@ -56,6 +56,9 @@ private slots:
 	void on_editPaletteButton_clicked ( bool checked );
 	void on_useVDPPalette_stateChanged ( int state );
 	void on_zoomLevel_valueChanged ( double d );
+
+	void imagePositionUpdate(int x, int y, int color, unsigned addr,int byteValue);
+
 	//void on_refreshButton_clicked ( bool checked );
 	void on_VDPDataStore_dataRefreshed();
 };

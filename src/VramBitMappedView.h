@@ -26,14 +26,16 @@ public:
     QRgb msxpallet[16];
 
     void mousePressEvent ( QMouseEvent * e );
-    
+    void mouseMoveEvent ( QMouseEvent * e );
+
 public slots:
     void refresh();
 
 signals:
     void imageChanged();
-    //void imageClicked(int xcoormsx,int ycoormsx);
-	
+    void imagePosition(int xcoormsx,int ycoormsx, int color, unsigned addr, int byte);
+    void imageClicked(int xcoormsx,int ycoormsx, int color, unsigned addr, int byte);
+
 protected:
     void paintEvent( QPaintEvent* );
 
@@ -53,7 +55,7 @@ private:
     float zoomFactor;
     unsigned char* pallet;
     unsigned char* vramBase;
-    int vramAddress;
+    unsigned int vramAddress;
     int lines;
     int screenMode;
     int borderColor;

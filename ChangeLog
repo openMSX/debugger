@@ -1,6 +1,10 @@
 $Id$
 
-2009-09-15 David Heremans <david.heremans@gnu-linux.net>
+2009-10-12 David Heremans <david.heremans@gnu-linux.net>
+	* More WIP: some more pixel based fun in the bitmapped
+	  vram viewer
+
+2009-10-08 David Heremans <david.heremans@gnu-linux.net>
 	* Added WIP:
 	   - A bitmapped vram viewer
 	   - The VDP status registers explained

@@ -513,7 +513,7 @@
      <item>
       <widget class="QLabel" name="label_17" >
        <property name="text" >
-        <string>Physical vram address:</string>
+        <string>Vram address:</string>
        </property>
       </widget>
      </item>
