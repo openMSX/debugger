@@ -1,10 +1,14 @@
 $Id$
 
-2009-10-12 David Heremans <david.heremans@gnu-linux.net>
+2008-10-13 Edwin Velds <e.velds@gmail.com>
+	* Small fix in usage of qWarning.
+	* Fixed ChangeLog dates.
+
+2008-10-12 David Heremans <david.heremans@gnu-linux.net>
 	* More WIP: some more pixel based fun in the bitmapped
 	  vram viewer
 
-2009-10-08 David Heremans <david.heremans@gnu-linux.net>
+2008-10-08 David Heremans <david.heremans@gnu-linux.net>
 	* Added WIP:
 	   - A bitmapped vram viewer
 	   - The VDP status registers explained
@@ -13,35 +17,35 @@ $Id$
 	  refinements, the last one is only a ui and some helper class at
 	  the moment.
 
-2009-09-15 David Heremans <david.heremans@gnu-linux.net>
+2008-09-15 David Heremans <david.heremans@gnu-linux.net>
 	* Added visual indication to show focus on HexViewer widget.
 	* More special keys handling.
 	* All debuggable views are now editable.A single value OR a
 	  chain of characters depending on where you click.
 
-2009-09-14 David Heremans <david.heremans@gnu-linux.net>
+2008-09-14 David Heremans <david.heremans@gnu-linux.net>
 	* HexViewer now correctly writes new values to the originatin
 	  debugable.
 
-2009-09-13 David Heremans <david.heremans@gnu-linux.net>
+2008-09-13 David Heremans <david.heremans@gnu-linux.net>
 	* More mousesupport in HexViewer
 	* Differentiate between data- vs charbased input.
 	  And of course visual indication for this feature.
 
-2009-09-12 David Heremans <david.heremans@gnu-linux.net>
+2008-09-12 David Heremans <david.heremans@gnu-linux.net>
 	* Added tooltips to HexViewer.
 	* Directly update memoryviewer after linking to a register.
 
-2009-09-11 David Heremans <david.heremans@gnu-linux.net>
+2008-09-11 David Heremans <david.heremans@gnu-linux.net>
 	* Made the memoryviewer always start at an offset of "horBytes".
 	* Introduced the backgroundmarker to indicate the selected address.
 	* Fixed an asyncronisation problem which made the scrollbalk cycle
 	  between previous values.
 
-2009-09-10 David Heremans <david.heremans@gnu-linux.net>
+2008-09-10 David Heremans <david.heremans@gnu-linux.net>
 	* You can now select the cpu register to follow.
 
-2009-09-09 David Heremans <david.heremans@gnu-linux.net>
+2008-09-09 David Heremans <david.heremans@gnu-linux.net>
 	* First steps towards MainMemoryViewer with Compass like
 	  'Linked-to-register' functionality. For now at least 
 	  one can enter the address for the memory viewer as hex value.

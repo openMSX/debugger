@@ -177,9 +177,9 @@ void OpenMSXConnection::processData()
 
 bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
 {
-	qWarning((QString("Fatal error on line") + exception.lineNumber() +
-	          ", column" + exception.columnNumber() +
-	          ": " + exception.message()).toAscii().data());
+	qWarning( "Fatal error on line %i, column %i: %s",
+	          exception.lineNumber(), exception.columnNumber(),
+	          exception.message().toAscii().data());
 	cleanup();
 	return false;
 }
@@ -216,7 +216,7 @@ bool OpenMSXConnection::endElement(
 	} else if (qName == "update") {
 		emit updateParsed(xmlAttrs.value("type"), xmlAttrs.value("name"), xmlData);
 	} else {
-		qWarning((QString("Unknown XML tag: ") + qName).toAscii().data());
+		qWarning("Unknown XML tag: %s", qName.toAscii().data());
 	}
 	return true;
 }
