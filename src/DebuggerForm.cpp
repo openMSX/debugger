@@ -262,14 +262,14 @@ void DebuggerForm::createActions()
 	viewDebuggableViewerAction = new QAction(tr("Add debuggable viewer"), this);
 	viewDebuggableViewerAction->setStatusTip(tr("Add a hex viewer for debuggables"));
 
-	viewVDPStatusRegsAction = new QAction(tr("VDP status register viewer"), this);
+	viewVDPStatusRegsAction = new QAction(tr("Status Registers"), this);
 	viewVDPStatusRegsAction->setStatusTip(tr("The VDP status registers interpreted"));
 	viewVDPStatusRegsAction->setCheckable(true);
-	viewVDPRegsAction = new QAction(tr("VDP register viewer"), this);
+	viewVDPRegsAction = new QAction(tr("Registers"), this);
 	viewVDPRegsAction->setStatusTip(tr("Interact with the VDP registers"));
 	viewVDPRegsAction->setCheckable(true);
-	viewBitMappedAction = new QAction(tr("Add bitmapped vram viewer"), this);
-	viewBitMappedAction->setStatusTip(tr("Decode vram as screen 5/6/7/8 image"));
+	viewBitMappedAction = new QAction(tr("Bitmapped VRAM"), this);
+	viewBitMappedAction->setStatusTip(tr("Decode VRAM as screen 5/6/7/8 image"));
 	//viewBitMappedAction->setCheckable(true);
 
 	executeBreakAction = new QAction(tr("Break"), this);
@@ -377,15 +377,15 @@ void DebuggerForm::createMenus()
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemPreferencesAction);
 
-	// create execute menu
+	// create view menu
 	viewMenu = menuBar()->addMenu(tr("&View"));
 	viewMenu->addAction(viewRegistersAction);
 	viewMenu->addAction(viewFlagsAction);
 	viewMenu->addAction(viewStackAction);
 	viewMenu->addAction(viewSlotsAction);
 	viewMenu->addAction(viewMemoryAction);
+	viewVDPDialogsMenu = viewMenu->addMenu("VDP");
 	viewMenu->addSeparator();
-	viewVDPDialogsMenu = viewMenu->addMenu("view VDP Dialogs");
 	viewMenu->addAction(viewDebuggableViewerAction);
 	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
 
@@ -1088,7 +1088,7 @@ void DebuggerForm::toggleBitMappedDisplay()
 	BitMapViewer *viewer = new BitMapViewer();
 	DockableWidget *dw = new DockableWidget( dockMan );
 	dw->setWidget(viewer);
-	dw->setTitle(tr("bitmapped vram view"));
+	dw->setTitle(tr("Bitmapped VRAM View"));
 	dw->setId("BITMAPVRAMVIEW");
 	dw->setFloating(true);
 	dw->setDestroyable(true);
