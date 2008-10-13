@@ -35,11 +35,11 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	//connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
 	//connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
 
-	connect( pushButton_0_7, SIGNAL( mouseOver(bool) ), pushButton_0_7, SLOT( highlight(bool) ) );
-	connect( pushButton_0_6, SIGNAL( mouseOver(bool) ), pushButton_0_6, SLOT( highlight(bool) ) );
-	connect( pushButton_0_5, SIGNAL( mouseOver(bool) ), pushButton_0_5, SLOT( highlight(bool) ) );
-	connect( pushButton_0_4, SIGNAL( mouseOver(bool) ), pushButton_0_4, SLOT( highlight(bool) ) );
-	connect( pushButton_0_3, SIGNAL( mouseOver(bool) ), pushButton_0_3, SLOT( highlight(bool) ) );
+	//connect( pushButton_0_7, SIGNAL( mouseOver(bool) ), pushButton_0_7, SLOT( highlight(bool) ) );
+	//connect( pushButton_0_6, SIGNAL( mouseOver(bool) ), pushButton_0_6, SLOT( highlight(bool) ) );
+	//connect( pushButton_0_5, SIGNAL( mouseOver(bool) ), pushButton_0_5, SLOT( highlight(bool) ) );
+	//connect( pushButton_0_4, SIGNAL( mouseOver(bool) ), pushButton_0_4, SLOT( highlight(bool) ) );
+	//connect( pushButton_0_3, SIGNAL( mouseOver(bool) ), pushButton_0_3, SLOT( highlight(bool) ) );
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -51,65 +51,98 @@ VDPRegViewer::~VDPRegViewer()
 
 void VDPRegViewer::decodeVDPRegs()
 {
-/*
 	//first update all hex values
-	label_val_0->setText(QString("%1").arg(statusregs[0],2,16,QChar('0')));
-	label_val_1->setText(QString("%1").arg(statusregs[1],2,16,QChar('0')));
-	label_val_2->setText(QString("%1").arg(statusregs[2],2,16,QChar('0')));
-	label_val_3->setText(QString("%1").arg(statusregs[3],2,16,QChar('0')));
-	label_val_4->setText(QString("%1").arg(statusregs[4],2,16,QChar('0')));
-	label_val_5->setText(QString("%1").arg(statusregs[5],2,16,QChar('0')));
-	label_val_6->setText(QString("%1").arg(statusregs[6],2,16,QChar('0')));
-	label_val_7->setText(QString("%1").arg(statusregs[7],2,16,QChar('0')));
-	label_val_8->setText(QString("%1").arg(statusregs[8],2,16,QChar('0')));
-	label_val_9->setText(QString("%1").arg(statusregs[9],2,16,QChar('0')));
+	label_val_0->setText(QString("%1").arg(regs[0],2,16,QChar('0')));
+	label_val_1->setText(QString("%1").arg(regs[1],2,16,QChar('0')));
+	label_val_2->setText(QString("%1").arg(regs[2],2,16,QChar('0')));
+	label_val_3->setText(QString("%1").arg(regs[3],2,16,QChar('0')));
+	label_val_4->setText(QString("%1").arg(regs[4],2,16,QChar('0')));
+	label_val_5->setText(QString("%1").arg(regs[5],2,16,QChar('0')));
+	label_val_6->setText(QString("%1").arg(regs[6],2,16,QChar('0')));
+	label_val_7->setText(QString("%1").arg(regs[7],2,16,QChar('0')));
+	label_val_8->setText(QString("%1").arg(regs[8],2,16,QChar('0')));
+	label_val_9->setText(QString("%1").arg(regs[9],2,16,QChar('0')));
+	label_val_10->setText(QString("%1").arg(regs[10],2,16,QChar('0')));
+	label_val_11->setText(QString("%1").arg(regs[11],2,16,QChar('0')));
+	label_val_12->setText(QString("%1").arg(regs[12],2,16,QChar('0')));
+	label_val_13->setText(QString("%1").arg(regs[13],2,16,QChar('0')));
+	label_val_14->setText(QString("%1").arg(regs[14],2,16,QChar('0')));
+	label_val_15->setText(QString("%1").arg(regs[15],2,16,QChar('0')));
+	label_val_16->setText(QString("%1").arg(regs[16],2,16,QChar('0')));
+	label_val_17->setText(QString("%1").arg(regs[17],2,16,QChar('0')));
+	label_val_18->setText(QString("%1").arg(regs[18],2,16,QChar('0')));
+	label_val_19->setText(QString("%1").arg(regs[19],2,16,QChar('0')));
+	label_val_20->setText(QString("%1").arg(regs[20],2,16,QChar('0')));
+	label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')));
+	label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')));
+	label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')));
 	//update all the individual bits
-	for (int r=0;r<=9;r++){
+	for (int r=0;r<=23;r++){
 		for (int b=7;b>=0;b--){
-			QString name=QString("label_%1_%2").arg(r).arg(b);
-			InteractiveLabel *l = qFindChild<InteractiveLabel*>(this, name);
-			l->setText((statusregs[r]&(1<<b))?"1":"0");
+			QString name=QString("pushButton_%1_%2").arg(r).arg(b);
+			InteractiveButton *I = qFindChild<InteractiveButton*>(this, name);
+			I->setChecked((regs[r]&(1<<b))?true:false);
 		};
 	};
 	
 
 	// Start the interpretation
-	label_I_0_7->setText((statusregs[0] & 128)?"Interrupt":"No int" );
-	label_I_0_6->setText((statusregs[0] & 64)?"5th sprite":"No 5th" );
-	label_I_0_5->setText((statusregs[0] & 32)?"Collision":"No collision" );
-	label_I_0_0->setText(QString("sprnr:%1").arg(statusregs[0] & 31));
+	label_dec_ie2->setText((regs[0] & 32)?"Interrupt from lightpen enabled":"Interrupt from lightpen disabled" );
+	label_dec_ie1->setText((regs[0] & 16)?"Horizontal scanning line int enabled":"Horizontal scanning line int disabled" );
 
-	label_I_1_7->setText((statusregs[1] & 128)?"Light":"No light" );
-	label_I_1_6->setText((statusregs[1] & 64)?"switch on":"Switch off" );
-	label_I_1_0->setText((statusregs[1] & 1)?"hor scanline int":"no hor int" );
-	QString id;
-	switch (statusregs[1] & 62){
-		case 0:
-			id=QString("v9938");
-			break;;
-		case 2:
-			id=QString("v9948");
-			break;;
-		case 4:
-			id=QString("v9958");
-			break;;
-		default:
-			id=QString("unknown VDP");
-	}
-	label_I_1_1->setText( id );
+	int m=((regs[0] & 14)<<1) | ((regs[1] & 24)>>3);
+	const char* screen[]={"let's find out 0", "let's find out 1", "let's find out 2",
+	  "let's find out 3", "let's find out 4", "let's find out 5",
+	  "let's find out 6", "let's find out 7", "let's find out 8",
+	  "let's find out 9", "let's find out 10", "let's find out 11",
+	  "let's find out 12", "let's find out 13", "let's find out 14",
+	  "let's find out 15", "let's find out 16", "let's find out 17",
+	  "let's find out 18", "let's find out 19", "let's find out 20",
+	  "let's find out 21", "let's find out 22", "let's find out 23",
+	  "let's find out 24", "let's find out 25", "let's find out 26",
+	  "let's find out 27", "let's find out 28", "let's find out 29",
+	  "let's find out 30", "let's find out 31"};
+	label_dec_m->setText(QString("Screen modebits %1 : SCREEN %2").arg(m).arg(screen[m]) );
 
-	label_I_2_7->setText((statusregs[2] & 128)?"Transfer ready":"Transfering" );
-	label_I_2_6->setText((statusregs[2] & 64)?"Vertical scanning":"Not vert scan" );
-	label_I_2_5->setText((statusregs[2] & 32)?"Horizontal scanning":"Not hor scan" );
-	label_I_2_4->setText((statusregs[2] & 16)?"Boundary color detected":"BC not deteced" );
-	label_I_2_1->setText((statusregs[2] & 2)?"First field":"Second field" );
-	label_I_2_0->setText((statusregs[2] & 2)?"Command execution":"No command exec" );
+	label_dec_bl->setText((regs[1] & 64)?"Display enabled":"Display disabled");
+	label_dec_ie0->setText((regs[1] & 32)?"Horizontal scanning line int enabled":"Horizontal scanning line int disabled" );
 
-	label_I_3->setText(QString("Column: %1").arg(statusregs[3]|((statusregs[4]&1)<<8)));
-	label_I_5->setText(QString("Row: %1").arg(statusregs[5]|((statusregs[6]&3)<<8)));
-	label_I_7->setText(QString("Color: %1").arg(statusregs[7]));
-	label_I_8->setText(QString("Border X: %1").arg(statusregs[8]|((statusregs[9]&1)<<8)));
-*/
+	label_dec_si->setText((regs[1] & 2)?"16x16 sprites":"8x8 sprites" );
+	label_dec_mag->setText((regs[1] & 1)?"magnified sprites":"regular sized" );
+
+	label_dec_tp->setText((regs[8] & 32)?"Color 0 is transparent (=shows border)":"Color 0 uses the color registers" );
+	label_dec_spd->setText((regs[8] & 2)?"Sprites enabled":"Sprites disabled");
+
+	label_dec_ln->setText((regs[9] & 128)?"212":"192");
+	label_dec_il->setText((regs[9] & 8)?"interlaced":"non-interlaced");
+	label_dec_eo->setText((regs[9] & 4)?"alternate pages":"same page");
+	label_dec_nt->setText((regs[9] & 2)?"PAL":"NTSC");
+
+	//TODO mask according to screen mode, displayed values are wrong atm!!
+	//TODO ignore bits if in MSX1 debug mode
+	label_dec_r2->setText(QString("0x%1").arg(regs[2]<<10,5,16,QChar('0')));
+	label_dec_r3->setText(QString("0x%1").arg((regs[3]<<6)|(regs[10]<<14),5,16,QChar('0')));
+	label_dec_r4->setText(QString("0x%1").arg(regs[4]<<11,5,16,QChar('0')));
+	label_dec_r5->setText(QString("0x%1").arg((regs[5]<<7)|(regs[11]<<15),5,16,QChar('0')));
+	label_dec_r6->setText(QString("0x%1").arg(regs[6]<<11,5,16,QChar('0')));
+
+	label_dec_tc->setText(QString("%1").arg((regs[7]>>4)&15 ,2,10,QChar('0')));
+	label_dec_bd->setText(QString("%1").arg( regs[7]&15     ,2,10,QChar('0')));
+	label_dec_t2->setText(QString("%1").arg((regs[12]>>4)&15 ,2,10,QChar('0')));
+	label_dec_bc->setText(QString("%1").arg( regs[12]&15     ,2,10,QChar('0')));
+	label_dec_on->setText(QString("%1").arg((regs[13]>>4)&15 ,2,10,QChar('0')));
+	label_dec_off->setText(QString("%1").arg( regs[13]&15     ,2,10,QChar('0')));
+
+	int x=(regs[8]&15)-8;
+	int y=((regs[8]>>4)&15)-8;
+	label_dec_r18->setText(QString("(%1,%2)").arg(x).arg(y));
+
+	label_dec_r19->setText(QString("%1").arg(regs[19] ,3,10));
+
+	label_dec_r14->setText(QString("0x%1").arg(regs[14]<<14,5,16,QChar('0')));
+	label_dec_r15->setText(QString("%1").arg(regs[15]&15 ,2,10));
+	label_dec_r16->setText(QString("%1").arg(regs[16]&15 ,2,10));
+	label_dec_r17->setText(QString("%1").arg(regs[17]&63 ,3,10).append((regs[17]&128)?" ,auto incr":""));
 }
 
 void VDPRegViewer::doConnect( InteractiveButton* but, buttonHighlightDispatcher* dis)
@@ -118,141 +151,196 @@ void VDPRegViewer::doConnect( InteractiveButton* but, buttonHighlightDispatcher*
 		connect( dis, SIGNAL( dispatchState(bool) ), but, SLOT( highlight(bool) ) );
 };
 
+
+void VDPRegViewer::monoGroup( InteractiveButton* but, InteractiveLabel* lab)
+{
+	connect( lab, SIGNAL( mouseOver(bool) ), but, SLOT( highlight(bool) ) );
+	connect( but, SIGNAL( mouseOver(bool) ), lab, SLOT( highlight(bool) ) );
+	connect( lab, SIGNAL( mouseOver(bool) ), lab, SLOT( highlight(bool) ) );
+}
+
+void VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* explained)
+{
+        // First "steal" the Tooltip of the explained widget.
+        InteractiveButton* item;
+
+	/*
+        foreach (item , list){
+                item->setToolTip( explained->toolTip() );
+        };
+	*/
+
+        //Create a dispatcher and connect all to them
+        buttonHighlightDispatcher* dispat = new buttonHighlightDispatcher();
+	connect( explained, SIGNAL( mouseOver(bool) ), dispat, SLOT( receiveState(bool) ) );
+	connect( dispat, SIGNAL( dispatchState(bool) ), explained, SLOT( highlight(bool) ) );
+        foreach (item , list){
+                doConnect( item, dispat );
+        };
+}
+
+
+
 void VDPRegViewer::connectHighLights()
 {
-	buttonHighlightDispatcher* dispat = new buttonHighlightDispatcher();
-/*
-	doConnect( label_0_7, dispat );
-	doConnect( label_I_0_7, dispat );
+	QList<InteractiveButton*> list;
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_0_6, dispat );
-	doConnect( label_I_0_6, dispat );
+	// register 0 (+M1,M2)
+	monoGroup( pushButton_0_5,label_dec_ie2);
+	monoGroup( pushButton_0_4,label_dec_ie1);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_0_5, dispat );
-	doConnect( label_I_0_5, dispat );
+	list.clear();
+	list << pushButton_0_3 << pushButton_0_2 << pushButton_0_1;
+	list << pushButton_1_4 << pushButton_1_3;
+	makeGroup( list, label_dec_m);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_0_4, dispat );
-	doConnect( label_0_3, dispat );
-	doConnect( label_0_2, dispat );
-	doConnect( label_0_1, dispat );
-	doConnect( label_0_0, dispat );
-	doConnect( label_I_0_0, dispat );
+	// register 1
+	monoGroup( pushButton_1_6,label_dec_bl);
+	monoGroup( pushButton_1_5,label_dec_ie0);
+	monoGroup( pushButton_1_1,label_dec_si);
+	monoGroup( pushButton_1_0,label_dec_mag);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_1_7, dispat );
-	doConnect( label_I_1_7, dispat );
+	// register 8
+	//monoGroup( pushButton_8_7,label_dec_ms);
+	//monoGroup( pushButton_8_6,label_dec_lp);
+	monoGroup( pushButton_8_5,label_dec_tp);
+	//monoGroup( pushButton_8_4,label_dec_cb);
+	//monoGroup( pushButton_8_3,label_dec_vr);
+	monoGroup( pushButton_8_1,label_dec_spd);
+	//monoGroup( pushButton_8_0,label_dec_bw);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_1_6, dispat );
-	doConnect( label_I_1_6, dispat );
+	// register 9
+	monoGroup( pushButton_9_7,label_dec_ln);
+	list.clear();
+	list << pushButton_9_5 << pushButton_9_4 ;
+	makeGroup( list, label_dec_m); //TODO fix label
+	monoGroup( pushButton_9_3,label_dec_il);
+	monoGroup( pushButton_9_2,label_dec_eo);
+	monoGroup( pushButton_9_1,label_dec_nt);
+	//monoGroup( pushButton_9_0,label_dec_dc);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_1_5, dispat );
-	doConnect( label_1_4, dispat );
-	doConnect( label_1_3, dispat );
-	doConnect( label_1_2, dispat );
-	doConnect( label_1_1, dispat );
-	doConnect( label_I_1_1, dispat );
+	// register 2
+	list.clear();
+	list << pushButton_2_7 << pushButton_2_6 << pushButton_2_5;
+	list << pushButton_2_4 << pushButton_2_3 << pushButton_2_2;
+	list << pushButton_2_1 << pushButton_2_0;
+	makeGroup( list, label_dec_r2);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_1_0, dispat );
-	doConnect( label_I_1_0, dispat );
+	// register 3 + 10
+	list.clear();
+	list << pushButton_3_7 << pushButton_3_6 << pushButton_3_5;
+	list << pushButton_3_4 << pushButton_3_3 << pushButton_3_2;
+	list << pushButton_3_1 << pushButton_3_0;
+	list << pushButton_10_7 << pushButton_10_6 << pushButton_10_5;
+	list << pushButton_10_4 << pushButton_10_3 << pushButton_10_2;
+	list << pushButton_10_1 << pushButton_10_0;
+	makeGroup( list, label_dec_r3);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_7, dispat );
-	doConnect( label_I_2_7, dispat );
+	// register 4
+	list.clear();
+	list << pushButton_4_7 << pushButton_4_6 << pushButton_4_5;
+	list << pushButton_4_4 << pushButton_4_3 << pushButton_4_2;
+	list << pushButton_4_1 << pushButton_4_0;
+	makeGroup( list, label_dec_r4);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_6, dispat );
-	doConnect( label_I_2_6, dispat );
+	// register 5 + 11
+	list.clear();
+	list << pushButton_5_7 << pushButton_5_6 << pushButton_5_5;
+	list << pushButton_5_4 << pushButton_5_3 << pushButton_5_2;
+	list << pushButton_5_1 << pushButton_5_0;
+	list << pushButton_11_7 << pushButton_11_6 << pushButton_11_5;
+	list << pushButton_11_4 << pushButton_11_3 << pushButton_11_2;
+	list << pushButton_11_1 << pushButton_11_0;
+	makeGroup( list, label_dec_r5);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_5, dispat );
-	doConnect( label_I_2_5, dispat );
+	// register 6
+	list.clear();
+	list << pushButton_6_7 << pushButton_6_6 << pushButton_6_5;
+	list << pushButton_6_4 << pushButton_6_3 << pushButton_6_2;
+	list << pushButton_6_1 << pushButton_6_0;
+	makeGroup( list, label_dec_r6);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_4, dispat );
-	doConnect( label_I_2_4, dispat );
+	// register 7
+	list.clear();
+	list << pushButton_7_7 << pushButton_7_6;
+	list << pushButton_7_5 << pushButton_7_4;
+	makeGroup( list, label_dec_tc);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_1, dispat );
-	doConnect( label_I_2_1, dispat );
+	list.clear();
+	list << pushButton_7_3 << pushButton_7_2;
+	list << pushButton_7_1 << pushButton_7_0;
+	makeGroup( list, label_dec_bd);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_2_0, dispat );
-	doConnect( label_I_2_0, dispat );
+	// register 12
+	list.clear();
+	list << pushButton_12_7 << pushButton_12_6;
+	list << pushButton_12_5 << pushButton_12_4;
+	makeGroup( list, label_dec_t2);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_3_7, dispat );
-	doConnect( label_3_6, dispat );
-	doConnect( label_3_5, dispat );
-	doConnect( label_3_4, dispat );
-	doConnect( label_3_3, dispat );
-	doConnect( label_3_2, dispat );
-	doConnect( label_3_1, dispat );
-	doConnect( label_3_0, dispat );
-	doConnect( label_4_7, dispat );
-	doConnect( label_4_6, dispat );
-	doConnect( label_4_5, dispat );
-	doConnect( label_4_4, dispat );
-	doConnect( label_4_3, dispat );
-	doConnect( label_4_2, dispat );
-	doConnect( label_4_1, dispat );
-	doConnect( label_4_0, dispat );
-	doConnect( label_I_3, dispat );
+	list.clear();
+	list << pushButton_12_3 << pushButton_12_2;
+	list << pushButton_12_1 << pushButton_12_0;
+	makeGroup( list, label_dec_bc);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_5_7, dispat );
-	doConnect( label_5_6, dispat );
-	doConnect( label_5_5, dispat );
-	doConnect( label_5_4, dispat );
-	doConnect( label_5_3, dispat );
-	doConnect( label_5_2, dispat );
-	doConnect( label_5_1, dispat );
-	doConnect( label_5_0, dispat );
-	doConnect( label_6_7, dispat );
-	doConnect( label_6_6, dispat );
-	doConnect( label_6_5, dispat );
-	doConnect( label_6_4, dispat );
-	doConnect( label_6_3, dispat );
-	doConnect( label_6_2, dispat );
-	doConnect( label_6_1, dispat );
-	doConnect( label_6_0, dispat );
-	doConnect( label_I_5, dispat );
+	// register 13
+	list.clear();
+	list << pushButton_13_7 << pushButton_13_6;
+	list << pushButton_13_5 << pushButton_13_4;
+	makeGroup( list, label_dec_on);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_7_7, dispat );
-	doConnect( label_7_6, dispat );
-	doConnect( label_7_5, dispat );
-	doConnect( label_7_4, dispat );
-	doConnect( label_7_3, dispat );
-	doConnect( label_7_2, dispat );
-	doConnect( label_7_1, dispat );
-	doConnect( label_7_0, dispat );
-	doConnect( label_I_7, dispat );
+	list.clear();
+	list << pushButton_13_3 << pushButton_13_2;
+	list << pushButton_13_1 << pushButton_13_0;
+	makeGroup( list, label_dec_off);
 
-	dispat = new buttonHighlightDispatcher();
-	doConnect( label_8_7, dispat );
-	doConnect( label_8_6, dispat );
-	doConnect( label_8_5, dispat );
-	doConnect( label_8_4, dispat );
-	doConnect( label_8_3, dispat );
-	doConnect( label_8_2, dispat );
-	doConnect( label_8_1, dispat );
-	doConnect( label_8_0, dispat );
-	doConnect( label_9_7, dispat );
-	doConnect( label_9_6, dispat );
-	doConnect( label_9_5, dispat );
-	doConnect( label_9_4, dispat );
-	doConnect( label_9_3, dispat );
-	doConnect( label_9_2, dispat );
-	doConnect( label_9_1, dispat );
-	doConnect( label_9_0, dispat );
-	doConnect( label_I_8, dispat );
-*/
+	// register 14
+	list.clear();
+	list << pushButton_14_7 << pushButton_14_6 << pushButton_14_5;
+	list << pushButton_14_4 << pushButton_14_3 << pushButton_14_2;
+	list << pushButton_14_1 << pushButton_14_0;
+	makeGroup( list, label_dec_r14);
+
+	// register 15
+	list.clear();
+	list << pushButton_15_7 << pushButton_15_6 << pushButton_15_5;
+	list << pushButton_15_4 << pushButton_15_3 << pushButton_15_2;
+	list << pushButton_15_1 << pushButton_15_0;
+	makeGroup( list, label_dec_r15);
+
+	// register 16
+	list.clear();
+	list << pushButton_16_7 << pushButton_16_6 << pushButton_16_5;
+	list << pushButton_16_4 << pushButton_16_3 << pushButton_16_2;
+	list << pushButton_16_1 << pushButton_16_0;
+	makeGroup( list, label_dec_r16);
+
+	// register 17
+	list.clear();
+	list << pushButton_17_7 << pushButton_17_6 << pushButton_17_5;
+	list << pushButton_17_4 << pushButton_17_3 << pushButton_17_2;
+	list << pushButton_17_1 << pushButton_17_0;
+	makeGroup( list, label_dec_r17);
+
+	// register 18
+	list.clear();
+	list << pushButton_18_7 << pushButton_18_6 << pushButton_18_5;
+	list << pushButton_18_4 << pushButton_18_3 << pushButton_18_2;
+	list << pushButton_18_1 << pushButton_18_0;
+	makeGroup( list, label_dec_r18);
+
+	// register 19
+	list.clear();
+	list << pushButton_19_7 << pushButton_19_6 << pushButton_19_5;
+	list << pushButton_19_4 << pushButton_19_3 << pushButton_19_2;
+	list << pushButton_19_1 << pushButton_19_0;
+	makeGroup( list, label_dec_r19);
+
+	// register 23
+	list.clear();
+	list << pushButton_23_7 << pushButton_23_6 << pushButton_23_5;
+	list << pushButton_23_4 << pushButton_23_3 << pushButton_23_2;
+	list << pushButton_23_1 << pushButton_23_0;
+	makeGroup( list, label_dec_r23);
 
 }
 

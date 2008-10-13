@@ -23,13 +23,15 @@ public:
 	unsigned char* getPalettePointer();
 	unsigned char* getRegsPointer();
 	unsigned char* getStatusRegsPointer();
+	bool old_version;	// TODO these should be private but then
+	bool got_version;	// VDPDataStoreVersionCheck needs to be 'friend'
+				// so this is simpler for this WIP :-)
 
 private:
 	unsigned char* vram;
 	unsigned char* palette;
 	unsigned char* regs;
 	unsigned char* statusRegs;
-
 
 public slots:
 	void refresh();

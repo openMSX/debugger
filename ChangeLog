@@ -1,5 +1,9 @@
 $Id$
 
+2008-10-13 David Heremans <david.heremans@gnu-linux.net>
+	* Check if this it is {physical VRAM} vs the older {VRAM}
+	* More registerViewer code
+
 2008-10-13 Edwin Velds <e.velds@gmail.com>
 	* Small fix in usage of qWarning.
 	* Fixed ChangeLog dates.

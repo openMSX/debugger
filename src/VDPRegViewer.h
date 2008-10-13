@@ -45,6 +45,8 @@ private:
 	void connectHighLights();
 
 	void doConnect( InteractiveButton* lab, buttonHighlightDispatcher* dis);
+	void makeGroup(QList<InteractiveButton*>, InteractiveLabel*);
+	void monoGroup(InteractiveButton*, InteractiveLabel*);
 
 public slots:
 	void refresh();
