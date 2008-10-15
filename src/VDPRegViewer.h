@@ -21,7 +21,7 @@ public:
 	buttonHighlightDispatcher();
 
 public slots:
-	void receiveState(bool state);	
+	void receiveState(bool state);
 
 signals:
 	void dispatchState(bool state);
@@ -50,7 +50,8 @@ private:
 
 public slots:
 	void refresh();
-	void on_VDPDataStore_dataRefreshed();
+	void VDPDataStoreDataRefreshed();
+	void registerBitChanged(int reg, int bit, bool state);
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

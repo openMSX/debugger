@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>784</height>
+    <height>740</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -9608,7 +9608,7 @@ When 0, sets color (available only with a composite encoder).</string>
      <item>
       <widget class="QGroupBox" name="groupBox_6" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="MinimumExpanding" hsizetype="Expanding" >
+        <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -9616,7 +9616,7 @@ When 0, sets color (available only with a composite encoder).</string>
        <property name="minimumSize" >
         <size>
          <width>250</width>
-         <height>0</height>
+         <height>260</height>
         </size>
        </property>
        <property name="title" >

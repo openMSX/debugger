@@ -3,12 +3,10 @@
 #include <QPalette>
 #include "InteractiveButton.h"
 
-
 buttonHighlightDispatcher::buttonHighlightDispatcher() 
 {
 	counter=0;
 }
-
 
 void buttonHighlightDispatcher::receiveState(bool state)
 {
@@ -20,8 +18,6 @@ void buttonHighlightDispatcher::receiveState(bool state)
 	counter+= state?1:-1;
 }
 
-
-
 VDPRegViewer::VDPRegViewer( QWidget *parent)
 	: QDialog(parent)
 {
@@ -31,7 +27,7 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	//now hook up some signals and slots
 	connectHighLights();
 
-	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( on_VDPDataStore_dataRefreshed() ) );
+	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( VDPDataStoreDataRefreshed() ) );
 	//connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
 	//connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
 
@@ -41,8 +37,15 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	//connect( pushButton_0_4, SIGNAL( mouseOver(bool) ), pushButton_0_4, SLOT( highlight(bool) ) );
 	//connect( pushButton_0_3, SIGNAL( mouseOver(bool) ), pushButton_0_3, SLOT( highlight(bool) ) );
 
+	
+
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
+	// this thing will only work if the VDPDataStore has by now figured out
+	// if it is an oldopenMSX version or a newer one. {physical VRAM}
+	// debugable stuff...
+
+
 }
 
 VDPRegViewer::~VDPRegViewer()
@@ -52,30 +55,30 @@ VDPRegViewer::~VDPRegViewer()
 void VDPRegViewer::decodeVDPRegs()
 {
 	//first update all hex values
-	label_val_0->setText(QString("%1").arg(regs[0],2,16,QChar('0')));
-	label_val_1->setText(QString("%1").arg(regs[1],2,16,QChar('0')));
-	label_val_2->setText(QString("%1").arg(regs[2],2,16,QChar('0')));
-	label_val_3->setText(QString("%1").arg(regs[3],2,16,QChar('0')));
-	label_val_4->setText(QString("%1").arg(regs[4],2,16,QChar('0')));
-	label_val_5->setText(QString("%1").arg(regs[5],2,16,QChar('0')));
-	label_val_6->setText(QString("%1").arg(regs[6],2,16,QChar('0')));
-	label_val_7->setText(QString("%1").arg(regs[7],2,16,QChar('0')));
-	label_val_8->setText(QString("%1").arg(regs[8],2,16,QChar('0')));
-	label_val_9->setText(QString("%1").arg(regs[9],2,16,QChar('0')));
-	label_val_10->setText(QString("%1").arg(regs[10],2,16,QChar('0')));
-	label_val_11->setText(QString("%1").arg(regs[11],2,16,QChar('0')));
-	label_val_12->setText(QString("%1").arg(regs[12],2,16,QChar('0')));
-	label_val_13->setText(QString("%1").arg(regs[13],2,16,QChar('0')));
-	label_val_14->setText(QString("%1").arg(regs[14],2,16,QChar('0')));
-	label_val_15->setText(QString("%1").arg(regs[15],2,16,QChar('0')));
-	label_val_16->setText(QString("%1").arg(regs[16],2,16,QChar('0')));
-	label_val_17->setText(QString("%1").arg(regs[17],2,16,QChar('0')));
-	label_val_18->setText(QString("%1").arg(regs[18],2,16,QChar('0')));
-	label_val_19->setText(QString("%1").arg(regs[19],2,16,QChar('0')));
-	label_val_20->setText(QString("%1").arg(regs[20],2,16,QChar('0')));
-	label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')));
-	label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')));
-	label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')));
+	label_val_0->setText(QString("%1").arg(regs[0],2,16,QChar('0')).toUpper());
+	label_val_1->setText(QString("%1").arg(regs[1],2,16,QChar('0')).toUpper());
+	label_val_2->setText(QString("%1").arg(regs[2],2,16,QChar('0')).toUpper());
+	label_val_3->setText(QString("%1").arg(regs[3],2,16,QChar('0')).toUpper());
+	label_val_4->setText(QString("%1").arg(regs[4],2,16,QChar('0')).toUpper());
+	label_val_5->setText(QString("%1").arg(regs[5],2,16,QChar('0')).toUpper());
+	label_val_6->setText(QString("%1").arg(regs[6],2,16,QChar('0')).toUpper());
+	label_val_7->setText(QString("%1").arg(regs[7],2,16,QChar('0')).toUpper());
+	label_val_8->setText(QString("%1").arg(regs[8],2,16,QChar('0')).toUpper());
+	label_val_9->setText(QString("%1").arg(regs[9],2,16,QChar('0')).toUpper());
+	label_val_10->setText(QString("%1").arg(regs[10],2,16,QChar('0')).toUpper());
+	label_val_11->setText(QString("%1").arg(regs[11],2,16,QChar('0')).toUpper());
+	label_val_12->setText(QString("%1").arg(regs[12],2,16,QChar('0')).toUpper());
+	label_val_13->setText(QString("%1").arg(regs[13],2,16,QChar('0')).toUpper());
+	label_val_14->setText(QString("%1").arg(regs[14],2,16,QChar('0')).toUpper());
+	label_val_15->setText(QString("%1").arg(regs[15],2,16,QChar('0')).toUpper());
+	label_val_16->setText(QString("%1").arg(regs[16],2,16,QChar('0')).toUpper());
+	label_val_17->setText(QString("%1").arg(regs[17],2,16,QChar('0')).toUpper());
+	label_val_18->setText(QString("%1").arg(regs[18],2,16,QChar('0')).toUpper());
+	label_val_19->setText(QString("%1").arg(regs[19],2,16,QChar('0')).toUpper());
+	label_val_20->setText(QString("%1").arg(regs[20],2,16,QChar('0')).toUpper());
+	label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')).toUpper());
+	label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')).toUpper());
+	label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')).toUpper());
 	//update all the individual bits
 	for (int r=0;r<=23;r++){
 		for (int b=7;b>=0;b--){
@@ -110,7 +113,8 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_si->setText((regs[1] & 2)?"16x16 sprites":"8x8 sprites" );
 	label_dec_mag->setText((regs[1] & 1)?"magnified sprites":"regular sized" );
 
-	label_dec_tp->setText((regs[8] & 32)?"Color 0 is transparent (=shows border)":"Color 0 uses the color registers" );
+	label_dec_tp->setText((regs[8] & 32)? "Color 0 uses the color registers":"Color 0 is transparent (=shows border)"
+ );
 	label_dec_spd->setText((regs[8] & 2)?"Sprites enabled":"Sprites disabled");
 
 	label_dec_ln->setText((regs[9] & 128)?"212":"192");
@@ -120,11 +124,11 @@ void VDPRegViewer::decodeVDPRegs()
 
 	//TODO mask according to screen mode, displayed values are wrong atm!!
 	//TODO ignore bits if in MSX1 debug mode
-	label_dec_r2->setText(QString("0x%1").arg(regs[2]<<10,5,16,QChar('0')));
-	label_dec_r3->setText(QString("0x%1").arg((regs[3]<<6)|(regs[10]<<14),5,16,QChar('0')));
-	label_dec_r4->setText(QString("0x%1").arg(regs[4]<<11,5,16,QChar('0')));
-	label_dec_r5->setText(QString("0x%1").arg((regs[5]<<7)|(regs[11]<<15),5,16,QChar('0')));
-	label_dec_r6->setText(QString("0x%1").arg(regs[6]<<11,5,16,QChar('0')));
+	label_dec_r2->setText(QString("0x%1").arg(regs[2]<<10,5,16,QChar('0')).toUpper());
+	label_dec_r3->setText(QString("0x%1").arg((regs[3]<<6)|(regs[10]<<14),5,16,QChar('0')).toUpper());
+	label_dec_r4->setText(QString("0x%1").arg(regs[4]<<11,5,16,QChar('0')).toUpper());
+	label_dec_r5->setText(QString("0x%1").arg((regs[5]<<7)|(regs[11]<<15),5,16,QChar('0')).toUpper());
+	label_dec_r6->setText(QString("0x%1").arg(regs[6]<<11,5,16,QChar('0')).toUpper());
 
 	label_dec_tc->setText(QString("%1").arg((regs[7]>>4)&15 ,2,10,QChar('0')));
 	label_dec_bd->setText(QString("%1").arg( regs[7]&15     ,2,10,QChar('0')));
@@ -133,11 +137,14 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_on->setText(QString("%1").arg((regs[13]>>4)&15 ,2,10,QChar('0')));
 	label_dec_off->setText(QString("%1").arg( regs[13]&15     ,2,10,QChar('0')));
 
-	int x=(regs[8]&15)-8;
-	int y=((regs[8]>>4)&15)-8;
+	int x=(regs[18]&15);
+	int y=((regs[18]>>4)&15);
+	x=x>7?16-x:0-x;
+	y=y>7?16-y:0-y;
 	label_dec_r18->setText(QString("(%1,%2)").arg(x).arg(y));
 
 	label_dec_r19->setText(QString("%1").arg(regs[19] ,3,10));
+	label_dec_r23->setText(QString("%1").arg(regs[23] ,3,10));
 
 	label_dec_r14->setText(QString("0x%1").arg(regs[14]<<14,5,16,QChar('0')));
 	label_dec_r15->setText(QString("%1").arg(regs[15]&15 ,2,10));
@@ -184,6 +191,18 @@ void VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* 
 void VDPRegViewer::connectHighLights()
 {
 	QList<InteractiveButton*> list;
+
+	// Before connecting the highlights we connect the special 
+	// 'Toggled Bit' event
+	// Warning: This function is not available with MSVC 6!! Not that it
+	// matters to me on my Linux environment :-)
+	list = this->findChildren<InteractiveButton*>();
+        InteractiveButton* item;
+        foreach (item , list){
+		connect( item, SIGNAL( newBitValue(int,int,bool) ),
+			 this, SLOT( registerBitChanged(int,int,bool) ) );
+        };
+
 
 	// register 0 (+M1,M2)
 	monoGroup( pushButton_0_5,label_dec_ie2);
@@ -354,7 +373,36 @@ void VDPRegViewer::refresh()
 
 
 
-void VDPRegViewer::on_VDPDataStore_dataRefreshed()
+void VDPRegViewer::VDPDataStoreDataRefreshed()
 {
 	decodeVDPRegs();
+}
+void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
+{
+	//maybe this call is the result of our own SetChecked (VDPDataStorte
+	//update event) 
+	if (state == (regs[reg]&(1<<bit)) ) {
+		return;
+	};
+
+	//state does not correspond to the current register setting so we send
+	//an update command
+	if (state){
+		regs[reg] |= (1<<bit);
+	} else {
+		regs[reg] &= 255^(1<<bit);
+	}
+	CommClient::instance().sendCommand(
+		new SimpleCommand(
+			QString("debug write {VDP regs} %1 %2").arg(reg).arg(regs[reg]) 
+		)
+	);
+
+	// Update display without waiting for the VDPDataStore update
+	decodeVDPRegs();
+	// and then we could request an update nevertheless since some other
+	// objects might want to see this change through the VDPDataStore also
+	// :-)
+	// VDPDataStore::instance().refresh();
+
 }
