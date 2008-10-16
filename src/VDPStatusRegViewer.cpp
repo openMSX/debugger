@@ -33,7 +33,7 @@ VDPStatusRegViewer::VDPStatusRegViewer( QWidget *parent)
 	//now hook up some signals and slots
 	connectHighLights();
 
-	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( on_VDPDataStore_dataRefreshed() ) );
+	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( VDPDataStoreDataRefreshed() ) );
 	//connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
 	//connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
 
@@ -231,7 +231,7 @@ void VDPStatusRegViewer::refresh()
 
 
 
-void VDPStatusRegViewer::on_VDPDataStore_dataRefreshed()
+void VDPStatusRegViewer::VDPDataStoreDataRefreshed()
 {
 	decodeVDPStatusRegs();
 }

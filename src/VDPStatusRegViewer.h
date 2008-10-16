@@ -60,7 +60,7 @@ private:
 
 public slots:
 	void refresh();
-	void on_VDPDataStore_dataRefreshed();
+	void VDPDataStoreDataRefreshed();
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

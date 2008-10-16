@@ -60,7 +60,7 @@ private slots:
 	void imagePositionUpdate(int x, int y, int color, unsigned addr,int byteValue);
 
 	//void on_refreshButton_clicked ( bool checked );
-	void on_VDPDataStore_dataRefreshed();
+	void VDPDataStoreDataRefreshed();
 };
 
 #endif /* BITMAPVIEWER_H */

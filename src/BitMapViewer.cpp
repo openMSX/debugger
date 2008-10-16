@@ -36,12 +36,12 @@ BitMapViewer::BitMapViewer( QWidget *parent)
 	imageWidget->setPaletteSource(palette);
 
 	//now hook up some signals and slots
-	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( on_VDPDataStore_dataRefreshed() ) );
+	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( VDPDataStoreDataRefreshed() ) );
 	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
 	connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
 
 	connect( imageWidget,  SIGNAL( imagePosition (int,int,int,unsigned int,int) ), this, SLOT( imagePositionUpdate(int,int,int,unsigned int,int) ) );
-	connect( imageWidget,  SIGNAL( imageClicked (int,int,int,int) ), this, SLOT( imagePositionUpdate(int,int,int,unsigned int,int) ) );
+	connect( imageWidget,  SIGNAL( imageClicked (int,int,int,unsigned int,int) ), this, SLOT( imagePositionUpdate(int,int,int,unsigned int,int) ) );
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -305,7 +305,7 @@ void BitMapViewer::on_refreshButton_clicked( bool checked )
 }
 */
 
-void BitMapViewer::on_VDPDataStore_dataRefreshed()
+void BitMapViewer::VDPDataStoreDataRefreshed()
 {
 	decodeVDPregs();
 }
