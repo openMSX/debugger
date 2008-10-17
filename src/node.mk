@@ -12,7 +12,7 @@ MOC_SRC_HDR:= \
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \
-	CPURegs 
+	CPURegs SimpleHexRequest
 
 SRC_ONLY:= \
 	main

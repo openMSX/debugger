@@ -6,9 +6,10 @@
 #include "CommClient.h"
 #include "Settings.h"
 
+#include "SimpleHexRequest.h"
 class BigHexRequest;
 
-class VDPDataStore : public QObject
+class VDPDataStore : public QObject, public SimpleHexRequestUser
 {
 	Q_OBJECT
 public:
@@ -17,8 +18,6 @@ public:
 
 	static VDPDataStore& instance();
 
-	void hexdataTransfered(BigHexRequest* r);
-	void transferCancelled(BigHexRequest* r);
 	unsigned char* getVramPointer();
 	unsigned char* getPalettePointer();
 	unsigned char* getRegsPointer();
@@ -47,6 +46,10 @@ signals:
         void regsChanged(); //only the regs changed
         void statusRegsChanged(); //only the regs changed
 	*/
+
+protected:
+	virtual void DataHexRequestReceived();
+
 };
 
 #endif /* VDPDATASTORE_H */

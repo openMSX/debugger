@@ -123,92 +123,9 @@ void BitMapViewer::decodeVDPregs()
 
 void BitMapViewer::refresh()
 {
-	// send data request for vram + vdp palette regs + vdp regs
-	// during this tcl command the emulation is halted so we get a consistant
-	/** this code stops after 2 appends ???
-	QString command("debug_bin2hex [ concat ");
-	command.append("[debug read_block {physical VRAM} 0 0x2000]");
-	command.append("[debug read_block {VDP palette} 0 32]");
-	command.append("[debug read_block {VDP regs} 0 48]");
-	command.append("]");
-
-	Neither does this
-	QString command("debug_bin2hex [ concat [debug read_block {physical VRAM} 0 0x2000][debug read_block {VDP palette} 0 32][debug read_block {VDP regs} 0 48]]");
-	
-	Both seem to stop after +/- 104 chars ?
-
-	HexRequest* req = new HexRequest( command
-			,unsigned(0) ,  unsigned(0x20000+32+48), vram , *this);
-
-	So temp split up in multiple parts again
-	*/
-
-	/*
-	QString command("debug_bin2hex [ debug read_block {physical VRAM} 0 0x2000 ]");
-
-	HexRequest* req = new HexRequest( command
-			,unsigned(0) ,  unsigned(0x20000), vram , *this);
-	CommClient::instance().sendCommand(req);
-
-	command = QString ("debug_bin2hex [ debug read_block {VDP palette} 0 32 ]");
-	req = new HexRequest( command
-			, unsigned(0), unsigned(32), palette, *this);
-	CommClient::instance().sendCommand(req);
-
-	command=QString("debug_bin2hex [ debug read_block {VDP regs} 0 48 ]");
-	req = new HexRequest( command
-			, unsigned(0), unsigned(48), regs, *this);
-	CommClient::instance().sendCommand(req);
-	*/
-
-	/*
-	HexRequest* req = new HexRequest( "{physical VRAM}"
-			,unsigned(0) ,  unsigned(0x20000), vram , *this);
-	CommClient::instance().sendCommand(req);
-
-	req = new HexRequest( "{VDP palette}"
-			, unsigned(0), unsigned(32), palette, *this);
-	CommClient::instance().sendCommand(req);
-
-	req = new HexRequest( "{VDP regs}"
-			, unsigned(0), unsigned(48), regs, *this);
-	CommClient::instance().sendCommand(req);
-	*/
-
-	/*
-	HexRequest* req = new HexRequest(
-		"debug_bin2hex "
-		"[ debug read_block {physical VRAM} 0 0x20000 ]"
-		"[ debug read_block {VDP palette} 0 32 ]"
-		"[ debug read_block {VDP regs} 0 48 ]"
-		,  unsigned(0x20000+32+48), vram , *this);
-	CommClient::instance().sendCommand(req);
-	*/
-		/* "[ debug read_block {physical VRAM} 0 0x200 ]" */
-
-
-	// All of the abocve is now in the new VDPDataStore;
-
+	// All of the code is in the VDPDataStore;
 	VDPDataStore::instance().refresh();
 }
-
-/*
-void BitMapViewer::hexdataTransfered(HexRequest* r)
-{
-	transferCancelled(r);
-	// imageWidget->refresh();
-	update();
-}
-
-void BitMapViewer::transferCancelled(HexRequest* r)
-{
-	delete r;
-	//waitingForData = false;
-}
-*/
-
-
-
 
 void BitMapViewer::on_screenMode_currentIndexChanged( const QString & text  )
 {

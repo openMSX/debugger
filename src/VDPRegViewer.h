@@ -6,6 +6,8 @@
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
 #include "Settings.h"
+#include "SimpleHexRequest.h"
+
 #include "ui_VDPRegistersExplained.h"
 
 
@@ -30,7 +32,7 @@ private:
 	int counter;
 };
 
-class VDPRegViewer : public QDialog, private Ui::VDPRegisters
+class VDPRegViewer : public QDialog, public SimpleHexRequestUser, private Ui::VDPRegisters
 {
 	Q_OBJECT
 public:
@@ -48,9 +50,11 @@ private:
 	void makeGroup(QList<InteractiveButton*>, InteractiveLabel*);
 	void monoGroup(InteractiveButton*, InteractiveLabel*);
 
+protected:
+        virtual void DataHexRequestReceived();
+
 public slots:
 	void refresh();
-	void VDPDataStoreDataRefreshed();
 	void registerBitChanged(int reg, int bit, bool state);
 };
 

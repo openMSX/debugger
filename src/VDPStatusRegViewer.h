@@ -9,6 +9,8 @@
 #include "Settings.h"
 #include "ui_VDPStatusRegisters.h"
 
+#include "SimpleHexRequest.h"
+
 /** The highlightDispatcher serves 2 purposes for the InteractiveLabel widgets
   * a) keep a correct state: Assume widget A and B are related (both are
   * highlighted at the same time) and they are touching each other. I don't
@@ -24,7 +26,7 @@
   *
   */
 
-class highlightDispatcher : public QObject
+class highlightDispatcher : public QObject 
 {
 	Q_OBJECT
 public:
@@ -40,7 +42,7 @@ private:
 	int counter;
 };
 
-class VDPStatusRegViewer : public QDialog, private Ui::VDPStatusRegisters
+class VDPStatusRegViewer : public QDialog, public SimpleHexRequestUser, private Ui::VDPStatusRegisters
 {
 	Q_OBJECT
 public:
@@ -58,9 +60,12 @@ private:
 
 	void makeGroup( QList<InteractiveLabel*> list, InteractiveLabel* explained);
 
+protected:
+	virtual void DataHexRequestReceived();
+
+
 public slots:
 	void refresh();
-	void VDPDataStoreDataRefreshed();
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

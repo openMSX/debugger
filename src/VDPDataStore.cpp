@@ -1,42 +1,5 @@
 #include "VDPDataStore.h"
 
-class BigHexRequest : public ReadDebugBlockCommand
-{
-public:
-	BigHexRequest(const QString& debuggable,  unsigned size,
-	           unsigned char* target, VDPDataStore& viewer_)
-		: ReadDebugBlockCommand(debuggable , size, target)
-		, offset(0)
-		, viewer(viewer_)
-	{
-	}
-
-	BigHexRequest(const QString& debuggable, unsigned offset_, unsigned size,
-	           unsigned char* target, VDPDataStore& viewer_)
-		: ReadDebugBlockCommand(debuggable, offset_, size, target)
-		, offset(offset_)
-		, viewer(viewer_)
-	{
-	}
-
-	virtual void replyOk(const QString& message)
-	{
-		copyData(message);
-		viewer.hexdataTransfered(this);
-	}
-
-	virtual void cancel()
-	{
-		viewer.transferCancelled(this);
-	}
-
-	unsigned offset;
-
-private:
-	VDPDataStore& viewer;
-};
-
-
 class VDPDataStoreVersionCheck : public SimpleCommand
 {
 public:
@@ -84,36 +47,31 @@ void VDPDataStore::refresh()
 {
 	if (!got_version) return;
 
-	BigHexRequest* req;
+	QString req;
 	if (old_version){
-	  req = new BigHexRequest(
+	  req = QString(
 		"debug_bin2hex "
 		"[ debug read_block {VRAM} 0 0x20000 ]"
 		"[ debug read_block {VDP palette} 0 32 ]"
 		"[ debug read_block {VDP status regs} 0 16 ]"
 		"[ debug read_block {VDP regs} 0 64 ]"
-		,  unsigned(0x20000+32+16+64), vram , *this);
+		);
 	} else {
-	  req = new BigHexRequest(
+	  req = QString(
 		"debug_bin2hex "
 		"[ debug read_block {physical VRAM} 0 0x20000 ]"
 		"[ debug read_block {VDP palette} 0 32 ]"
 		"[ debug read_block {VDP status regs} 0 16 ]"
 		"[ debug read_block {VDP regs} 0 64 ]"
-		,  unsigned(0x20000+32+16+64), vram , *this);
+		);
 	};
-	CommClient::instance().sendCommand(req);
+	new SimpleHexRequest(req
+		,  unsigned(0x20000+32+16+64), vram , *this);
 }
 
-void VDPDataStore::hexdataTransfered(BigHexRequest* r)
+void VDPDataStore::DataHexRequestReceived()
 {
-	delete r; // or transferCancelled(r) if that function would need to do more...
 	emit dataRefreshed();
-}
-
-void VDPDataStore::transferCancelled(BigHexRequest* r)
-{
-	delete r;
 }
 
 unsigned char* VDPDataStore::getVramPointer()

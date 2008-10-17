@@ -22,34 +22,19 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs =  VDPDataStore::instance().getRegsPointer();
+	regs =  new unsigned char[64];
 
 	//now hook up some signals and slots
 	connectHighLights();
 
-	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( VDPDataStoreDataRefreshed() ) );
-	//connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
-	//connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
-
-	//connect( pushButton_0_7, SIGNAL( mouseOver(bool) ), pushButton_0_7, SLOT( highlight(bool) ) );
-	//connect( pushButton_0_6, SIGNAL( mouseOver(bool) ), pushButton_0_6, SLOT( highlight(bool) ) );
-	//connect( pushButton_0_5, SIGNAL( mouseOver(bool) ), pushButton_0_5, SLOT( highlight(bool) ) );
-	//connect( pushButton_0_4, SIGNAL( mouseOver(bool) ), pushButton_0_4, SLOT( highlight(bool) ) );
-	//connect( pushButton_0_3, SIGNAL( mouseOver(bool) ), pushButton_0_3, SLOT( highlight(bool) ) );
-
-	
-
-	// and now go fetch the initial data
-	VDPDataStore::instance().refresh();
-	// this thing will only work if the VDPDataStore has by now figured out
-	// if it is an oldopenMSX version or a newer one. {physical VRAM}
-	// debugable stuff...
-
+	//get initiale data
+	refresh();
 
 }
 
 VDPRegViewer::~VDPRegViewer()
 {
+	delete[] regs;
 }
 
 void VDPRegViewer::decodeVDPRegs()
@@ -367,16 +352,17 @@ void VDPRegViewer::connectHighLights()
 
 void VDPRegViewer::refresh()
 {
-	VDPDataStore::instance().refresh();
+	new SimpleHexRequest("{VDP regs}",0,16,regs, *this);
 }
 
 
 
 
-void VDPRegViewer::VDPDataStoreDataRefreshed()
+void VDPRegViewer::DataHexRequestReceived()
 {
 	decodeVDPRegs();
 }
+
 void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
 {
 	//maybe this call is the result of our own SetChecked (VDPDataStorte

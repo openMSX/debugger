@@ -9,19 +9,12 @@
 #include "VramBitMappedView.h"
 #include "ui_BitMapViewer.h"
 
-class HexRequest;
-
 class BitMapViewer : public QDialog, private Ui::BitMapViewer
 {
 	Q_OBJECT
 public:
 	BitMapViewer( QWidget *parent = 0);
 	~BitMapViewer();
-
-	/*
-	void hexdataTransfered(HexRequest* r);
-	void transferCancelled(HexRequest* r);
-	*/
 
 private:
 	int screenMod;
@@ -59,7 +52,6 @@ private slots:
 
 	void imagePositionUpdate(int x, int y, int color, unsigned addr,int byteValue);
 
-	//void on_refreshButton_clicked ( bool checked );
 	void VDPDataStoreDataRefreshed();
 };
 

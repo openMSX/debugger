@@ -28,36 +28,35 @@ VDPStatusRegViewer::VDPStatusRegViewer( QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	statusregs =  VDPDataStore::instance().getStatusRegsPointer();
+	//statusregs =  VDPDataStore::instance().getStatusRegsPointer();
+	statusregs = new unsigned char[16];	
 
 	//now hook up some signals and slots
 	connectHighLights();
 
-	connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), this, SLOT( VDPDataStoreDataRefreshed() ) );
-	//connect( &VDPDataStore::instance(), SIGNAL( dataRefreshed() ), imageWidget, SLOT( refresh() ) );
-	//connect( refreshButton,  SIGNAL( clicked (bool) ), &VDPDataStore::instance(), SLOT( refresh() ) );
+	//get initiale data
+	refresh();
 
-	// and now go fetch the initial data
-	VDPDataStore::instance().refresh();
 }
 
 VDPStatusRegViewer::~VDPStatusRegViewer()
 {
+	delete[] statusregs;
 }
 
 void VDPStatusRegViewer::decodeVDPStatusRegs()
 {
 	//first update all hex values
-	label_val_0->setText(QString("%1").arg(statusregs[0],2,16,QChar('0')));
-	label_val_1->setText(QString("%1").arg(statusregs[1],2,16,QChar('0')));
-	label_val_2->setText(QString("%1").arg(statusregs[2],2,16,QChar('0')));
-	label_val_3->setText(QString("%1").arg(statusregs[3],2,16,QChar('0')));
-	label_val_4->setText(QString("%1").arg(statusregs[4],2,16,QChar('0')));
-	label_val_5->setText(QString("%1").arg(statusregs[5],2,16,QChar('0')));
-	label_val_6->setText(QString("%1").arg(statusregs[6],2,16,QChar('0')));
-	label_val_7->setText(QString("%1").arg(statusregs[7],2,16,QChar('0')));
-	label_val_8->setText(QString("%1").arg(statusregs[8],2,16,QChar('0')));
-	label_val_9->setText(QString("%1").arg(statusregs[9],2,16,QChar('0')));
+	label_val_0->setText(QString("%1").arg(statusregs[0],2,16,QChar('0')).toUpper());
+	label_val_1->setText(QString("%1").arg(statusregs[1],2,16,QChar('0')).toUpper());
+	label_val_2->setText(QString("%1").arg(statusregs[2],2,16,QChar('0')).toUpper());
+	label_val_3->setText(QString("%1").arg(statusregs[3],2,16,QChar('0')).toUpper());
+	label_val_4->setText(QString("%1").arg(statusregs[4],2,16,QChar('0')).toUpper());
+	label_val_5->setText(QString("%1").arg(statusregs[5],2,16,QChar('0')).toUpper());
+	label_val_6->setText(QString("%1").arg(statusregs[6],2,16,QChar('0')).toUpper());
+	label_val_7->setText(QString("%1").arg(statusregs[7],2,16,QChar('0')).toUpper());
+	label_val_8->setText(QString("%1").arg(statusregs[8],2,16,QChar('0')).toUpper());
+	label_val_9->setText(QString("%1").arg(statusregs[9],2,16,QChar('0')).toUpper());
 	//update all the individual bits
 	for (int r=0;r<=9;r++){
 		for (int b=7;b>=0;b--){
@@ -225,13 +224,13 @@ void VDPStatusRegViewer::connectHighLights()
 
 void VDPStatusRegViewer::refresh()
 {
-	VDPDataStore::instance().refresh();
+	new SimpleHexRequest("{VDP status regs}",0,16,statusregs, *this);
 }
 
 
 
 
-void VDPStatusRegViewer::VDPDataStoreDataRefreshed()
+void VDPStatusRegViewer::DataHexRequestReceived()
 {
 	decodeVDPStatusRegs();
 }
