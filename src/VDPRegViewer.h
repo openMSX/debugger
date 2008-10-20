@@ -41,8 +41,12 @@ public:
 
 private:
 	unsigned char* regs;
+	unsigned char* statusregs;
+	int vdpid;
 
 	void decodeVDPRegs();
+	void decodeStatusVDPRegs();
+	void setRegisterVisible(int r,bool visible);
 
 	void connectHighLights();
 

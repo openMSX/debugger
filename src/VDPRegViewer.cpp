@@ -22,7 +22,9 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs =  new unsigned char[64];
+	regs =  new unsigned char[64+16];
+	statusregs = regs + 64;
+	vdpid = 99; // make sure that we parse the first time the status registers are read
 
 	//now hook up some signals and slots
 	connectHighLights();
@@ -35,6 +37,127 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 VDPRegViewer::~VDPRegViewer()
 {
 	delete[] regs;
+}
+
+void VDPRegViewer::setRegisterVisible(int r,bool visible)
+{
+	QString name=QString("label_R%1").arg(r);
+
+	QLabel *L = qFindChild<QLabel*>(this, name);
+	L->setVisible(visible);
+
+	name=QString("label_val_%1").arg(r);
+	L = qFindChild<QLabel*>(this, name);
+	L->setVisible(visible);
+
+	for (int b=7;b>=0;b--){
+		QString name=QString("pushButton_%1_%2").arg(r).arg(b);
+		InteractiveButton *I = qFindChild<InteractiveButton*>(this, name);
+		I->setVisible(visible);
+	};
+	
+	// now hide/show the explications of the give register
+	switch (r){
+	  case 8:
+		label_dec_tp->setVisible(visible);
+		label_dec_spd->setVisible(visible);
+		break;;
+	  case 9:
+		label_dec_nt->setVisible(visible);
+		label_dec_nt2->setVisible(visible);
+		label_dec_il->setVisible(visible);
+		label_dec_eo->setVisible(visible);
+		label_dec_ln->setVisible(visible);
+		label_dec_ln2->setVisible(visible);
+		break;;
+	  case 12:
+		label_t2->setVisible(visible);
+		label_bc->setVisible(visible);
+		label_dec_t2->setVisible(visible);
+		label_dec_bc->setVisible(visible);
+		break;;
+	  case 13:
+		label_on->setVisible(visible);
+		label_off->setVisible(visible);
+		label_dec_on->setVisible(visible);
+		label_dec_off->setVisible(visible);
+		break;;
+	}
+	
+}
+
+void VDPRegViewer::decodeStatusVDPRegs()
+{
+	int id=statusregs[1] & 62; // + (machine_has_TMS99x8?1:0)
+	// test MSX1 id =1;
+	if (vdpid != id){
+		vdpid=id;
+		switch (vdpid){
+		  case 1:  // TMS9918 = MSX1 VDP
+			groupBox_V9958->setVisible(false);
+			groupBox_TableBase->setVisible(true);
+			groupBox_Color->setVisible(true);
+			groupBox_Display->setVisible(false);
+			groupBox_Access->setVisible(false);
+			groupBox_dec_V9958->setVisible(false);
+			groupBox_dec_TableBase->setVisible(true);
+			groupBox_dec_Color->setVisible(true);
+			groupBox_dec_Display->setVisible(false);
+			groupBox_dec_Access->setVisible(false);
+			setRegisterVisible(8,false);
+			setRegisterVisible(9,false);
+			setRegisterVisible(10,false);
+			setRegisterVisible(11,false);
+			setRegisterVisible(12,false);
+			setRegisterVisible(13,false);
+			setRegisterVisible(20,false);
+			setRegisterVisible(21,false);
+			setRegisterVisible(22,false);
+			break;;
+		  case 0:  // V9938 = MSX2 VDP
+			groupBox_V9958->setVisible(false);
+			groupBox_TableBase->setVisible(true);
+			groupBox_Color->setVisible(true);
+			groupBox_Display->setVisible(true);
+			groupBox_Access->setVisible(true);
+			groupBox_dec_V9958->setVisible(false);
+			groupBox_dec_TableBase->setVisible(true);
+			groupBox_dec_Color->setVisible(true);
+			groupBox_dec_Display->setVisible(true);
+			groupBox_dec_Access->setVisible(true);
+			setRegisterVisible(8,true);
+			setRegisterVisible(9,true);
+			setRegisterVisible(10,true);
+			setRegisterVisible(11,true);
+			setRegisterVisible(12,true);
+			setRegisterVisible(13,true);
+			setRegisterVisible(20,true);
+			setRegisterVisible(21,true);
+			setRegisterVisible(22,true);
+			break;;
+		  case 4:  // V9958 = MSX2+ VDP
+			groupBox_V9958->setVisible(true);
+			groupBox_TableBase->setVisible(true);
+			groupBox_Color->setVisible(true);
+			groupBox_Display->setVisible(true);
+			groupBox_Access->setVisible(true);
+			groupBox_dec_V9958->setVisible(true);
+			groupBox_dec_TableBase->setVisible(true);
+			groupBox_dec_Color->setVisible(true);
+			groupBox_dec_Display->setVisible(true);
+			groupBox_dec_Access->setVisible(true);
+			setRegisterVisible(8,true);
+			setRegisterVisible(9,true);
+			setRegisterVisible(10,true);
+			setRegisterVisible(11,true);
+			setRegisterVisible(12,true);
+			setRegisterVisible(13,true);
+			setRegisterVisible(20,true);
+			setRegisterVisible(21,true);
+			setRegisterVisible(22,true);
+			break;;
+		};
+	}
 }
 
 void VDPRegViewer::decodeVDPRegs()
@@ -64,8 +187,13 @@ void VDPRegViewer::decodeVDPRegs()
 	label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')).toUpper());
 	label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')).toUpper());
 	label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')).toUpper());
+	label_val_25->setText(QString("%1").arg(regs[25],2,16,QChar('0')).toUpper());
+	label_val_26->setText(QString("%1").arg(regs[26],2,16,QChar('0')).toUpper());
+	label_val_27->setText(QString("%1").arg(regs[27],2,16,QChar('0')).toUpper());
 	//update all the individual bits
-	for (int r=0;r<=23;r++){
+	// TODO determine upper register depending on VDP used
+	for (int r=0;r<=27;r++){
+		if (r==24) r++; //skip number 24
 		for (int b=7;b>=0;b--){
 			QString name=QString("pushButton_%1_%2").arg(r).arg(b);
 			InteractiveButton *I = qFindChild<InteractiveButton*>(this, name);
@@ -352,7 +480,14 @@ void VDPRegViewer::connectHighLights()
 
 void VDPRegViewer::refresh()
 {
-	new SimpleHexRequest("{VDP regs}",0,16,regs, *this);
+	//new SimpleHexRequest("{VDP regs}",0,64,regs, *this);
+	//new SimpleHexRequest("{VDP status regs}",0,16,regs, *this);
+	// now combined in one request:
+	new SimpleHexRequest(
+		"debug_bin2hex "
+		"[ debug read_block {VDP regs} 0 64 ]"
+		"[ debug read_block {VDP status regs} 0 16 ]"
+		,64+16,regs, *this);
 }
 
 
@@ -360,6 +495,7 @@ void VDPRegViewer::refresh()
 
 void VDPRegViewer::DataHexRequestReceived()
 {
+	decodeStatusVDPRegs();
 	decodeVDPRegs();
 }
 
