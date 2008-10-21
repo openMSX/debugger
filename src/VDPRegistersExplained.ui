@@ -6,19 +6,13 @@
     <x>0</x>
     <y>0</y>
     <width>820</width>
-    <height>714</height>
+    <height>777</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4" >
-   <property name="spacing" >
-    <number>3</number>
-   </property>
-   <property name="margin" >
-    <number>0</number>
-   </property>
    <item>
     <widget class="QFrame" name="VDPRegistersViewer" >
      <property name="frameShape" >
@@ -182,7 +176,7 @@
               </font>
              </property>
              <property name="toolTip" >
-              <string>Sets the color bus to input mode, and inputs data into the VRAM.</string>
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>DG</string>
@@ -221,7 +215,7 @@
               </font>
              </property>
              <property name="toolTip" >
-              <string>Enables interrupt from Lightpen by Interrupt Enable 2.</string>
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>IE2</string>
@@ -260,7 +254,7 @@
               </font>
              </property>
              <property name="toolTip" >
-              <string>Enables interrupt from Horizontal scanning line by Interrupt Enable 1.</string>
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>IE1</string>
@@ -299,7 +293,7 @@
               </font>
              </property>
              <property name="toolTip" >
-              <string>Used to change the display mode.</string>
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>M5</string>
@@ -338,7 +332,7 @@
               </font>
              </property>
              <property name="toolTip" >
-              <string>Used to change the display mode.</string>
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>M4</string>
@@ -503,6 +497,9 @@
               <font>
                <pointsize>8</pointsize>
               </font>
+             </property>
+             <property name="toolTip" >
+              <string>tooltip set in VDPRegViewer code (VDP dependent)</string>
              </property>
              <property name="text" >
               <string>0</string>
@@ -1668,7 +1665,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Video Command Mode&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=Normal&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=Screen 2-4 as screen 8&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>CMD</string>
@@ -1707,7 +1710,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">YJK Attribute Enable&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=No Attribute&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=With Attribute&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>VDS</string>
@@ -1746,7 +1755,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">YJK Attribute Enable&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=No Attribute&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=With Attribute&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>YAE</string>
@@ -1785,7 +1800,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">YJK Mode Enable&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=Normal RGB&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=YJK System&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>YJK</string>
@@ -1824,7 +1845,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">VRAM Access Waitstates&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=Normal&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=Enable CPU Waitstate&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>WTE</string>
@@ -1863,7 +1890,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">H-Scroll Mask 8 Pixels&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=Normal&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=Hide Leftmost Pixels&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>MSK</string>
@@ -1902,7 +1935,13 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display adjust register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">H-Scroll Screen Width&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">0=One page&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">1=Two pages&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>SP2</string>
@@ -2069,7 +2108,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H08</string>
@@ -2108,7 +2158,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H07</string>
@@ -2147,7 +2208,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H06</string>
@@ -2186,7 +2258,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H05</string>
@@ -2225,7 +2308,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H04</string>
@@ -2264,7 +2358,18 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Display offset register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE LEFT&lt;/span> as specified in &lt;span style=" font-weight:600;">8-dot units&lt;/span> (16-dot units in Screen 6-7).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=0: Scrolling is done within one page and the non-displayed left side of the page is &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">displayed on the right hand side of the screen (HO8 is ignored in this mode).&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When SP2=1: Scrolling is done within 2 pages, and when scrolled, the second page appears to&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">the right habd side of the first page, and when scrolled more, the first page reappears to the right&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">of the second page.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; font-style:italic;">Note&lt;/span>&lt;span style=" font-style:italic;">: When SP2=1, the A15 bit of the Pattern Name table base address register should be set&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;">to "1" (VDP Reg 2, Bit 5), otherwise only the leftmost page would be displayed.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H03</string>
@@ -2548,7 +2653,14 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Interrupt line register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE RIGHT&lt;/span> (unlike as for Register 26 which shifts to the left) as specified in&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">1-dot units&lt;/span> (2-dot units in Screen 6-7). When this register is set to a non-zero value, the colors of the&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">leftmost pixel(s) will be undefined, to avoid this dirt effect, the MSK bit must be set, the leftmost 8&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">pixels (16 pixels in Screen 6-7) will be then covered by the border color.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H02</string>
@@ -2587,7 +2699,14 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Interrupt line register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE RIGHT&lt;/span> (unlike as for Register 26 which shifts to the left) as specified in&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">1-dot units&lt;/span> (2-dot units in Screen 6-7). When this register is set to a non-zero value, the colors of the&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">leftmost pixel(s) will be undefined, to avoid this dirt effect, the MSK bit must be set, the leftmost 8&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">pixels (16 pixels in Screen 6-7) will be then covered by the border color.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H01</string>
@@ -2626,7 +2745,14 @@ When 0, sets *DLCLK to output mode.</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>Interrupt line register</string>
+              <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">The screen is shifted &lt;span style=" font-weight:600;">TO THE RIGHT&lt;/span> (unlike as for Register 26 which shifts to the left) as specified in&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">1-dot units&lt;/span> (2-dot units in Screen 6-7). When this register is set to a non-zero value, the colors of the&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">leftmost pixel(s) will be undefined, to avoid this dirt effect, the MSK bit must be set, the leftmost 8&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">pixels (16 pixels in Screen 6-7) will be then covered by the border color.&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="text" >
               <string>H00</string>
@@ -10297,6 +10423,13 @@ When 0, sets *DLCLK to output mode.</string>
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="InteractiveLabel" name="label_dec_r26" >
+          <property name="text" >
+           <string>explaining h0x</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -10773,6 +10906,56 @@ When 0, sets *DLCLK to output mode.</string>
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6" >
+     <item>
+      <spacer name="horizontalSpacer" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:10pt; font-weight:600; font-style:italic;">Quick hack&lt;/span>&lt;span style=" font-size:10pt; font-style:italic;"> use this to switch between VDP chip, since no autodetection yet in the code&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+       </property>
+       <property name="textFormat" >
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="VDPcomboBox" >
+       <item>
+        <property name="text" >
+         <string>V9958</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>V9938</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TMS99x8</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

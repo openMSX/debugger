@@ -60,6 +60,9 @@ protected:
 public slots:
 	void refresh();
 	void registerBitChanged(int reg, int bit, bool state);
+
+	//quick hack while no autodetection...
+	void on_VDPcomboBox_currentIndexChanged ( int index );
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

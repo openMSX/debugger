@@ -3,6 +3,10 @@
 #include <QPalette>
 #include "InteractiveButton.h"
 
+static const int VDP_TMS99X8 = 1;
+static const int VDP_V9938 = 0;
+static const int VDP_V9958 = 4;
+
 buttonHighlightDispatcher::buttonHighlightDispatcher() 
 {
 	counter=0;
@@ -25,6 +29,7 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	regs =  new unsigned char[64+16];
 	statusregs = regs + 64;
 	vdpid = 99; // make sure that we parse the first time the status registers are read
+	vdpid = VDP_V9958; //quick hack for now
 
 	//now hook up some signals and slots
 	connectHighLights();
@@ -90,10 +95,10 @@ void VDPRegViewer::decodeStatusVDPRegs()
 {
 	int id=statusregs[1] & 62; // + (machine_has_TMS99x8?1:0)
 	// test MSX1 id =1;
-	if (vdpid != id){
-		vdpid=id;
+	//if (vdpid != id){
+	//	vdpid=id;
 		switch (vdpid){
-		  case 1:  // TMS9918 = MSX1 VDP
+		  case VDP_TMS99X8:  // TMS9918 = MSX1 VDP
 			groupBox_V9958->setVisible(false);
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
@@ -113,8 +118,20 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			setRegisterVisible(20,false);
 			setRegisterVisible(21,false);
 			setRegisterVisible(22,false);
+			pushButton_0_2->setText("0");
+			pushButton_0_3->setText("0");
+			pushButton_0_4->setText("0");
+			pushButton_0_5->setText("0");
+			pushButton_0_6->setText("0");
+			pushButton_1_7->setText("4/16");
+			pushButton_0_2->setToolTip("");
+			pushButton_0_3->setToolTip("");
+			pushButton_0_4->setToolTip("");
+			pushButton_0_5->setToolTip("");
+			pushButton_0_6->setToolTip("");
+			pushButton_1_7->setToolTip("4/16K selection\n0 selects 4027 RAM operation\n1 selects 4108/4116 RAM operation");
 			break;;
-		  case 0:  // V9938 = MSX2 VDP
+		  case VDP_V9938:  // V9938 = MSX2 VDP
 			groupBox_V9958->setVisible(false);
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
@@ -134,8 +151,27 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			setRegisterVisible(20,true);
 			setRegisterVisible(21,true);
 			setRegisterVisible(22,true);
+			pushButton_0_2->setText("M4");
+			pushButton_0_3->setText("M5");
+			pushButton_0_4->setText("IE1");
+			pushButton_0_5->setText("IE2");
+			pushButton_0_6->setText("DG");
+			pushButton_1_7->setText("0");
+			pushButton_0_2->setToolTip("Used to change the display mode.");
+			pushButton_0_3->setToolTip("Used to change the display mode.");
+			pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
+			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+			pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
+			pushButton_1_7->setToolTip("");
+
+			pushButton_0_5->setText("IE2");
+			pushButton_8_7->setText("MS");
+			pushButton_8_6->setText("LP");
+			pushButton_0_5->setToolTip("");
+			pushButton_8_7->setToolTip("");
+			pushButton_8_6->setToolTip("");
 			break;;
-		  case 4:  // V9958 = MSX2+ VDP
+		  case VDP_V9958:  // V9958 = MSX2+ VDP
 			groupBox_V9958->setVisible(true);
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
@@ -155,9 +191,34 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			setRegisterVisible(20,true);
 			setRegisterVisible(21,true);
 			setRegisterVisible(22,true);
+			pushButton_0_2->setText("M4");
+			pushButton_0_3->setText("M5");
+			pushButton_0_4->setText("IE1");
+			pushButton_0_5->setText("IE2");
+			pushButton_0_6->setText("DG");
+			pushButton_1_7->setText("0");
+			pushButton_0_2->setToolTip("Used to change the display mode.");
+			pushButton_0_3->setToolTip("Used to change the display mode.");
+			pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
+			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+			pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
+			pushButton_1_7->setToolTip("");
+			pushButton_1_7->setToolTip("");
+
+			pushButton_0_5->setText("0");
+			pushButton_8_7->setText("0");
+			pushButton_8_6->setText("0");
+			pushButton_0_5->setToolTip("");
+			pushButton_8_7->setToolTip("");
+			pushButton_8_6->setToolTip("");
+			/*
+			Since mouse/lightpen are disabled this will affect 
+			status reg1 bit 7 (LPS) and
+			status reg1 bit 6 (FL)
+			*/
 			break;;
 		};
-	}
+	//}
 }
 
 void VDPRegViewer::decodeVDPRegs()
@@ -207,16 +268,16 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_ie1->setText((regs[0] & 16)?"Horizontal scanning line int enabled":"Horizontal scanning line int disabled" );
 
 	int m=((regs[0] & 14)<<1) | ((regs[1] & 24)>>3);
-	const char* screen[]={"let's find out 0", "let's find out 1", "let's find out 2",
-	  "let's find out 3", "let's find out 4", "let's find out 5",
-	  "let's find out 6", "let's find out 7", "let's find out 8",
-	  "let's find out 9", "let's find out 10", "let's find out 11",
-	  "let's find out 12", "let's find out 13", "let's find out 14",
-	  "let's find out 15", "let's find out 16", "let's find out 17",
-	  "let's find out 18", "let's find out 19", "let's find out 20",
+	const char* screen[]={"SCREEN 1", "SCREEN 3", "SCREEN 0",
+	  "let's find out 3", "SCREEN 2", "let's find out 5",
+	  "let's find out 6", "let's find out 7", "SCREEN 4",
+	  "let's find out 9", "SCREEN 0 width 80", "let's find out 11",
+	  "SCREEN 5", "let's find out 13", "let's find out 14",
+	  "let's find out 15", "SCREEN 6", "let's find out 17",
+	  "let's find out 18", "let's find out 19", "SCREEN 7",
 	  "let's find out 21", "let's find out 22", "let's find out 23",
 	  "let's find out 24", "let's find out 25", "let's find out 26",
-	  "let's find out 27", "let's find out 28", "let's find out 29",
+	  "let's find out 27", "SCREEN 8", "let's find out 29",
 	  "let's find out 30", "let's find out 31"};
 	label_dec_m->setText(QString("Screen modebits %1 : SCREEN %2").arg(m).arg(screen[m]) );
 
@@ -263,6 +324,17 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_r15->setText(QString("%1").arg(regs[15]&15 ,2,10));
 	label_dec_r16->setText(QString("%1").arg(regs[16]&15 ,2,10));
 	label_dec_r17->setText(QString("%1").arg(regs[17]&63 ,3,10).append((regs[17]&128)?" ,auto incr":""));
+
+	//V9958 registers
+	label_dec_r26->setText(QString("%1").arg(regs[26]*8 + regs[27]));
+	label_dec_sp2->setText((regs[25] &  1)?"interlaced":"non-interlaced");
+	label_dec_msk->setText((regs[25] &  2)?"interlaced":"non-interlaced");
+	label_dec_wte->setText((regs[25] &  4)?"interlaced":"non-interlaced");
+	label_dec_yjk->setText((regs[25] &  8)?"interlaced":"non-interlaced");
+	label_dec_yae->setText((regs[25] & 16)?"interlaced":"non-interlaced");
+	label_dec_vds->setText((regs[25] & 32)?"interlaced":"non-interlaced");
+	label_dec_cmd->setText((regs[25] & 64)?"interlaced":"non-interlaced");
+
 }
 
 void VDPRegViewer::doConnect( InteractiveButton* but, buttonHighlightDispatcher* dis)
@@ -277,6 +349,7 @@ void VDPRegViewer::monoGroup( InteractiveButton* but, InteractiveLabel* lab)
 	connect( lab, SIGNAL( mouseOver(bool) ), but, SLOT( highlight(bool) ) );
 	connect( but, SIGNAL( mouseOver(bool) ), lab, SLOT( highlight(bool) ) );
 	connect( lab, SIGNAL( mouseOver(bool) ), lab, SLOT( highlight(bool) ) );
+	connect( but, SIGNAL( mouseOver(bool) ), but, SLOT( highlight(bool) ) );
 }
 
 void VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* explained)
@@ -474,6 +547,25 @@ void VDPRegViewer::connectHighLights()
 	list << pushButton_23_1 << pushButton_23_0;
 	makeGroup( list, label_dec_r23);
 
+	// register 25
+	monoGroup( pushButton_25_0,label_dec_sp2);
+	monoGroup( pushButton_25_1,label_dec_msk);
+	monoGroup( pushButton_25_2,label_dec_wte);
+	monoGroup( pushButton_25_3,label_dec_yjk);
+	monoGroup( pushButton_25_4,label_dec_yae);
+	monoGroup( pushButton_25_5,label_dec_vds);
+	monoGroup( pushButton_25_6,label_dec_cmd);
+
+	// register 26
+	list.clear();
+	list << pushButton_26_7 << pushButton_26_6 << pushButton_26_5;
+	list << pushButton_26_4 << pushButton_26_3 << pushButton_26_2;
+	list << pushButton_26_1 << pushButton_26_0;
+	list << pushButton_27_7 << pushButton_27_6 << pushButton_27_5;
+	list << pushButton_27_4 << pushButton_27_3 << pushButton_27_2;
+	list << pushButton_27_1 << pushButton_27_0;
+	makeGroup( list, label_dec_r26);
+
 }
 
 
@@ -528,3 +620,18 @@ void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
 	// VDPDataStore::instance().refresh();
 
 }
+
+
+void VDPRegViewer::on_VDPcomboBox_currentIndexChanged ( int index )
+{
+	switch (index){
+		case 0: vdpid = VDP_V9958;
+			break;;
+		case 1: vdpid = VDP_V9938;
+			break;;
+		case 2: vdpid = VDP_TMS99X8;
+			break;;
+	}
+	decodeStatusVDPRegs();
+}
+
