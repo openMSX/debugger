@@ -51,8 +51,12 @@ private:
 	void connectHighLights();
 
 	void doConnect( InteractiveButton* lab, buttonHighlightDispatcher* dis);
-	void makeGroup(QList<InteractiveButton*>, InteractiveLabel*);
+	buttonHighlightDispatcher* makeGroup(QList<InteractiveButton*>, InteractiveLabel*);
+	void reGroup(InteractiveButton*, buttonHighlightDispatcher*);
 	void monoGroup(InteractiveButton*, InteractiveLabel*);
+
+	buttonHighlightDispatcher* modeBitsDispat;
+
 
 protected:
         virtual void DataHexRequestReceived();

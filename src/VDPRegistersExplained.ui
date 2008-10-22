@@ -10350,6 +10350,20 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="InteractiveLabel" name="label_dec_dg" >
+          <property name="text" >
+           <string>DG explained</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="InteractiveLabel" name="label_dec_416K" >
+          <property name="text" >
+           <string>Uses 4/16K memory</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>

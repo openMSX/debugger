@@ -37,6 +37,8 @@ VDPRegViewer::VDPRegViewer( QWidget *parent)
 	//get initiale data
 	refresh();
 
+	decodeStatusVDPRegs(); // part of the quick hack :-)
+
 }
 
 VDPRegViewer::~VDPRegViewer()
@@ -109,6 +111,10 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			groupBox_dec_Color->setVisible(true);
 			groupBox_dec_Display->setVisible(false);
 			groupBox_dec_Access->setVisible(false);
+			label_dec_416K->setVisible(true);
+			label_dec_ie1->setVisible(false);
+			label_dec_ie2->setVisible(false);
+			label_dec_dg->setVisible(false);
 			setRegisterVisible(8,false);
 			setRegisterVisible(9,false);
 			setRegisterVisible(10,false);
@@ -130,6 +136,14 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_0_5->setToolTip("");
 			pushButton_0_6->setToolTip("");
 			pushButton_1_7->setToolTip("4/16K selection\n0 selects 4027 RAM operation\n1 selects 4108/4116 RAM operation");
+			disconnect(modeBitsDispat,0,pushButton_0_2,0);
+			disconnect(modeBitsDispat,0,pushButton_0_3,0);
+			disconnect(pushButton_0_2,0,0,0);
+			disconnect(pushButton_0_3,0,0,0);
+			disconnect(pushButton_0_4,0,0,0);
+			disconnect(pushButton_0_5,0,0,0);
+			disconnect(pushButton_0_6,0,0,0);
+			monoGroup(pushButton_1_7,label_dec_416K);
 			break;;
 		  case VDP_V9938:  // V9938 = MSX2 VDP
 			groupBox_V9958->setVisible(false);
@@ -142,6 +156,10 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			groupBox_dec_Color->setVisible(true);
 			groupBox_dec_Display->setVisible(true);
 			groupBox_dec_Access->setVisible(true);
+			label_dec_416K->setVisible(false);
+			label_dec_ie1->setVisible(true);
+			label_dec_ie2->setVisible(true);
+			label_dec_dg->setVisible(true);
 			setRegisterVisible(8,true);
 			setRegisterVisible(9,true);
 			setRegisterVisible(10,true);
@@ -170,6 +188,17 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_0_5->setToolTip("");
 			pushButton_8_7->setToolTip("");
 			pushButton_8_6->setToolTip("");
+
+			disconnect(pushButton_0_7,0,0,0);
+			disconnect(label_dec_416K,0,0,0);
+
+			reGroup(pushButton_0_2,modeBitsDispat);
+			reGroup(pushButton_0_3,modeBitsDispat);
+
+			monoGroup( pushButton_0_4,label_dec_ie1);
+			monoGroup( pushButton_0_5,label_dec_ie2);
+			monoGroup( pushButton_0_6,label_dec_dg);
+
 			break;;
 		  case VDP_V9958:  // V9958 = MSX2+ VDP
 			groupBox_V9958->setVisible(true);
@@ -182,6 +211,10 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			groupBox_dec_Color->setVisible(true);
 			groupBox_dec_Display->setVisible(true);
 			groupBox_dec_Access->setVisible(true);
+			label_dec_416K->setVisible(false);
+			label_dec_ie1->setVisible(true);
+			label_dec_ie2->setVisible(false);
+			label_dec_dg->setVisible(true);
 			setRegisterVisible(8,true);
 			setRegisterVisible(9,true);
 			setRegisterVisible(10,true);
@@ -194,21 +227,18 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_0_2->setText("M4");
 			pushButton_0_3->setText("M5");
 			pushButton_0_4->setText("IE1");
-			pushButton_0_5->setText("IE2");
+			pushButton_0_5->setText("0");
 			pushButton_0_6->setText("DG");
 			pushButton_1_7->setText("0");
+			pushButton_8_7->setText("0");
+			pushButton_8_6->setText("0");
 			pushButton_0_2->setToolTip("Used to change the display mode.");
 			pushButton_0_3->setToolTip("Used to change the display mode.");
 			pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
-			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+			pushButton_0_5->setToolTip("");
 			pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
 			pushButton_1_7->setToolTip("");
 			pushButton_1_7->setToolTip("");
-
-			pushButton_0_5->setText("0");
-			pushButton_8_7->setText("0");
-			pushButton_8_6->setText("0");
-			pushButton_0_5->setToolTip("");
 			pushButton_8_7->setToolTip("");
 			pushButton_8_6->setToolTip("");
 			/*
@@ -216,6 +246,14 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			status reg1 bit 7 (LPS) and
 			status reg1 bit 6 (FL)
 			*/
+			disconnect(pushButton_0_7,0,0,0);
+			disconnect(label_dec_416K,0,0,0);
+			reGroup(pushButton_0_2,modeBitsDispat);
+			reGroup(pushButton_0_3,modeBitsDispat);
+
+			monoGroup( pushButton_0_4,label_dec_ie1);
+			monoGroup( pushButton_0_5,label_dec_ie2);
+			monoGroup( pushButton_0_6,label_dec_dg);
 			break;;
 		};
 	//}
@@ -232,29 +270,36 @@ void VDPRegViewer::decodeVDPRegs()
 	label_val_5->setText(QString("%1").arg(regs[5],2,16,QChar('0')).toUpper());
 	label_val_6->setText(QString("%1").arg(regs[6],2,16,QChar('0')).toUpper());
 	label_val_7->setText(QString("%1").arg(regs[7],2,16,QChar('0')).toUpper());
-	label_val_8->setText(QString("%1").arg(regs[8],2,16,QChar('0')).toUpper());
-	label_val_9->setText(QString("%1").arg(regs[9],2,16,QChar('0')).toUpper());
-	label_val_10->setText(QString("%1").arg(regs[10],2,16,QChar('0')).toUpper());
-	label_val_11->setText(QString("%1").arg(regs[11],2,16,QChar('0')).toUpper());
-	label_val_12->setText(QString("%1").arg(regs[12],2,16,QChar('0')).toUpper());
-	label_val_13->setText(QString("%1").arg(regs[13],2,16,QChar('0')).toUpper());
-	label_val_14->setText(QString("%1").arg(regs[14],2,16,QChar('0')).toUpper());
-	label_val_15->setText(QString("%1").arg(regs[15],2,16,QChar('0')).toUpper());
-	label_val_16->setText(QString("%1").arg(regs[16],2,16,QChar('0')).toUpper());
-	label_val_17->setText(QString("%1").arg(regs[17],2,16,QChar('0')).toUpper());
-	label_val_18->setText(QString("%1").arg(regs[18],2,16,QChar('0')).toUpper());
-	label_val_19->setText(QString("%1").arg(regs[19],2,16,QChar('0')).toUpper());
-	label_val_20->setText(QString("%1").arg(regs[20],2,16,QChar('0')).toUpper());
-	label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')).toUpper());
-	label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')).toUpper());
-	label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')).toUpper());
-	label_val_25->setText(QString("%1").arg(regs[25],2,16,QChar('0')).toUpper());
-	label_val_26->setText(QString("%1").arg(regs[26],2,16,QChar('0')).toUpper());
-	label_val_27->setText(QString("%1").arg(regs[27],2,16,QChar('0')).toUpper());
+	// Only on V9938 and V9958 this makes sence
+	if (vdpid!=VDP_TMS99X8){
+		label_val_8->setText(QString("%1").arg(regs[8],2,16,QChar('0')).toUpper());
+		label_val_9->setText(QString("%1").arg(regs[9],2,16,QChar('0')).toUpper());
+		label_val_10->setText(QString("%1").arg(regs[10],2,16,QChar('0')).toUpper());
+		label_val_11->setText(QString("%1").arg(regs[11],2,16,QChar('0')).toUpper());
+		label_val_12->setText(QString("%1").arg(regs[12],2,16,QChar('0')).toUpper());
+		label_val_13->setText(QString("%1").arg(regs[13],2,16,QChar('0')).toUpper());
+		label_val_14->setText(QString("%1").arg(regs[14],2,16,QChar('0')).toUpper());
+		label_val_15->setText(QString("%1").arg(regs[15],2,16,QChar('0')).toUpper());
+		label_val_16->setText(QString("%1").arg(regs[16],2,16,QChar('0')).toUpper());
+		label_val_17->setText(QString("%1").arg(regs[17],2,16,QChar('0')).toUpper());
+		label_val_18->setText(QString("%1").arg(regs[18],2,16,QChar('0')).toUpper());
+		label_val_19->setText(QString("%1").arg(regs[19],2,16,QChar('0')).toUpper());
+		label_val_20->setText(QString("%1").arg(regs[20],2,16,QChar('0')).toUpper());
+		label_val_21->setText(QString("%1").arg(regs[21],2,16,QChar('0')).toUpper());
+		label_val_22->setText(QString("%1").arg(regs[22],2,16,QChar('0')).toUpper());
+		label_val_23->setText(QString("%1").arg(regs[23],2,16,QChar('0')).toUpper());
+	}
+	// Only on V9958 this makes sence
+	if (vdpid==VDP_V9958){
+		label_val_25->setText(QString("%1").arg(regs[25],2,16,QChar('0')).toUpper());
+		label_val_26->setText(QString("%1").arg(regs[26],2,16,QChar('0')).toUpper());
+		label_val_27->setText(QString("%1").arg(regs[27],2,16,QChar('0')).toUpper());
+	};
+
 	//update all the individual bits
-	// TODO determine upper register depending on VDP used
-	for (int r=0;r<=27;r++){
-		if (r==24) r++; //skip number 24
+	int upper_r=(vdpid==VDP_TMS99X8)?7:(vdpid==VDP_V9938)?23:27;
+	for (int r=0;r<=upper_r;r++){
+		if (r==24) r++; //skip number 24 if needed
 		for (int b=7;b>=0;b--){
 			QString name=QString("pushButton_%1_%2").arg(r).arg(b);
 			InteractiveButton *I = qFindChild<InteractiveButton*>(this, name);
@@ -265,7 +310,7 @@ void VDPRegViewer::decodeVDPRegs()
 
 	// Start the interpretation
 	label_dec_ie2->setText((regs[0] & 32)?"Interrupt from lightpen enabled":"Interrupt from lightpen disabled" );
-	label_dec_ie1->setText((regs[0] & 16)?"Horizontal scanning line int enabled":"Horizontal scanning line int disabled" );
+	label_dec_ie1->setText((regs[0] & 16)?"Reg 19 scanline interrupt enabled":"Reg 19 scanline interrupt disabled" );
 
 	int m=((regs[0] & 14)<<1) | ((regs[1] & 24)>>3);
 	const char* screen[]={"SCREEN 1", "SCREEN 3", "SCREEN 0",
@@ -279,61 +324,105 @@ void VDPRegViewer::decodeVDPRegs()
 	  "let's find out 24", "let's find out 25", "let's find out 26",
 	  "let's find out 27", "SCREEN 8", "let's find out 29",
 	  "let's find out 30", "let's find out 31"};
-	label_dec_m->setText(QString("Screen modebits %1 : SCREEN %2").arg(m).arg(screen[m]) );
+
+	label_dec_m->setText(QString("M=%1 :  %2").arg(m).arg(screen[m]) );
+	if (m==28 && vdpid==VDP_V9958){
+		bool yjk=(regs[25] &  8);
+		bool yae=(regs[25] & 16);
+		int scr= yjk?(yae?10:12):8;
+		label_dec_m->setText(QString("M=%1%2%3 : SCREEN %4").arg(m).arg(yjk?"+YJK":"").arg(yae?"+YAE":"").arg(scr) );
+	} else {
+		label_dec_m->setText(QString("M=%1 :  %2").arg(m).arg(screen[m]) );
+	}
 
 	label_dec_bl->setText((regs[1] & 64)?"Display enabled":"Display disabled");
-	label_dec_ie0->setText((regs[1] & 32)?"Horizontal scanning line int enabled":"Horizontal scanning line int disabled" );
+	label_dec_ie0->setText((regs[1] & 32)?"V-Blank interrupt enabled":"V-Blank interrupt disabled" );
 
 	label_dec_si->setText((regs[1] & 2)?"16x16 sprites":"8x8 sprites" );
 	label_dec_mag->setText((regs[1] & 1)?"magnified sprites":"regular sized" );
 
-	label_dec_tp->setText((regs[8] & 32)? "Color 0 uses the color registers":"Color 0 is transparent (=shows border)"
- );
-	label_dec_spd->setText((regs[8] & 2)?"Sprites enabled":"Sprites disabled");
+	//TODO warn if mustbeone bits are not one.. and they should depend on the active screenmode
 
-	label_dec_ln->setText((regs[9] & 128)?"212":"192");
-	label_dec_il->setText((regs[9] & 8)?"interlaced":"non-interlaced");
-	label_dec_eo->setText((regs[9] & 4)?"alternate pages":"same page");
-	label_dec_nt->setText((regs[9] & 2)?"PAL":"NTSC");
+	int mustbeone[][12]={
+		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX2 = static const int VDP_V9938 = 0;
+		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX1 = static const int VDP_TMS99X8 = 1;
+		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
+		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
+		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}  // MSX2+ = static const int VDP_V9958 = 4;
+		};
+	int bitsused[][12]={
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // MSX2 = static const int VDP_V9938 = 0;
+		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // MSX1 = static const int VDP_TMS99X8 = 1;
+		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
+		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}  // MSX2+ = static const int VDP_V9958 = 4;
+		};
 
-	//TODO mask according to screen mode, displayed values are wrong atm!!
-	//TODO ignore bits if in MSX1 debug mode
-	label_dec_r2->setText(QString("0x%1").arg(regs[2]<<10,5,16,QChar('0')).toUpper());
-	label_dec_r3->setText(QString("0x%1").arg((regs[3]<<6)|(regs[10]<<14),5,16,QChar('0')).toUpper());
-	label_dec_r4->setText(QString("0x%1").arg(regs[4]<<11,5,16,QChar('0')).toUpper());
-	label_dec_r5->setText(QString("0x%1").arg((regs[5]<<7)|(regs[11]<<15),5,16,QChar('0')).toUpper());
-	label_dec_r6->setText(QString("0x%1").arg(regs[6]<<11,5,16,QChar('0')).toUpper());
+	label_dec_r2->setText(QString("0x%1").arg(
+		( bitsused[vdpid][2] & regs[2] )<<10,
+		5,16,QChar('0')).toUpper());
+	label_dec_r3->setText(QString("0x%1").arg(
+		( ( bitsused[vdpid][3] & regs[3] )<<6)|((bitsused[vdpid][10] & regs[10])<<14),
+		5,16,QChar('0')).toUpper());
+	label_dec_r4->setText(QString("0x%1").arg(
+		( bitsused[vdpid][4] & regs[4]) <<11,
+		5,16,QChar('0')).toUpper());
+	label_dec_r5->setText(QString("0x%1").arg(
+		( ( bitsused[vdpid][5] & regs[5] )<<7)|((bitsused[vdpid][11] & regs[11])<<15),
+		5,16,QChar('0')).toUpper());
+	label_dec_r6->setText(QString("0x%1").arg(
+		( bitsused[vdpid][6] & regs[6]) <<11,
+		5,16,QChar('0')).toUpper());
 
 	label_dec_tc->setText(QString("%1").arg((regs[7]>>4)&15 ,2,10,QChar('0')));
 	label_dec_bd->setText(QString("%1").arg( regs[7]&15     ,2,10,QChar('0')));
-	label_dec_t2->setText(QString("%1").arg((regs[12]>>4)&15 ,2,10,QChar('0')));
-	label_dec_bc->setText(QString("%1").arg( regs[12]&15     ,2,10,QChar('0')));
-	label_dec_on->setText(QString("%1").arg((regs[13]>>4)&15 ,2,10,QChar('0')));
-	label_dec_off->setText(QString("%1").arg( regs[13]&15     ,2,10,QChar('0')));
 
-	int x=(regs[18]&15);
-	int y=((regs[18]>>4)&15);
-	x=x>7?16-x:0-x;
-	y=y>7?16-y:0-y;
-	label_dec_r18->setText(QString("(%1,%2)").arg(x).arg(y));
+	if ( vdpid != VDP_TMS99X8 ){
+		label_dec_tp->setText((regs[8] & 32)? "Color 0 uses the color registers":"Color 0 is transparent (=shows border)"
+				);
+		label_dec_spd->setText((regs[8] & 2)?"Sprites enabled":"Sprites disabled");
 
-	label_dec_r19->setText(QString("%1").arg(regs[19] ,3,10));
-	label_dec_r23->setText(QString("%1").arg(regs[23] ,3,10));
+		label_dec_ln->setText((regs[9] & 128)?"212":"192");
+		label_dec_il->setText((regs[9] & 8)?"interlaced":"non-interlaced");
+		label_dec_eo->setText((regs[9] & 4)?"alternate pages":"same page");
+		label_dec_nt->setText((regs[9] & 2)?"PAL":"NTSC");
 
-	label_dec_r14->setText(QString("0x%1").arg(regs[14]<<14,5,16,QChar('0')));
-	label_dec_r15->setText(QString("%1").arg(regs[15]&15 ,2,10));
-	label_dec_r16->setText(QString("%1").arg(regs[16]&15 ,2,10));
-	label_dec_r17->setText(QString("%1").arg(regs[17]&63 ,3,10).append((regs[17]&128)?" ,auto incr":""));
+		label_dec_t2->setText(QString("%1").arg((regs[12]>>4)&15 ,2,10,QChar('0')));
+		label_dec_bc->setText(QString("%1").arg( regs[12]&15     ,2,10,QChar('0')));
+		label_dec_on->setText(QString("%1").arg((regs[13]>>4)&15 ,2,10,QChar('0')));
+		label_dec_off->setText(QString("%1").arg( regs[13]&15     ,2,10,QChar('0')));
+
+		int x=(regs[18]&15);
+		int y=((regs[18]>>4)&15);
+		x=x>7?16-x:0-x;
+		y=y>7?16-y:0-y;
+		label_dec_r18->setText(QString("(%1,%2)").arg(x).arg(y));
+
+		label_dec_r19->setText(QString("%1").arg(regs[19] ,3,10));
+		label_dec_r23->setText(QString("%1").arg(regs[23] ,3,10));
+
+		label_dec_r14->setText(QString("0x%1").arg((regs[14]&7)<<14,5,16,QChar('0')));
+		label_dec_r15->setText(QString("%1").arg(regs[15]&15 ,2,10));
+		label_dec_r16->setText(QString("%1").arg(regs[16]&15 ,2,10));
+		label_dec_r17->setText(QString("%1").arg(regs[17]&63 ,3,10).append((regs[17]&128)?" ,auto incr":""));
+	};
 
 	//V9958 registers
-	label_dec_r26->setText(QString("%1").arg(regs[26]*8 + regs[27]));
-	label_dec_sp2->setText((regs[25] &  1)?"interlaced":"non-interlaced");
-	label_dec_msk->setText((regs[25] &  2)?"interlaced":"non-interlaced");
-	label_dec_wte->setText((regs[25] &  4)?"interlaced":"non-interlaced");
-	label_dec_yjk->setText((regs[25] &  8)?"interlaced":"non-interlaced");
-	label_dec_yae->setText((regs[25] & 16)?"interlaced":"non-interlaced");
-	label_dec_vds->setText((regs[25] & 32)?"interlaced":"non-interlaced");
-	label_dec_cmd->setText((regs[25] & 64)?"interlaced":"non-interlaced");
+	if ( vdpid == VDP_V9958 ){
+		label_dec_r26->setText(QString("horizontal scroll %1").arg((regs[26]&63)*8 - (7 & regs[27])));
+		label_dec_sp2->setText((regs[25] &  1)?"Scroll uses 2 pages":"Scroll same page");
+		label_dec_msk->setText((regs[25] &  2)?"Hide 8 leftmost pixels":"No masking");
+		label_dec_wte->setText((regs[25] &  4)?"Disabled CPU Waitstate":"Enable CPU Waitstate");
+		if (!(regs[25] &  8)){
+			label_dec_yjk->setText("Normal RGB");
+			label_dec_yae->setText("Ignored (YJK disabled)");
+		} else {
+			label_dec_yjk->setText("YJK System");
+			label_dec_yae->setText((regs[25] & 16)?"Attribute enabled (Y=4bits)":"regular YJK  (Y=5bits)");
+		};
+		label_dec_vds->setText((regs[25] & 32)?"Pin8 is /VDS":"Pin8 is CPUCLK ");
+		label_dec_cmd->setText((regs[25] & 64)?"CMD engine in char modes":"V9938 VDP CMD engine");
+	};
 
 }
 
@@ -352,7 +441,15 @@ void VDPRegViewer::monoGroup( InteractiveButton* but, InteractiveLabel* lab)
 	connect( but, SIGNAL( mouseOver(bool) ), but, SLOT( highlight(bool) ) );
 }
 
-void VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* explained)
+void  VDPRegViewer::reGroup( InteractiveButton* item, buttonHighlightDispatcher* dispat)
+{
+	//button must rehighlight itself
+	connect( item, SIGNAL( mouseOver(bool) ), item, SLOT( highlight(bool) ) );
+	// and then talk to dispatcher
+	doConnect( item, dispat );
+}
+
+buttonHighlightDispatcher* VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* explained)
 {
         // First "steal" the Tooltip of the explained widget.
         InteractiveButton* item;
@@ -370,6 +467,8 @@ void VDPRegViewer::makeGroup( QList<InteractiveButton*> list, InteractiveLabel* 
         foreach (item , list){
                 doConnect( item, dispat );
         };
+
+	return dispat;
 }
 
 
@@ -397,7 +496,7 @@ void VDPRegViewer::connectHighLights()
 	list.clear();
 	list << pushButton_0_3 << pushButton_0_2 << pushButton_0_1;
 	list << pushButton_1_4 << pushButton_1_3;
-	makeGroup( list, label_dec_m);
+	modeBitsDispat = makeGroup( list, label_dec_m);
 
 	// register 1
 	monoGroup( pushButton_1_6,label_dec_bl);
@@ -633,5 +732,6 @@ void VDPRegViewer::on_VDPcomboBox_currentIndexChanged ( int index )
 			break;;
 	}
 	decodeStatusVDPRegs();
+	decodeVDPRegs();
 }
 

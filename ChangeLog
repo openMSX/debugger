@@ -1,5 +1,10 @@
 $Id$
 
+2008-10-22 David Heremans <david.heremans@gnu-linux.net>
+	* More (V9958) registers explained
+	* Started to correctly differentiate between TMS99x8,V9938 and V9958
+	  in decoding table addresses and function of some bits.
+
 2008-10-17 David Heremans <david.heremans@gnu-linux.net>
 	* Added the SimpleHexRequest and SimpleHexRequestUser:
 	  An attempt to simplify the request of openMSX debugable data
