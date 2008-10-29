@@ -19,6 +19,7 @@
 #include "DebuggableViewer.h"
 #include "VDPRegViewer.h"
 #include "VDPStatusRegViewer.h"
+#include "VDPCommandRegViewer.h"
 #include "Settings.h"
 #include "Version.h"
 #include <QAction>
@@ -182,6 +183,7 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	// TODO: Is this done by GCC by default ?
 	VDPRegView = NULL;
 	VDPStatusRegView = NULL;
+	VDPCommandRegView = NULL;
 	
 	createActions();
 	createMenus();
@@ -265,6 +267,9 @@ void DebuggerForm::createActions()
 	viewVDPStatusRegsAction = new QAction(tr("Status Registers"), this);
 	viewVDPStatusRegsAction->setStatusTip(tr("The VDP status registers interpreted"));
 	viewVDPStatusRegsAction->setCheckable(true);
+	viewVDPCommandRegsAction = new QAction(tr("Command Registers"), this);
+	viewVDPCommandRegsAction->setStatusTip(tr("Interact with the VDP command registers"));
+	viewVDPCommandRegsAction->setCheckable(true);
 	viewVDPRegsAction = new QAction(tr("Registers"), this);
 	viewVDPRegsAction->setStatusTip(tr("Interact with the VDP registers"));
 	viewVDPRegsAction->setCheckable(true);
@@ -341,6 +346,7 @@ void DebuggerForm::createActions()
 	connect(viewDebuggableViewerAction, SIGNAL(triggered()), this, SLOT(addDebuggableViewer()));
 	connect(viewBitMappedAction, SIGNAL(triggered()), this, SLOT(toggleBitMappedDisplay()));
 	connect(viewVDPRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPRegsDisplay()));
+	connect(viewVDPCommandRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPCommandRegsDisplay()));
 	connect(viewVDPStatusRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPStatusRegsDisplay()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
 	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
@@ -391,6 +397,7 @@ void DebuggerForm::createMenus()
 
 	// create VDP dialogs menu
 	viewVDPDialogsMenu->addAction(viewVDPRegsAction);
+	viewVDPDialogsMenu->addAction(viewVDPCommandRegsAction);
 	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
 	connect( viewVDPDialogsMenu, SIGNAL( aboutToShow() ), this, SLOT( updateVDPViewMenu() ) );
@@ -1111,6 +1118,25 @@ void DebuggerForm::toggleBitMappedDisplay()
 	*/
 }
 
+void DebuggerForm::toggleVDPCommandRegsDisplay()
+{
+	if (VDPCommandRegView == NULL){
+		VDPCommandRegView = new VDPCommandRegViewer();
+		DockableWidget *dw = new DockableWidget( dockMan );
+		dw->setWidget(VDPCommandRegView);
+		dw->setTitle(tr("VDP registers view"));
+		dw->setId("VDPCommandRegView");
+		dw->setFloating(true);
+		dw->setDestroyable(true);
+		dw->setMovable(true);
+		dw->setClosable(true);
+		connect( this, SIGNAL( emulationChanged() ),
+		         VDPCommandRegView, SLOT( refresh() ) );
+	} else {
+		toggleView( qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
+	}
+}
+
 void DebuggerForm::toggleVDPRegsDisplay()
 {
 	if (VDPRegView == NULL){
@@ -1123,7 +1149,6 @@ void DebuggerForm::toggleVDPRegsDisplay()
 		dw->setDestroyable(true);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		// TODO: refresh should be being hanled by VDPDataStore...
 		connect( this, SIGNAL( emulationChanged() ),
 		         VDPRegView, SLOT( refresh() ) );
 	} else {
@@ -1143,7 +1168,6 @@ void DebuggerForm::toggleVDPStatusRegsDisplay()
 		dw->setDestroyable(true);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		// TODO: refresh should be being hanled by VDPDataStore...
 		connect( this, SIGNAL( emulationChanged() ),
 		         VDPStatusRegView, SLOT( refresh() ) );
 	} else {
@@ -1205,6 +1229,8 @@ void DebuggerForm::updateViewMenu()
 
 void DebuggerForm::updateVDPViewMenu()
 {
+	if (VDPCommandRegView)
+		viewVDPCommandRegsAction->setChecked( VDPCommandRegView->isVisible() );
 	if (VDPRegView)
 		viewVDPRegsAction->setChecked( VDPRegView->isVisible() );
 	if (VDPStatusRegView)

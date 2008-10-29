@@ -22,6 +22,7 @@ class QToolBar;
 class QSplitter;
 class VDPStatusRegViewer;
 class VDPRegViewer;
+class VDPCommandRegViewer;
 
 class DebuggerForm : public QMainWindow
 {
@@ -71,6 +72,7 @@ private:
 	QAction* viewBitMappedAction;
 	QAction* viewVDPStatusRegsAction;
 	QAction* viewVDPRegsAction;
+	QAction* viewVDPCommandRegsAction;
 
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
@@ -96,6 +98,7 @@ private:
 	SlotViewer* slotView;
 	VDPStatusRegViewer* VDPStatusRegView;
 	VDPRegViewer* VDPRegView;
+	VDPCommandRegViewer* VDPCommandRegView;
 
 	CommClient& comm;
 	DebugSession session;
@@ -139,6 +142,7 @@ private slots:
 	void toggleBitMappedDisplay();
 	void toggleVDPRegsDisplay();
 	void toggleVDPStatusRegsDisplay();
+	void toggleVDPCommandRegsDisplay();
 	void addDebuggableViewer();
 	void executeBreak();
 	void executeRun();

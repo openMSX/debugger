@@ -1,0 +1,730 @@
+<ui version="4.0" >
+ <class>VDPCmdRegs</class>
+ <widget class="QDialog" name="VDPCmdRegs" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>489</width>
+    <height>659</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
+   <item>
+    <layout class="QGridLayout" name="gridLayout" >
+     <item row="0" column="0" colspan="5" >
+      <widget class="QLabel" name="label_29" >
+       <property name="font" >
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text" >
+        <string>New command</string>
+       </property>
+      </widget>
+     </item>
+     <item rowspan="21" row="0" column="5" >
+      <widget class="Line" name="line" >
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6" colspan="2" >
+      <widget class="QLabel" name="label_27" >
+       <property name="font" >
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text" >
+        <string>Current registers</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2" >
+      <widget class="QLineEdit" name="lineEdit_sx" />
+     </item>
+     <item row="1" column="3" >
+      <widget class="QLabel" name="label_3" >
+       <property name="text" >
+        <string>R32</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r32" />
+     </item>
+     <item row="1" column="6" >
+      <widget class="QLabel" name="label_r_sx" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="7" >
+      <widget class="QLabel" name="label_r_32" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3" >
+      <widget class="QLabel" name="label_4" >
+       <property name="text" >
+        <string>R33</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r33" />
+     </item>
+     <item row="2" column="7" >
+      <widget class="QLabel" name="label_r_33" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2" >
+      <widget class="QLineEdit" name="lineEdit_sy" />
+     </item>
+     <item row="3" column="3" >
+      <widget class="QLabel" name="label_5" >
+       <property name="text" >
+        <string>R34</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r34" />
+     </item>
+     <item row="3" column="6" >
+      <widget class="QLabel" name="label_r_sy" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="7" >
+      <widget class="QLabel" name="label_r_34" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3" >
+      <widget class="QLabel" name="label_6" >
+       <property name="text" >
+        <string>R35</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r35" />
+     </item>
+     <item row="4" column="7" >
+      <widget class="QLabel" name="label_r_35" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2" >
+      <widget class="QLineEdit" name="lineEdit_dx" />
+     </item>
+     <item row="5" column="3" >
+      <widget class="QLabel" name="label_12" >
+       <property name="text" >
+        <string>R36</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r36" />
+     </item>
+     <item row="5" column="6" >
+      <widget class="QLabel" name="label_r_dx" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="7" >
+      <widget class="QLabel" name="label_r_36" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="3" >
+      <widget class="QLabel" name="label_9" >
+       <property name="text" >
+        <string>R37</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r37" />
+     </item>
+     <item row="6" column="7" >
+      <widget class="QLabel" name="label_r_37" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="2" >
+      <widget class="QLineEdit" name="lineEdit_dy" />
+     </item>
+     <item row="7" column="3" >
+      <widget class="QLabel" name="label_11" >
+       <property name="text" >
+        <string>R38</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r38" />
+     </item>
+     <item row="7" column="6" >
+      <widget class="QLabel" name="label_r_dy" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="7" >
+      <widget class="QLabel" name="label_r_38" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="3" >
+      <widget class="QLabel" name="label_7" >
+       <property name="text" >
+        <string>R39</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r39" />
+     </item>
+     <item row="8" column="7" >
+      <widget class="QLabel" name="label_r_39" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="2" >
+      <widget class="QLineEdit" name="lineEdit_nx" />
+     </item>
+     <item row="9" column="3" >
+      <widget class="QLabel" name="label_13" >
+       <property name="text" >
+        <string>R40</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r40" />
+     </item>
+     <item row="9" column="6" >
+      <widget class="QLabel" name="label_r_nx" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="7" >
+      <widget class="QLabel" name="label_r_40" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="3" >
+      <widget class="QLabel" name="label_14" >
+       <property name="text" >
+        <string>R41</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r41" />
+     </item>
+     <item row="10" column="7" >
+      <widget class="QLabel" name="label_r_41" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="2" >
+      <widget class="QLineEdit" name="lineEdit_ny" />
+     </item>
+     <item row="11" column="3" >
+      <widget class="QLabel" name="label_15" >
+       <property name="text" >
+        <string>R42</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r42" />
+     </item>
+     <item row="11" column="6" >
+      <widget class="QLabel" name="label_r_ny" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="7" >
+      <widget class="QLabel" name="label_r_42" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="3" >
+      <widget class="QLabel" name="label_16" >
+       <property name="text" >
+        <string>R43</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r43" />
+     </item>
+     <item row="12" column="7" >
+      <widget class="QLabel" name="label_r_43" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="0" colspan="2" >
+      <widget class="QLabel" name="label_22" >
+       <property name="text" >
+        <string>COLOR</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="3" >
+      <widget class="QLabel" name="label_17" >
+       <property name="text" >
+        <string>R44</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r44" />
+     </item>
+     <item row="13" column="7" >
+      <widget class="QLabel" name="label_r_44" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="0" colspan="2" >
+      <widget class="QLabel" name="label_23" >
+       <property name="text" >
+        <string>ARG</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="3" >
+      <widget class="QLabel" name="label_18" >
+       <property name="text" >
+        <string>R45</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r45" />
+     </item>
+     <item row="14" column="7" >
+      <widget class="QLabel" name="label_r_45" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0" colspan="5" >
+      <widget class="QLabel" name="label_expl2" >
+       <property name="text" >
+        <string>CMD explained</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2" >
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>SX</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2" >
+      <widget class="QLabel" name="label_2" >
+       <property name="text" >
+        <string>SY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2" >
+      <widget class="QLabel" name="label_8" >
+       <property name="text" >
+        <string>DX</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2" >
+      <widget class="QLabel" name="label_10" >
+       <property name="text" >
+        <string>DY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="2" >
+      <widget class="QLabel" name="label_20" >
+       <property name="text" >
+        <string>NY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0" colspan="2" >
+      <widget class="QLabel" name="label_21" >
+       <property name="text" >
+        <string>NX</string>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="0" colspan="5" >
+      <layout class="QGridLayout" name="gridLayout_2" >
+       <item row="0" column="0" >
+        <widget class="QCheckBox" name="checkBoxBit_3" >
+         <property name="text" >
+          <string>DIY</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QCheckBox" name="checkBoxBit_2" >
+         <property name="text" >
+          <string>DIX</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QCheckBox" name="checkBoxBit_1" >
+         <property name="text" >
+          <string>EQ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="QCheckBox" name="checkBoxBit_0" >
+         <property name="text" >
+          <string>MAJ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QCheckBox" name="checkBoxBit_4" >
+         <property name="text" >
+          <string>MXS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="QCheckBox" name="checkBoxBit_5" >
+         <property name="text" >
+          <string>MXD</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QCheckBox" name="checkBoxBit_6" >
+         <property name="text" >
+          <string>MXC</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="17" column="0" >
+      <widget class="QLabel" name="label_24" >
+       <property name="text" >
+        <string>CMD</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="3" >
+      <widget class="QLabel" name="label_19" >
+       <property name="text" >
+        <string>R46</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="1" >
+      <widget class="QComboBox" name="comboBox_cmd" >
+       <item>
+        <property name="text" >
+         <string>0: Stop</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>1: Invalid</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>2: Invalid</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>3: Invalid</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>4: POINT</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>5: PSET</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>6: SRCH</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>7: LINE</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>8: LMMV</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>9: LMMM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>A: LMCM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>B: LMMC</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>C: HMMV</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>D: HMMM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>E: YMMM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>F: HMMC</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="17" column="2" >
+      <widget class="QComboBox" name="comboBox_operator" >
+       <item>
+        <property name="text" >
+         <string>INP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>AND</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>OR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>EOR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>NOT</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TIMP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TAND</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TOR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TEOR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>TNOT</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>---</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="17" column="7" >
+      <widget class="QLabel" name="label_r_46" >
+       <property name="text" >
+        <string>0x00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="4" >
+      <widget class="QLineEdit" name="lineEdit_r46" />
+     </item>
+     <item row="14" column="2" >
+      <widget class="QLabel" name="label_arg" >
+       <property name="text" >
+        <string>00000000</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="2" >
+      <widget class="QLabel" name="label_color" >
+       <property name="text" >
+        <string>0000 0000</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0" colspan="5" >
+      <widget class="QLabel" name="label_expl1" >
+       <property name="text" >
+        <string>CMD 
+explained</string>
+       </property>
+      </widget>
+     </item>
+     <item rowspan="2" row="19" column="6" colspan="2" >
+      <layout class="QVBoxLayout" name="verticalLayout" >
+       <item>
+        <widget class="QPushButton" name="syncPushButton" >
+         <property name="text" >
+          <string>Sync regs to new cmd</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="autoSyncRadioButton" >
+         <property name="text" >
+          <string>Auto sync</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="20" column="0" colspan="5" >
+      <layout class="QHBoxLayout" name="horizontalLayout" >
+       <item>
+        <widget class="QPushButton" name="pushButton_2" >
+         <property name="text" >
+          <string>Launch command</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>138</width>
+           <height>24</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

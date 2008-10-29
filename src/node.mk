@@ -8,7 +8,8 @@ MOC_SRC_HDR:= \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager \
 	Settings PreferencesDialog BreakpointDialog DebuggableViewer \
 	DebugSession MainMemoryViewer BitMapViewer VramBitMappedView \
-	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel InteractiveButton
+	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
+	InteractiveButton VDPCommandRegViewer
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \
@@ -19,7 +20,7 @@ SRC_ONLY:= \
 
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
-	BitMapViewer VDPStatusRegisters VDPRegistersExplained
+	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters
 
 UI_PROMO_HDR:= 
 #	InteractiveLabel

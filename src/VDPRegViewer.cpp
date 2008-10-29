@@ -99,8 +99,8 @@ void VDPRegViewer::decodeStatusVDPRegs()
 	// test MSX1 id =1;
 	//if (vdpid != id){
 	//	vdpid=id;
-		switch (vdpid){
-		  case VDP_TMS99X8:  // TMS9918 = MSX1 VDP
+		if (vdpid == VDP_TMS99X8){
+			// TMS9918 = MSX1 VDP
 			groupBox_V9958->setVisible(false);
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
@@ -125,17 +125,29 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			setRegisterVisible(21,false);
 			setRegisterVisible(22,false);
 			pushButton_0_2->setText("0");
-			pushButton_0_3->setText("0");
-			pushButton_0_4->setText("0");
-			pushButton_0_5->setText("0");
-			pushButton_0_6->setText("0");
-			pushButton_1_7->setText("4/16");
 			pushButton_0_2->setToolTip("");
+			pushButton_0_3->setText("0");
 			pushButton_0_3->setToolTip("");
+			pushButton_0_4->setText("0");
 			pushButton_0_4->setToolTip("");
+			pushButton_0_5->setText("0");
 			pushButton_0_5->setToolTip("");
+			pushButton_0_6->setText("0");
 			pushButton_0_6->setToolTip("");
+			pushButton_1_7->setText("4/16");
 			pushButton_1_7->setToolTip("4/16K selection\n0 selects 4027 RAM operation\n1 selects 4108/4116 RAM operation");
+			// mask all A16 bits of regs < 7
+			pushButton_2_6->setText("0");
+			pushButton_4_5->setText("0");
+			pushButton_6_5->setText("0");
+			// mask all A15
+			pushButton_2_5->setText("0");
+			pushButton_4_4->setText("0");
+			pushButton_6_4->setText("0");
+			// mask all A14 bits of regs < 7
+			pushButton_2_4->setText("0");
+			pushButton_4_3->setText("0");
+			pushButton_6_3->setText("0");
 			disconnect(modeBitsDispat,0,pushButton_0_2,0);
 			disconnect(modeBitsDispat,0,pushButton_0_3,0);
 			disconnect(pushButton_0_2,0,0,0);
@@ -144,21 +156,20 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			disconnect(pushButton_0_5,0,0,0);
 			disconnect(pushButton_0_6,0,0,0);
 			monoGroup(pushButton_1_7,label_dec_416K);
-			break;;
-		  case VDP_V9938:  // V9938 = MSX2 VDP
-			groupBox_V9958->setVisible(false);
+		} else {
+		  // V9938 = MSX2 VDP
+		  // or 
+		  // V9958 = MSX2+ VDP
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
 			groupBox_Display->setVisible(true);
 			groupBox_Access->setVisible(true);
-			groupBox_dec_V9958->setVisible(false);
 			groupBox_dec_TableBase->setVisible(true);
 			groupBox_dec_Color->setVisible(true);
 			groupBox_dec_Display->setVisible(true);
 			groupBox_dec_Access->setVisible(true);
 			label_dec_416K->setVisible(false);
 			label_dec_ie1->setVisible(true);
-			label_dec_ie2->setVisible(true);
 			label_dec_dg->setVisible(true);
 			setRegisterVisible(8,true);
 			setRegisterVisible(9,true);
@@ -172,23 +183,73 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_0_2->setText("M4");
 			pushButton_0_3->setText("M5");
 			pushButton_0_4->setText("IE1");
-			pushButton_0_5->setText("IE2");
 			pushButton_0_6->setText("DG");
 			pushButton_1_7->setText("0");
 			pushButton_0_2->setToolTip("Used to change the display mode.");
 			pushButton_0_3->setToolTip("Used to change the display mode.");
 			pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
-			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
 			pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
 			pushButton_1_7->setToolTip("");
 
-			pushButton_0_5->setText("IE2");
-			pushButton_8_7->setText("MS");
-			pushButton_8_6->setText("LP");
-			pushButton_0_5->setToolTip("");
-			pushButton_8_7->setToolTip("");
-			pushButton_8_6->setToolTip("");
+			// all A16 bits of regs < 7
+			pushButton_2_6->setText("A16");
+			pushButton_4_5->setText("A16");
+			pushButton_6_5->setText("A16");
+			// all A15
+			pushButton_2_5->setText("A15");
+			pushButton_4_4->setText("A15");
+			pushButton_6_4->setText("A15");
+			// all A14 
+			pushButton_2_4->setText("A14");
+			pushButton_4_3->setText("A14");
+			pushButton_6_3->setText("A14");
+			////pushButton_0_5->setText("IE2");
 
+			////disconnect(pushButton_0_7,0,0,0);
+			////disconnect(label_dec_416K,0,0,0);
+
+			////reGroup(pushButton_0_2,modeBitsDispat);
+			////reGroup(pushButton_0_3,modeBitsDispat);
+
+			////monoGroup( pushButton_0_4,label_dec_ie1);
+			////monoGroup( pushButton_0_5,label_dec_ie2);
+			////monoGroup( pushButton_0_6,label_dec_dg);
+
+			//break;;
+		    // V9958 = MSX2+ VDP
+			////groupBox_TableBase->setVisible(true);
+			////groupBox_Color->setVisible(true);
+			////groupBox_Display->setVisible(true);
+			////groupBox_Access->setVisible(true);
+			////groupBox_dec_TableBase->setVisible(true);
+			////groupBox_dec_Color->setVisible(true);
+			////groupBox_dec_Display->setVisible(true);
+			////groupBox_dec_Access->setVisible(true);
+			////label_dec_416K->setVisible(false);
+			////label_dec_ie1->setVisible(true);
+			////label_dec_dg->setVisible(true);
+			////setRegisterVisible(8,true);
+			////setRegisterVisible(9,true);
+			////setRegisterVisible(10,true);
+			////setRegisterVisible(11,true);
+			////setRegisterVisible(12,true);
+			////setRegisterVisible(13,true);
+			////setRegisterVisible(20,true);
+			////setRegisterVisible(21,true);
+			////setRegisterVisible(22,true);
+			////pushButton_0_2->setText("M4");
+			////pushButton_0_3->setText("M5");
+			////pushButton_0_4->setText("IE1");
+			////pushButton_0_6->setText("DG");
+			////pushButton_1_7->setText("0");
+			////pushButton_0_2->setToolTip("Used to change the display mode.");
+			////pushButton_0_3->setToolTip("Used to change the display mode.");
+			////pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
+			////pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
+			////pushButton_1_7->setToolTip("");
+
+
+			pushButton_1_7->setToolTip("");
 			disconnect(pushButton_0_7,0,0,0);
 			disconnect(label_dec_416K,0,0,0);
 
@@ -199,62 +260,33 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			monoGroup( pushButton_0_5,label_dec_ie2);
 			monoGroup( pushButton_0_6,label_dec_dg);
 
-			break;;
-		  case VDP_V9958:  // V9958 = MSX2+ VDP
-			groupBox_V9958->setVisible(true);
-			groupBox_TableBase->setVisible(true);
-			groupBox_Color->setVisible(true);
-			groupBox_Display->setVisible(true);
-			groupBox_Access->setVisible(true);
-			groupBox_dec_V9958->setVisible(true);
-			groupBox_dec_TableBase->setVisible(true);
-			groupBox_dec_Color->setVisible(true);
-			groupBox_dec_Display->setVisible(true);
-			groupBox_dec_Access->setVisible(true);
-			label_dec_416K->setVisible(false);
-			label_dec_ie1->setVisible(true);
-			label_dec_ie2->setVisible(false);
-			label_dec_dg->setVisible(true);
-			setRegisterVisible(8,true);
-			setRegisterVisible(9,true);
-			setRegisterVisible(10,true);
-			setRegisterVisible(11,true);
-			setRegisterVisible(12,true);
-			setRegisterVisible(13,true);
-			setRegisterVisible(20,true);
-			setRegisterVisible(21,true);
-			setRegisterVisible(22,true);
-			pushButton_0_2->setText("M4");
-			pushButton_0_3->setText("M5");
-			pushButton_0_4->setText("IE1");
-			pushButton_0_5->setText("0");
-			pushButton_0_6->setText("DG");
-			pushButton_1_7->setText("0");
-			pushButton_8_7->setText("0");
-			pushButton_8_6->setText("0");
-			pushButton_0_2->setToolTip("Used to change the display mode.");
-			pushButton_0_3->setToolTip("Used to change the display mode.");
-			pushButton_0_4->setToolTip("Enables interrupt from Horizontal scanning line by Interrupt Enable 1.");
-			pushButton_0_5->setToolTip("");
-			pushButton_0_6->setToolTip("Sets the color bus to input mode, and inputs data into the VRAM.");
-			pushButton_1_7->setToolTip("");
-			pushButton_1_7->setToolTip("");
+		  if (vdpid == VDP_V9938){
+			groupBox_V9958->setVisible(false);
+			groupBox_dec_V9958->setVisible(false);
+			label_dec_ie2->setVisible(true);
+			pushButton_0_5->setText("IE2");
+			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+			pushButton_8_6->setText("LP");
+			pushButton_8_6->setToolTip("");
+			pushButton_8_7->setText("MS");
 			pushButton_8_7->setToolTip("");
+			} else {
+			groupBox_V9958->setVisible(true);
+			groupBox_dec_V9958->setVisible(true);
+			label_dec_ie2->setVisible(false);
+			pushButton_0_5->setText("0");
+			pushButton_0_5->setToolTip("");
+			pushButton_8_7->setText("0");
+			pushButton_8_7->setToolTip("");
+			pushButton_8_6->setText("0");
 			pushButton_8_6->setToolTip("");
 			/*
 			Since mouse/lightpen are disabled this will affect 
 			status reg1 bit 7 (LPS) and
 			status reg1 bit 6 (FL)
 			*/
-			disconnect(pushButton_0_7,0,0,0);
-			disconnect(label_dec_416K,0,0,0);
-			reGroup(pushButton_0_2,modeBitsDispat);
-			reGroup(pushButton_0_3,modeBitsDispat);
-
-			monoGroup( pushButton_0_4,label_dec_ie1);
-			monoGroup( pushButton_0_5,label_dec_ie2);
-			monoGroup( pushButton_0_6,label_dec_dg);
-			break;;
+		}
+			//break;;
 		};
 	//}
 }
