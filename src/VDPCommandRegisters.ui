@@ -413,6 +413,11 @@
       <layout class="QGridLayout" name="gridLayout_2" >
        <item row="0" column="0" >
         <widget class="QCheckBox" name="checkBoxBit_3" >
+         <property name="toolTip" >
+          <string>Direction from source:
+0: Down
+1: Up</string>
+         </property>
          <property name="text" >
           <string>DIY</string>
          </property>
@@ -420,6 +425,17 @@
        </item>
        <item row="0" column="1" >
         <widget class="QCheckBox" name="checkBoxBit_2" >
+         <property name="font" >
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="toolTip" >
+          <string>Direction from source:
+0: RIght
+1: Left</string>
+         </property>
          <property name="text" >
           <string>DIX</string>
          </property>
@@ -427,6 +443,10 @@
        </item>
        <item row="0" column="2" >
         <widget class="QCheckBox" name="checkBoxBit_1" >
+         <property name="toolTip" >
+          <string>When 1, ends execution when border color found.
+When 0, ends execution when a color other than the border color is found.</string>
+         </property>
          <property name="text" >
           <string>EQ</string>
          </property>
@@ -434,6 +454,11 @@
        </item>
        <item row="0" column="3" >
         <widget class="QCheckBox" name="checkBoxBit_0" >
+         <property name="toolTip" >
+          <string>Direction for long side
+0: Long side is in x-axis
+1: Long side is in y-axis</string>
+         </property>
          <property name="text" >
           <string>MAJ</string>
          </property>
@@ -441,6 +466,11 @@
        </item>
        <item row="1" column="3" >
         <widget class="QCheckBox" name="checkBoxBit_4" >
+         <property name="toolTip" >
+          <string>Select source memory
+0: Video RAM
+1: Expansion RAM</string>
+         </property>
          <property name="text" >
           <string>MXS</string>
          </property>
@@ -448,6 +478,11 @@
        </item>
        <item row="1" column="2" >
         <widget class="QCheckBox" name="checkBoxBit_5" >
+         <property name="toolTip" >
+          <string>Select destination memory
+0: Video RAM
+1: Expansion RAM</string>
+         </property>
          <property name="text" >
           <string>MXD</string>
          </property>
@@ -455,6 +490,11 @@
        </item>
        <item row="1" column="1" >
         <widget class="QCheckBox" name="checkBoxBit_6" >
+         <property name="toolTip" >
+          <string>Select memory
+0: Video RAM
+1: Expansion RAM</string>
+         </property>
          <property name="text" >
           <string>MXC</string>
          </property>

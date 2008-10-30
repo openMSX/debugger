@@ -135,7 +135,10 @@ void VDPCommandRegViewer::decodeR46( int val )
 	int cnam[]={  6, 7, 7, 7, 8, 9,10,11,12,12,12,12,13,13,13,13 }; //refers to words
 	QString oper[] = {"IMP","AND","OR","EOR","NOT","---","---","---",
 			"TIMP","TAND","TOR","TEOR","TNOT","---","---","---" };
-	
+	int argbold[]={ 0x00,0x00,0x00,0x00,
+			0x10,0x20,0x26,0x2D,
+			0x2C,0x2C,0x1C,0x2C,
+			0x2C,0x3C,0x2C,0x2C };
 	int operat=val&15;
 	int cmd=(val>>4)&15;
 
@@ -149,6 +152,16 @@ void VDPCommandRegViewer::decodeR46( int val )
 	arg(oper[operat]);
 
 	label_expl1->setText(explication);
+	//set the checkbox font in bold if command uses the corresponding bit
+        QCheckBox* item;
+	for (int b=0 ; b<7 ; b++){
+		item = this->findChild<QCheckBox*>(QString("checkBoxBit_%1").arg(b));
+		QFont font;
+		font.setBold( (argbold[cmd] & (1<<b))?true:false);
+		item->setFont(font);
+	};
+
+
 	//TODO: create basic equivalent
 	//TODO: warn about wrong stuff (majorant < minorant when line drawing for instance)
 

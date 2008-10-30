@@ -1,6 +1,9 @@
 $Id$
 
 2008-10-30 David Heremans <david.heremans@gnu-linux.net>
+	* Added indication of used bits in ARG register
+
+2008-10-29 David Heremans <david.heremans@gnu-linux.net>
 	* First steps towards VDP Command registers dialog.
 
 2008-10-22 David Heremans <david.heremans@gnu-linux.net>
