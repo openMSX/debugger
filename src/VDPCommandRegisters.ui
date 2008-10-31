@@ -313,7 +313,7 @@
       </widget>
      </item>
      <item row="13" column="0" colspan="2" >
-      <widget class="QLabel" name="label_22" >
+      <widget class="QLabel" name="labelCOLOR" >
        <property name="text" >
         <string>COLOR</string>
        </property>
@@ -337,7 +337,7 @@
       </widget>
      </item>
      <item row="14" column="0" colspan="2" >
-      <widget class="QLabel" name="label_23" >
+      <widget class="QLabel" name="labelARG" >
        <property name="text" >
         <string>ARG</string>
        </property>
@@ -368,42 +368,42 @@
       </widget>
      </item>
      <item row="1" column="0" colspan="2" >
-      <widget class="QLabel" name="label" >
+      <widget class="QLabel" name="labelSX" >
        <property name="text" >
         <string>SX</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0" colspan="2" >
-      <widget class="QLabel" name="label_2" >
+      <widget class="QLabel" name="labelSY" >
        <property name="text" >
         <string>SY</string>
        </property>
       </widget>
      </item>
      <item row="5" column="0" colspan="2" >
-      <widget class="QLabel" name="label_8" >
+      <widget class="QLabel" name="labelDX" >
        <property name="text" >
         <string>DX</string>
        </property>
       </widget>
      </item>
      <item row="7" column="0" colspan="2" >
-      <widget class="QLabel" name="label_10" >
+      <widget class="QLabel" name="labelDY" >
        <property name="text" >
         <string>DY</string>
        </property>
       </widget>
      </item>
      <item row="11" column="0" colspan="2" >
-      <widget class="QLabel" name="label_20" >
+      <widget class="QLabel" name="labelNY" >
        <property name="text" >
         <string>NY</string>
        </property>
       </widget>
      </item>
      <item row="9" column="0" colspan="2" >
-      <widget class="QLabel" name="label_21" >
+      <widget class="QLabel" name="labelNX" >
        <property name="text" >
         <string>NX</string>
        </property>

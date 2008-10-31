@@ -139,6 +139,10 @@ void VDPCommandRegViewer::decodeR46( int val )
 			0x10,0x20,0x26,0x2D,
 			0x2C,0x2C,0x1C,0x2C,
 			0x2C,0x3C,0x2C,0x2C };
+	int regbold[]={ 0x00,0x00,0x00,0x00,
+			0x83,0xCC,0xC3,0xFC,
+			0xFC,0xBF,0xB3,0xFC,
+			0xFC,0xBF,0xAE,0xFC };
 	int operat=val&15;
 	int cmd=(val>>4)&15;
 
@@ -152,14 +156,25 @@ void VDPCommandRegViewer::decodeR46( int val )
 	arg(oper[operat]);
 
 	label_expl1->setText(explication);
+
+	//a Normal and a Bold font
+	QFont fontN;
+	QFont fontB;
+	fontB.setBold(true);
 	//set the checkbox font in bold if command uses the corresponding bit
         QCheckBox* item;
 	for (int b=0 ; b<7 ; b++){
 		item = this->findChild<QCheckBox*>(QString("checkBoxBit_%1").arg(b));
-		QFont font;
-		font.setBold( (argbold[cmd] & (1<<b))?true:false);
-		item->setFont(font);
+		item->setFont( (argbold[cmd] & (1<<b)) ? fontB : fontN );
 	};
+	labelSX->setFont( (regbold[cmd] & 1) ? fontB : fontN );
+	labelSY->setFont( (regbold[cmd] & 2) ? fontB : fontN );
+	labelDX->setFont( (regbold[cmd] & 4) ? fontB : fontN );
+	labelDY->setFont( (regbold[cmd] & 8) ? fontB : fontN );
+	labelNX->setFont( (regbold[cmd] & 16) ? fontB : fontN );
+	labelNY->setFont( (regbold[cmd] & 32) ? fontB : fontN );
+	labelCOLOR->setFont( (regbold[cmd] & 64) ? fontB : fontN );
+	labelARG->setFont( (regbold[cmd] & 128) ? fontB : fontN );
 
 
 	//TODO: create basic equivalent
