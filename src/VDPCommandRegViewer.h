@@ -184,6 +184,7 @@ public slots:
 	void on_comboBox_cmd_currentIndexChanged ( int index ) ;
 	void on_comboBox_operator_currentIndexChanged ( int index ) ;
 	void on_syncPushButton_clicked() ;
+	void on_launchPushButton_clicked() ;
 };
 
 #endif /* VDPCOMMANDREGVIEWER_H */

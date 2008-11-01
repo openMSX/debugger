@@ -10,6 +10,7 @@ VDPCommandRegViewer::VDPCommandRegViewer( QWidget *parent)
 {
 	setupUi(this);
 	regs =  new unsigned char[64+16];
+	memset(regs, 0, 64+16);
 	statusregs = regs + 64;
 
 	// create the needed groups
@@ -64,6 +65,9 @@ VDPCommandRegViewer::VDPCommandRegViewer( QWidget *parent)
                          this, SLOT( R45BitChanged(int) ) );
         };
 
+	lineEdit_r44->setText("0x00");
+	lineEdit_r45->setText("0x00");
+	lineEdit_r46->setText("0x00");
 	R46=0;
 	comboBox_cmd->setCurrentIndex(0);
 	//decodeR46(R46);
@@ -185,6 +189,31 @@ void VDPCommandRegViewer::decodeR46( int val )
 void VDPCommandRegViewer::on_syncPushButton_clicked()
 {
 	syncRegToCmd();
+}
+
+void VDPCommandRegViewer::on_launchPushButton_clicked()
+{
+	unsigned char newregs[64];
+	memset(newregs,0,64);
+	newregs[32]=lineEdit_r32->text().toInt(NULL,0);
+	newregs[33]=lineEdit_r33->text().toInt(NULL,0);
+	newregs[34]=lineEdit_r34->text().toInt(NULL,0);
+	newregs[35]=lineEdit_r35->text().toInt(NULL,0);
+	newregs[36]=lineEdit_r36->text().toInt(NULL,0);
+	newregs[37]=lineEdit_r37->text().toInt(NULL,0);
+	newregs[38]=lineEdit_r38->text().toInt(NULL,0);
+	newregs[39]=lineEdit_r39->text().toInt(NULL,0);
+	newregs[40]=lineEdit_r40->text().toInt(NULL,0);
+	newregs[41]=lineEdit_r41->text().toInt(NULL,0);
+	newregs[42]=lineEdit_r42->text().toInt(NULL,0);
+	newregs[43]=lineEdit_r43->text().toInt(NULL,0);
+	newregs[44]=lineEdit_r44->text().toInt(NULL,0);
+	newregs[45]=lineEdit_r45->text().toInt(NULL,0);
+	newregs[46]=lineEdit_r46->text().toInt(NULL,0);
+
+	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
+		"{VDP regs}", 32, 15, newregs);
+	CommClient::instance().sendCommand(req);
 }
 
 void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()

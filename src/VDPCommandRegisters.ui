@@ -740,7 +740,7 @@ explained</string>
      <item row="20" column="0" colspan="5" >
       <layout class="QHBoxLayout" name="horizontalLayout" >
        <item>
-        <widget class="QPushButton" name="pushButton_2" >
+        <widget class="QPushButton" name="launchPushButton" >
          <property name="text" >
           <string>Launch command</string>
          </property>
