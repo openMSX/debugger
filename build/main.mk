@@ -243,7 +243,7 @@ endif
 
 CXX:=g++
 CXXFLAGS:= -g
-COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(GEN_SRC_PATH))
+COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(SOURCES_PATH) $(GEN_SRC_PATH))
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 else
