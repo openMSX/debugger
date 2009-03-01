@@ -311,7 +311,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 				// Move line to middle
 				disasmTopLine = line - visibleLines / 2;
 			}
-			if (disasmTopLine+visibleLines > int(disasmLines.size())) disasmTopLine = disasmLines.size() - visibleLines;
+			if (disasmTopLine+visibleLines > int(disasmLines.size())) disasmTopLine = int(disasmLines.size()) - visibleLines;
 			if (disasmTopLine < 0) disasmTopLine = 0;
 			update();
 			return;
@@ -389,7 +389,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 
 	if (disasmTopLine < 0) disasmTopLine = 0;
 	if (disasmTopLine + visibleLines > int(disasmLines.size()) )
-		disasmTopLine = disasmLines.size() - visibleLines;
+		disasmTopLine = int(disasmLines.size()) - visibleLines;
 
 	updateCancelled(req);
 
@@ -562,7 +562,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	case Qt::Key_PageDown:
 	{
 		int line = disasmTopLine + visibleLines + partialBottomLine - 1;
-		if ( line >= int(disasmLines.size())) line = disasmLines.size();
+		if ( line >= int(disasmLines.size())) line = int(disasmLines.size());
 		setAddress(disasmLines[line].addr, disasmLines[line].infoLine, TopAlways);
 		e->accept();
 		break;

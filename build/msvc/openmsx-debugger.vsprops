@@ -66,4 +66,14 @@
 		Value="$(3rdPartySrcDir)\$(LibQtName)\bin"
 		PerformEnvironmentSet="true"
 	/>
+	<UserMacro
+		Name="LibQtName_64"
+		Value="Qt-4.4.3-src"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="3rdPartyOutDir_64"
+		Value="$(3rdPartySrcDir)\$(LibQtName_64)\lib"
+		PerformEnvironmentSet="true"
+	/>
 </VisualStudioPropertySheet>

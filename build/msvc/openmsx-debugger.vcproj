@@ -11,6 +11,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -107,6 +110,277 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="$(DebuggerOutDir)"
+			IntermediateDirectory="$(DebuggerIntDir)"
+			ConfigurationType="1"
+			InheritedPropertySheets=".\openmsx-debugger.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\..\..\derived\bin/wxCatapult.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BrowseInformation="0"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				AdditionalIncludeDirectories="&quot;..\..\derived\$(PlatformName)-VC-$(ConfigurationName)\config&quot;"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
+				Version=""
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\derived\bin/wxCatapult.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(DebuggerOutDir)"
+			IntermediateDirectory="$(DebuggerIntDir)"
+			ConfigurationType="1"
+			InheritedPropertySheets=".\openmsx-debugger.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				TypeLibraryName=".\..\..\derived\bin/wxCatapult.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				OmitFramePointers="true"
+				EnableFiberSafeOptimizations="true"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				BrowseInformation="0"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				AdditionalIncludeDirectories="&quot;..\..\derived\$(PlatformName)-VC-$(ConfigurationName)\config&quot;"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
+				Version=""
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\derived\bin/wxCatapult.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(DebuggerOutDir)"
+			IntermediateDirectory="$(DebuggerIntDir)"
+			ConfigurationType="1"
+			InheritedPropertySheets=".\openmsx-debugger.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				TypeLibraryName=".\..\..\derived\bin/wxCatapult.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BrowseInformation="0"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				AdditionalIncludeDirectories="&quot;..\..\derived\$(PlatformName)-VC-$(ConfigurationName)\config&quot;"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
+				Version=""
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\..\..\derived\bin/wxCatapult.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(DebuggerOutDir)"
 			IntermediateDirectory="$(DebuggerIntDir)"
@@ -172,95 +446,6 @@
 				SubSystem="2"
 				LinkTimeCodeGeneration="1"
 				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
-				OutputFile=".\..\..\derived\bin/wxCatapult.bsc"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(DebuggerOutDir)"
-			IntermediateDirectory="$(DebuggerIntDir)"
-			ConfigurationType="1"
-			InheritedPropertySheets=".\openmsx-debugger.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine=""
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\derived\bin/wxCatapult.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				BrowseInformation="0"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				AdditionalIncludeDirectories="&quot;..\..\derived\$(PlatformName)-VC-$(ConfigurationName)\config&quot;"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
-				Version=""
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
-				IgnoreDefaultLibraryNames="msvcrt.lib"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -565,6 +750,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\BreakpointDialog.h"
@@ -581,6 +786,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -613,6 +838,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\ConnectDialog.h"
@@ -629,6 +874,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -661,6 +926,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DebuggableViewer.h"
@@ -677,6 +962,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -709,6 +1014,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DebugSession.h"
@@ -725,6 +1050,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -757,6 +1102,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DockableWidget.h"
@@ -773,6 +1138,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -805,6 +1190,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DockableWidgetLayout.h"
@@ -821,6 +1226,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -853,6 +1278,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\HexViewer.h"
@@ -869,6 +1314,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -901,6 +1366,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\InteractiveLabel.h"
@@ -917,6 +1402,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -949,6 +1454,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\OpenMSXConnection.h"
@@ -965,6 +1490,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -997,6 +1542,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\Settings.h"
@@ -1013,6 +1578,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1045,6 +1630,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\StackViewer.h"
@@ -1061,6 +1666,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1093,6 +1718,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\VDPCommandRegViewer.h"
@@ -1109,6 +1754,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1141,6 +1806,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\VDPRegViewer.h"
@@ -1157,6 +1842,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1189,6 +1894,26 @@
 						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\VramBitMappedView.h"
@@ -1205,6 +1930,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating moc_$(InputName).cpp..."
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1242,6 +1987,26 @@
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\BreakpointDialog.ui"
@@ -1266,6 +2031,26 @@
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\ConnectDialog.ui"
@@ -1282,6 +2067,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1318,6 +2123,26 @@
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\SymbolManager.ui"
@@ -1334,6 +2159,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1366,6 +2211,26 @@
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\VDPRegistersExplained.ui"
@@ -1390,6 +2255,26 @@
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\VDPStatusRegisters.ui"
@@ -1406,6 +2291,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating ui_$(InputName).h..."
+						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1552,6 +2457,20 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\CPURegs.h"
@@ -1565,6 +2484,20 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1588,6 +2521,20 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DasmTables.h"
@@ -1601,6 +2548,20 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1624,6 +2585,20 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\DockManager.h"
@@ -1637,6 +2612,20 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1660,6 +2649,20 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\SymbolTable.h"
@@ -1673,6 +2676,20 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1694,6 +2711,26 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating config headers..."
+						CommandLine="for /f &quot;delims=&quot; %%d in (&quot;$(DebuggerConfigDir)&quot;) do set CONFIG_DIR=%%~fd&#x0D;&#x0A;@rem echo CONFIG_DIR=%CONFIG_DIR%&#x0D;&#x0A;set MSVC_DIR=%CD%&#x0D;&#x0A;@rem echo MSVC_DIR=%MSVC_DIR%&#x0D;&#x0A;cd ..&#x0D;&#x0A;set BUILD_DIR=%CD%&#x0D;&#x0A;@rem echo BUILD_DIR=%BUILD_DIR%&#x0D;&#x0A;cd ..&#x0D;&#x0A;set PYTHONPATH=%PYTHONPATH%;%BUILD_DIR%&#x0D;&#x0A;python &quot;%MSVC_DIR%\genconfig.py&quot; $(PlatformName) &quot;$(ConfigurationName)&quot; &quot;%CONFIG_DIR%&#x0D;&quot;&#x0D;&#x0A;cd %MSVC_DIR%&#x0D;&#x0A;"
+						Outputs="Version.ii"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating config headers..."
+						CommandLine="for /f &quot;delims=&quot; %%d in (&quot;$(DebuggerConfigDir)&quot;) do set CONFIG_DIR=%%~fd&#x0D;&#x0A;@rem echo CONFIG_DIR=%CONFIG_DIR%&#x0D;&#x0A;set MSVC_DIR=%CD%&#x0D;&#x0A;@rem echo MSVC_DIR=%MSVC_DIR%&#x0D;&#x0A;cd ..&#x0D;&#x0A;set BUILD_DIR=%CD%&#x0D;&#x0A;@rem echo BUILD_DIR=%BUILD_DIR%&#x0D;&#x0A;cd ..&#x0D;&#x0A;set PYTHONPATH=%PYTHONPATH%;%BUILD_DIR%&#x0D;&#x0A;python &quot;%MSVC_DIR%\genconfig.py&quot; $(PlatformName) &quot;$(ConfigurationName)&quot; &quot;%CONFIG_DIR%&#x0D;&quot;&#x0D;&#x0A;cd %MSVC_DIR%&#x0D;&#x0A;"
+						Outputs="Version.ii"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
