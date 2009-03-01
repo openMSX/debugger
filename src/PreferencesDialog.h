@@ -1,5 +1,5 @@
-#ifndef PREFERENCESDIALOG_H
-#define PREFERENCESDIALOG_H
+#ifndef PREFERENCESDIALOG_OPENMSX_H
+#define PREFERENCESDIALOG_OPENMSX_H
 
 #include "ui_PreferencesDialog.h"
 
@@ -22,4 +22,4 @@ private slots:
 	void fontSelectColor();
 };
 
-#endif /* PREFERENCESDIALOG_H */
+#endif /* PREFERENCESDIALOG_OPENMSX_H */

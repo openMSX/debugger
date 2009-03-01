@@ -10,7 +10,7 @@
 class CommMemoryRequest;
 class QScrollBar;
 class Breakpoints;
-class MemoryLayout;
+struct MemoryLayout;
 class SymbolTable;
 
 class DisasmViewer : public QFrame

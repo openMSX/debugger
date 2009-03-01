@@ -11,9 +11,6 @@
 		<Platform
 			Name="Win32"
 		/>
-		<Platform
-			Name="x64"
-		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -149,7 +146,7 @@
 				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(BuildDir)\ui&quot;;&quot;$(3rdPartySrcDir)\$(QtLibName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(QtLibName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(QtLibName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(QtLibName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(QtLibName)\Include\QtXml&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -235,7 +232,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="2"
+				RuntimeLibrary="3"
 				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -261,7 +258,6 @@
 				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				LinkTimeCodeGeneration="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -326,7 +322,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="2"
 				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -555,8 +551,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -565,8 +561,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -579,8 +575,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -589,8 +585,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -603,8 +599,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -613,8 +609,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -627,8 +623,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -637,8 +633,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -651,8 +647,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -661,8 +657,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -675,8 +671,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -685,8 +681,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -699,8 +695,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -709,8 +705,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -723,8 +719,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -733,8 +729,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -747,8 +743,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -757,8 +753,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -771,8 +767,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -781,8 +777,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -795,8 +791,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -805,8 +801,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -819,8 +815,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -829,8 +825,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -843,8 +839,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -853,8 +849,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -867,8 +863,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -877,8 +873,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -891,8 +887,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -901,8 +897,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -915,8 +911,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -925,8 +921,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -939,8 +935,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -949,8 +945,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -963,8 +959,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -973,8 +969,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -987,8 +983,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -997,8 +993,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1011,8 +1007,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1021,8 +1017,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1035,8 +1031,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1045,8 +1041,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1059,8 +1055,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1069,8 +1065,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1083,8 +1079,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1093,8 +1089,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1107,8 +1103,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1117,8 +1113,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1131,8 +1127,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1141,8 +1137,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1155,8 +1151,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1165,8 +1161,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1179,8 +1175,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1189,8 +1185,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1203,8 +1199,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1213,8 +1209,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating moc_$(InputName).cpp..."
-						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
-						Outputs="&quot;$(MocOutDir)\%OutFile%&quot;"
+						CommandLine="@rem copy %0 foo.bat&#x0D;&#x0A;set OutFile=moc_$(InputName).cpp&#x0D;&#x0A;if not exist &quot;$(MocOutDir)&quot; (md &quot;$(MocOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\moc.exe&quot; &quot;$(InputPath)&quot; -o &quot;$(MocOutDir)\%OutFile%&quot;&#x0D;&#x0A;"
+						Outputs="&quot;$(MocOutDir)\moc_$(InputName).cpp&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1237,16 +1233,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1254,16 +1240,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1281,16 +1257,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1298,16 +1264,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1325,16 +1281,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1342,16 +1288,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1373,16 +1309,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1390,16 +1316,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1417,16 +1333,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1434,16 +1340,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1461,16 +1357,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1478,16 +1364,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1505,16 +1381,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1522,16 +1388,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1549,16 +1405,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1566,16 +1412,6 @@
 						Description="Generating ui_$(InputName).h..."
 						CommandLine="if not exist &quot;$(UiOutDir)&quot; (md &quot;$(UiOutDir)&quot;)&#x0D;&#x0A;&quot;$(LibQtToolsDir)\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(UiOutDir)\ui_$(InputName).h&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(UiOutDir)\ui_$(InputName).h&quot;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating UI header..."
-						CommandLine="@rem echo $(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&#x0D;&#x0A;if not exist &quot;$(BuildDir)\ui&quot; (md &quot;$(BuildDir)\ui&quot;)&#x0D;&#x0A;&quot;$(3rdPartySrcDir)\$(QtLibName)\bin\uic.exe&quot; &quot;$(InputPath)&quot; &gt; &quot;$(BuildDir)\ui\ui_$(InputName).h&quot;&#x0D;&#x0A;"
-						Outputs="$(InputName).h"
 					/>
 				</FileConfiguration>
 			</File>

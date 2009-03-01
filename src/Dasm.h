@@ -5,9 +5,9 @@
 
 #include <string>
 #include <vector>
+#include "SymbolTable.h"
 
-class MemoryLayout;
-class SymbolTable;
+struct MemoryLayout;
 
 struct DisasmRow {
 	enum RowType { INSTRUCTION, LABEL };

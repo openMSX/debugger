@@ -726,7 +726,7 @@ void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
 {
 	//maybe this call is the result of our own SetChecked (VDPDataStorte
 	//update event) 
-	if (state == (regs[reg]&(1<<bit)) ) {
+	if (state ? 1:0 == (regs[reg]&(1<<bit))) {
 		return;
 	};
 

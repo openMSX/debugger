@@ -1,9 +1,9 @@
-#ifndef BREAKPOINTDIALOG_H
-#define BREAKPOINTDIALOG_H
+#ifndef BREAKPOINTDIALOG_OPENMSX_H
+#define BREAKPOINTDIALOG_OPENMSX_H
 
 #include "ui_BreakpointDialog.h"
 
-class MemoryLayout;
+struct MemoryLayout;
 
 class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 {
@@ -24,4 +24,4 @@ private slots:
 	void subslotChanged( int i );
 };
 
-#endif /* BREAKPOINTDIALOG_H */
+#endif /* BREAKPOINTDIALOG_OPENMSX_H */

@@ -5,7 +5,7 @@
 
 #include <QFrame>
 
-class MemoryLayout;
+struct MemoryLayout;
 class QString;
 
 class SlotViewer : public QFrame

@@ -71,7 +71,7 @@ void BitMapViewer::setDefaultPalette()
 		{5,5,5},
 		{7,7,7}
 		};
-	for (int i; i<16;i++){
+	for (int i = 0; i<16;i++){
 		palette[2*i]= ((rgb[i][0])<<4) + rgb[i][2];
 		palette[2*i +1]= rgb[i][1];
 	}

@@ -1,6 +1,6 @@
 // $Id$
-#ifndef SYMBOLMANAGER_H
-#define SYMBOLMANAGER_H
+#ifndef SYMBOLMANAGER_OPENMSX_H
+#define SYMBOLMANAGER_OPENMSX_H
 
 #include "ui_SymbolManager.h"
 
@@ -91,4 +91,4 @@ signals:
 	void symbolTableChanged();
 };
 
-#endif /* SYMBOLMANAGER_H */
+#endif /* SYMBOLMANAGER_OPENMSX_H */

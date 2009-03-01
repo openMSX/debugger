@@ -1,5 +1,5 @@
-#ifndef BITMAPVIEWER_H
-#define BITMAPVIEWER_H
+#ifndef BITMAPVIEWER_OPENMSX_H
+#define BITMAPVIEWER_OPENMSX_H
 
 #include <QDialog>
 #include <QColor>
@@ -55,4 +55,4 @@ private slots:
 	void VDPDataStoreDataRefreshed();
 };
 
-#endif /* BITMAPVIEWER_H */
+#endif /* BITMAPVIEWER_OPENMSX_H */

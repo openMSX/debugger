@@ -318,7 +318,7 @@ void HexViewer::setDebuggable( const QString& name, int size )
 	if( size ) {
 		debuggableName = name;
 		debuggableSize = size;
-		addressLength = 2 * int(ceil( log(size) / log(2) / 8 ));
+		addressLength = 2 * int(ceil( log(float(size)) / log(float(2)) / 8 ));
 		hexTopAddress = 0;
 		hexMarkAddress = 0;
 		hexData = new unsigned char[size];
