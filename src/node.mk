@@ -22,7 +22,4 @@ UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
 	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters
 
-UI_PROMO_HDR:= 
-#	InteractiveLabel
-
 include build/node-end.mk

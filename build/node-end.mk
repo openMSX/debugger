@@ -18,10 +18,6 @@ UI_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(addsuffix .ui, \
 		$(UI) \
 	)))
-UI_PROMO_HDR_FULL+=$(sort \
-	$(addprefix $(CURDIR),$(addsuffix .h, \
-		$(UI_PROMO_HDR) \
-	)))
 DIST_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(DIST) node.mk) \
 	)
