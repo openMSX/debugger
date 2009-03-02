@@ -19,6 +19,7 @@
 class SimpleHexRequestUser
 {
 protected:
+	virtual ~SimpleHexRequestUser();
 	virtual void DataHexRequestReceived();
 	virtual void DataHexRequestCanceled();
 	friend class SimpleHexRequest;

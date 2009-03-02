@@ -31,6 +31,10 @@ void SimpleHexRequest::cancel()
 	delete this;
 }
 
+SimpleHexRequestUser::~SimpleHexRequestUser()
+{
+}
+
 void SimpleHexRequestUser::DataHexRequestReceived()
 {
 }
