@@ -7,13 +7,13 @@
 #include <QMultiMap>
 #include <QMultiHash>
 #include <QDateTime>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 
 struct MemoryLayout;
 
 class SymbolTable;
-class QXmlStreamWriter;
-class QXmlStreamReader;
 
 class Symbol
 {

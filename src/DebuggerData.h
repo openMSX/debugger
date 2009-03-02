@@ -5,9 +5,8 @@
 
 #include <QLinkedList>
 #include <QString>
-
-class QXmlStreamWriter;
-class QXmlStreamReader;
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 struct MemoryLayout
 {
