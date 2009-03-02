@@ -88,22 +88,22 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	so.rect.setWidth(headerSize1);
 	so.section = 0;
 	so.text = "Page";
-	style()->drawControl(QStyle::CE_Header, &so, &p);
+	style()->drawControl(QStyle::CE_Header, &so, &p, this);
 	so.rect.setLeft(so.rect.left() + headerSize1);
 	so.rect.setWidth(headerSize2);
 	so.section = 1;
 	so.text = "Address";
-	style()->drawControl(QStyle::CE_Header, &so, &p);
+	style()->drawControl(QStyle::CE_Header, &so, &p, this);
 	so.rect.setLeft(so.rect.left() + headerSize2);
 	so.rect.setWidth(headerSize3);
 	so.section = 2;
 	so.text = "Slot";
-	style()->drawControl(QStyle::CE_Header, &so, &p);
+	style()->drawControl(QStyle::CE_Header, &so, &p, this);
 	so.rect.setLeft(so.rect.left() + headerSize3);
 	so.rect.setWidth(headerSize4);
 	so.section = 3;
 	so.text = "Segment";
-	style()->drawControl(QStyle::CE_Header, &so, &p);
+	style()->drawControl(QStyle::CE_Header, &so, &p, this);
 
 	int mid1 = frameL + headerSize1 / 2;
 	int mid2 = frameL + headerSize1 + headerSize2 / 2;
