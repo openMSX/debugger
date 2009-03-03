@@ -75,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
+				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib ws2_32.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
@@ -167,7 +167,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
+				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib ws2_32.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
@@ -255,7 +255,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
+				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib ws2_32.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
@@ -345,7 +345,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
+				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib ws2_32.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
@@ -1975,7 +1975,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -1985,7 +1985,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -1995,7 +1995,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -2005,7 +2005,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
