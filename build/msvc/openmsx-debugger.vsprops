@@ -57,6 +57,11 @@
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
+		Name="QrcOutDir"
+		Value="..\..\src\qrc"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
 		Name="LibQtName"
 		Value="Qt-4.4.3-dev-msvc2008e-rdh"
 		PerformEnvironmentSet="true"
