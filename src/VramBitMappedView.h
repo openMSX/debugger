@@ -7,60 +7,60 @@
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QColor>
+
 class VramBitMappedView : public QWidget
 {
 	Q_OBJECT
-
 public:
-    VramBitMappedView(QWidget *parent = 0);
-    void load(QString filename);
-    void setZoom(float zoom);
+	VramBitMappedView(QWidget* parent = 0);
 
-    void setScreenMode(int mode);
-    void setLines(int nrLines);
-    void setVramSource(const unsigned char* adr);
-    void setVramAddress(int adr);
-    void setPaletteSource(const unsigned char* adr);
-    void setBorderColor(int value);
+	void setZoom(float zoom);
 
-    QRgb msxpallet[16];
+	void setScreenMode(int mode);
+	void setLines(int nrLines);
+	void setVramSource(const unsigned char* adr);
+	void setVramAddress(int adr);
+	void setPaletteSource(const unsigned char* adr);
+	void setBorderColor(int value);
 
-    void mousePressEvent ( QMouseEvent * e );
-    void mouseMoveEvent ( QMouseEvent * e );
+	void mousePressEvent(QMouseEvent* e);
+	void mouseMoveEvent (QMouseEvent* e);
 
 public slots:
-    void refresh();
+	void refresh();
 
 signals:
-    void imageChanged();
-    void imagePosition(int xcoormsx,int ycoormsx, int color, unsigned addr, int byte);
-    void imageClicked(int xcoormsx,int ycoormsx, int color, unsigned addr, int byte);
-
-protected:
-    void paintEvent( QPaintEvent* );
-
-    void decode();
-    void decodePallet();
-    void decodeSCR5();
-    void decodeSCR6();
-    void decodeSCR7();
-    void decodeSCR8();
-    void decodeSCR10();
-    void decodeSCR11();
-    void decodeSCR12();
+	void imageChanged();
+	void imagePosition(int xcoormsx, int ycoormsx, int color,
+	                   unsigned addr, int byte);
+	void imageClicked (int xcoormsx, int ycoormsx, int color,
+	                   unsigned addr, int byte);
 
 private:
-    QImage image;
-    QPixmap piximage;
-    float zoomFactor;
-    const unsigned char* pallet;
-    const unsigned char* vramBase;
-    unsigned int vramAddress;
-    int lines;
-    int screenMode;
-    int borderColor;
+	void paintEvent(QPaintEvent*);
 
+	void decode();
+	void decodePallet();
+	void decodeSCR5();
+	void decodeSCR6();
+	void decodeSCR7();
+	void decodeSCR8();
+	void decodeSCR10();
+	void decodeSCR12();
+	void setPixel2x2(int x, int y, QRgb c);
+	void setPixel1x2(int x, int y, QRgb c);
+	QRgb getColor(int c);
+
+	QRgb msxpallet[16];
+	QImage image;
+	QPixmap piximage;
+	const unsigned char* pallet;
+	const unsigned char* vramBase;
+	float zoomFactor;
+	unsigned int vramAddress;
+	int lines;
+	int screenMode;
+	int borderColor;
 };
 
 #endif // VRAMBITMAPPEDVIEW
-
