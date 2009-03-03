@@ -32,7 +32,7 @@ VramBitMappedView::VramBitMappedView(QWidget *parent) : QWidget(parent),image(51
   setMouseTracking(true);
 }
 
-void VramBitMappedView::setZoom(float zoom) 
+void VramBitMappedView::setZoom(float zoom)
 {
   if (zoom<1.0) zoom=1.0;
   setFixedSize(int(512*zoom), int(lines*2*zoom));
@@ -42,36 +42,37 @@ void VramBitMappedView::setZoom(float zoom)
 
 void VramBitMappedView::decode()
 {
-  if (vramBase){
-    printf("\nscreenMode: %i\nvram to start decoding: %i\n",screenMode,vramBase+vramAddress);
-    switch (screenMode){
-      case 12:
-	decodeSCR12();
-	break;
-      case 11:
-	decodeSCR11();
-	break;
-      case 10:
-	decodeSCR10();
-	break;
-      case 8:
-	decodeSCR8();
-	break;
-      case 7:
-	decodeSCR7();
-	break;
-      case 6:
-	decodeSCR6();
-	break;
-      case 5:
-	decodeSCR5();
-	break;
-      default:
-	break;
-    }
-    piximage=piximage.fromImage(image);
-    update();
-  }
+	if (!vramBase) return;
+
+	printf("\n"
+	       "screenMode: %i\n"
+	       "vram to start decoding: %i\n",
+	       screenMode, vramAddress);
+	switch (screenMode) {
+	case 12:
+		decodeSCR12();
+		break;
+	case 11:
+		decodeSCR11();
+		break;
+	case 10:
+		decodeSCR10();
+		break;
+	case 8:
+		decodeSCR8();
+		break;
+	case 7:
+		decodeSCR7();
+		break;
+	case 6:
+		decodeSCR6();
+		break;
+	case 5:
+		decodeSCR5();
+		break;
+	}
+	piximage = piximage.fromImage(image);
+	update();
 }
 
 

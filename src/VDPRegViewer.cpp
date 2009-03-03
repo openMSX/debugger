@@ -95,10 +95,10 @@ void VDPRegViewer::setRegisterVisible(int r,bool visible)
 
 void VDPRegViewer::decodeStatusVDPRegs()
 {
-	int id=statusregs[1] & 62; // + (machine_has_TMS99x8?1:0)
-	// test MSX1 id =1;
-	//if (vdpid != id){
-	//	vdpid=id;
+	//int id = statusregs[1] & 62; // + (machine_has_TMS99x8 ? 1 : 0)
+	// test MSX1 id = 1;
+	//if (vdpid != id) {
+	//	vdpid = id;
 		if (vdpid == VDP_TMS99X8){
 			// TMS9918 = MSX1 VDP
 			groupBox_V9958->setVisible(false);
@@ -115,15 +115,15 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			label_dec_ie1->setVisible(false);
 			label_dec_ie2->setVisible(false);
 			label_dec_dg->setVisible(false);
-			setRegisterVisible(8,false);
-			setRegisterVisible(9,false);
-			setRegisterVisible(10,false);
-			setRegisterVisible(11,false);
-			setRegisterVisible(12,false);
-			setRegisterVisible(13,false);
-			setRegisterVisible(20,false);
-			setRegisterVisible(21,false);
-			setRegisterVisible(22,false);
+			setRegisterVisible( 8, false);
+			setRegisterVisible( 9, false);
+			setRegisterVisible(10, false);
+			setRegisterVisible(11, false);
+			setRegisterVisible(12, false);
+			setRegisterVisible(13, false);
+			setRegisterVisible(20, false);
+			setRegisterVisible(21, false);
+			setRegisterVisible(22, false);
 			pushButton_0_2->setText("0");
 			pushButton_0_2->setToolTip("");
 			pushButton_0_3->setText("0");
@@ -148,18 +148,18 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_2_4->setText("0");
 			pushButton_4_3->setText("0");
 			pushButton_6_3->setText("0");
-			disconnect(modeBitsDispat,0,pushButton_0_2,0);
-			disconnect(modeBitsDispat,0,pushButton_0_3,0);
-			disconnect(pushButton_0_2,0,0,0);
-			disconnect(pushButton_0_3,0,0,0);
-			disconnect(pushButton_0_4,0,0,0);
-			disconnect(pushButton_0_5,0,0,0);
-			disconnect(pushButton_0_6,0,0,0);
-			monoGroup(pushButton_1_7,label_dec_416K);
+			disconnect(modeBitsDispat, 0, pushButton_0_2, 0);
+			disconnect(modeBitsDispat, 0, pushButton_0_3, 0);
+			disconnect(pushButton_0_2, 0, 0, 0);
+			disconnect(pushButton_0_3, 0, 0, 0);
+			disconnect(pushButton_0_4, 0, 0, 0);
+			disconnect(pushButton_0_5, 0, 0, 0);
+			disconnect(pushButton_0_6, 0, 0, 0);
+			monoGroup(pushButton_1_7, label_dec_416K);
 		} else {
-		  // V9938 = MSX2 VDP
-		  // or 
-		  // V9958 = MSX2+ VDP
+			// V9938 = MSX2 VDP
+			// or
+			// V9958 = MSX2+ VDP
 			groupBox_TableBase->setVisible(true);
 			groupBox_Color->setVisible(true);
 			groupBox_Display->setVisible(true);
@@ -171,15 +171,15 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			label_dec_416K->setVisible(false);
 			label_dec_ie1->setVisible(true);
 			label_dec_dg->setVisible(true);
-			setRegisterVisible(8,true);
-			setRegisterVisible(9,true);
-			setRegisterVisible(10,true);
-			setRegisterVisible(11,true);
-			setRegisterVisible(12,true);
-			setRegisterVisible(13,true);
-			setRegisterVisible(20,true);
-			setRegisterVisible(21,true);
-			setRegisterVisible(22,true);
+			setRegisterVisible( 8, true);
+			setRegisterVisible( 9, true);
+			setRegisterVisible(10, true);
+			setRegisterVisible(11, true);
+			setRegisterVisible(12, true);
+			setRegisterVisible(13, true);
+			setRegisterVisible(20, true);
+			setRegisterVisible(21, true);
+			setRegisterVisible(22, true);
 			pushButton_0_2->setText("M4");
 			pushButton_0_3->setText("M5");
 			pushButton_0_4->setText("IE1");
@@ -205,18 +205,18 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_6_3->setText("A14");
 			////pushButton_0_5->setText("IE2");
 
-			////disconnect(pushButton_0_7,0,0,0);
-			////disconnect(label_dec_416K,0,0,0);
+			////disconnect(pushButton_0_7, 0, 0, 0);
+			////disconnect(label_dec_416K, 0, 0, 0);
 
-			////reGroup(pushButton_0_2,modeBitsDispat);
-			////reGroup(pushButton_0_3,modeBitsDispat);
+			////reGroup(pushButton_0_2, modeBitsDispat);
+			////reGroup(pushButton_0_3, modeBitsDispat);
 
-			////monoGroup( pushButton_0_4,label_dec_ie1);
-			////monoGroup( pushButton_0_5,label_dec_ie2);
-			////monoGroup( pushButton_0_6,label_dec_dg);
+			////monoGroup( pushButton_0_4, label_dec_ie1);
+			////monoGroup( pushButton_0_5, label_dec_ie2);
+			////monoGroup( pushButton_0_6, label_dec_dg);
 
 			//break;;
-		    // V9958 = MSX2+ VDP
+			// V9958 = MSX2+ VDP
 			////groupBox_TableBase->setVisible(true);
 			////groupBox_Color->setVisible(true);
 			////groupBox_Display->setVisible(true);
@@ -228,15 +228,15 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			////label_dec_416K->setVisible(false);
 			////label_dec_ie1->setVisible(true);
 			////label_dec_dg->setVisible(true);
-			////setRegisterVisible(8,true);
-			////setRegisterVisible(9,true);
-			////setRegisterVisible(10,true);
-			////setRegisterVisible(11,true);
-			////setRegisterVisible(12,true);
-			////setRegisterVisible(13,true);
-			////setRegisterVisible(20,true);
-			////setRegisterVisible(21,true);
-			////setRegisterVisible(22,true);
+			////setRegisterVisible( 8, true);
+			////setRegisterVisible( 9, true);
+			////setRegisterVisible(10, true);
+			////setRegisterVisible(11, true);
+			////setRegisterVisible(12, true);
+			////setRegisterVisible(13, true);
+			////setRegisterVisible(20, true);
+			////setRegisterVisible(21, true);
+			////setRegisterVisible(22, true);
 			////pushButton_0_2->setText("M4");
 			////pushButton_0_3->setText("M5");
 			////pushButton_0_4->setText("IE1");
@@ -250,44 +250,43 @@ void VDPRegViewer::decodeStatusVDPRegs()
 
 
 			pushButton_1_7->setToolTip("");
-			disconnect(pushButton_0_7,0,0,0);
-			disconnect(label_dec_416K,0,0,0);
+			disconnect(pushButton_0_7, 0, 0, 0);
+			disconnect(label_dec_416K, 0, 0, 0);
 
-			reGroup(pushButton_0_2,modeBitsDispat);
-			reGroup(pushButton_0_3,modeBitsDispat);
+			reGroup(pushButton_0_2, modeBitsDispat);
+			reGroup(pushButton_0_3, modeBitsDispat);
 
-			monoGroup( pushButton_0_4,label_dec_ie1);
-			monoGroup( pushButton_0_5,label_dec_ie2);
-			monoGroup( pushButton_0_6,label_dec_dg);
+			monoGroup( pushButton_0_4, label_dec_ie1);
+			monoGroup( pushButton_0_5, label_dec_ie2);
+			monoGroup( pushButton_0_6, label_dec_dg);
 
-		  if (vdpid == VDP_V9938){
-			groupBox_V9958->setVisible(false);
-			groupBox_dec_V9958->setVisible(false);
-			label_dec_ie2->setVisible(true);
-			pushButton_0_5->setText("IE2");
-			pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
-			pushButton_8_6->setText("LP");
-			pushButton_8_6->setToolTip("");
-			pushButton_8_7->setText("MS");
-			pushButton_8_7->setToolTip("");
+			if (vdpid == VDP_V9938){
+				groupBox_V9958->setVisible(false);
+				groupBox_dec_V9958->setVisible(false);
+				label_dec_ie2->setVisible(true);
+				pushButton_0_5->setText("IE2");
+				pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+				pushButton_8_6->setText("LP");
+				pushButton_8_6->setToolTip("");
+				pushButton_8_7->setText("MS");
+				pushButton_8_7->setToolTip("");
 			} else {
-			groupBox_V9958->setVisible(true);
-			groupBox_dec_V9958->setVisible(true);
-			label_dec_ie2->setVisible(false);
-			pushButton_0_5->setText("0");
-			pushButton_0_5->setToolTip("");
-			pushButton_8_7->setText("0");
-			pushButton_8_7->setToolTip("");
-			pushButton_8_6->setText("0");
-			pushButton_8_6->setToolTip("");
-			/*
-			Since mouse/lightpen are disabled this will affect 
-			status reg1 bit 7 (LPS) and
-			status reg1 bit 6 (FL)
-			*/
-		}
+				groupBox_V9958->setVisible(true);
+				groupBox_dec_V9958->setVisible(true);
+				label_dec_ie2->setVisible(false);
+				pushButton_0_5->setText("0");
+				pushButton_0_5->setToolTip("");
+				pushButton_8_7->setText("0");
+				pushButton_8_7->setToolTip("");
+				pushButton_8_6->setText("0");
+				pushButton_8_6->setToolTip("");
+				/* Since mouse/lightpen are disabled this will affect
+				 * status reg1 bit 7 (LPS) and
+				 * status reg1 bit 6 (FL)
+				 */
+			}
 			//break;;
-		};
+		}
 	//}
 }
 
@@ -373,22 +372,22 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_si->setText((regs[1] & 2)?"16x16 sprites":"8x8 sprites" );
 	label_dec_mag->setText((regs[1] & 1)?"magnified sprites":"regular sized" );
 
-	//TODO warn if mustbeone bits are not one.. and they should depend on the active screenmode
-
-	int mustbeone[][12]={
+	/*TODO warn if mustbeone bits are not one.. and they should depend
+	 *     on the active screenmode
+	int mustbeone[][12] = {
 		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX2 = static const int VDP_V9938 = 0;
 		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX1 = static const int VDP_TMS99X8 = 1;
 		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
 		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
 		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}  // MSX2+ = static const int VDP_V9958 = 4;
-		};
-	int bitsused[][12]={
+	};*/
+	int bitsused[][12] = {
 		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // MSX2 = static const int VDP_V9938 = 0;
 		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // MSX1 = static const int VDP_TMS99X8 = 1;
 		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
 		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
 		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}  // MSX2+ = static const int VDP_V9958 = 4;
-		};
+	};
 
 	label_dec_r2->setText(QString("0x%1").arg(
 		( bitsused[vdpid][2] & regs[2] )<<10,

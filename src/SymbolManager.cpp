@@ -620,9 +620,9 @@ void SymbolManager::updateItemSlots( QTreeWidgetItem *item )
 	item->setText( 3, slotText );
 }
 
-void SymbolManager::updateItemSegments( QTreeWidgetItem *item )
+void SymbolManager::updateItemSegments(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	item->data(0, Qt::UserRole).value<quintptr>();
 }
 
 void SymbolManager::updateItemRegisters( QTreeWidgetItem *item )
