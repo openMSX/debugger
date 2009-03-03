@@ -1964,6 +1964,54 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\qrc\qrc_resources.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\resources\resources.qrc"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating qrc_$(InputName).cpp..."
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating qrc_$(InputName).cpp..."
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating qrc_$(InputName).cpp..."
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating qrc_$(InputName).cpp..."
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;"
+						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\src\SymbolManager.ui"
 				>
 				<FileConfiguration
