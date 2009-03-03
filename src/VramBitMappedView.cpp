@@ -78,28 +78,24 @@ void VramBitMappedView::decode()
 
 void VramBitMappedView::decodePallet()
 {
-  if (pallet){
-	for (int i=0 ; i<16 ;i++){
-			int r,g,b;
+	if (!pallet) return;
 
-			r=(pallet[2*i] & 0xf0)>>4;
-			b=(pallet[2*i]  & 0x0f);
-			g=(pallet[2*i+1] & 0x0f);
-			//printf("%i :%i%i%i  ",i,r,g,b);
+	for (int i = 0; i < 16; ++i) {
+		int r = (pallet[2 * i + 0] & 0xf0) >> 4;
+		int b = (pallet[2 * i + 0] & 0x0f);
+		int g = (pallet[2 * i + 1] & 0x0f);
 
-			r=(r>>1)|(r<<2)|(r<<5);
-			b=(b>>1)|(b<<2)|(b<<5);
-			g=(g>>1)|(g<<2)|(g<<5);
+		r = (r >> 1) | (r << 2) | (r << 5);
+		b = (b >> 1) | (b << 2) | (b << 5);
+		g = (g >> 1) | (g << 2) | (g << 5);
 
-			//printf(" :R=%i G=%i B=%i\n",r,g,b);
-			msxpallet[i] = qRgb(r,g,b);
+		msxpallet[i] = qRgb(r, g, b);
 	}
-  }
 }
 
 void VramBitMappedView::decodeSCR12()
 {
-  unsigned char* val;
+  const unsigned char* val;
   int offset=vramAddress;
 
     for (int y=0;y<lines*2;){
@@ -142,7 +138,7 @@ void VramBitMappedView::decodeSCR12()
 			image.setPixel(x++, y  , c );
                 }
       }
-      y += 2; 
+      y += 2;
     }
 }
 
@@ -153,7 +149,7 @@ void VramBitMappedView::decodeSCR11()
 }
 void VramBitMappedView::decodeSCR10()
 {
-  unsigned char* val;
+  const unsigned char* val;
   int offset=vramAddress;
 
     for (int y=0;y<lines*2;){
@@ -208,7 +204,7 @@ void VramBitMappedView::decodeSCR10()
 
 void VramBitMappedView::decodeSCR8()
 {
-  unsigned char* val;
+  const unsigned char* val;
   int offset=vramAddress;
 
   int r,g,b;
@@ -237,7 +233,7 @@ void VramBitMappedView::decodeSCR8()
 
 void VramBitMappedView::decodeSCR7()
 {
-  unsigned char* val = vramBase+vramAddress;
+  const unsigned char* val = vramBase + vramAddress;
 
     for (int y=0;y<lines*2;){
       for (int x=0;x<511;){
@@ -257,7 +253,7 @@ void VramBitMappedView::decodeSCR7()
 
 void VramBitMappedView::decodeSCR6()
 {
-  unsigned char* val = vramBase+vramAddress;
+  const unsigned char* val = vramBase + vramAddress;
 
     for (int y=0;y<lines*2;){
       for (int x=0;x<511;){
@@ -285,7 +281,7 @@ void VramBitMappedView::decodeSCR6()
 
 void VramBitMappedView::decodeSCR5()
 {
-  unsigned char* val = vramBase + vramAddress;
+  const unsigned char* val = vramBase + vramAddress;
 
     for (int y=0;y<lines*2;){
       for (int x=0;x<511;){
@@ -369,9 +365,9 @@ void VramBitMappedView::mouseMoveEvent ( QMouseEvent * e )
 	unsigned int offset = bytes_a_line[screenMode] * y + \
 			x/pixels_per_byte[screenMode];
 	unsigned int addr = offset + vramAddress ;
-	unsigned char* val =vramBase + ( (screenMode<8)?
-			addr:
-			(((addr>>1)|(addr<<16)) & 0x1FFFF ) );
+	const unsigned char* val = vramBase +
+		((screenMode < 8) ? addr
+		                  : (((addr >> 1) | (addr << 16)) & 0x1FFFF));
 
 	int byteval = *val;
 	int color;
@@ -438,7 +434,7 @@ void VramBitMappedView::setVramAddress(int adr)
 	update();
 }
 
-void VramBitMappedView::setVramSource(unsigned char* adr)
+void VramBitMappedView::setVramSource(const unsigned char* adr)
 {
 	vramBase = adr;
 	decodePallet();
@@ -446,7 +442,7 @@ void VramBitMappedView::setVramSource(unsigned char* adr)
 	update();
 }
 
-void VramBitMappedView::setPaletteSource(unsigned char* adr)
+void VramBitMappedView::setPaletteSource(const unsigned char* adr)
 {
 	pallet = adr;
 	decodePallet();

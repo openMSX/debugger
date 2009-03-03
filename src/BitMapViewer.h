@@ -22,15 +22,10 @@ private:
 	int showpage;
 	int borderColor;
 	bool useVDP;
-	bool useVDPcolors;
 
 	int vramAddress;
 	int vramSize;
-	unsigned char* vram;
-	unsigned char* palette;
-	unsigned char* regs;
 
-	void setDefaultPalette();
 	void decodeVDPregs();
 
 	VramBitMappedView *imageWidget;

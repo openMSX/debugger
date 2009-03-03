@@ -3,6 +3,25 @@
 #include <QMessageBox>
 #include "VDPDataStore.h"
 
+static const unsigned char defaultPalette[32] = {
+//        RB  G
+	0x00, 0,
+	0x00, 0,
+	0x11, 6,
+	0x33, 7,
+	0x17, 1,
+	0x27, 3,
+	0x51, 1,
+	0x27, 6,
+	0x71, 1,
+	0x73, 3,
+	0x61, 6,
+	0x64, 6,
+	0x11, 4,
+	0x65, 2,
+	0x55, 5,
+	0x77, 7,
+};
 
 BitMapViewer::BitMapViewer( QWidget *parent)
 	: QDialog(parent)
@@ -26,10 +45,8 @@ BitMapViewer::BitMapViewer( QWidget *parent)
 	lines=212;
 	vramSize=lines*256;
 	useVDP=true;
-	useVDPcolors=true;
-	vram = VDPDataStore::instance().getVramPointer();
-	palette = VDPDataStore::instance().getPalettePointer();
-	regs =  VDPDataStore::instance().getRegsPointer();
+	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
+	const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
 	vramAddress=0;
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
@@ -51,37 +68,12 @@ BitMapViewer::~BitMapViewer()
 {
 }
 
-void BitMapViewer::setDefaultPalette()
-{
-	int rgb[][3]={
-		{0,0,0},
-		{0,0,0},
-		{1,6,1},
-		{3,7,3},
-		{1,1,7},
-		{2,3,7},
-		{5,1,1},
-		{2,6,7},
-		{7,1,1},
-		{7,3,3},
-		{6,6,1},
-		{6,6,4},
-		{1,4,1},
-		{6,2,5},
-		{5,5,5},
-		{7,7,7}
-		};
-	for (int i = 0; i<16;i++){
-		palette[2*i]= ((rgb[i][0])<<4) + rgb[i][2];
-		palette[2*i +1]= rgb[i][1];
-	}
-}
-
 void BitMapViewer::decodeVDPregs()
 {
-	int v;
+	const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+
 	//Get the number of lines from bit x from reg Y
-	v = (regs[9]&128)?212:192;
+	int v = (regs[9]&128)?212:192;
 	printf("\nlines acording to the bits %i,: %i\n",(regs[9]&128),v);
 	linesLabel->setText(QString("%1").arg(v,0,10));
 	if (useVDP) linesVisible->setCurrentIndex( (regs[9]&128)?1:0 );
@@ -202,14 +194,18 @@ void BitMapViewer::on_saveImageButton_clicked( bool checked )
 
 void BitMapViewer::on_editPaletteButton_clicked( bool checked )
 {
-	useVDPPalette->setChecked(false); 
+	useVDPPalette->setChecked(false);
 	QMessageBox::information(this,"Not yet implemented","Sorry, the palette editor is not yet implementedi,only disabling 'Use VDP palette registers' for now");
 }
 
-void BitMapViewer::on_useVDPPalette_stateChanged ( int state )
+void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
-	useVDPcolors = state;
-	if (!state) setDefaultPalette();
+	if (state) {
+		const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
+		imageWidget->setPaletteSource(palette);
+	} else {
+		imageWidget->setPaletteSource(defaultPalette);
+	}
 	//refresh();
 	imageWidget->refresh();
 }

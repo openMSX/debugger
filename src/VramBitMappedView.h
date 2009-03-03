@@ -18,9 +18,9 @@ public:
 
     void setScreenMode(int mode);
     void setLines(int nrLines);
-    void setVramSource(unsigned char* adr);
+    void setVramSource(const unsigned char* adr);
     void setVramAddress(int adr);
-    void setPaletteSource(unsigned char* adr);
+    void setPaletteSource(const unsigned char* adr);
     void setBorderColor(int value);
 
     QRgb msxpallet[16];
@@ -53,8 +53,8 @@ private:
     QImage image;
     QPixmap piximage;
     float zoomFactor;
-    unsigned char* pallet;
-    unsigned char* vramBase;
+    const unsigned char* pallet;
+    const unsigned char* vramBase;
     unsigned int vramAddress;
     int lines;
     int screenMode;

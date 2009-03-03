@@ -3,8 +3,9 @@
 class VDPDataStoreVersionCheck : public SimpleCommand
 {
 public:
-	VDPDataStoreVersionCheck(VDPDataStore& dataStore_ ) : SimpleCommand("debug desc {physical VRAM}"),
-		dataStore(dataStore_)
+	VDPDataStoreVersionCheck(VDPDataStore& dataStore_)
+		: SimpleCommand("debug desc {physical VRAM}")
+		, dataStore(dataStore_)
 	{
 	}
 
@@ -22,19 +23,20 @@ public:
 		dataStore.refresh();
 		delete this;
 	}
+
 private:
 	VDPDataStore& dataStore;
 };
 
+
+static const unsigned TOTAL_SIZE = 0x20000 + 32 + 16 + 64;
+
 VDPDataStore::VDPDataStore()
 {
-	vram = new unsigned char[0x20000 + 32 + 16 + 64];
-	palette = vram + 0x20000;
-	statusRegs = palette + 32;
-	regs = statusRegs + 16;
-	memset(vram,0x00,0x20000+32+16+64);
-	got_version=false;
-	old_version=false;
+	vram = new unsigned char[TOTAL_SIZE];
+	memset(vram, 0x00, TOTAL_SIZE);
+	got_version = false;
+	old_version = false;
 	CommClient::instance().sendCommand(new VDPDataStoreVersionCheck(*this));
 }
 
@@ -43,30 +45,34 @@ VDPDataStore::~VDPDataStore()
 	delete[] vram;
 }
 
+VDPDataStore& VDPDataStore::instance()
+{
+	static VDPDataStore oneInstance;
+	return oneInstance;
+}
+
+
 void VDPDataStore::refresh()
 {
 	if (!got_version) return;
 
 	QString req;
-	if (old_version){
-	  req = QString(
-		"debug_bin2hex "
-		"[ debug read_block {VRAM} 0 0x20000 ]"
-		"[ debug read_block {VDP palette} 0 32 ]"
-		"[ debug read_block {VDP status regs} 0 16 ]"
-		"[ debug read_block {VDP regs} 0 64 ]"
-		);
+	if (old_version) {
+		req = QString(
+			"debug_bin2hex "
+			"[ debug read_block {VRAM} 0 0x20000 ]"
+			"[ debug read_block {VDP palette} 0 32 ]"
+			"[ debug read_block {VDP status regs} 0 16 ]"
+			"[ debug read_block {VDP regs} 0 64 ]");
 	} else {
-	  req = QString(
-		"debug_bin2hex "
-		"[ debug read_block {physical VRAM} 0 0x20000 ]"
-		"[ debug read_block {VDP palette} 0 32 ]"
-		"[ debug read_block {VDP status regs} 0 16 ]"
-		"[ debug read_block {VDP regs} 0 64 ]"
-		);
-	};
-	new SimpleHexRequest(req
-		,  unsigned(0x20000+32+16+64), vram , *this);
+		req = QString(
+			"debug_bin2hex "
+			"[ debug read_block {physical VRAM} 0 0x20000 ]"
+			"[ debug read_block {VDP palette} 0 32 ]"
+			"[ debug read_block {VDP status regs} 0 16 ]"
+			"[ debug read_block {VDP regs} 0 64 ]");
+	}
+	new SimpleHexRequest(req, TOTAL_SIZE, vram, *this);
 }
 
 void VDPDataStore::DataHexRequestReceived()
@@ -74,26 +80,20 @@ void VDPDataStore::DataHexRequestReceived()
 	emit dataRefreshed();
 }
 
-unsigned char* VDPDataStore::getVramPointer()
+
+const unsigned char* VDPDataStore::getVramPointer() const
 {
 	return vram;
 }
-unsigned char* VDPDataStore::getPalettePointer()
+const unsigned char* VDPDataStore::getPalettePointer() const
 {
-	return palette;
+	return vram + 0x20000;
 }
-unsigned char* VDPDataStore::getRegsPointer()
+const unsigned char* VDPDataStore::getStatusRegsPointer() const
 {
-	return regs;
+	return vram + 0x20000 + 32;
 }
-unsigned char* VDPDataStore::getStatusRegsPointer()
+const unsigned char* VDPDataStore::getRegsPointer() const
 {
-	return statusRegs;
+	return vram + 0x20000 + 32 + 16;
 }
-
-VDPDataStore& VDPDataStore::instance()
-{
-	static VDPDataStore oneInstance;
-	return oneInstance;
-}
-
