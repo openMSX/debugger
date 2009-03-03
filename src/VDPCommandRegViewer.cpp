@@ -3,6 +3,10 @@
 static const int VIEW_HEX = 1;
 static const int VIEW_SEPERATE = 2;
 
+static QString hex8bit(int val)
+{
+	return QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper();
+}
 
 VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	: QDialog(parent)
@@ -312,12 +316,3 @@ void VDPCommandRegViewer::DataHexRequestReceived()
 	if (autoSyncRadioButton->isChecked()) syncRegToCmd();
 }
 
-const QString VDPCommandRegViewer::hex8bit(int val)
-{
-	return QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper();
-}
-
-const QString VDPCommandRegViewer::hex16bit(int val)
-{
-	return QString("0x%1").arg(val, 4, 16, QChar('0')).toUpper();
-}

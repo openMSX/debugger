@@ -143,8 +143,6 @@ public:
 private:
 	virtual void DataHexRequestReceived();
 	void decodeR46(int val);
-	const QString hex8bit(int val);
-	const QString hex16bit(int val);
 	void syncRegToCmd();
 
 	unsigned char* regs;
