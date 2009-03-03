@@ -1,4 +1,5 @@
 #include "VDPDataStore.h"
+#include "CommClient.h"
 
 class VDPDataStoreVersionCheck : public SimpleCommand
 {

@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 	app.setWindowIcon(QIcon::QIcon(":icons/openMSX-debugger-logo-128.png"));
 #endif
 	// restore main settings
-	app.setFont( Settings::get().font( Settings::APP_FONT ) );
+	app.setFont(Settings::get().font(Settings::APP_FONT));
 	
 	DebuggerForm debugger;
 	debugger.show();

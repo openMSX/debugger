@@ -2,8 +2,6 @@
 #define SIMPLEHEXREQUEST_H
 
 #include "OpenMSXConnection.h"
-#include "CommClient.h"
-#include "Settings.h"
 
 /**  
  * A set of helper classes if code needs to read openmsx debugables into an array of unsigned chars
@@ -28,10 +26,10 @@ protected:
 class SimpleHexRequest : public ReadDebugBlockCommand
 {
 public:
-	SimpleHexRequest(const QString& debuggable,  unsigned size,
-	           unsigned char* target, SimpleHexRequestUser& user_);
-	SimpleHexRequest(const QString& debuggable, unsigned offset_, unsigned size,
-	           unsigned char* target, SimpleHexRequestUser& user_);
+	SimpleHexRequest(const QString& debuggable, unsigned size,
+	           unsigned char* target, SimpleHexRequestUser& user);
+	SimpleHexRequest(const QString& debuggable, unsigned offset, unsigned size,
+	           unsigned char* target, SimpleHexRequestUser& user);
 
 	virtual void replyOk(const QString& message);
 	virtual void cancel();
@@ -43,4 +41,3 @@ private:
 };
 
 #endif /* SIMPLEHEXREQUEST_H */
-

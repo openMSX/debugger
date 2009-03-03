@@ -1,6 +1,7 @@
 #include "VDPRegViewer.h"
 #include "VDPDataStore.h"
 #include "InteractiveButton.h"
+#include "CommClient.h"
 
 static const int VDP_TMS99X8 = 1;
 static const int VDP_V9938 = 0;

@@ -19,9 +19,9 @@ const int CpuRegs::REG_R   = 13;
 const int CpuRegs::REG_IM  = 14;
 const int CpuRegs::REG_IFF = 15;
 
-const char* CpuRegs::regNames[14] = {
-		"AF", "AF'", "BC", "BC'",
-		"DE", "DE'", "HL", "HL'",
-		"IX", "IY", "PC", "SP",
-		"I", "R"
-	};
+const char* const CpuRegs::regNames[14] = {
+	"AF", "AF'", "BC", "BC'",
+	"DE", "DE'", "HL", "HL'",
+	"IX", "IY", "PC", "SP",
+	"I", "R"
+};

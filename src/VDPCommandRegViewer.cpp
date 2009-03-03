@@ -1,4 +1,5 @@
 #include "VDPCommandRegViewer.h"
+#include "CommClient.h"
 
 static const int VIEW_HEX = 1;
 static const int VIEW_SEPERATE = 2;
