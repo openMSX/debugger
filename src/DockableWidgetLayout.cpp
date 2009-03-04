@@ -4,7 +4,7 @@
 #include "DockableWidget.h"
 #include <QLayoutItem>
 #include <QtGlobal>
-#include <QMap>
+#include <QSet>
 
 
 static const int SNAP_DISTANCE = 16;
@@ -434,13 +434,28 @@ void DockableWidgetLayout::doLayout(bool check)
 	}
 }
 
+bool DockableWidgetLayout::overlaysWithFirstNWidgets(const QRect& r, int n) const
+{
+	for (int i = 0; i < n; ++i) {
+		if (r.intersects(dockedWidgets[i]->bounds())) {
+			return true;
+		}
+	}
+	return false;
+}
+
+static bool isClose(int a, int b)
+{
+	return abs(a - b) < SNAP_DISTANCE;
+}
+
 bool DockableWidgetLayout::insertLocation(
 	QRect& rect, int& index, DockSide& side, const QSizePolicy& sizePol)
 {
 	// best insertion data
 	// Distance is a number that represents the how far
 	// the insertion rectangle is from the final location.
-	unsigned int bestDistance = 0xFFFFFFFF;
+	unsigned bestDistance = 0xFFFFFFFF;
 	int bestIndex = 0;
 	DockSide bestSide;
 	QRect bestRect;
@@ -454,104 +469,75 @@ bool DockableWidgetLayout::insertLocation(
 		if (i == 0 || d->dockSide != BOTTOM) {
 			if (!(rect.left()  > d->right() - SNAP_DISTANCE ||
 			      rect.right() < d->left    + SNAP_DISTANCE) &&
-			    abs(rect.bottom() - d->top) < SNAP_DISTANCE) {
+			    isClose(rect.bottom(), d->top)) {
 				// rectangle is close to the edge
-				unsigned int dist = 8 * abs(rect.bottom() - d->top);
+				unsigned dist = 8 * abs(rect.bottom() - d->top);
 				// now find all points on this side
-				// (abuse map to get sorted unique list)
-				QMap<int, int> sidePoints;
-				// loop over all widgets
+				// (use set as a sorted unique list)
+				QSet<int> sidePoints;
 				for (int j = 0; j <= i; ++j) {
 					DockInfo* d2 = dockedWidgets[j];
 					if (d->top == d2->top) {
-						// add the two edges
-						sidePoints.insert(d2->left, 0);
-						sidePoints.insert(d2->right(), 0);
+						sidePoints.insert(d2->left);
+						sidePoints.insert(d2->right());
 						// check if any other widget rest against this side
 						for (int k = i + 1; k < dockedWidgets.size(); ++k) {
 							DockInfo* d3 = dockedWidgets[k];
 							if (d3->bottom() == d2->top) {
-								// add the two edges
-								sidePoints.insert(d3->left, 0);
-								sidePoints.insert(d3->right(), 0);
+								sidePoints.insert(d3->left);
+								sidePoints.insert(d3->right());
 							}
 						}
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QMap<int, int>::iterator it = sidePoints.begin();
+				QSet<int>::iterator it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
-					if (dist + abs(it.key() - rect.left()) < bestDistance &&
-					    abs(it.key() - rect.left()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(it.key(), d->top - rect.height()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.left());
+					unsigned newDist1 = dist + abs(*it - rect.left());
+					if (newDist1 < bestDistance && isClose(*it, rect.left())) {
+						QRect r(QPoint(*it, d->top - rect.height()), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist1;
 							bestIndex = i + 1;
 							bestSide = TOP;
-							bestRect = rect;
-							bestRect.moveBottomLeft(QPoint(it.key(), d->top - 1));
+							bestRect = r;
 						}
 					}
 					++it;
 					// check before point
-					if (dist + abs(it.key() - rect.right()) < bestDistance &&
-					    abs(it.key() - rect.right()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(it.key() - rect.width(), d->top - rect.height()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.right());
+					unsigned newDist2 = dist + abs(*it - rect.right());
+					if (newDist2 < bestDistance && isClose(*it, rect.right())) {
+						QRect r(QPoint(*it - rect.width(), d->top - rect.height()),
+						        rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist2;
 							bestIndex = i + 1;
 							bestSide = TOP;
-							bestRect = rect;
-							bestRect.moveBottomRight(QPoint(it.key() - 1, d->top - 1));
+							bestRect = r;
 						}
 					}
 				}
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					QMap<int, int>::iterator ita = sidePoints.begin() + 1;
-					while (ita != sidePoints.end()) {
-						QMap<int, int>::iterator itb = sidePoints.begin();
-						while (ita != itb) {
-							// check if rect middle is close to the middle between two points
-							if (abs((ita.key() + itb.key()) / 2 - mid) < SNAP_DISTANCE) {
-								// verify if this area is free
-								int k;
-								for (k = 0; k < i; ++k) {
-									DockInfo* d3 = dockedWidgets[k];
-									if (QRect(itb.key(), d->top - rect.height(), ita.key() - itb.key(), rect.height())
-									       .intersects(d3->bounds())) {
-										break;
-									}
-								}
-								if (k == i) {
-									bestDistance = dist + abs((ita.key() + itb.key()) / 2 - mid);
+					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
+					     ita != sidePoints.end(); ++ita) {
+						for (QSet<int>::iterator itb = sidePoints.begin();
+						     ita != itb; ++itb) {
+							int sp_mid = (*ita + *itb) / 2;
+							int sp_diff = *ita - *itb;
+							if (isClose(sp_mid, mid)) {
+								QRect r(*itb, d->top - rect.height(),
+								        sp_diff, rect.height());
+								if (!overlaysWithFirstNWidgets(r, i)) {
+									bestDistance = dist + abs(sp_mid - mid);
 									bestIndex = i + 1;
 									bestSide = TOP;
-									bestRect = QRect(itb.key(), d->top - rect.height(),
-									                 ita.key() - itb.key(), rect.height());
+									bestRect = r;
 								}
 							}
-							++itb;
 						}
-						++ita;
 					}
 				}
 			}
@@ -563,103 +549,74 @@ bool DockableWidgetLayout::insertLocation(
 		if (i == 0 || d->dockSide != TOP) {
 			if (!(rect.left()  > d->right() - SNAP_DISTANCE ||
 			      rect.right() < d->left    + SNAP_DISTANCE) &&
-			    abs(rect.top() - d->bottom()) < SNAP_DISTANCE) {
+			    isClose(rect.top(), d->bottom())) {
 				// rectangle is close to the edge
-				unsigned int dist = 8 * abs(rect.top() - d->bottom());
+				unsigned dist = 8 * abs(rect.top() - d->bottom());
 				// now find all points on this side
-				// (abuse map to get sorted unique list)
-				QMap<int, int> sidePoints;
-				// loop over all widgets
+				// (use set as a sorted unique list)
+				QSet<int> sidePoints;
 				for (int j = 0; j <= i; ++j) {
 					DockInfo* d2 = dockedWidgets[j];
 					if (d->bottom() == d2->bottom()) {
-						// add the two edges
-						sidePoints.insert(d2->left, 0);
-						sidePoints.insert(d2->right(), 0);
+						sidePoints.insert(d2->left);
+						sidePoints.insert(d2->right());
 						// check if any other widget rest against this side
 						for (int k = i + 1; k < dockedWidgets.size(); ++k) {
 							DockInfo* d3 = dockedWidgets[k];
 							if (d3->top == d2->bottom()) {
-								// add the two edges
-								sidePoints.insert(d3->left, 0);
-								sidePoints.insert(d3->right(), 0);
+								sidePoints.insert(d3->left);
+								sidePoints.insert(d3->right());
 							}
 						}
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QMap<int, int>::iterator it = sidePoints.begin();
+				QSet<int>::iterator it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
-					if (dist + abs(it.key() - rect.left()) < bestDistance &&
-					    abs(it.key() - rect.left()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(it.key(), d->bottom()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.left());
+					unsigned newDist1 = dist + abs(*it - rect.left());
+					if (newDist1 < bestDistance && isClose(*it, rect.left())) {
+						QRect r(QPoint(*it, d->bottom()), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist1;
 							bestIndex = i + 1;
 							bestSide = BOTTOM;
-							bestRect = rect;
-							bestRect.moveTopLeft(QPoint(it.key(), d->bottom()));
+							bestRect = r;
 						}
 					}
 					++it;
 					// check before point
-					if (dist + abs(it.key() - rect.right()) < bestDistance &&
-					    abs(it.key() - rect.right()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(it.key() - rect.width(), d->bottom()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.right());
+					unsigned newDist2 = dist + abs(*it - rect.right());
+					if (newDist2 < bestDistance && isClose(*it, rect.right())) {
+						QRect r(QPoint(*it - rect.width(), d->bottom()), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist2;
 							bestIndex = i + 1;
 							bestSide = BOTTOM;
-							bestRect = rect;
-							bestRect.moveTopRight(QPoint(it.key() - 1, d->bottom()));
+							bestRect = r;
 						}
 					}
 				}
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					QMap<int, int>::iterator ita = sidePoints.begin() + 1;
-					while (ita != sidePoints.end()) {
-						QMap<int, int>::iterator itb = sidePoints.begin();
-						while (ita != itb) {
-							// check if rect middle is close to the middle between two points
-							if (abs((ita.key() + itb.key()) / 2 - mid) < SNAP_DISTANCE) {
-								// verify if this area is free
-								int k;
-								for (k = 0; k < i; ++k) {
-									DockInfo* d3 = dockedWidgets[k];
-									if (QRect(itb.key(), d->bottom(), ita.key() - itb.key(), rect.height())
-									       .intersects(d3->bounds())) {
-										break;
-									}
-								}
-								if (k == i) {
-									bestDistance = dist + abs((ita.key() + itb.key()) / 2 - mid);
+					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
+					     ita != sidePoints.end(); ++ita) {
+						for (QSet<int>::iterator itb = sidePoints.begin();
+						     ita != itb; ++itb) {
+							int sp_mid = (*ita + *itb) / 2;
+							int sp_diff = *ita - *itb;
+							if (isClose(sp_mid, mid)) {
+								QRect r(*itb, d->bottom(),
+								        sp_diff, rect.height());
+								if (!overlaysWithFirstNWidgets(r, i)) {
+									bestDistance = dist + abs(sp_mid - mid);
 									bestIndex = i + 1;
 									bestSide = BOTTOM;
-									bestRect = QRect(itb.key(), d->bottom(), ita.key() - itb.key(), rect.height());
+									bestRect = r;
 								}
 							}
-							++itb;
 						}
-						++ita;
 					}
 				}
 			}
@@ -671,102 +628,75 @@ bool DockableWidgetLayout::insertLocation(
 		if (i == 0 || d->dockSide != RIGHT) {
 			if (!(rect.top()    > d->bottom() - SNAP_DISTANCE ||
 			      rect.bottom() < d->top      + SNAP_DISTANCE) &&
-			    abs(rect.right() - d->left) < SNAP_DISTANCE) {
+			    isClose(rect.right(), d->left)) {
 				// rectangle is close to the edge
-				unsigned int dist = 8 * abs(rect.right() - d->left);
+				unsigned dist = 8 * abs(rect.right() - d->left);
 				// now find all points on this side
-				// (abuse map to get sorted unique list)
-				QMap<int, int> sidePoints;
-				// loop over all widgets
+				// (use set as a sorted unique list)
+				QSet<int> sidePoints;
 				for (int j = 0; j <= i; ++j) {
 					DockInfo* d2 = dockedWidgets[j];
 					if (d->left == d2->left) {
-						// add the two edges
-						sidePoints.insert(d2->top, 0);
-						sidePoints.insert(d2->bottom(), 0);
+						sidePoints.insert(d2->top);
+						sidePoints.insert(d2->bottom());
 						// check if any other widget rest against this side
 						for (int k = i + 1; k < dockedWidgets.size(); ++k) {
 							DockInfo* d3 = dockedWidgets[k];
 							if (d3->right() == d2->left) {
-								// add the two edges
-								sidePoints.insert(d3->top, 0);
-								sidePoints.insert(d3->bottom(), 0);
+								sidePoints.insert(d3->top);
+								sidePoints.insert(d3->bottom());
 							}
 						}
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QMap<int, int>::iterator it = sidePoints.begin();
+				QSet<int>::iterator it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
-					if (dist + abs(it.key() - rect.top()) < bestDistance &&
-					    abs(it.key() - rect.top()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(d->left - rect.width(), it.key()), rect.size())
-							       .intersects(d3->bounds()))
-								break;
-							
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.top());
+					unsigned newDist1 = dist + abs(*it - rect.top());
+					if (newDist1 < bestDistance && isClose(*it, rect.top())) {
+						QRect r(QPoint(d->left - rect.width(), *it), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist1;
 							bestIndex = i + 1;
 							bestSide = LEFT;
-							bestRect = rect;
-							bestRect.moveTopRight(QPoint(d->left - 1, it.key()));
+							bestRect = r;
 						}
 					}
 					++it;
 					// check before point
-					if (dist + abs(it.key() - rect.bottom()) < bestDistance &&
-					    abs(it.key() - rect.bottom()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(d->left - rect.width(), it.key() - rect.height()), rect.size())
-							       .intersects(d3->bounds()))
-								break;
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.bottom());
+					unsigned newDist2 = dist + abs(*it - rect.bottom());
+					if (newDist2 < bestDistance && isClose(*it, rect.bottom())) {
+						QRect r(QPoint(d->left - rect.width(), *it - rect.height()),
+						        rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist2;
 							bestIndex = i + 1;
 							bestSide = LEFT;
-							bestRect = rect;
-							bestRect.moveBottomRight(QPoint(d->left - 1, it.key() - 1));
+							bestRect = r;
 						}
 					}
 				}
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					QMap<int, int>::iterator ita = sidePoints.begin() + 1;
-					while (ita != sidePoints.end()) {
-						QMap<int, int>::iterator itb = sidePoints.begin();
-						while (ita != itb) {
-							// check if rect middle is close to the middle between two points
-							if (abs((ita.key() + itb.key()) / 2 - mid) < SNAP_DISTANCE) {
-								// verify if this area is free
-								int k;
-								for (k = 0; k < i; ++k) {
-									DockInfo* d3 = dockedWidgets[k];
-									if (QRect(d->left - rect.width(), itb.key(), rect.width(), ita.key() - itb.key())
-									       .intersects(d3->bounds())) {
-										break;
-									}
-								}
-								if (k == i) {
-									bestDistance = dist + abs((ita.key() + itb.key()) / 2 - mid);
+					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
+					     ita != sidePoints.end(); ++ita) {
+						for (QSet<int>::iterator itb = sidePoints.begin();
+						     ita != itb; ++itb) {
+							int sp_mid = (*ita + *itb) / 2;
+							int sp_diff = *ita - *itb;
+							if (isClose(sp_mid, mid)) {
+								QRect r(d->left - rect.width(), *itb,
+								        rect.width(), sp_diff);
+								if (!overlaysWithFirstNWidgets(r, i)) {
+									bestDistance = dist + abs(sp_mid - mid);
 									bestIndex = i + 1;
 									bestSide = LEFT;
-									bestRect = QRect(d->left - rect.width(), itb.key(), rect.width(), ita.key() - itb.key());
+									bestRect = r;
 								}
 							}
-							++itb;
 						}
-						++ita;
 					}
 				}
 			}
@@ -777,103 +707,73 @@ bool DockableWidgetLayout::insertLocation(
 		if (i == 0 || d->dockSide != LEFT) {
 			if (!(rect.top()    > d->bottom() - SNAP_DISTANCE ||
 			      rect.bottom() < d->top      + SNAP_DISTANCE) &&
-			    abs(rect.left() - d->right()) < SNAP_DISTANCE) {
+			    isClose(rect.left(), d->right())) {
 				// rectangle is close to the edge
-				unsigned int dist = 8 * abs(rect.left() - d->right());
+				unsigned dist = 8 * abs(rect.left() - d->right());
 				// now find all points on this side
-				// (abuse map to get sorted unique list)
-				QMap<int, int> sidePoints;
-				// loop over all widgets
+				// (use set as a sorted unique list)
+				QSet<int> sidePoints;
 				for (int j = 0; j <= i; ++j) {
 					DockInfo* d2 = dockedWidgets[j];
 					if (d->right() == d2->right()) {
-						// add the two edges
-						sidePoints.insert(d2->top, 0);
-						sidePoints.insert(d2->bottom(), 0);
+						sidePoints.insert(d2->top);
+						sidePoints.insert(d2->bottom());
 						// check if any other widget rest against this side
 						for (int k = i + 1; k < dockedWidgets.size(); ++k) {
 							DockInfo* d3 = dockedWidgets[k];
 							if (d3->left == d2->right()) {
-								// add the two edges
-								sidePoints.insert(d3->top, 0);
-								sidePoints.insert(d3->bottom(), 0);
+								sidePoints.insert(d3->top);
+								sidePoints.insert(d3->bottom());
 							}
 						}
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QMap<int, int>::iterator it = sidePoints.begin();
+				QSet<int>::iterator it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
-					if (dist + abs(it.key() - rect.top()) < bestDistance &&
-					    abs(it.key() - rect.top()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(d->left + d->width, it.key()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.top());
+					unsigned newDist1 = dist + abs(*it - rect.top());
+					if (newDist1 < bestDistance && isClose(*it, rect.top())) {
+						QRect r(QPoint(d->left + d->width, *it), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist1;
 							bestIndex = i + 1;
 							bestSide = RIGHT;
-							bestRect = rect;
-							bestRect.moveTopLeft(QPoint(d->right(), it.key()));
+							bestRect = r;
 						}
 					}
 					++it;
 					// check before point
-					if (dist + abs(it.key() - rect.bottom()) < bestDistance &&
-					    abs(it.key() - rect.bottom()) < SNAP_DISTANCE) {
-						// verify if it does not overlap a placed widget
-						int k;
-						for (k = 0; k < i; ++k) {
-							DockInfo* d3 = dockedWidgets[k];
-							if (QRect(QPoint(d->right(), it.key()-rect.height()), rect.size())
-							       .intersects(d3->bounds())) {
-								break;
-							}
-						}
-						if (k == i) {
-							bestDistance = dist + abs(it.key() - rect.bottom());
+					unsigned newDist2 = dist + abs(*it - rect.bottom());
+					if (newDist2 < bestDistance && isClose(*it, rect.bottom())) {
+						QRect r(QPoint(d->right(), *it - rect.height()), rect.size());
+						if (!overlaysWithFirstNWidgets(r, i)) {
+							bestDistance = newDist2;
 							bestIndex = i + 1;
 							bestSide = RIGHT;
-							bestRect = rect;
-							bestRect.moveBottomLeft(QPoint(d->right(), it.key() - 1));
+							bestRect = r;
 						}
 					}
 				}
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					QMap<int, int>::iterator ita = sidePoints.begin() + 1;
-					while (ita != sidePoints.end()) {
-						QMap<int, int>::iterator itb = sidePoints.begin();
-						while (ita != itb) {
-							// check if rect middle is close to the middle between two points
-							if (abs((ita.key() + itb.key()) / 2 - mid) < SNAP_DISTANCE) {
-								// verify if this area is free
-								int k;
-								for (k = 0; k < i; ++k) {
-									DockInfo* d3 = dockedWidgets[k];
-									if (QRect(d->right(), itb.key(), rect.width(), ita.key() - itb.key())
-									       .intersects(d3->bounds())) {
-										break;
-									}
-								}
-								if (k == i) {
-									bestDistance = dist + abs((ita.key() + itb.key()) / 2 - mid);
+					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
+					     ita != sidePoints.end(); ++ita) {
+						for (QSet<int>::iterator itb = sidePoints.begin();
+						     ita != itb; ++itb) {
+							int sp_mid = (*ita + *itb) / 2;
+							int sp_diff = *ita - *itb;
+							if (isClose(sp_mid, mid)) {
+								QRect r(d->right(), *itb, rect.width(), sp_diff);
+								if (!overlaysWithFirstNWidgets(r, i)) {
+									bestDistance = dist + abs(sp_mid - mid);
 									bestIndex = i + 1;
 									bestSide = RIGHT;
-									bestRect = QRect(d->right(), itb.key(), rect.width(), ita.key() - itb.key());
+									bestRect = r;
 								}
 							}
-							++itb;
 						}
-						++ita;
 					}
 				}
 			}

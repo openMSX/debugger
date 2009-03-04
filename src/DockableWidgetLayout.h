@@ -4,11 +4,11 @@
 #define _DOCKABLEWIDGETLAYOUT_H
 
 #include <QLayout>
+#include <QRect>
 
 class QLayoutItem;
 class DockableWidget;
 class QStringList;
-class QRect;
 
 class DockableWidgetLayout : public QLayout
 {
@@ -75,6 +75,7 @@ private:
 	void doLayout(bool check = false);
 	bool insertLocation(QRect& rect, int& index, DockSide& side,
 	                    const QSizePolicy& sizePol);
+	bool overlaysWithFirstNWidgets(const QRect& r, int n) const;
 };
 
 #endif // _DOCKABLEWIDGETLAYOUT_H
