@@ -4,83 +4,77 @@
 #include "DockableWidget.h"
 #include "DockableWidgetArea.h"
 
-DockManager::DockManager()
-{
-}
 
-DockManager::~DockManager()
+void DockManager::addDockArea(DockableWidgetArea* area)
 {
-}
-
-void DockManager::addDockArea( DockableWidgetArea *area )
-{
-	if( areas.indexOf( area ) == -1 )
-		areas.append( area );
-}
-
-int DockManager::dockAreaIndex( DockableWidgetArea *area )
-{
-	return areas.indexOf( area );
-}
-
-void DockManager::dockWidget( DockableWidget *widget, const QPoint& p, const QRect& r )
-{
-	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.begin(); // TODO
-	if( it != areaMap.end() ) {
-		areaMap[widget] = it.value();	
-		return it.value()->addWidget( widget, r );
+	if (areas.indexOf(area) == -1) {
+		areas.append(area);
 	}
 }
 
-void DockManager::undockWidget( DockableWidget *widget )
+int DockManager::dockAreaIndex(DockableWidgetArea* area) const
 {
-	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.find( widget );
-	if( it != areaMap.end() ) {
-		it.value()->removeWidget( widget );
+	return areas.indexOf(area);
+}
+
+void DockManager::dockWidget(DockableWidget* widget, const QPoint& p, const QRect& r)
+{
+	AreaMap::iterator it = areaMap.begin(); // TODO
+	if (it != areaMap.end()) {
+		areaMap[widget] = it.value();
+		return it.value()->addWidget(widget, r);
 	}
 }
 
-void DockManager::insertWidget( DockableWidget *widget, int index,
-	                   DockableWidgetLayout::DockSide side, int distance, int w , int h ) 
+void DockManager::undockWidget(DockableWidget* widget)
 {
-	if( index<0 || index>=areas.size() ) return;
+	AreaMap::iterator it = areaMap.find(widget);
+	if (it != areaMap.end()) {
+		it.value()->removeWidget(widget);
+	}
+}
 
-	//Q_ASSERT( areaMap.find(widget) == areaMap.end() );
+void DockManager::insertWidget(
+		DockableWidget* widget, int index,
+		DockableWidgetLayout::DockSide side, int distance, int w , int h)
+{
+	if (index < 0 || index >= areas.size()) return;
 
-	areas[index]->addWidget( widget, side, distance, w, h );
+	//Q_ASSERT(areaMap.find(widget) == areaMap.end());
+
+	areas[index]->addWidget(widget, side, distance, w, h);
 	areaMap[widget] = areas[index];
 }
 
-bool DockManager::insertLocation( QRect& r, const QSizePolicy& sizePol )
+bool DockManager::insertLocation(QRect& r, const QSizePolicy& sizePol)
 {
-	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.begin(); // TODO
-	if( it != areaMap.end() ) {
-		return it.value()->insertLocation( r, sizePol );
-	}
-	return false;
+	AreaMap::iterator it = areaMap.begin(); // TODO
+	if (it == areaMap.end()) return false;
+
+	return it.value()->insertLocation(r, sizePol);
 }
 
-void DockManager::visibilityChanged( DockableWidget *widget )
+void DockManager::visibilityChanged(DockableWidget* widget)
 {
-	QMap<DockableWidget*, DockableWidgetArea*>::iterator it = areaMap.find( widget );
-	if( it != areaMap.end() ) {
+	AreaMap::iterator it = areaMap.find(widget);
+	if (it != areaMap.end()) {
 		it.value()->layout->changed();
 	}
 }
 
-void DockManager::getConfig( int index, QStringList& list )
+void DockManager::getConfig(int index, QStringList& list) const
 {
-	areas[index]->getConfig( list );
+	areas[index]->getConfig(list);
 }
 
-void DockManager::attachWidget( DockableWidget* widget )
+void DockManager::attachWidget(DockableWidget* widget)
 {
-	dockWidgets.append( widget );
+	dockWidgets.append(widget);
 }
 
-void DockManager::detachWidget( DockableWidget* widget )
+void DockManager::detachWidget(DockableWidget* widget)
 {
-	dockWidgets.removeAll( widget );
+	dockWidgets.removeAll(widget);
 }
 
 const QList<DockableWidget*>& DockManager::managedWidgets() const
@@ -88,13 +82,11 @@ const QList<DockableWidget*>& DockManager::managedWidgets() const
 	return dockWidgets;
 }
 
-DockableWidget *DockManager::findDockableWidget( const QString& id )
+DockableWidget* DockManager::findDockableWidget(const QString& id) const
 {
-	QList<DockableWidget*>::iterator it = dockWidgets.begin();
-	while( it != dockWidgets.end() ) {
-		if( (*it)->id() == id ) return *it;
-		it++;
+	for (QList<DockableWidget*>::const_iterator it = dockWidgets.begin();
+	     it != dockWidgets.end(); ++it) {
+		if ((*it)->id() == id) return *it;
 	}
 	return 0;
 }
-

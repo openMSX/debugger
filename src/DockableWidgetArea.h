@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef _DOCKABLETWIDGETAREA_H
-#define _DOCKABLETWIDGETAREA_H
+#ifndef DOCKABLETWIDGETAREA_H
+#define DOCKABLETWIDGETAREA_H
 
 #include "DockableWidgetLayout.h"
 #include <QWidget>
@@ -30,4 +30,4 @@ private:
 	friend class DockManager;
 };
 
-#endif // _DOCKABLETWIDGETAREA_H
+#endif // DOCKABLETWIDGETAREA_H

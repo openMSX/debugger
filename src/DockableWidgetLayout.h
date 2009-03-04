@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef _DOCKABLEWIDGETLAYOUT_H
-#define _DOCKABLEWIDGETLAYOUT_H
+#ifndef DOCKABLEWIDGETLAYOUT_H
+#define DOCKABLEWIDGETLAYOUT_H
 
 #include <QLayout>
 #include <QRect>
@@ -78,4 +78,4 @@ private:
 	bool overlaysWithFirstNWidgets(const QRect& r, int n) const;
 };
 
-#endif // _DOCKABLEWIDGETLAYOUT_H
+#endif // DOCKABLEWIDGETLAYOUT_H

@@ -25,7 +25,7 @@ static std::string toHex(unsigned value, unsigned width)
 
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
-          unsigned short endAddr, DisasmLines& disasm, 
+          unsigned short endAddr, DisasmLines& disasm,
           MemoryLayout *memLayout, SymbolTable *symTable, int currentPC )
 {
 	const char* s;

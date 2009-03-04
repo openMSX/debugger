@@ -1,10 +1,11 @@
 // $Id$
-#ifndef _DEBUGSESSION_H
-#define _DEBUGSESSION_H
 
-#include <QObject>
+#ifndef DEBUGSESSION_H
+#define DEBUGSESSION_H
+
 #include "DebuggerData.h"
 #include "SymbolTable.h"
+#include <QObject>
 
 class QXmlStreamReader;
 
@@ -17,9 +18,9 @@ public:
 
 	// session
 	void clear();
-	void open( const QString& file );
+	void open(const QString& file);
 	bool save();
-	void saveAs( const QString& file );
+	void saveAs(const QString& file);
 	bool existsAsFile() const;
 	const QString& filename() const;
 	bool isModified() const;
@@ -34,13 +35,10 @@ private:
 	Breakpoints breaks;
 	SymbolTable symTable;
 
-	void skipUnknownElement( QXmlStreamReader& ses );
+	void skipUnknownElement(QXmlStreamReader& ses);
 	
 public slots:
 	void sessionModified();
-	
 };
 
-
-
-#endif // _DEBUGSESSION_H
+#endif // DEBUGSESSION_H

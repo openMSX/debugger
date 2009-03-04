@@ -1,12 +1,12 @@
 // $Id$
 
-#ifndef _DASM_H
-#define _DASM_H
+#ifndef DASM_H
+#define DASM_H
 
 #include <string>
 #include <vector>
-#include "SymbolTable.h"
 
+class SymbolTable;
 struct MemoryLayout;
 
 struct DisasmRow {
@@ -26,7 +26,7 @@ static const int LAST_INFO_LINE = -65536;
 typedef std::vector<DisasmRow> DisasmLines;
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
-          unsigned short endAddr, DisasmLines& disasm, 
-          MemoryLayout *memLayout, SymbolTable *symTable, int currentPC );
+          unsigned short endAddr, DisasmLines& disasm,
+          MemoryLayout *memLayout, SymbolTable *symTable, int currentPC);
 
-#endif // _DASM_H
+#endif // DASM_H

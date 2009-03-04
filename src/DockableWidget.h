@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef _DOCKABLEWIDGET_H
-#define _DOCKABLEWIDGET_H
+#ifndef DOCKABLEWIDGET_H
+#define DOCKABLEWIDGET_H
 
 #include <QWidget>
 #include <QString>
@@ -63,4 +63,4 @@ signals:
 	void visibilityChanged(DockableWidget* w);
 };
 
-#endif // _DOCKABLEWIDGET_H
+#endif // DOCKABLEWIDGET_H

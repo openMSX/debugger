@@ -58,7 +58,7 @@ void DebugSession::open( const QString& file )
 		                      tr("Cannot read file %1:\n%2.")
 		                      .arg(file)
 		                      .arg(f.errorString()));
-         return;
+		return;
 	}
 	// clear current project
 	clear();
@@ -91,7 +91,7 @@ void DebugSession::open( const QString& file )
 		}
 	}
 	f.close();
-	
+
 	fileName = file;
 	modified = false;
 }
@@ -105,7 +105,7 @@ bool DebugSession::save()
 		                      tr("Cannot write file %1:\n%2.")
 		                      .arg(fileName)
 		                      .arg(file.errorString()));
-         return false;
+		return false;
 	}
 	// start xml file
 	QXmlStreamWriter ses;
@@ -154,4 +154,3 @@ void DebugSession::sessionModified()
 {
 	modified = true;
 }
-

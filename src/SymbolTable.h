@@ -1,6 +1,7 @@
 // $Id$
-#ifndef _SYMBOLTABLE_H
-#define _SYMBOLTABLE_H
+
+#ifndef SYMBOLTABLE_H
+#define SYMBOLTABLE_H
 
 #include <QString>
 #include <QList>
@@ -10,18 +11,14 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-
 struct MemoryLayout;
-
 class SymbolTable;
 
 class Symbol
 {
 public:
-	Symbol( const QString& str, int addr, int val = 0xFFFF );
-	Symbol( const Symbol& symbol );
-	
-	friend class SymbolTable;
+	Symbol(const QString& str, int addr, int val = 0xFFFF);
+	Symbol(const Symbol& symbol);
 
 	// ACTIVE status is for regular symbols. HIDDEN is for symbols
 	// that are in the list but not shown anywhere. LOST is a special
@@ -41,92 +38,93 @@ public:
 	                REG_ALL = 0x3FFFF };
 	
 	const QString& text() const;
-	void setText( const QString& str );
+	void setText(const QString& str);
 	int value() const;
-	void setValue( int addr );
+	void setValue(int addr);
 	int validSlots() const;
-	void setValidSlots( int val );
+	void setValidSlots(int val);
 	int validRegisters() const;
-	void setValidRegisters( int regs );
-	const QString *source() const;
-	void setSource( QString* name );
+	void setValidRegisters(int regs);
+	const QString* source() const;
+	void setSource(QString* name);
 	SymbolStatus status() const;
-	void setStatus( SymbolStatus s );
+	void setStatus(SymbolStatus s);
 	SymbolType type() const;
-	void setType( SymbolType t );
+	void setType(SymbolType t);
 	
-	bool isSlotValid( MemoryLayout *ml = 0 );
+	bool isSlotValid(MemoryLayout* ml = 0);
 
 private:
-	SymbolTable *table;
+	SymbolTable* table;
 
 	QString symText;
 	int symValue;
 	int symSlots;
 	QList<unsigned char> symSegments;
 	int symRegisters;
-	QString *symSource;
+	QString* symSource;
 	SymbolStatus symStatus;
 	SymbolType symType;
+
+	friend class SymbolTable;
 };
 
 
 class SymbolTable
 {
 public:
+	enum FileType { DETECT_FILE, TNIASM_FILE, ASMSX_FILE, LINKMAP_FILE };
+
 	SymbolTable();
 	~SymbolTable();
 
-	void add( Symbol *symbol );
-	void removeAt( int index );
-	void remove( Symbol *symbol );
+	void add(Symbol* symbol);
+	void removeAt(int index);
+	void remove(Symbol *symbol);
 	void clear();
 
 	/* xml session file functions */
-	void saveSymbols( QXmlStreamWriter& xml );
-	void loadSymbols( QXmlStreamReader& xml );
+	void saveSymbols(QXmlStreamWriter& xml);
+	void loadSymbols(QXmlStreamReader& xml);
 
 	/* Symbol access functions */
-	Symbol *findFirstAddressSymbol( int addr, MemoryLayout *ml = 0 );
-	Symbol *getCurrentAddressSymbol();
-	Symbol *findNextAddressSymbol( MemoryLayout *ml = 0 );
-	Symbol *getValueSymbol( int val, Symbol::Register reg, MemoryLayout *ml = 0 );
-	Symbol *getAddressSymbol( int val, MemoryLayout *ml = 0 );
+	Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = 0);
+	Symbol* getCurrentAddressSymbol();
+	Symbol* findNextAddressSymbol(MemoryLayout* ml = 0);
+	Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = 0);
+	Symbol* getAddressSymbol(int val, MemoryLayout* ml = 0);
 
-	void symbolTypeChanged( Symbol *symbol );
-	void symbolValueChanged( Symbol *symbol );
+	void symbolTypeChanged(Symbol* symbol);
+	void symbolValueChanged(Symbol* symbol);
 
 	int symbolFilesSize() const;
-	const QString& symbolFile( int index ) const;
-	const QDateTime& symbolFileRefresh( int index ) const;
+	const QString& symbolFile(int index) const;
+	const QDateTime& symbolFileRefresh(int index) const;
 
-	enum FileType { DETECT_FILE, TNIASM_FILE, ASMSX_FILE, LINKMAP_FILE };
-
-	bool readFile( const QString& filename, FileType type = DETECT_FILE );
+	bool readFile(const QString& filename, FileType type = DETECT_FILE);
 	void reloadFiles();
-	void unloadFile( const QString& file, bool keepSymbols = false );
+	void unloadFile(const QString& file, bool keepSymbols = false);
 
 private:
+	void appendFile(const QString& file, FileType type);
+	bool readTNIASM0File(const QString& filename);
+	bool readASMSXFile(const QString& filename);
+	bool readLinkMapFile(const QString& filename);
+
+	void mapSymbol(Symbol* symbol);
+	void unmapSymbol(Symbol* symbol);
+
 	QList<Symbol*> symbols;
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
 	QMultiMap<int, Symbol*>::iterator currentAddress;
 	
-	typedef struct {
+	struct SymbolFileRecord {
 		QString fileName;
 		QDateTime refreshTime;
 		FileType fileType;
-	} SymbolFileRecord;
+	};
 	QList<SymbolFileRecord> symbolFiles;
-	
-	void appendFile( const QString& file, FileType type );
-	bool readTNIASM0File( const QString& filename );
-	bool readASMSXFile( const QString& filename );
-	bool readLinkMapFile( const QString& filename );
-
-	void mapSymbol( Symbol *symbol );
-	void unmapSymbol( Symbol *symbol );
 };
 
-
-#endif // _SYMBOLTABLE_H
+#endif // SYMBOLTABLE_H

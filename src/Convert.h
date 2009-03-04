@@ -1,8 +1,8 @@
-#ifndef _CONVERT_H
-#define _CONVERT_H
+#ifndef CONVERT_H
+#define CONVERT_H
 
 class QString;
 
-int stringToValue( const QString& str );
+int stringToValue(const QString& str);
 
-#endif // _CONVERT_H
+#endif // CONVERT_H
