@@ -17,13 +17,13 @@ class DockableWidget : public QWidget
 {
 	Q_OBJECT;
 public:
-	DockableWidget( DockManager& manager, QWidget* parent = 0 );
+	DockableWidget(DockManager& manager, QWidget* parent = 0);
 	~DockableWidget();
 
-	QWidget *widget() const;
-	void setWidget(QWidget *widget);
+	QWidget* widget() const;
+	void setWidget(QWidget* widget);
 	const QString& id() const;
-	void setId( const QString& str );
+	void setId(const QString& str);
 
 	QString title() const;
 	void setTitle(const QString& title);
@@ -37,13 +37,12 @@ public:
 	bool isDestroyable() const;
 	void setDestroyable(bool enable);
 
-protected:
-	virtual void mousePressEvent ( QMouseEvent * event );
-	virtual void mouseMoveEvent ( QMouseEvent * event );
-	virtual void mouseReleaseEvent ( QMouseEvent * event );
-	virtual void closeEvent( QCloseEvent * event );
-
 private:
+	virtual void mousePressEvent(QMouseEvent* event);
+	virtual void mouseMoveEvent(QMouseEvent* event);
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+	virtual void closeEvent(QCloseEvent* event);
+
 	DockManager& dockManager;
 	QString widgetId;
 
@@ -51,17 +50,17 @@ private:
 	bool closable, movable, destroyable;
 	bool dragging;
 	QPoint dragStart, dragOffset;
-	QRubberBand *rubberBand;
+	QRubberBand* rubberBand;
 
-	QWidget *mainWidget;
-	QHBoxLayout *headerLayout;
-	QVBoxLayout *widgetLayout;
-	QWidget *headerWidget;
-	QLabel *titleLabel;
-	QToolButton *closeButton;
+	QWidget* mainWidget;
+	QHBoxLayout* headerLayout;
+	QVBoxLayout* widgetLayout;
+	QWidget* headerWidget;
+	QLabel* titleLabel;
+	QToolButton* closeButton;
 	
 signals:
-	void visibilityChanged( DockableWidget *w );
+	void visibilityChanged(DockableWidget* w);
 };
 
-#endif    // _DOCKABLEWIDGET_H
+#endif // _DOCKABLEWIDGET_H
