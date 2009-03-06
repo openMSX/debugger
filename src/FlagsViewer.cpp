@@ -9,14 +9,13 @@ FlagsViewer::FlagsViewer(QWidget* parent)
 	: QFrame(parent)
 {
 	flags = flagsChanged = 0; // avoid UMR
-	
+
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
-	
-	frameL = frameT = frameB = frameWidth();
-	frameR = frameL;
+	setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	frameR = frameL = frameT = frameB = frameWidth();
 }
 
 void FlagsViewer::resizeEvent(QResizeEvent* e)
@@ -48,11 +47,11 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	p.setClipRect(r);
 
 	// redraw background
-	p.fillRect( r, palette().color(QPalette::Base) );
+	p.fillRect(r, palette().color(QPalette::Base));
 
 	int h = fontMetrics().height();
 	int flagWidth = fontMetrics().width("ZW");
-	int valWidth = fontMetrics().width("0 ");
+	int valWidth  = fontMetrics().width("0 ");
 	int d = fontMetrics().descent();
 	int y = frameT + h - 1 - d;
 	for (int flag = 7; flag >= 0; --flag) {
@@ -69,8 +68,8 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 
 QSize FlagsViewer::sizeHint() const
 {
-	return QSize( frameL + 4 + fontMetrics().width("ZW0 (PE) ") + 4 + frameR,
-	              frameT + 8 * fontMetrics().height() + frameB );
+	return QSize(frameL + 4 + fontMetrics().width("ZW0 (PE) ") + 4 + frameR,
+	             frameT + 8 * fontMetrics().height() + frameB);
 }
 
 void FlagsViewer::drawValue(QPainter& p, int x, int y, const QString& str,
@@ -89,6 +88,5 @@ void FlagsViewer::setFlags(quint8 newFlags)
 {
 	flagsChanged = flags ^ newFlags;
 	flags = newFlags;
-	
 	update();
 }

@@ -4,23 +4,20 @@
 #define MAINMEMORYVIEWER_H
 
 #include <QWidget>
-#include "HexViewer.h"
-#include <QString>
-#include <QComboBox>
-#include <QLineEdit>
 
+class HexViewer;
 class CPURegsViewer;
+class QComboBox;
+class QLineEdit;
 
 class MainMemoryViewer : public QWidget
 {
 	Q_OBJECT
 public:
 	MainMemoryViewer(QWidget* parent = 0);
-	~MainMemoryViewer();
 
-	void setDebuggable( const QString& name, int size );
-	void setRegsView( CPURegsViewer* viewer );
-
+	void setDebuggable(const QString& name, int size);
+	void setRegsView(CPURegsViewer* viewer);
 
 public slots:
 	void setLocation(int addr);
@@ -37,11 +34,10 @@ private:
 	QComboBox* addressSourceList;
 	QLineEdit* addressValue;
 
-	bool isLinked;
-	int linkedId;
 	static const int linkRegisters[];
 	CPURegsViewer* regsViewer;
+	int linkedId;
+	bool isLinked;
 };
-
 
 #endif // MAINMEMORYVIEWER_H

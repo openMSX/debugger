@@ -16,18 +16,16 @@ public:
 	StackViewer(QWidget* parent = 0);
 
 	void setData(unsigned char* memPtr, int memLength);
-
 	QSize sizeHint() const;
 
 public slots:
 	void setLocation(int addr);
 	void setStackPointer(quint16 addr);
 
-protected:
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 
-private:
 	void setScrollBarValues();
 	void memdataTransfered(StackRequest* r);
 	void transferCancelled(StackRequest* r);

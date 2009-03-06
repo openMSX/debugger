@@ -21,18 +21,16 @@ public:
 public slots:
 	void setFlags(quint8 newFlags);
 
-protected:
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 
-private:
-	int frameL, frameR, frameT, frameB;
-
-	unsigned char flags;
-	unsigned char flagsChanged;
-
 	void drawValue(QPainter& p, int x, int y, const QString& str,
 	               const bool changed);
+
+	int frameL, frameR, frameT, frameB;
+	unsigned char flags;
+	unsigned char flagsChanged;
 };
 
 #endif // FLAGSVIEWER_H

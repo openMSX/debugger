@@ -44,7 +44,7 @@ StackViewer::StackViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
+	setSizePolicy(QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred));
 
 	setFont(QFont("Courier New", 12));
 
@@ -58,15 +58,16 @@ StackViewer::StackViewer(QWidget* parent)
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
-	setMinimumHeight( frameT+frameB+fontMetrics().height() );
+	setMinimumHeight(frameT+frameB+fontMetrics().height());
 
-	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(setLocation(int)));
+	connect(vertScrollBar, SIGNAL(valueChanged(int)),
+	        this, SLOT(setLocation(int)));
 }
 
 QSize StackViewer::sizeHint() const
 {
-	return QSize( frameL + 4 + fontMetrics().width("FFFFWFFFF ") + 4 + frameR,
-	              frameT + 8*fontMetrics().height() + frameB );
+	return QSize(frameL + 4 + fontMetrics().width("FFFFWFFFF ") + 4 + frameR,
+	             frameT + 8 * fontMetrics().height() + frameB);
 }
 
 void StackViewer::setScrollBarValues()
@@ -75,10 +76,10 @@ void StackViewer::setScrollBarValues()
 
 	visibleLines = double(height() - frameT - frameB) / fontMetrics().height();
 
-	int lines = (memoryLength-stackPointer) / 2;
+	int lines = (memoryLength - stackPointer) / 2;
 	vertScrollBar->setMaximum(stackPointer + 2 * (lines - int(visibleLines)));
 	vertScrollBar->setSingleStep(2);
-	vertScrollBar->setPageStep(2*int(visibleLines));
+	vertScrollBar->setPageStep(2 * int(visibleLines));
 }
 
 void StackViewer::resizeEvent(QResizeEvent* e)
@@ -115,14 +116,12 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	p.setClipRect(r);
 
 	// redraw background
-	p.fillRect( r, palette().color(QPalette::Base) );
+	p.fillRect(r, palette().color(QPalette::Base));
 
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
 	int xStack = xAddr + fontMetrics().width("FFFF ");
-
 	int y = frameT + h - 1;
-	
 	int address = topAddress;
 
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
@@ -154,7 +153,7 @@ void StackViewer::setLocation(int addr)
 	int start = (addr & ~1) | (stackPointer & 1);
 	int size = 2 * int(ceil(visibleLines));
 
-	if(start + size >= memoryLength) {
+	if (start + size >= memoryLength) {
 		size = memoryLength - start;
 	}
 	StackRequest* req = new StackRequest(start, size,
@@ -178,7 +177,7 @@ void StackViewer::memdataTransfered(StackRequest* r)
 
 	waitingForData = false;
 	delete r;
-	
+
 	// check whether a new value is available
 	if ((topAddress & ~1) != (vertScrollBar->value() & ~1)) {
 		setLocation(vertScrollBar->value());

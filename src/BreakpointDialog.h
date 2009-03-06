@@ -2,6 +2,7 @@
 #define BREAKPOINTDIALOG_OPENMSX_H
 
 #include "ui_BreakpointDialog.h"
+#include <QDialog>
 
 struct MemoryLayout;
 
@@ -9,7 +10,7 @@ class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 {
 	Q_OBJECT
 public:
-	BreakpointDialog(const MemoryLayout& ml, QWidget *parent = 0);
+	BreakpointDialog(const MemoryLayout& ml, QWidget* parent = 0);
 
 	int address();
 	int slot();
@@ -20,8 +21,8 @@ private:
 	const MemoryLayout& memLayout;
 
 private slots:
-	void slotChanged( int i );
-	void subslotChanged( int i );
+	void slotChanged(int i);
+	void subslotChanged(int i);
 };
 
-#endif /* BREAKPOINTDIALOG_OPENMSX_H */
+#endif // BREAKPOINTDIALOG_OPENMSX_H

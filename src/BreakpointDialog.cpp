@@ -2,20 +2,20 @@
 #include "DebuggerData.h"
 #include "Convert.h"
 
-BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, QWidget *parent)
+BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, QWidget* parent)
 	: QDialog(parent), memLayout(ml)
 {
 	setupUi(this);
 
-	connect( cmbxSlot, SIGNAL( activated(int) ), this, SLOT( slotChanged(int) ) );
-	connect( cmbxSubslot, SIGNAL( activated(int) ), this, SLOT( subslotChanged(int) ) );
-	
+	connect(cmbxSlot,    SIGNAL(activated(int)), this, SLOT(slotChanged(int)));
+	connect(cmbxSubslot, SIGNAL(activated(int)), this, SLOT(subslotChanged(int)));
+
 	slotChanged(0);
 }
 
 int BreakpointDialog::address()
 {
-	return stringToValue( edtAddress->text() );
+	return stringToValue(edtAddress->text());
 }
 
 int BreakpointDialog::slot()
@@ -33,10 +33,10 @@ int BreakpointDialog::segment()
 	return cmbxSegment->currentIndex() - 1;
 }
 
-void BreakpointDialog::slotChanged( int i )
+void BreakpointDialog::slotChanged(int i)
 {
-	if( i ) {
-		if( memLayout.isSubslotted[i-1] ) {
+	if (i) {
+		if (memLayout.isSubslotted[i - 1]) {
 			cmbxSubslot->setEnabled(true);
 		} else {
 			cmbxSubslot->setEnabled(false);
@@ -46,10 +46,10 @@ void BreakpointDialog::slotChanged( int i )
 		cmbxSubslot->setEnabled(false);
 		cmbxSubslot->setCurrentIndex(0);
 	}
-	subslotChanged( cmbxSubslot->currentIndex() );
+	subslotChanged(cmbxSubslot->currentIndex());
 }
 
-void BreakpointDialog::subslotChanged( int i )
+void BreakpointDialog::subslotChanged(int i)
 {
 	cmbxSegment->clear();
 	cmbxSegment->addItem("any");
@@ -57,15 +57,16 @@ void BreakpointDialog::subslotChanged( int i )
 	int ps = cmbxSlot->currentIndex() - 1;
 	int ss = i - 1;
 	
-	if( ps >=0 && !memLayout.isSubslotted[ps] ) ss = 0;
+	if (ps >=0 && !memLayout.isSubslotted[ps]) ss = 0;
 	
-	if( ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0 ) {
+	if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
 		cmbxSegment->setEnabled(false);
 		cmbxSegment->setCurrentIndex(0);
 		return;
 	}
 	
-	for( int s = 0; s < memLayout.mapperSize[ps][ss]; s++ )
-		cmbxSegment->addItem( QString("%1").arg(s) );
+	for (int s = 0; s < memLayout.mapperSize[ps][ss]; ++s) {
+		cmbxSegment->addItem(QString("%1").arg(s));
+	}
 	cmbxSegment->setEnabled(true);
 }

@@ -16,15 +16,15 @@ public:
 
 public slots:
 	void settingsChanged();
-	void setDebuggables( const QMap<QString,int>& list );
+	void setDebuggables(const QMap<QString, int>& list);
 	void refresh();
 
 private:
-	HexViewer *hexView;
-	QComboBox *debuggableList;
-	
+	HexViewer* hexView;
+	QComboBox* debuggableList;
+
 private slots:
-	void debuggableSelected( int index );
+	void debuggableSelected(int index);
 };
 
 #endif // DEBUGGABLEVIEWER_H
