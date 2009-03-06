@@ -32,11 +32,11 @@ public:
 	                REG_H = 32, REG_L = 64, REG_BC = 128, REG_DE = 256,
 	                REG_HL = 512, REG_IX = 1024, REG_IY = 2048, REG_IXL = 4096,
 	                REG_IXH = 8192, REG_IYL = 16384, REG_IYH = 32768,
-	                REG_OFFSET = 65536, REG_I = 131072, 
+	                REG_OFFSET = 65536, REG_I = 131072,
 	                REG_ALL8 = 1+2+4+8+16+32+64+4096+8192+16384+32768+65536+131072,
 	                REG_ALL16 = 128+256+512+1024+2048,
 	                REG_ALL = 0x3FFFF };
-	
+
 	const QString& text() const;
 	void setText(const QString& str);
 	int value() const;
@@ -46,12 +46,12 @@ public:
 	int validRegisters() const;
 	void setValidRegisters(int regs);
 	const QString* source() const;
-	void setSource(QString* name);
+	void setSource(const QString* name);
 	SymbolStatus status() const;
 	void setStatus(SymbolStatus s);
 	SymbolType type() const;
 	void setType(SymbolType t);
-	
+
 	bool isSlotValid(MemoryLayout* ml = 0);
 
 private:
@@ -62,7 +62,7 @@ private:
 	int symSlots;
 	QList<unsigned char> symSegments;
 	int symRegisters;
-	QString* symSource;
+	const QString* symSource;
 	SymbolStatus symStatus;
 	SymbolType symType;
 
@@ -75,7 +75,6 @@ class SymbolTable
 public:
 	enum FileType { DETECT_FILE, TNIASM_FILE, ASMSX_FILE, LINKMAP_FILE };
 
-	SymbolTable();
 	~SymbolTable();
 
 	void add(Symbol* symbol);
@@ -118,7 +117,7 @@ private:
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
 	QMultiMap<int, Symbol*>::iterator currentAddress;
-	
+
 	struct SymbolFileRecord {
 		QString fileName;
 		QDateTime refreshTime;

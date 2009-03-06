@@ -6,22 +6,20 @@
 #include "Convert.h"
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QFile>
-#include <QTextStream>
 #include <QHeaderView>
 
-SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
+SymbolManager::SymbolManager(SymbolTable& symtable, QWidget* parent)
 	: QDialog(parent), symTable(symtable)
 {
 	setupUi(this);
 
 	// restore layout
-	Settings &s = Settings::get();
-	restoreGeometry( s.value( "SymbolManager/WindowGeometry", saveGeometry() ).toByteArray() );
-	treeFiles->header()->restoreState( s.value( "SymbolManager/HeaderFiles",
-	                                   treeFiles->header()->saveState() ).toByteArray() );
-	treeLabels->header()->restoreState( s.value( "SymbolManager/HeaderSymbols",
-	                                   treeLabels->header()->saveState() ).toByteArray() );
+	Settings& s = Settings::get();
+	restoreGeometry(s.value("SymbolManager/WindowGeometry", saveGeometry()).toByteArray());
+	treeFiles->header()->restoreState(s.value("SymbolManager/HeaderFiles",
+	                                  treeFiles->header()->saveState()).toByteArray());
+	treeLabels->header()->restoreState(s.value("SymbolManager/HeaderSymbols",
+	                                   treeLabels->header()->saveState()).toByteArray());
 
 	treeLabelsUpdateCount = 0;
 	editColumn = -1;
@@ -35,56 +33,56 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 	chkRegs[ 4] = chkRegE ; chkRegs[ 5] = chkRegH ; chkRegs[ 6] = chkRegL ; chkRegs[ 7] = chkRegBC;
 	chkRegs[ 8] = chkRegDE; chkRegs[ 9] = chkRegHL; chkRegs[10] = chkRegIX; chkRegs[11] = chkRegIY;
 	chkRegs[12] = chkRegIXL;chkRegs[13] = chkRegIXH;chkRegs[14] = chkRegIYL;chkRegs[15] = chkRegIYH;
-	chkRegs[16] = chkRegOffset ; chkRegs[17] = chkRegI;
+	chkRegs[16] = chkRegOffset; chkRegs[17] = chkRegI;
 	
-	connect( treeFiles, SIGNAL( itemSelectionChanged() ), this, SLOT( fileSelectionChange() ) );
-	connect( btnAddFile, SIGNAL( clicked() ), this, SLOT( addFile() ) );
-	connect( btnRemoveFile, SIGNAL( clicked() ), this, SLOT( removeFile() ) );
-	connect( btnReloadFiles, SIGNAL( clicked() ), this, SLOT( reloadFiles() ) );
-	connect( treeLabels, SIGNAL( itemSelectionChanged() ), this, SLOT( labelSelectionChanged() ) );
-	connect( treeLabels, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-	         this, SLOT( labelEdit( QTreeWidgetItem*, int ) ) );
-	connect( treeLabels, SIGNAL( itemChanged( QTreeWidgetItem *, int ) ),
-	         this, SLOT( labelChanged( QTreeWidgetItem*, int ) ) );
-	connect( btnAddSymbol, SIGNAL( clicked() ), this, SLOT( addLabel() ) );
-	connect( btnRemoveSymbol, SIGNAL( clicked() ), this, SLOT( removeLabel() ) );
-	connect( radJump, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
-	connect( radVar, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
-	connect( radValue, SIGNAL( toggled(bool) ), this, SLOT( changeType(bool) ) );
-	connect( chk00, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot00(int) ) );
-	connect( chk01, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot01(int) ) );
-	connect( chk02, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot02(int) ) );
-	connect( chk03, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot03(int) ) );
-	connect( chk10, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot10(int) ) );
-	connect( chk11, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot11(int) ) );
-	connect( chk12, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot12(int) ) );
-	connect( chk13, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot13(int) ) );
-	connect( chk20, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot20(int) ) );
-	connect( chk21, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot21(int) ) );
-	connect( chk22, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot22(int) ) );
-	connect( chk23, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot23(int) ) );
-	connect( chk30, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot30(int) ) );
-	connect( chk31, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot31(int) ) );
-	connect( chk32, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot32(int) ) );
-	connect( chk33, SIGNAL( stateChanged(int) ), this, SLOT( changeSlot33(int) ) );
-	connect( chkRegA, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterA(int) ) );
-	connect( chkRegB, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterB(int) ) );
-	connect( chkRegC, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterC(int) ) );
-	connect( chkRegD, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterD(int) ) );
-	connect( chkRegE, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterE(int) ) );
-	connect( chkRegH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterH(int) ) );
-	connect( chkRegL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterL(int) ) );
-	connect( chkRegBC, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterBC(int) ) );
-	connect( chkRegDE, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterDE(int) ) );
-	connect( chkRegHL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterHL(int) ) );
-	connect( chkRegIX, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIX(int) ) );
-	connect( chkRegIY, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIY(int) ) );
-	connect( chkRegIXL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIXL(int) ) );
-	connect( chkRegIXH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIXH(int) ) );
-	connect( chkRegIYL, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIYL(int) ) );
-	connect( chkRegIYH, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterIYH(int) ) );
-	connect( chkRegOffset, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterOffset(int) ) );
-	connect( chkRegI, SIGNAL( stateChanged(int) ), this, SLOT( changeRegisterI(int) ) );
+	connect(treeFiles, SIGNAL(itemSelectionChanged()), this, SLOT(fileSelectionChange()));
+	connect(btnAddFile, SIGNAL(clicked()), this, SLOT(addFile()));
+	connect(btnRemoveFile, SIGNAL(clicked()), this, SLOT(removeFile()));
+	connect(btnReloadFiles, SIGNAL(clicked()), this, SLOT(reloadFiles()));
+	connect(treeLabels, SIGNAL(itemSelectionChanged()), this, SLOT(labelSelectionChanged()));
+	connect(treeLabels, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+	        this, SLOT(labelEdit(QTreeWidgetItem*, int)));
+	connect(treeLabels, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+	        this, SLOT(labelChanged(QTreeWidgetItem*, int)));
+	connect(btnAddSymbol, SIGNAL(clicked()), this, SLOT(addLabel()));
+	connect(btnRemoveSymbol, SIGNAL(clicked()), this, SLOT(removeLabel()));
+	connect(radJump, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
+	connect(radVar, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
+	connect(radValue, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
+	connect(chk00, SIGNAL(stateChanged(int)), this, SLOT(changeSlot00(int)));
+	connect(chk01, SIGNAL(stateChanged(int)), this, SLOT(changeSlot01(int)));
+	connect(chk02, SIGNAL(stateChanged(int)), this, SLOT(changeSlot02(int)));
+	connect(chk03, SIGNAL(stateChanged(int)), this, SLOT(changeSlot03(int)));
+	connect(chk10, SIGNAL(stateChanged(int)), this, SLOT(changeSlot10(int)));
+	connect(chk11, SIGNAL(stateChanged(int)), this, SLOT(changeSlot11(int)));
+	connect(chk12, SIGNAL(stateChanged(int)), this, SLOT(changeSlot12(int)));
+	connect(chk13, SIGNAL(stateChanged(int)), this, SLOT(changeSlot13(int)));
+	connect(chk20, SIGNAL(stateChanged(int)), this, SLOT(changeSlot20(int)));
+	connect(chk21, SIGNAL(stateChanged(int)), this, SLOT(changeSlot21(int)));
+	connect(chk22, SIGNAL(stateChanged(int)), this, SLOT(changeSlot22(int)));
+	connect(chk23, SIGNAL(stateChanged(int)), this, SLOT(changeSlot23(int)));
+	connect(chk30, SIGNAL(stateChanged(int)), this, SLOT(changeSlot30(int)));
+	connect(chk31, SIGNAL(stateChanged(int)), this, SLOT(changeSlot31(int)));
+	connect(chk32, SIGNAL(stateChanged(int)), this, SLOT(changeSlot32(int)));
+	connect(chk33, SIGNAL(stateChanged(int)), this, SLOT(changeSlot33(int)));
+	connect(chkRegA, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterA(int)));
+	connect(chkRegB, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterB(int)));
+	connect(chkRegC, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterC(int)));
+	connect(chkRegD, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterD(int)));
+	connect(chkRegE, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterE(int)));
+	connect(chkRegH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterH(int)));
+	connect(chkRegL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterL(int)));
+	connect(chkRegBC, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterBC(int)));
+	connect(chkRegDE, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterDE(int)));
+	connect(chkRegHL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterHL(int)));
+	connect(chkRegIX, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIX(int)));
+	connect(chkRegIY, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIY(int)));
+	connect(chkRegIXL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIXL(int)));
+	connect(chkRegIXH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIXH(int)));
+	connect(chkRegIYL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIYL(int)));
+	connect(chkRegIYH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIYH(int)));
+	connect(chkRegOffset, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterOffset(int)));
+	connect(chkRegI, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterI(int)));
 
 	groupSlots->setEnabled(false);
 	groupSegments->setEnabled(false);
@@ -96,13 +94,13 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget *parent)
 }
 
 
-void SymbolManager::closeEvent( QCloseEvent *e )
+void SymbolManager::closeEvent(QCloseEvent* e)
 {
 	// store layout
-	Settings &s = Settings::get();
-	s.setValue( "SymbolManager/WindowGeometry", saveGeometry() );
-	s.setValue( "SymbolManager/HeaderFiles", treeFiles->header()->saveState() );
-	s.setValue( "SymbolManager/HeaderSymbols", treeLabels->header()->saveState() );
+	Settings& s = Settings::get();
+	s.setValue("SymbolManager/WindowGeometry", saveGeometry());
+	s.setValue("SymbolManager/HeaderFiles", treeFiles->header()->saveState());
+	s.setValue("SymbolManager/HeaderSymbols", treeLabels->header()->saveState());
 	QDialog::closeEvent(e);
 }
 
@@ -113,63 +111,66 @@ void SymbolManager::closeEvent( QCloseEvent *e )
 void SymbolManager::initFileList()
 {
 	treeFiles->clear();
-	for( int i = 0; i < symTable.symbolFilesSize(); i++ ) {
-		QTreeWidgetItem *item = new QTreeWidgetItem(treeFiles);
-		item->setText( 0, symTable.symbolFile(i) );
-		item->setText( 1, symTable.symbolFileRefresh(i).toString( Qt::LocaleDate ) );
+	for (int i = 0; i < symTable.symbolFilesSize(); ++i) {
+		QTreeWidgetItem* item = new QTreeWidgetItem(treeFiles);
+		item->setText(0, symTable.symbolFile(i));
+		item->setText(1, symTable.symbolFileRefresh(i).toString(Qt::LocaleDate));
 	}
 }
 
 void SymbolManager::addFile()
 {
 	// create dialog
-	QFileDialog *d = new QFileDialog(this);
+	QFileDialog* d = new QFileDialog(this);
 	QStringList types;
 	types << "All supported files (*.sym *.map)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech link map files (*.map)";
-	d->setFilters( types );
-	d->setAcceptMode( QFileDialog::AcceptOpen );
-	d->setFileMode( QFileDialog::ExistingFile );
+	d->setFilters(types);
+	d->setAcceptMode(QFileDialog::AcceptOpen);
+	d->setFileMode(QFileDialog::ExistingFile);
 	// set default directory
-	d->setDirectory( Settings::get().value("SymbolManager/OpenDir", QDir::currentPath() ).toString() );
+	d->setDirectory(Settings::get().value("SymbolManager/OpenDir", QDir::currentPath()).toString());
 	// run
-	if( d->exec() ) {
+	if (d->exec()) {
 		QString f = d->selectedFilter();
 		QString n = d->selectedFiles().at(0);
 		// load file from the correct type
 		bool read = false;
-		if( f.startsWith( "tniASM 0" ) ) {
-			read = symTable.readFile( n, SymbolTable::TNIASM_FILE );
-		} else if( f.startsWith( "asMSX" ) ) {
-			read = symTable.readFile( n, SymbolTable::ASMSX_FILE );
-		} else if( f.startsWith( "HiTech" ) ) {
-			read = symTable.readFile( n, SymbolTable::LINKMAP_FILE );
+		if        (f.startsWith("tniASM 0")) {
+			read = symTable.readFile(n, SymbolTable::TNIASM_FILE);
+		} else if (f.startsWith("asMSX")) {
+			read = symTable.readFile(n, SymbolTable::ASMSX_FILE);
+		} else if (f.startsWith("HiTech")) {
+			read = symTable.readFile(n, SymbolTable::LINKMAP_FILE);
 		} else {
-			read = symTable.readFile( n );
+			read = symTable.readFile(n);
 		}
 		// if read succesful, add it to the list
-		if( read ) {
+		if (read) {
 			initFileList();
 			initSymbolList();
 			emit symbolTableChanged();
 		}
 	}
 	// store last used path
-	Settings::get().setValue( "SymbolManager/OpenDir", d->directory().absolutePath() );
+	Settings::get().setValue("SymbolManager/OpenDir", d->directory().absolutePath());
 }
 
 void SymbolManager::removeFile()
 {
-	int r = QMessageBox::question(this, tr("Remove symbol file(s)"),
-		tr("When removing the symbol file(s), do you want keep or delete the attached symbols?"),
+	int r = QMessageBox::question(
+		this,
+		tr("Remove symbol file(s)"),
+		tr("When removing the symbol file(s), do you want keep or "
+		   "delete the attached symbols?"),
 		"Keep symbols", "Delete symbols", "Cancel", 1, 2);
+	if (r == 2) return;
 
-	if( r == 2 ) return;
-
-	for( int i = 0; i < treeFiles->selectedItems().size(); i++ )
-		symTable.unloadFile( treeFiles->selectedItems().at(i)->text(0), r == 0);
+	for (int i = 0; i < treeFiles->selectedItems().size(); ++i) {
+		symTable.unloadFile(treeFiles->selectedItems().at(i)->text(0), r == 0);
+	}
 
 	initFileList();
 	initSymbolList();
@@ -186,20 +187,20 @@ void SymbolManager::reloadFiles()
 
 void SymbolManager::fileSelectionChange()
 {
-	btnRemoveFile->setEnabled( treeFiles->selectedItems().size() );
+	btnRemoveFile->setEnabled(treeFiles->selectedItems().size());
 }
 
-void SymbolManager::labelEdit( QTreeWidgetItem * item, int column )
+void SymbolManager::labelEdit(QTreeWidgetItem* item, int column)
 {
 	// only symbol name and value are editable
-	if( column == 0 || column == 2 ) {
+	if (column == 0 || column == 2) {
 		// open editor if manually added symbol
-		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
-		if( sym->source() == 0 ) {
+		Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+		if (sym->source() == 0) {
 			// first close possible existing editor
 			closeEditor();
 			// open new editor
-			treeLabels->openPersistentEditor( item, column );
+			treeLabels->openPersistentEditor(item, column);
 			editItem = item;
 			editColumn = column;
 		}
@@ -214,39 +215,39 @@ void SymbolManager::initSymbolList()
 {
 	treeLabels->clear();
 	beginTreeLabelsUpdate();
-	Symbol *sym = symTable.findFirstAddressSymbol( 0 );
-	while( sym != 0 ) {
-		QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
+	for (Symbol* sym = symTable.findFirstAddressSymbol(0);
+	     sym != 0;
+	     sym = symTable.findNextAddressSymbol()) {
+		QTreeWidgetItem* item = new QTreeWidgetItem(treeLabels);
 		// attach a pointer to the symbol object to the tree item
-		item->setData(0L, Qt::UserRole, quintptr(sym) );
+		item->setData(0L, Qt::UserRole, quintptr(sym));
 		// update columns
-		updateItemName( item );
-		updateItemType( item );
-		updateItemValue( item );
-		updateItemSlots( item );
-		updateItemSegments( item );
-		updateItemRegisters( item );
-		
-		sym = symTable.findNextAddressSymbol();
+		updateItemName(item);
+		updateItemType(item);
+		updateItemValue(item);
+		updateItemSlots(item);
+		updateItemSegments(item);
+		updateItemRegisters(item);
 	}
 	endTreeLabelsUpdate();
 }
 
 void SymbolManager::beginTreeLabelsUpdate()
 {
-	treeLabelsUpdateCount++;
+	++treeLabelsUpdateCount;
 }
 
 void SymbolManager::endTreeLabelsUpdate()
 {
-	if( treeLabelsUpdateCount > 0 )
-		treeLabelsUpdateCount--;
+	if (treeLabelsUpdateCount > 0) {
+		--treeLabelsUpdateCount;
+	}
 }
 
 void SymbolManager::closeEditor()
 {
-	if( editColumn >= 0 ) {
-		treeLabels->closePersistentEditor( editItem, editColumn );
+	if (editColumn >= 0) {
+		treeLabels->closePersistentEditor(editItem, editColumn);
 		editColumn = -1;
 	}
 }
@@ -254,69 +255,68 @@ void SymbolManager::closeEditor()
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
-	Symbol *sym = new Symbol( tr("New symbol"), 0 );
-	symTable.add( sym );
+	Symbol* sym = new Symbol(tr("New symbol"), 0);
+	symTable.add(sym);
 
 	beginTreeLabelsUpdate();
-	QTreeWidgetItem *item = new QTreeWidgetItem(treeLabels);
-	item->setData(0, Qt::UserRole, quintptr(sym) );
-	updateItemName( item );
-	updateItemType( item );
-	updateItemValue( item );
-	updateItemSlots( item );
-	updateItemSegments( item );
-	updateItemRegisters( item );
+	QTreeWidgetItem* item = new QTreeWidgetItem(treeLabels);
+	item->setData(0, Qt::UserRole, quintptr(sym));
+	updateItemName(item);
+	updateItemType(item);
+	updateItemValue(item);
+	updateItemSlots(item);
+	updateItemSegments(item);
+	updateItemRegisters(item);
 	endTreeLabelsUpdate();
 	closeEditor();
 	treeLabels->setFocus();
-	treeLabels->setCurrentItem( item, 0 );
+	treeLabels->setCurrentItem(item, 0);
 	treeLabels->scrollToItem(item);
-	treeLabels->openPersistentEditor( item, 0 );
+	treeLabels->openPersistentEditor(item, 0);
 	editItem = item;
 	editColumn = 0;
-	
+
 	// emit notification that something has changed
 	emit symbolTableChanged();
 }
 
 void SymbolManager::removeLabel()
 {
-	QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 	// check for selection
-	if( !selection.size() ) return;
+	if (selection.empty()) return;
 	// remove selected items
-	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
 	bool deleted = false;
-	while( selit != selection.end() ) {
+	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
+	     selit != selection.end(); ++selit) {
 		// get symbol
-		Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
-		if( !sym->source() ) {
+		if (!sym->source()) {
 			// remove from table
 			symTable.remove(sym);
-			deleted = true;			
+			deleted = true;
 		}
-		selit++;
 	}
-	if( deleted ) {
+	if (deleted) {
 		// refresh tree
 		initSymbolList();
 		emit symbolTableChanged();
 	}
 }
 
-void SymbolManager::labelChanged( QTreeWidgetItem *item, int column )
+void SymbolManager::labelChanged(QTreeWidgetItem* item, int column)
 {
-	if( !treeLabelsUpdateCount ) {
-		Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	if (!treeLabelsUpdateCount) {
+		Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 		// Set symbol text from tree item if any
 		QString symText = item->text(0).trimmed();
-		if( symText.isEmpty() ) symText = "[unnamed]";
-		sym->setText( symText );
+		if (symText.isEmpty()) symText = "[unnamed]";
+		sym->setText(symText);
 		// set value TODO: proper decoding of value
-		int value = stringToValue( item->text(2) );
-		if( value >= 0 && value < 65536 ) sym->setValue( value );
-		treeLabels->closePersistentEditor( item, column );
+		int value = stringToValue(item->text(2));
+		if (value >= 0 && value < 65536) sym->setValue(value);
+		treeLabels->closePersistentEditor(item, column);
 		editColumn = -1;
 		// update item name and value
 		beginTreeLabelsUpdate();
@@ -333,9 +333,9 @@ void SymbolManager::labelSelectionChanged()
 	// remove possible editor
 	closeEditor();
 	
-	QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 	// check if is available at all
-	if( !selection.size() ) {
+	if (selection.empty()) {
 		// disable everything
 		btnRemoveSymbol->setEnabled(false);
 		groupSlots->setEnabled(false);
@@ -347,19 +347,20 @@ void SymbolManager::labelSelectionChanged()
 	}
 	// check selection for "manual insertion", identical slot mask,
 	// identical register mask, identical types and value size
-	bool removeButActive = true, anyEight = false;
+	bool removeButActive = true;
+	bool anyEight = false;
 	bool sameType = true;
 	Symbol::SymbolType type;
 	int slotMask, slotMaskMultiple = 0;
 	int regMask, regMaskMultiple = 0;
-	QList<QTreeWidgetItem *>::iterator selit = selection.begin();
-	while( selit != selection.end() ) {
+	for (QList<QTreeWidgetItem *>::iterator selit = selection.begin();
+	     selit != selection.end(); ++selit) {
 		// get symbol
-		Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
-		if( sym->source() ) removeButActive = false;
+		if (sym->source()) removeButActive = false;
 		
-		if( selit == selection.begin() ) {
+		if (selit == selection.begin()) {
 			// first item, reference for slotMask and regMask
 			slotMask = sym->validSlots();
 			regMask = sym->validRegisters();
@@ -369,15 +370,13 @@ void SymbolManager::labelSelectionChanged()
 			slotMaskMultiple |= slotMask ^ sym->validSlots();
 			regMaskMultiple |= regMask ^ sym->validRegisters();
 			// check for different type
-			if( type != sym->type() ) sameType = false;
+			if (type != sym->type()) sameType = false;
 		}
 
 		// check for 8 bit values
-		if( (sym->value() & 0xFF00) == 0 )
+		if ((sym->value() & 0xFF00) == 0) {
 			anyEight = true;
-		
-		// next
-		selit++;
+		}
 	}
 
 	btnRemoveSymbol->setEnabled(removeButActive);
@@ -386,140 +385,135 @@ void SymbolManager::labelSelectionChanged()
 	groupRegs8->setEnabled(anyEight);
 	groupRegs16->setEnabled(true);
 	beginTreeLabelsUpdate();
+
 	// set slot selection
-	for( int i = 0; i < 16; i++ ) {
+	for (int i = 0; i < 16; ++i) {
 		chkSlots[i]->setTristate(false);
-		if( slotMaskMultiple & 1 )
+		if (slotMaskMultiple & 1) {
 			chkSlots[i]->setCheckState(Qt::PartiallyChecked);
-		else if( slotMask & 1 )
+		} else if (slotMask & 1) {
 			chkSlots[i]->setCheckState(Qt::Checked);
-		else
+		} else {
 			chkSlots[i]->setCheckState(Qt::Unchecked);
+		}
 		slotMask >>= 1;
 		slotMaskMultiple >>= 1;
 	}
 	// set register selection
-	for( int i = 0; i < 18; i++ ) {
+	for (int i = 0; i < 18; ++i) {
 		chkRegs[i]->setTristate(false);
-		if( regMaskMultiple & 1 )
+		if (regMaskMultiple & 1) {
 			chkRegs[i]->setCheckState(Qt::PartiallyChecked);
-		else if( regMask & 1 )
+		} else if (regMask & 1) {
 			chkRegs[i]->setCheckState(Qt::Checked);
-		else
+		} else {
 			chkRegs[i]->setCheckState(Qt::Unchecked);
+		}
 		regMask >>= 1;
 		regMaskMultiple >>= 1;
 	}
+
 	// temporarily disable exclusive radiobuttons to be able to
 	// deselect them all.
-	radJump->setAutoExclusive(false);
-	radVar->setAutoExclusive(false);
+	radJump->setAutoExclusive (false);
+	radVar->setAutoExclusive  (false);
 	radValue->setAutoExclusive(false);
 	// set type radio buttons
-	radJump->setChecked( sameType && type == Symbol::JUMPLABEL );
-	radVar->setChecked( sameType && type == Symbol::VARIABLELABEL );
-	radValue->setChecked( sameType && type == Symbol::VALUE );
+	radJump->setChecked (sameType && type == Symbol::JUMPLABEL);
+	radVar->setChecked  (sameType && type == Symbol::VARIABLELABEL);
+	radValue->setChecked(sameType && type == Symbol::VALUE);
 	// enable exclusive radiobuttons (this won't immediately activate
 	// one if none are active).
-	radJump->setAutoExclusive(true);
-	radVar->setAutoExclusive(true);
+	radJump->setAutoExclusive (true);
+	radVar->setAutoExclusive  (true);
 	radValue->setAutoExclusive(true);
 	endTreeLabelsUpdate();
 }
 
-void SymbolManager::changeSlot( int id, int state )
+void SymbolManager::changeSlot(int id, int state)
 {
-	if( !treeLabelsUpdateCount ) {
-		// disallow another tristate selection
-		chkSlots[id]->setTristate(false);
-		// get selected items
-		QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	if (treeLabelsUpdateCount) return;
 
-		// update items		
-		beginTreeLabelsUpdate();
-		QList<QTreeWidgetItem *>::iterator selit = selection.begin();
-		int bit = 1<<id;
-		while( selit != selection.end() ) {
-			// get symbol
-			Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
-			// set or clear bit
-			if( state == Qt::Checked )
-				sym->setValidSlots( sym->validSlots() | bit );
-			else
-				sym->setValidSlots( sym->validSlots() & (~bit) );
-			// update item in treewidget
-			updateItemSlots( *selit );
-			// next
-			selit++;
+	// disallow another tristate selection
+	chkSlots[id]->setTristate(false);
+	// get selected items
+	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
+
+	// update items		
+	beginTreeLabelsUpdate();
+	int bit = 1 << id;
+	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
+	     selit != selection.end(); ++selit) {
+		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		// set or clear bit
+		if (state == Qt::Checked) {
+			sym->setValidSlots(sym->validSlots() |  bit);
+		} else {
+			sym->setValidSlots(sym->validSlots() & ~bit);
 		}
-		endTreeLabelsUpdate();
-		// notify change
-		emit symbolTableChanged();
+		// update item in treewidget
+		updateItemSlots(*selit);
 	}
+	endTreeLabelsUpdate();
+	// notify change
+	emit symbolTableChanged();
 }
 
-void SymbolManager::changeRegister( int id, int state )
+void SymbolManager::changeRegister(int id, int state)
 {
-	if( !treeLabelsUpdateCount ) {
-		// disallow another tristate selection
-		chkRegs[id]->setTristate(false);
-		// get selected items
-		QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	if (treeLabelsUpdateCount) return;
 
-		// update items		
-		beginTreeLabelsUpdate();
-		QList<QTreeWidgetItem *>::iterator selit = selection.begin();
-		int bit = 1<<id;
-		while( selit != selection.end() ) {
-			// get symbol
-			Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
-			// set or clear bit
-			if( state == Qt::Checked )
-				sym->setValidRegisters( sym->validRegisters() | bit );
-			else
-				sym->setValidRegisters( sym->validRegisters() & (~bit) );
-			// update item in treewidget
-			updateItemRegisters( *selit );
-			// next
-			selit++;
+	// disallow another tristate selection
+	chkRegs[id]->setTristate(false);
+	// get selected items
+	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
+
+	// update items		
+	beginTreeLabelsUpdate();
+	int bit = 1 << id;
+	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
+	     selit != selection.end(); ++selit) {
+		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		// set or clear bit
+		if (state == Qt::Checked) {
+			sym->setValidRegisters(sym->validRegisters() |  bit);
+		} else {
+			sym->setValidRegisters(sym->validRegisters() & ~bit);
 		}
-		endTreeLabelsUpdate();
-		// notify change
-		emit symbolTableChanged();
+		// update item in treewidget
+		updateItemRegisters(*selit);
 	}
+	endTreeLabelsUpdate();
+	// notify change
+	emit symbolTableChanged();
 }
 
-void SymbolManager::changeType( bool /* checked */ )
+void SymbolManager::changeType(bool /*checked*/)
 {
-	if( !treeLabelsUpdateCount ) {
-		// determine selected type
-		Symbol::SymbolType newType = Symbol::JUMPLABEL;
-		if( radVar->isChecked() )
-			newType = Symbol::VARIABLELABEL;
-		else if( radValue->isChecked() )
-			newType = Symbol::VALUE;
-		
-		// get selected items
-		QList<QTreeWidgetItem *> selection = treeLabels->selectedItems();
+	if (treeLabelsUpdateCount) return;
 
-		// update items		
-		beginTreeLabelsUpdate();
-		QList<QTreeWidgetItem *>::iterator selit = selection.begin();
-		while( selit != selection.end() ) {
-			// get symbol
-			Symbol *sym = (Symbol *)((*selit)->data(0, Qt::UserRole).value<quintptr>());
-			// set type
-			sym->setType( newType );
-			// update item in treewidget
-			updateItemType( *selit );
-			// next
-			selit++;
-		}
-		endTreeLabelsUpdate();
-		// notify change
-		emit symbolTableChanged();
+	// determine selected type
+	Symbol::SymbolType newType = Symbol::JUMPLABEL;
+	if (radVar->isChecked()) {
+		newType = Symbol::VARIABLELABEL;
+	} else if (radValue->isChecked()) {
+		newType = Symbol::VALUE;
 	}
 	
+	// get selected items
+	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
+
+	// update items		
+	beginTreeLabelsUpdate();
+	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
+	     selit != selection.end(); ++selit) {
+		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		sym->setType(newType);
+		updateItemType(*selit);
+	}
+	endTreeLabelsUpdate();
+	// notify change
+	emit symbolTableChanged();
 }
 
 
@@ -527,97 +521,94 @@ void SymbolManager::changeType( bool /* checked */ )
  * Symbol tree layout functions
  */
 
-void SymbolManager::updateItemName( QTreeWidgetItem *item )
+void SymbolManager::updateItemName(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 	// set text and icon
-	item->setText( 0, sym->text() );
-	if( sym->source() ) {
-		item->setIcon( 0, QIcon(":/icons/symfil.png") );
-		item->setText( 6, *sym->source() );
-	} else
-		item->setIcon( 0, QIcon(":/icons/symman.png") );
-	// set colour based on status as well as status in 2nd column
-	switch( sym->status() ) {
-		case Symbol::HIDDEN:
-			item->setTextColor(0, QColor(128, 128, 128) );
-			break;
-		case Symbol::LOST:
-			item->setTextColor(0, QColor(128, 0, 0) );
-			break;
-		default:
-			break;
+	item->setText(0, sym->text());
+	if (sym->source()) {
+		item->setIcon(0, QIcon(":/icons/symfil.png"));
+		item->setText(6, *sym->source());
+	} else {
+		item->setIcon(0, QIcon(":/icons/symman.png"));
+	}
+	// set color based on status as well as status in 2nd column
+	switch (sym->status()) {
+	case Symbol::HIDDEN:
+		item->setTextColor(0, QColor(128, 128, 128));
+		break;
+	case Symbol::LOST:
+		item->setTextColor(0, QColor(128, 0, 0));
+		break;
+	default:
+		break;
 	}
 }
 
-void SymbolManager::updateItemType( QTreeWidgetItem *item )
+void SymbolManager::updateItemType(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 	// set symbol type in 2nd column
-	switch( sym->type() ) {
-		case Symbol::JUMPLABEL:
-			item->setText( 1, tr("Jump label") );
-			break;
-		case Symbol::VARIABLELABEL:
-			item->setText( 1, tr("Variable label") );
-			break;
-		case Symbol::VALUE:
-			item->setText( 1, tr("Value") );
-			break;
+	switch (sym->type()) {
+	case Symbol::JUMPLABEL:
+		item->setText(1, tr("Jump label"));
+		break;
+	case Symbol::VARIABLELABEL:
+		item->setText(1, tr("Variable label"));
+		break;
+	case Symbol::VALUE:
+		item->setText(1, tr("Value"));
+		break;
 	}
 }
 
-void SymbolManager::updateItemValue( QTreeWidgetItem *item )
+void SymbolManager::updateItemValue(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 
 	// symbol value in 3rd column
 	// TODO: Custom prefix/postfix
-	item->setText( 2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')) );
+	item->setText(2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')));
 }
 
-void SymbolManager::updateItemSlots( QTreeWidgetItem *item )
+void SymbolManager::updateItemSlots(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 
 	QString slotText;
 	int slotmask = sym->validSlots();
 	// value represents 16 bits for 4 subslots in 4 slots
-	if( slotmask == 0xFFFF ) {
+	if (slotmask == 0xFFFF) {
 		slotText = tr("All");
-	} else if( slotmask == 0 ) {
+	} else if (slotmask == 0) {
 		slotText = tr("None");
 	} else {
 		// create a list of valid slots
 		// loop over all primary slots
-		for( int ps = 0; ps < 4; ps++ ) {
+		for (int ps = 0; ps < 4; ++ps) {
 			QString subText;
-			int subslots = (slotmask >> (4*ps)) & 15;
-			if( subslots == 15 ) {
+			int subslots = (slotmask >> (4 * ps)) & 15;
+			if (subslots == 15) {
 				// all subslots are ok
 				subText = QString("%1-*").arg(ps);
-			} else if( subslots ) {
+			} else if (subslots) {
 				// some subslots are ok
-				if( subslots & 1 )
-					subText += "/0";
-				if( subslots & 2 )
-					subText += "/1";
-				if( subslots & 4 )
-					subText += "/2";
-				if( subslots & 8 )
-					subText += "/3";
+				if (subslots & 1) subText += "/0";
+				if (subslots & 2) subText += "/1";
+				if (subslots & 4) subText += "/2";
+				if (subslots & 8) subText += "/3";
 				subText = QString("%1-").arg(ps) + subText.mid(1);
 			}
 			// add to string if any subslots were ok
-			if( !subText.isEmpty() ) {
-				if( !slotText.isEmpty() ) slotText += ", ";
+			if (!subText.isEmpty()) {
+				if (!slotText.isEmpty()) slotText += ", ";
 				slotText += subText;
 			}
 		}
 	}
 
 	// valid slots in 4th column
-	item->setText( 3, slotText );
+	item->setText(3, slotText);
 }
 
 void SymbolManager::updateItemSegments(QTreeWidgetItem* item)
@@ -625,214 +616,180 @@ void SymbolManager::updateItemSegments(QTreeWidgetItem* item)
 	item->data(0, Qt::UserRole).value<quintptr>();
 }
 
-void SymbolManager::updateItemRegisters( QTreeWidgetItem *item )
+void SymbolManager::updateItemRegisters(QTreeWidgetItem* item)
 {
-	Symbol *sym = (Symbol *)(item->data(0, Qt::UserRole).value<quintptr>());
+	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
 
 	QString regText;
 	int regmask = sym->validRegisters();
 	// value represents 16 bits for 4 subslots in 4 slots
-	if( regmask == 0x3FFFF ) {
+	if (regmask == 0x3FFFF) {
 		regText = tr("All");
-	} else if( regmask == 0 ) {
+	} else if (regmask == 0) {
 		regText = tr("None");
 	} else {
-		if( (regmask & Symbol::REG_ALL8) == Symbol::REG_ALL8 ) {
+		if ((regmask & Symbol::REG_ALL8) == Symbol::REG_ALL8) {
 			// all 8 bit registers selected
 			regText = "All 8 bit, ";
 			regmask ^= Symbol::REG_ALL8;
-		} else if( (regmask & Symbol::REG_ALL16) == Symbol::REG_ALL16 ) {
+		} else if ((regmask & Symbol::REG_ALL16) == Symbol::REG_ALL16) {
 			// all 16 bit registers selected
 			regText = "All 16 bit, ";
 			regmask ^= Symbol::REG_ALL16;
 		}
 		// register list for remaining registers
-		static const char *registers[] = { "A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL",
-		                                   "IX", "IY", "IXL", "IXH", "IYL", "IYH", "Offset", "I" };
-		for( int i = 0; i < 18; i++ ) {
-			if( regmask & 1 )
+		static const char* const registers[] = {
+			"A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL",
+		        "IX", "IY", "IXL", "IXH", "IYL", "IYH", "Offset", "I"
+		};
+		for (int i = 0; i < 18; ++i) {
+			if (regmask & 1) {
 				regText += QString("%1, ").arg(registers[i]);
+			}
 			regmask >>= 1;
 		}
 		regText.chop(2);
 	}
 
 	// valid slots in 4th column
-	item->setText( 5, regText );
+	item->setText(5, regText);
 }
-
-
-
 
 
 // load of functions that shouldn't really be necessary
-
-void SymbolManager::changeSlot00( int state )
+void SymbolManager::changeSlot00(int state)
 {
-	changeSlot( 0, state );
+	changeSlot(0, state);
 }
-
-void SymbolManager::changeSlot01( int state )
+void SymbolManager::changeSlot01(int state)
 {
-	changeSlot( 1, state );
+	changeSlot(1, state);
 }
-
-void SymbolManager::changeSlot02( int state )
+void SymbolManager::changeSlot02(int state)
 {
-	changeSlot( 2, state );
+	changeSlot(2, state);
 }
-
-void SymbolManager::changeSlot03( int state )
+void SymbolManager::changeSlot03(int state)
 {
-	changeSlot( 3, state );
+	changeSlot(3, state);
 }
-
-void SymbolManager::changeSlot10( int state )
+void SymbolManager::changeSlot10(int state)
 {
-	changeSlot( 4, state );
+	changeSlot(4, state);
 }
-
-void SymbolManager::changeSlot11( int state )
+void SymbolManager::changeSlot11(int state)
 {
-	changeSlot( 5, state );
+	changeSlot(5, state);
 }
-
-void SymbolManager::changeSlot12( int state )
+void SymbolManager::changeSlot12(int state)
 {
-	changeSlot( 6, state );
+	changeSlot(6, state);
 }
-
-void SymbolManager::changeSlot13( int state )
+void SymbolManager::changeSlot13(int state)
 {
-	changeSlot( 7, state );
+	changeSlot(7, state);
 }
-
-void SymbolManager::changeSlot20( int state )
+void SymbolManager::changeSlot20(int state)
 {
-	changeSlot( 8, state );
+	changeSlot(8, state);
 }
-
-void SymbolManager::changeSlot21( int state )
+void SymbolManager::changeSlot21(int state)
 {
-	changeSlot( 9, state );
+	changeSlot(9, state);
 }
-
-void SymbolManager::changeSlot22( int state )
+void SymbolManager::changeSlot22(int state)
 {
-	changeSlot( 10, state );
+	changeSlot(10, state);
 }
-
-void SymbolManager::changeSlot23( int state )
+void SymbolManager::changeSlot23(int state)
 {
-	changeSlot( 11, state );
+	changeSlot(11, state);
 }
-
-void SymbolManager::changeSlot30( int state )
+void SymbolManager::changeSlot30(int state)
 {
-	changeSlot( 12, state );
+	changeSlot(12, state);
 }
-
-void SymbolManager::changeSlot31( int state )
+void SymbolManager::changeSlot31(int state)
 {
-	changeSlot( 13, state );
+	changeSlot(13, state);
 }
-
-void SymbolManager::changeSlot32( int state )
+void SymbolManager::changeSlot32(int state)
 {
-	changeSlot( 14, state );
+	changeSlot(14, state);
 }
-
-void SymbolManager::changeSlot33( int state )
+void SymbolManager::changeSlot33(int state)
 {
-	changeSlot( 15, state );
+	changeSlot(15, state);
 }
-
-void SymbolManager::changeRegisterA( int state )
+void SymbolManager::changeRegisterA(int state)
 {
-	changeRegister( 0, state );
+	changeRegister(0, state);
 }
-
-void SymbolManager::changeRegisterB( int state )
+void SymbolManager::changeRegisterB(int state)
 {
-	changeRegister( 1, state );
+	changeRegister(1, state);
 }
-
-void SymbolManager::changeRegisterC( int state )
+void SymbolManager::changeRegisterC(int state)
 {
-	changeRegister( 2, state );
+	changeRegister(2, state);
 }
-
-void SymbolManager::changeRegisterD( int state )
+void SymbolManager::changeRegisterD(int state)
 {
-	changeRegister( 3, state );
+	changeRegister(3, state);
 }
-
-void SymbolManager::changeRegisterE( int state )
+void SymbolManager::changeRegisterE(int state)
 {
-	changeRegister( 4, state );
+	changeRegister(4, state);
 }
-
-void SymbolManager::changeRegisterH( int state )
+void SymbolManager::changeRegisterH(int state)
 {
-	changeRegister( 5, state );
+	changeRegister(5, state);
 }
-
-void SymbolManager::changeRegisterL( int state )
+void SymbolManager::changeRegisterL(int state)
 {
-	changeRegister( 6, state );
+	changeRegister(6, state);
 }
-
-void SymbolManager::changeRegisterBC( int state )
+void SymbolManager::changeRegisterBC(int state)
 {
-	changeRegister( 7, state );
+	changeRegister(7, state);
 }
-
-void SymbolManager::changeRegisterDE( int state )
+void SymbolManager::changeRegisterDE(int state)
 {
-	changeRegister( 8, state );
+	changeRegister(8, state);
 }
-
-void SymbolManager::changeRegisterHL( int state )
+void SymbolManager::changeRegisterHL(int state)
 {
-	changeRegister( 9, state );
+	changeRegister(9, state);
 }
-
-void SymbolManager::changeRegisterIX( int state )
+void SymbolManager::changeRegisterIX(int state)
 {
-	changeRegister( 10, state );
+	changeRegister(10, state);
 }
-
-void SymbolManager::changeRegisterIY( int state )
+void SymbolManager::changeRegisterIY(int state)
 {
-	changeRegister( 11, state );
+	changeRegister(11, state);
 }
-
-void SymbolManager::changeRegisterIXL( int state )
+void SymbolManager::changeRegisterIXL(int state)
 {
-	changeRegister( 12, state );
+	changeRegister(12, state);
 }
-
-void SymbolManager::changeRegisterIXH( int state )
+void SymbolManager::changeRegisterIXH(int state)
 {
-	changeRegister( 13, state );
+	changeRegister(13, state);
 }
-
-void SymbolManager::changeRegisterIYL( int state )
+void SymbolManager::changeRegisterIYL(int state)
 {
-	changeRegister( 14, state );
+	changeRegister(14, state);
 }
-
-void SymbolManager::changeRegisterIYH( int state )
+void SymbolManager::changeRegisterIYH(int state)
 {
-	changeRegister( 15, state );
+	changeRegister(15, state);
 }
-
-void SymbolManager::changeRegisterOffset( int state )
+void SymbolManager::changeRegisterOffset(int state)
 {
-	changeRegister( 16, state );
+	changeRegister(16, state);
 }
-
-void SymbolManager::changeRegisterI( int state )
+void SymbolManager::changeRegisterI(int state)
 {
-	changeRegister( 17, state );
+	changeRegister(17, state);
 }
