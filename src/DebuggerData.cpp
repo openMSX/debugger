@@ -2,12 +2,9 @@
 
 #include "DebuggerData.h"
 #include <QStringList>
-#include <QXmlStreamWriter>
 
 
-//
-// MemoryLayout
-//
+// class MemoryLayout
 
 MemoryLayout::MemoryLayout()
 {
@@ -22,9 +19,8 @@ MemoryLayout::MemoryLayout()
 	}
 }
 
-//
-// Breakpoints
-//
+
+// class Breakpoints
 
 Breakpoints::Breakpoints()
 	: memLayout(NULL)
@@ -43,20 +39,19 @@ void Breakpoints::setMemoryLayout(MemoryLayout* ml)
 
 void Breakpoints::setBreakpoints(const QString& str)
 {
-	QStringList bps = str.split('\n');
-
 	breakpoints.clear();
+	QStringList bps = str.split('\n');
 	for (QStringList::Iterator it = bps.begin(); it != bps.end(); ++it) {
 		Breakpoint newBp;
 		newBp.type = BREAKPOINT;
 		int p = it->indexOf(' ');
 		newBp.id = it->left(p).trimmed();
-		if(newBp.id.isEmpty()) break;
-		int q = it->indexOf(' ', p+1);
+		if (newBp.id.isEmpty()) break;
+		int q = it->indexOf(' ', p + 1);
 		if (q == -1) {
-			newBp.address = it->mid(p).toUShort(0,0);
+			newBp.address = it->mid(p).toUShort(0, 0);
 		} else {
-			newBp.address = it->mid(p, q-p).trimmed().toUShort(0,0);
+			newBp.address = it->mid(p, q - p).trimmed().toUShort(0, 0);
 			newBp.condition = it->mid(q).trimmed();
 		}
 		newBp.regionEnd = newBp.address;
@@ -68,32 +63,33 @@ void Breakpoints::setBreakpoints(const QString& str)
 QString Breakpoints::mergeBreakpoints(const QString& str)
 {
 	// copy breakpoints
-	BreakpointList oldBps( breakpoints );
+	BreakpointList oldBps(breakpoints);
 	// parse new list
-	setBreakpoints( str );
+	setBreakpoints(str);
 	// check old list against new one
 	QStringList mergeSet;
-	while( oldBps.size() ) {
+	while (!oldBps.empty()) {
 		Breakpoint& old = oldBps.first();
 		BreakpointList::iterator newit = breakpoints.begin();
-		while( newit != breakpoints.end() ) {
+		for (/**/; newit != breakpoints.end(); ++newit) {
 			// check for identical location
-			if( old.type == newit->type &&
+			// TODO [wouter]: why is condition not compared?
+			//      maybe better use some sort of find algorithm?
+			//      and use BreakPoint::operator==()
+			if (old.type == newit->type &&
 			    old.address == newit->address &&
 			    old.regionEnd == newit->regionEnd &&
 			    old.ps == newit->ps &&
 			    old.ss == newit->ss &&
-			    old.segment == newit->segment )
-			{
+			    old.segment == newit->segment) {
 				break;
 			}
-			newit++;
 		}
-		if( newit == breakpoints.end() ) {
+		if (newit == breakpoints.end()) {
 			// create command to set this breakpoint again
 			QString cmd;
 			cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }",
-			            old.address, old.ps, old.ss, old.segment );
+			            old.address, old.ps, old.ss, old.segment);
 			mergeSet << cmd;
 		}
 		oldBps.removeFirst();
@@ -104,7 +100,7 @@ QString Breakpoints::mergeBreakpoints(const QString& str)
 static QString getNextArgument(QString& data, int& pos)
 {
 	QString result;
-	while (data[pos] == ' ' || data[pos]=='\t') ++pos;
+	while (data[pos] == ' ' || data[pos] == '\t') ++pos;
 	while (true) {
 		if (data[pos] == ' ' || data[pos] == '\t') break;
 		if (data[pos] == '}' || data[pos] == ']') break;
@@ -229,54 +225,59 @@ int Breakpoints::findNextBreakpoint()
 }
 
 
-void Breakpoints::saveBreakpoints( QXmlStreamWriter& xml )
+void Breakpoints::saveBreakpoints(QXmlStreamWriter& xml)
 {
 	// write symbols
-	BreakpointList::iterator it = breakpoints.begin();
-	while( it != breakpoints.end() ) {
+	for (BreakpointList::iterator it = breakpoints.begin();
+	     it != breakpoints.end(); ++it) {
 		xml.writeStartElement("Breakpoint");
+
 		// type
-		switch( it->type ) {
-			case BREAKPOINT:
-				xml.writeAttribute("type", "breakpoint");
-				break;
-			case WATCHPOINT_IOREAD:
-				xml.writeAttribute("type", "ioread");
-				break;
-			case WATCHPOINT_IOWRITE:
-				xml.writeAttribute("type", "iowrite");
-				break;
-			case WATCHPOINT_MEMREAD:
-				xml.writeAttribute("type", "memread");
-				break;
-			case WATCHPOINT_MEMWRITE:
-				xml.writeAttribute("type", "memwrite");
-				break;
+		switch (it->type) {
+		case BREAKPOINT:
+			xml.writeAttribute("type", "breakpoint");
+			break;
+		case WATCHPOINT_IOREAD:
+			xml.writeAttribute("type", "ioread");
+			break;
+		case WATCHPOINT_IOWRITE:
+			xml.writeAttribute("type", "iowrite");
+			break;
+		case WATCHPOINT_MEMREAD:
+			xml.writeAttribute("type", "memread");
+			break;
+		case WATCHPOINT_MEMWRITE:
+			xml.writeAttribute("type", "memwrite");
+			break;
 		}
+
 		// id
 		xml.writeAttribute("id", it->id);
+
 		// slot/segment
-		xml.writeAttribute("primarySlot", QString(it->ps) );
-		xml.writeAttribute("secondarySlot", QString(it->ss) );
-		xml.writeAttribute("segment", QString::number(it->segment) );
+		xml.writeAttribute("primarySlot", QString(it->ps));
+		xml.writeAttribute("secondarySlot", QString(it->ss));
+		xml.writeAttribute("segment", QString::number(it->segment));
+
 		// address
-		if( it->type == BREAKPOINT ) {
-			xml.writeTextElement("address", QString::number(it->address) );
+		if (it->type == BREAKPOINT) {
+			xml.writeTextElement("address", QString::number(it->address));
 		} else {
-			xml.writeTextElement("regionStart", QString::number(it->address) );
-			xml.writeTextElement("regionEnd", QString::number(it->regionEnd) );
+			xml.writeTextElement("regionStart", QString::number(it->address));
+			xml.writeTextElement("regionEnd", QString::number(it->regionEnd));
 		}
+
 		// condition not supported yet
+
 		// complete
 		xml.writeEndElement();
-		it++;
 	}
 }
 
-void Breakpoints::loadBreakpoints( QXmlStreamReader& xml )
+void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 {
 	Breakpoint bp;
-	while( !xml.atEnd() ) {
+	while (!xml.atEnd()) {
 		xml.readNext();
 		// exit if closing of main tag
 		if (xml.isEndElement()) {
@@ -287,39 +288,38 @@ void Breakpoints::loadBreakpoints( QXmlStreamReader& xml )
 			}
 		}
 		// begin tag
-		if( xml.isStartElement() ) {
-			if( xml.name() == "Breakpoint" ) {
-
+		if (xml.isStartElement()) {
+			if (xml.name() == "Breakpoint") {
 				// set type
 				QString type = xml.attributes().value("type").toString().toLower();
-				if( type == "ioread" )
+				if (type == "ioread") {
 					bp.type = WATCHPOINT_IOREAD;
-				else if( type == "iowrite" )
+				} else if (type == "iowrite") {
 					bp.type = WATCHPOINT_IOWRITE;
-				else if( type == "memread" )
+				} else if (type == "memread") {
 					bp.type = WATCHPOINT_MEMREAD;
-				else if( type == "memwrite" )
+				} else if (type == "memwrite") {
 					bp.type = WATCHPOINT_MEMWRITE;
-				else
+				} else {
 					bp.type = BREAKPOINT;
+				}
+
 				// id
 				bp.id = xml.attributes().value("id").toString();
+
 				// slot/segment
 				bp.ps = xml.attributes().value("primarySlot").at(0).toAscii();
 				bp.ss = xml.attributes().value("secondarySlot").at(0).toAscii();
 				bp.segment = xml.attributes().value("segment").toString().toInt();
 				
-			} else if( xml.name() == "address" || xml.name() == "regionStart" ) {
-				
+			} else if (xml.name() == "address" || xml.name() == "regionStart") {
 				// read symbol name
 				bp.address = xml.readElementText().toInt();
-				if( bp.type == BREAKPOINT ) bp.regionEnd = bp.address;
+				if (bp.type == BREAKPOINT) bp.regionEnd = bp.address;
 				
-			} else if( xml.name() == "regionEnd" ) {
-				
+			} else if (xml.name() == "regionEnd") {
 				// read symbol name
 				bp.regionEnd = xml.readElementText().toInt();
-				
 			}
 		}
 	}

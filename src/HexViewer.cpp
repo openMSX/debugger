@@ -8,6 +8,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QToolTip>
+#include <algorithm>
 #include <cmath>
 
 static const int EXTRA_SPACING = 4;
@@ -47,8 +48,8 @@ HexViewer::HexViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding ) );
-	
+	setSizePolicy(QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding));
+
 	horBytes = 16;
 	hexTopAddress = 0;
 	hexMarkAddress = 0;
@@ -74,8 +75,9 @@ HexViewer::HexViewer(QWidget* parent)
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
 	settingsChanged();
-	
-	connect(vertScrollBar, SIGNAL(valueChanged(int)), this, SLOT(scrollBarChanged(int)));
+
+	connect(vertScrollBar, SIGNAL(valueChanged(int)),
+	        this, SLOT(scrollBarChanged(int)));
 }
 
 HexViewer::~HexViewer()
@@ -104,52 +106,53 @@ void HexViewer::setUseMarker(bool enabled)
 void HexViewer::setIsInteractive(bool enabled)
 {
 	isInteractive = enabled;
-	vertScrollBar->setEnabled( enabled );
+	vertScrollBar->setEnabled(enabled);
 }
 
 void HexViewer::settingsChanged()
 {
-	QFontMetrics fm( Settings::get().font( Settings::HEX_FONT ) );
-	
+	QFontMetrics fm(Settings::get().font(Settings::HEX_FONT));
 	lineHeight = fm.height();
 	charWidth = fm.width("W");
 	xAddr = frameL + 8;
-	xData = xAddr + addressLength*charWidth + charWidth;
-	dataWidth = 5*charWidth/2;
+	xData = xAddr + addressLength * charWidth + charWidth;
+	dataWidth = 5 * charWidth / 2;
 	setSizes();
 }
 
 void HexViewer::setSizes()
 {
 	visibleLines = (height() - frameT - frameB) / lineHeight;
-	partialBottomLine = (height() - frameT - frameB) != lineHeight*visibleLines;
+	partialBottomLine = (height() - frameT - frameB) != lineHeight * visibleLines;
 	
 	frameR = frameL;
 	int w;
 	// fit display to width
-	if( adjustToWidth ) {
+	if (adjustToWidth) {
 		horBytes = 1;
-		w = width() - frameL - frameR - xData - dataWidth - 2*charWidth - 8;
+		w = width() - frameL - frameR - xData - dataWidth - 2 * charWidth - 8;
 		// calculate how many additional bytes can by displayed
-		while( w >= dataWidth+charWidth ) {
-			horBytes++;
-			w -= dataWidth+charWidth;
-			if( (horBytes&3) == 0 ) w -= EXTRA_SPACING;
-			if( (horBytes&7) == 0 ) w -= EXTRA_SPACING;
+		while (w >= dataWidth + charWidth) {
+			++horBytes;
+			w -= dataWidth + charWidth;
+			if ((horBytes & 3) == 0) w -= EXTRA_SPACING;
+			if ((horBytes & 7) == 0) w -= EXTRA_SPACING;
 		}
 	}
 	
 	// check if a scrollbar is needed
-	if( horBytes*visibleLines < debuggableSize ) {
-		if( adjustToWidth && w < vertScrollBar->sizeHint().width() ) horBytes--;
+	if (horBytes * visibleLines < debuggableSize) {
+		if (adjustToWidth && w < vertScrollBar->sizeHint().width()) {
+			--horBytes;
+		}
 		int maxLine = int(ceil(double(debuggableSize)/horBytes)) - visibleLines;
-		if( maxLine < 0 ) maxLine = 0;
+		maxLine = std::max(maxLine, 0);
 		vertScrollBar->setMaximum(maxLine);
 		vertScrollBar->setPageStep(visibleLines);
 		frameR += vertScrollBar->sizeHint().width();
 		vertScrollBar->setGeometry(width() - frameR, frameT,
 		                           vertScrollBar->sizeHint().width(),
-	    	                       height() - frameT - frameB);
+		                           height() - frameT - frameB);
 		vertScrollBar->show();
 	} else {
 		vertScrollBar->hide();
@@ -157,14 +160,15 @@ void HexViewer::setSizes()
 		hexMarkAddress = 0;
 	}
 	
-	//now see were the chars are drawn
-	rightValuePos =  xData + horBytes * dataWidth ;
-	xChar = rightValuePos + charWidth +  EXTRA_SPACING * ( int(horBytes/4) + int(horBytes/8) );
-	rightCharPos = xChar + horBytes * charWidth ;
+	// now see were the chars are drawn
+	rightValuePos = xData + horBytes * dataWidth;
+	xChar = rightValuePos + charWidth + EXTRA_SPACING * (int(horBytes / 4) +
+	        int(horBytes / 8));
+	rightCharPos = xChar + horBytes * charWidth;
 
-	if( isEnabled() ) {
-		///vertScrollBar->setValue(hexTopAddress/horBytes);
-		setTopLocation(horBytes*int(hexTopAddress/horBytes));
+	if (isEnabled()) {
+		///vertScrollBar->setValue(hexTopAddress / horBytes);
+		setTopLocation(horBytes * int(hexTopAddress / horBytes));
 	} else {
 		update();
 	}
@@ -172,14 +176,13 @@ void HexViewer::setSizes()
 
 QSize HexViewer::sizeHint() const
 {
-	return QSize( frameL + 16 + (6+3*horBytes/2)*fontMetrics().width("A") + frameR,
-	              frameT + 10*fontMetrics().height() + frameB );
+	return QSize(frameL + 16 + (6 + 3 * horBytes / 2) * fontMetrics().width("A") + frameR,
+	             frameT + 10 * fontMetrics().height() + frameB );
 }
 
 void HexViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
-
 	setSizes();
 }
 
@@ -189,16 +192,16 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	QFrame::paintEvent(e);
 
 	// exit if no debuggable is set
-	if( debuggableName.isEmpty() ) return;
+	if (debuggableName.isEmpty()) return;
 
 	QPainter p(this);
 	
 	// set font info
-	p.setFont( Settings::get().font( Settings::HEX_FONT ) );
-	QColor fc( Settings::get().fontColor( Settings::HEX_FONT ) );
+	p.setFont(Settings::get().font(Settings::HEX_FONT));
+	QColor fc(Settings::get().fontColor(Settings::HEX_FONT));
 	int a = p.fontMetrics().ascent();
 
-	p.setPen( fc );
+	p.setPen(fc);
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
@@ -209,92 +212,100 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	p.setClipRect(r);
 
 	// redraw background
-	p.fillRect( r, palette().color(QPalette::Base) );
+	p.fillRect(r, palette().color(QPalette::Base));
 
 	int y = frameT;
-	
 	int address = hexTopAddress;
-
 	for (int i = 0; i < visibleLines+partialBottomLine; ++i) {
 		// print address
 		QString hexStr = QString("%1").arg(address, addressLength, 16, QChar('0'));
-		p.setPen( palette().color(QPalette::Text) );
+		p.setPen(palette().color(QPalette::Text));
 		p.drawText(xAddr, y + a, hexStr.toUpper());
 
 		// print bytes
 		int x = xData;
-		for( int j = 0; j < horBytes; j++ ) {
+		for (int j = 0; j < horBytes; ++j) {
 			// print data
 			if (address + j < debuggableSize) {
 				hexStr.sprintf("%02X", hexData[address + j]);
 				// draw marker if needed
-				if (useMarker || beingEdited){
-					if ((address + j) == hexMarkAddress){
-						QRect b(x,y,dataWidth,lineHeight);
-						p.fillRect( b, (hasFocus?(Qt::cyan):(Qt::lightGray)));
-					};
+				if (useMarker || beingEdited) {
+					QRect b(x, y, dataWidth, lineHeight);
+					if ((address + j) == hexMarkAddress) {
+						p.fillRect(b, hasFocus ? Qt::cyan
+						                       : Qt::lightGray);
+					}
 					//  are we being edited ??
-					if (hasFocus && isEditable && !editedChars&& ((address + j) == hexMarkAddress)){
-						QRect b(x,y,dataWidth,lineHeight);
-						if (beingEdited ){
-							p.fillRect( b, Qt::darkGreen);
-							if (cursorPosition){
+					if (hasFocus && isEditable && !editedChars &&
+					    ((address + j) == hexMarkAddress)) {
+						if (beingEdited) {
+							p.fillRect(b, Qt::darkGreen);
+							if (cursorPosition) {
 								hexStr.sprintf("%2X", editValue);
 							}
 						} else {
-							p.drawRect( b );
+							p.drawRect(b);
 						}
-					};
-				};
+					}
+				}
 
 				// determine value colour
 				if (highlitChanges) {
 					QColor penClr = palette().color(QPalette::Text);
-					if ( hexData[address + j] != previousHexData[address + j]){
-						if ((address + j) != hexMarkAddress || !beingEdited ) penClr = Qt::red;
+					if (hexData[address + j] != previousHexData[address + j]) {
+						if ((address + j) != hexMarkAddress || !beingEdited) {
+							penClr = Qt::red;
+						}
 					}
-					if (((address + j) == hexMarkAddress ) && beingEdited && (cursorPosition == 0)) penClr = Qt::white;
-					p.setPen( penClr );
-				};
+					if (((address + j) == hexMarkAddress ) &&
+					    beingEdited && (cursorPosition == 0)) {
+						penClr = Qt::white;
+					}
+					p.setPen(penClr);
+				}
 				p.drawText(x, y + a, hexStr);
 			}
 			x += dataWidth;
+
 			// at extra spacing
-			if( (j&3) == 3 ) x += EXTRA_SPACING;
-			if( (j&7) == 7 ) x += EXTRA_SPACING;
+			if ((j & 3) == 3) x += EXTRA_SPACING;
+			if ((j & 7) == 7) x += EXTRA_SPACING;
 		}
 
 		// print characters
 		x += charWidth;
-		for( int j = 0; j < horBytes; j++ ) {
+		for (int j = 0; j < horBytes; ++j) {
 			if (address + j >= debuggableSize) break;
 			unsigned char chr = hexData[address + j];
 			if (chr < 32 || chr > 127) chr = '.';
 			// draw marker if needed
-			if (useMarker || beingEdited){
-				if ((address + j) == hexMarkAddress){
-					QRect b(x,y,charWidth,lineHeight);
-					p.fillRect( b, (hasFocus?(Qt::cyan):(Qt::lightGray)));
-					//p.fillRect( b, Qt::lightGray);
-				};
+			if (useMarker || beingEdited) {
+				QRect b(x, y, charWidth, lineHeight);
+				if ((address + j) == hexMarkAddress) {
+					p.fillRect(b, hasFocus ? Qt::cyan
+					                       : Qt::lightGray);
+				}
 				// are we being edited ??
-				if (hasFocus && isEditable && editedChars && ((address + j) == hexMarkAddress)){
-					QRect b(x,y,charWidth,lineHeight);
-					if (beingEdited){
-						p.fillRect( b, Qt::darkGreen);
+				if (hasFocus && isEditable && editedChars &&
+				    ((address + j) == hexMarkAddress)) {
+					if (beingEdited) {
+						p.fillRect(b, Qt::darkGreen);
 					} else {
-						p.drawRect( b );
+						p.drawRect(b);
 					}
 				}
-			};
+			}
 			// determine value colour
 			if (highlitChanges) {
 				QColor penClr = palette().color(QPalette::Text);
-				if (hexData[address + j] != previousHexData[address + j]){
+				if (hexData[address + j] != previousHexData[address + j]) {
 					penClr = Qt::red;
 				}
-				if (((address + j) == hexMarkAddress ) && beingEdited && (cursorPosition == 0)) penClr = Qt::white;
-				p.setPen( penClr );
+				if (((address + j) == hexMarkAddress ) && beingEdited &&
+				    (cursorPosition == 0)) {
+					penClr = Qt::white;
+				}
+				p.setPen(penClr);
 			}
 			p.drawText(x, y + a, QString(chr));
 			x += charWidth;
@@ -305,26 +316,26 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		if (address >= debuggableSize) break;
 	}
 	// copy the new values to the old-values buffer
-	memcpy( previousHexData, hexData, debuggableSize );
+	memcpy(previousHexData, hexData, debuggableSize);
 }
 
-void HexViewer::setDebuggable( const QString& name, int size )
+void HexViewer::setDebuggable(const QString& name, int size)
 {
 	delete[] hexData;
 	hexData = NULL;
 	delete[] previousHexData;
 	previousHexData = NULL;
 
-	if( size ) {
+	if (size) {
 		debuggableName = name;
 		debuggableSize = size;
-		addressLength = 2 * int(ceil( log(float(size)) / log(float(2)) / 8 ));
+		addressLength = 2 * int(ceil(log(double(size)) / log(2.0) / 8));
 		hexTopAddress = 0;
 		hexMarkAddress = 0;
 		hexData = new unsigned char[size];
-		memset( hexData, 0, size );
+		memset(hexData, 0, size);
 		previousHexData = new unsigned char[size];
-		memset( previousHexData, 0, size );
+		memset(previousHexData, 0, size);
 		settingsChanged();
 	} else {
 		debuggableName.clear();
@@ -335,21 +346,22 @@ void HexViewer::setDebuggable( const QString& name, int size )
 void HexViewer::scrollBarChanged(int addr)
 {
 	int start = addr * horBytes;
-	if (start == hexTopAddress){
+	if (start == hexTopAddress) {
 		// nothing changed or a callback since we changed the value to
 		// the current hexTopAddress
 		return;
-	};
+	}
 
-	if (!useMarker){
+	if (!useMarker) {
 		setTopLocation(addr * horBytes);
 		emit locationChanged(addr * horBytes);
 	} else {
-		//maybe marker is still "fully" visible ?
+		//maybe marker is still "fully" visible?
 		int size = horBytes * visibleLines;
 		hexTopAddress = start;
-		if ((start > hexMarkAddress) || ((start + size -1) < hexMarkAddress) ){
-			hexMarkAddress = (hexMarkAddress % horBytes) + ((start<hexMarkAddress)?(size-horBytes):0);
+		if ((start > hexMarkAddress) || ((start + size -1) < hexMarkAddress)) {
+			hexMarkAddress = (hexMarkAddress % horBytes) +
+				         ((start < hexMarkAddress) ? size - horBytes : 0);
 			hexMarkAddress += start;
 			emit locationChanged(hexMarkAddress);
 		}
@@ -359,15 +371,17 @@ void HexViewer::scrollBarChanged(int addr)
 
 void HexViewer::setLocation(int addr)
 {
-	if (!useMarker){
+	if (!useMarker) {
 		setTopLocation(addr);
 	} else {
-		//check if newmarker is in fully visible lines if so we do not change hexTopAddress
-		if (addr != hexMarkAddress)
+		// check if newmarker is in fully visible lines,
+		// if so we do not change hexTopAddress
+		if (addr != hexMarkAddress) {
 			emit locationChanged(addr);
+		}
 		hexMarkAddress = addr;
 		int size = horBytes * visibleLines ;
-		if ((addr < hexTopAddress) || (addr >= (hexTopAddress+size))){
+		if ((addr < hexTopAddress) || (addr >= (hexTopAddress+size))) {
 			setTopLocation(addr);
 		}
 		refresh();
@@ -376,12 +390,11 @@ void HexViewer::setLocation(int addr)
 
 void HexViewer::setTopLocation(int addr)
 {
-
 	if (debuggableName.isEmpty()) {
 		return;
-	};
-	int start = horBytes * int(addr/horBytes);
-	if ((!waitingForData) || (start != hexTopAddress )) {
+	}
+	int start = horBytes * int(addr / horBytes);
+	if (!waitingForData || (start != hexTopAddress)) {
 		hexTopAddress = start;
 		refresh();
 	}
@@ -398,7 +411,7 @@ void HexViewer::transferCancelled(HexRequest* r)
 	delete r;
 	waitingForData = false;
 	// check whether a new value is available
-	if (int(hexTopAddress / horBytes) != vertScrollBar->value() ) {
+	if (int(hexTopAddress / horBytes) != vertScrollBar->value()) {
 		vertScrollBar->setValue(hexTopAddress / horBytes);
 	}
 }
@@ -406,220 +419,225 @@ void HexViewer::transferCancelled(HexRequest* r)
 void HexViewer::refresh()
 {
 	// calculate data request
-	int size = horBytes * (visibleLines+partialBottomLine);
-
-	if (hexTopAddress + size > debuggableSize) {
-		size = debuggableSize - hexTopAddress;
-	}
+	int size = horBytes * (visibleLines + partialBottomLine);
+	size = std::min(size, debuggableSize - hexTopAddress);
 
 	// send data request
 	HexRequest* req = new HexRequest(
-			debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
+		debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
 }
 
-void HexViewer::keyPressEvent(QKeyEvent *e)
+void HexViewer::keyPressEvent(QKeyEvent* e)
 {
 	// don't hanlde if not interactive
-	if ((!beingEdited && !useMarker) || (!isInteractive)){
+	if ((!beingEdited && !useMarker) || !isInteractive) {
 		QFrame::keyPressEvent(e);
 		return;
 	}
 
-	bool setValue=false;
-	int newAddress=hexMarkAddress;
-	//entering a new digit ?
+	bool setValue = false;
+	int newAddress = hexMarkAddress;
+	// entering a new digit ?
 	// for now hex only, do we need decimal entry also ??
-	if( !editedChars && ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
-	           (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F) )) {
+	if (!editedChars &&
+	    ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
+	     (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F))) {
 		// calculate numercial value
 		int v = e->key() - Qt::Key_0;
-		if( v > 9 ) v -= Qt::Key_A-Qt::Key_0-10;
-		if (beingEdited){
+		if (v > 9) v -= Qt::Key_A - Qt::Key_0 - 10;
+		if (beingEdited) {
 			editValue = (editValue << 4) + v;
-			cursorPosition++;
-			if (cursorPosition==2){
+			++cursorPosition;
+			if (cursorPosition == 2){
 				setValue = true;
-				newAddress++;
-			};
+				++newAddress;
+			}
 		} else {
 			editValue = v;
 			beingEdited = true;
-			cursorPosition=1;
+			cursorPosition = 1;
 		}
-	} else if ( useMarker && e->key() == Qt::Key_Right ) {
+	} else if (useMarker && e->key() == Qt::Key_Right) {
 		setValue = beingEdited & !editedChars;
-		newAddress++;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_Left ) {
+		++newAddress;
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_Left) {
 		setValue = beingEdited & !editedChars;
-		newAddress--;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_Up ) {
+		--newAddress;
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_Up) {
 		setValue = beingEdited & !editedChars;
 		newAddress -= horBytes;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_Down ) {
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_Down) {
 		setValue = beingEdited & !editedChars;
 		newAddress += horBytes;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_Home ) {
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_Home) {
 		setValue = beingEdited & !editedChars;
 		newAddress = 0;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_PageUp ) {
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_PageUp) {
 		setValue = beingEdited & !editedChars;
-		hexTopAddress -= horBytes*visibleLines;
-		newAddress -= horBytes*visibleLines;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_PageDown ) {
+		hexTopAddress -= horBytes * visibleLines;
+		newAddress -= horBytes * visibleLines;
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_PageDown) {
 		setValue = beingEdited & !editedChars;
-		hexTopAddress += horBytes*visibleLines;
-		newAddress += horBytes*visibleLines;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_End ) {
+		hexTopAddress += horBytes * visibleLines;
+		newAddress += horBytes * visibleLines;
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_End) {
 		setValue = beingEdited & !editedChars;
-		newAddress = debuggableSize-1;
-		cursorPosition=0;
-	} else if ( useMarker && e->key() == Qt::Key_Backspace ) {
+		newAddress = debuggableSize - 1;
+		cursorPosition = 0;
+	} else if (useMarker && e->key() == Qt::Key_Backspace) {
 		editedChars = !editedChars;
-	} else if (!editedChars && ( e->key() == Qt::Key_Return ||  e->key() == Qt::Key_Enter)) {
+	} else if (!editedChars && (e->key() == Qt::Key_Return ||
+		                    e->key() == Qt::Key_Enter)) {
 		setValue = true;
-	} else if ( e->key() == Qt::Key_Shift     ||
-		    e->key() == Qt::Key_Control	  ||
-		    e->key() == Qt::Key_Meta	  ||
-		    e->key() == Qt::Key_Alt	  ||
-		    e->key() == Qt::Key_AltGr	  ||
-		    e->key() == Qt::Key_CapsLock  ||
-		    e->key() == Qt::Key_NumLock	  ||
-		    e->key() == Qt::Key_ScrollLock
-		  ) {
+	} else if (e->key() == Qt::Key_Shift    ||
+		   e->key() == Qt::Key_Control  ||
+		   e->key() == Qt::Key_Meta     ||
+		   e->key() == Qt::Key_Alt      ||
+		   e->key() == Qt::Key_AltGr    ||
+		   e->key() == Qt::Key_CapsLock ||
+		   e->key() == Qt::Key_NumLock  ||
+		   e->key() == Qt::Key_ScrollLock) {
 		// do nothing for these keys if editing chars
 		// if not editing chars they do nothing by deafult :-)
-	} else if ( e->key() == Qt::Key_Escape ) {
+	} else if (e->key() == Qt::Key_Escape) {
 		beingEdited = false;
 		e->accept();
 		update();
 		return;
-	} else if( editedChars ) {
+	} else if (editedChars) {
 		editValue = (e->text().toAscii())[0];
 		setValue = true;
-		newAddress++;
+		++newAddress;
 	} else {
 		QFrame::keyPressEvent(e);
 		return;
 	}
 
 	//apply changes
-	if (setValue){
+	if (setValue) {
 		//TODO actually write the values to openMSX memory
-		//for now we change the value in out local buffer
-		previousHexData[hexMarkAddress]=char(editValue);
+		//for now we change the value in our local buffer
+		previousHexData[hexMarkAddress] = char(editValue);
 		WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
 			debuggableName, hexMarkAddress, 1, previousHexData);
 		CommClient::instance().sendCommand(req);
 
 		editValue = 0;
-		cursorPosition=0;
-		beingEdited = editedChars ; //keep editing if we were inputing chars
+		cursorPosition = 0;
+		beingEdited = editedChars; // keep editing if we were inputing chars
 		refresh();
 	}
 
 	// indicate key Event handled
 	e->accept();
 
-	//Move Marker if needed
-	if ( (editedChars || useMarker) && (hexMarkAddress != newAddress)){
-		if (newAddress < 0 ) newAddress += debuggableSize;
+	// Move Marker if needed
+	if ((editedChars || useMarker) && (hexMarkAddress != newAddress)) {
+		if (newAddress < 0)               newAddress += debuggableSize;
 		if (newAddress >= debuggableSize) newAddress -= debuggableSize;
 		// influencing hexTopAddress during Key_PageUp/Down might need following 2 lines.
-		if (hexTopAddress < 0 ) hexTopAddress += debuggableSize;
+		if (hexTopAddress < 0)               hexTopAddress += debuggableSize;
 		if (hexTopAddress >= debuggableSize) hexTopAddress -= debuggableSize;
+
 		// Make scrolling downwards using cursors more "intuitive"
-		int addr = hexTopAddress + horBytes * visibleLines ;
-		if ( (newAddress >= addr) && (newAddress <= (addr+horBytes)) ){
+		int addr = hexTopAddress + horBytes * visibleLines;
+		if ((newAddress >= addr) && (newAddress <= (addr + horBytes))) {
 			hexTopAddress += horBytes;
-		};
-		if (useMarker){
+		}
+		if (useMarker) {
 			setLocation(newAddress);
 		} else {
 			//we can only get here when not using Markers but if we
 			//are typing in chars in charEdit mode, so scrolling
 			//one line is covered in code above
-			hexMarkAddress=newAddress ;
+			hexMarkAddress = newAddress;
 			refresh();
 		}
 	} else {
 		update();
-	};
+	}
 }
 
 int HexViewer::coorToOffset(int x, int y)
 {
 	int offset = -1;
-	if( x >= xData && x < rightValuePos )
-		offset = (x - xData) / dataWidth ;
-	if( x >= xChar &&  x < rightCharPos )
-		offset = (x - xChar) / charWidth ;
+	if (x >= xData && x < rightValuePos) {
+		offset = (x - xData) / dataWidth;
+	}
+	if (x >= xChar && x < rightCharPos) {
+		offset = (x - xChar) / charWidth;
+	}
 	int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
-	if( offset >= 0 && y < yMaxOffset)
-		offset += horBytes*((y - frameT)/lineHeight);
+	if (offset >= 0 && y < yMaxOffset) {
+		offset += horBytes * ((y - frameT) / lineHeight);
+	}
 	return offset;
 }
 
-bool HexViewer::event(QEvent *e)
+bool HexViewer::event(QEvent* e)
 {
-	if (e->type() == QEvent::ToolTip) {
-		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
-		// calculate address for tooltip
-		int offset = coorToOffset(helpEvent->x(), helpEvent->y() );
+	if (e->type() != QEvent::ToolTip) {
+		return QWidget::event(e);
+	}
 
-		if( offset >= 0 && (hexTopAddress + offset)< debuggableSize) {
-			// create text with binary and decimal values
-			int address = hexTopAddress + offset;
-			unsigned char chr = hexData[address];
-			QString text = QString("Address: %1").arg(address, addressLength, 16, QChar('0'));
-			// print 8 bit values
+	// calculate address for tooltip
+	QHelpEvent* helpEvent = static_cast<QHelpEvent*>(e);
+	int offset = coorToOffset(helpEvent->x(), helpEvent->y());
+	if (offset >= 0 && (hexTopAddress + offset) < debuggableSize) {
+		// create text with binary and decimal values
+		int address = hexTopAddress + offset;
+		unsigned char chr = hexData[address];
+		QString text = QString("Address: %1").arg(address, addressLength, 16, QChar('0'));
+
+		// print 8 bit values
+		text += "\nBinary: ";
+		text += QString("%1 ").arg(chr >> 4, 4, 2, QChar('0'));
+		text += QString("%1") .arg(chr & 0x000F, 4, 2, QChar('0'));
+		text += "\nDecimal: ";
+		text += QString::number(chr);
+
+		// print 16 bit values if possible
+		if ((address + 1) < debuggableSize) {
+			unsigned int wd = chr;
+			wd += 256 * hexData[address + 1];
+			text += QString("\n\nWord: %1").arg(wd, 4, 16, QChar('0'));
 			text += "\nBinary: ";
-			text += QString("%1 ").arg( chr >> 4, 4, 2, QChar('0') );
-			text += QString("%1") .arg( chr  & 0x000F , 4, 2, QChar('0') );
+			text += QString("%1 ").arg((wd & 0xF000) >> 12, 4, 2, QChar('0'));
+			text += QString("%1 ").arg((wd & 0x0F00) >>  8, 4, 2, QChar('0'));
+			text += QString("%1 ").arg((wd & 0x00F0) >>  4, 4, 2, QChar('0'));
+			text += QString("%1 ").arg((wd & 0x000F) >>  0, 4, 2, QChar('0'));
 			text += "\nDecimal: ";
-			text += QString::number(chr) ;
-			// print 16 bit values if possible
-			if ((address+1)< debuggableSize) {
-				unsigned int wd = chr;
-				wd += 256 * hexData[address + 1];
-				text += QString("\n\nWord: %1").arg(wd, 4, 16, QChar('0'));
-				text += "\nBinary: ";
-
-				text += QString("%1 ").arg( wd >> 12, 4, 2, QChar('0') );
-				text += QString("%1 ").arg( (wd & 0x0F00) >>  8, 4, 2, QChar('0') );
-				text += QString("%1 ").arg( (wd & 0x00F0) >>  4, 4, 2, QChar('0') );
-				text += QString("%1 ").arg( (wd & 0x000F) , 4, 2, QChar('0') );
-				text += "\nDecimal: ";
-				text += QString::number(wd) ;
-			}
-			QToolTip::showText(helpEvent->globalPos(), text);
-		} else
-			QToolTip::hideText();
+			text += QString::number(wd);
+		}
+		QToolTip::showText(helpEvent->globalPos(), text);
+	} else {
+		QToolTip::hideText();
 	}
 	return QWidget::event(e);
 }
 
-void HexViewer::mousePressEvent(QMouseEvent *e)
+void HexViewer::mousePressEvent(QMouseEvent* e)
 {
-	if( e->button() == Qt::LeftButton && isInteractive) {
-		int offset=coorToOffset(e->x(),e->y());
-		if (offset >=0 ){
-			int addr=hexTopAddress+offset;
-			if (useMarker && (hexMarkAddress != addr)){
+	if (e->button() == Qt::LeftButton && isInteractive) {
+		int offset=coorToOffset(e->x(), e->y());
+		if (offset >= 0) {
+			int addr = hexTopAddress + offset;
+			if (useMarker && (hexMarkAddress != addr)) {
 				setLocation(addr);
 			} else {
-				if (!useMarker) hexMarkAddress=addr;
+				if (!useMarker) hexMarkAddress = addr;
 				editValue = 0;
-				cursorPosition=0;
-				beingEdited=isEditable;
+				cursorPosition = 0;
+				beingEdited = isEditable;
 			}
 			editedChars = (e->x() >= xChar);
 		}
@@ -627,18 +645,18 @@ void HexViewer::mousePressEvent(QMouseEvent *e)
 	}
 }
 
-void HexViewer::focusInEvent(QFocusEvent *e)
+void HexViewer::focusInEvent(QFocusEvent* e)
 {
-		hasFocus = true;
-		update();
+	hasFocus = true;
+	update();
 }
 
-void HexViewer::focusOutEvent(QFocusEvent *e)
+void HexViewer::focusOutEvent(QFocusEvent* e)
 {
-	if( e->lostFocus() ) {
+	if (e->lostFocus()) {
 		editValue = 0;
-		cursorPosition=0;
-		beingEdited=false;
+		cursorPosition = 0;
+		beingEdited = false;
 		hasFocus = false;
 	}
 	update();

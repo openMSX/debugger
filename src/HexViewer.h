@@ -16,10 +16,10 @@ public:
 	HexViewer(QWidget* parent = 0);
 	~HexViewer();
 	
-	void setDebuggable( const QString& name, int size );
-	void setIsInteractive( bool enabled );
-	void setUseMarker( bool enabled );
-	void setIsEditable( bool enabled );
+	void setDebuggable(const QString& name, int size);
+	void setIsInteractive(bool enabled);
+	void setUseMarker(bool enabled);
+	void setIsEditable(bool enabled);
 
 	QSize sizeHint() const;
 
@@ -30,32 +30,31 @@ public slots:
 	void settingsChanged();
 	void refresh();
 
-protected:
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
-	void mousePressEvent(QMouseEvent *e);
-	bool event(QEvent *e);
-	void keyPressEvent(QKeyEvent *e);
-	void focusInEvent(QFocusEvent *e);
-	void focusOutEvent(QFocusEvent *e);
+	void mousePressEvent(QMouseEvent* e);
+	bool event(QEvent* e);
+	void keyPressEvent(QKeyEvent* e);
+	void focusInEvent(QFocusEvent* e);
+	void focusOutEvent(QFocusEvent* e);
 
-private:
 	void setSizes();
 	void hexdataTransfered(HexRequest* r);
 	void transferCancelled(HexRequest* r);
-	int coorToOffset(int x,int y);
+	int coorToOffset(int x, int y);
 
 	QScrollBar* vertScrollBar;
 
 	// layout
 	int frameL, frameR, frameT, frameB;
-	int leftCharPos, leftValuePos, rightValuePos, rightCharPos ;
+	int leftCharPos, leftValuePos, rightValuePos, rightCharPos;
 	bool adjustToWidth;
 	short horBytes;
 	int visibleLines, partialBottomLine;
-	int	lineHeight, xAddr, xData, xChar, dataWidth, charWidth;
+	int lineHeight, xAddr, xData, xChar, dataWidth, charWidth;
 	int addressLength;
-	
+
 	// data
 	QString debuggableName;
 	int debuggableSize;

@@ -3,8 +3,8 @@
 #ifndef CONNECTDIALOG_HH
 #define CONNECTDIALOG_HH
 
-#include "ui_ConnectDialog.h"
 #include "OpenMSXConnection.h"
+#include "ui_ConnectDialog.h"
 #include <QDialog>
 #include <QList>
 
@@ -16,9 +16,6 @@ class ConnectDialog : public QDialog
 	Q_OBJECT
 public:
 	static OpenMSXConnection* getConnection(QWidget* parent = 0);
-
-protected:
-	void timerEvent( QTimerEvent *event );
 
 private slots:
 	void on_connectButton_clicked();
@@ -32,7 +29,8 @@ private:
 	void connectionOk(OpenMSXConnection& connection,
 	                  const QString& title);
 	void connectionBad(OpenMSXConnection& connection);
-	friend class ConnectionInfoRequest;
+	
+	void timerEvent(QTimerEvent *event);
 
 	int delay;
 	Ui::ConnectDialog ui;
@@ -41,6 +39,8 @@ private:
 	OpenMSXConnections confirmedConnections;
 	OpenMSXConnection* result;
 	QList<ConnectionInfoRequest*> connectionInfos;
+
+	friend class ConnectionInfoRequest;
 };
 
 // Command handler to get initial info from new openmsx connections

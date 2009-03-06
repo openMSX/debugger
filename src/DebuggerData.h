@@ -31,7 +31,7 @@ public:
 
 	void clear();
 
-	void setMemoryLayout(MemoryLayout *ml);
+	void setMemoryLayout(MemoryLayout* ml);
 	void setBreakpoints(const QString& str);
 	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
@@ -39,8 +39,8 @@ public:
 	const QString idString(quint16 addr);
 
 	/* xml session file functions */
-	void saveBreakpoints( QXmlStreamWriter& xml );
-	void loadBreakpoints( QXmlStreamReader& xml );
+	void saveBreakpoints(QXmlStreamWriter& xml);
+	void loadBreakpoints(QXmlStreamReader& xml);
 
 	int findBreakpoint(quint16 addr);
 	int findNextBreakpoint();

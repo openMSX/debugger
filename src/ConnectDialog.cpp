@@ -1,7 +1,6 @@
 // $Id$
 
 #include "ConnectDialog.h"
-#include "OpenMSXConnection.h"
 #include <QProcess>
 #include <QString>
 #include <QDir>
@@ -221,11 +220,13 @@ void ConnectionInfoRequest::replyOk(const QString& message)
 		connection.sendCommand(this);
 		break;
 	case GET_TITLE: {
-		if( message != "" )
+		if (!message.isEmpty()) {
 			title += " (" + message + ")";
+		}
 		dialog.connectionOk(connection, title);
 		state = DONE;
-		connect( &connection, SIGNAL( disconnected() ), this, SLOT( terminate() ) );
+		connect(&connection, SIGNAL(disconnected()),
+		        this, SLOT(terminate()));
 		break;
 	}
 	default:
@@ -256,17 +257,18 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 
 	// delay for at most 500ms while checking the connections
 	dialog.delay = 1;
-	dialog.startTimer( 500 );
-	while( dialog.pendingConnections.size() && dialog.delay )
-		qApp->processEvents( QEventLoop::AllEvents, 200 );
+	dialog.startTimer(500);
+	while (!dialog.pendingConnections.empty() && dialog.delay) {
+		qApp->processEvents(QEventLoop::AllEvents, 200);
+	}
 
 	// if there is only one valid connection, use it immediately,
 	// otherwise execute the dialog.
-	if( dialog.pendingConnections.size() == 0 && dialog.confirmedConnections.size() == 1 )
+	if (dialog.pendingConnections.empty() && dialog.confirmedConnections.size() == 1 ) {
 		dialog.on_connectButton_clicked();
-	else
+	} else {
 		dialog.exec();
-
+	}
 	return dialog.result;
 }
 
@@ -283,7 +285,7 @@ ConnectDialog::~ConnectDialog()
 	clear();
 }
 
-void ConnectDialog::timerEvent( QTimerEvent *event )
+void ConnectDialog::timerEvent(QTimerEvent* event)
 {
 	killTimer(event->timerId());
 	delay = 0;
@@ -335,7 +337,7 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 	pendingConnections.erase(it);
 	confirmedConnections.push_back(&connection);
 
-	new QListWidgetItem( title, ui.listConnections );
+	new QListWidgetItem(title, ui.listConnections);
 
 	if (ui.listConnections->count() == 1) {
 		// automatically select first row
@@ -350,10 +352,10 @@ void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 	                                        &connection);
 	if (it == pendingConnections.end()) {
 		// was this connection established but terminated?
-		int id = confirmedConnections.indexOf( &connection );
-		if( id >= 0 ) {
-			OpenMSXConnection *conn = confirmedConnections.takeAt( id );
-			QListWidgetItem *item = ui.listConnections->takeItem( id );
+		int id = confirmedConnections.indexOf(&connection);
+		if (id >= 0) {
+			OpenMSXConnection* conn = confirmedConnections.takeAt(id);
+			QListWidgetItem* item = ui.listConnections->takeItem(id);
 			delete item;
 			delete conn;
                 }

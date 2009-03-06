@@ -18,17 +18,16 @@ public:
 
 	QSize sizeHint() const;
 
-protected:
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
-	void mousePressEvent(QMouseEvent *e);
-	//void mouseMoveEvent(QMouseEvent *e);
-	//void mouseReleaseEvent(QMouseEvent *e);
-	void keyPressEvent(QKeyEvent *e);
-	void focusOutEvent(QFocusEvent *e);
-	bool event(QEvent *e);
+	void mousePressEvent(QMouseEvent* e);
+	//void mouseMoveEvent(QMouseEvent* e);
+	//void mouseReleaseEvent(QMouseEvent* e);
+	void keyPressEvent(QKeyEvent* e);
+	void focusOutEvent(QFocusEvent* e);
+	bool event(QEvent* e);
 	
-private:
 	// layout
 	int frameL, frameR, frameT, frameB;
 	int leftRegPos, leftValuePos, rightRegPos, rightValuePos;
@@ -39,9 +38,9 @@ private:
 	bool regsChanged[16];
 	int cursorLoc;
 
-	void drawValue( QPainter& p, int id, int x, int y );
-	void setRegister( int id, int value );
-	void getRegister( int id, unsigned char* data );
+	void drawValue(QPainter& p, int id, int x, int y);
+	void setRegister(int id, int value);
+	void getRegister(int id, unsigned char* data);
 	void applyModifications();
 	void cancelModifications();
 

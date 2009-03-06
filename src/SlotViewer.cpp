@@ -34,7 +34,7 @@ SlotViewer::SlotViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Minimum ) );
+	setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum));
 
 	memLayout = NULL;
 	for (int p = 0; p < 4; ++p) {
@@ -42,13 +42,12 @@ SlotViewer::SlotViewer(QWidget* parent)
 		segmentsChanged[p] = false;
 	}
 
-	frameL = frameT = frameB = frameWidth();
-	frameR = frameL;
+	frameR = frameL = frameT = frameB = frameWidth();
 
-	headerSize1 = 8 + fontMetrics().width("Page");
-	headerSize2 = 8 + fontMetrics().width("Address");
-	headerSize3 = 8 + fontMetrics().width("Slot");
-	headerSize4 = 8 + fontMetrics().width("Segment");
+	headerSize1  = 8 + fontMetrics().width("Page");
+	headerSize2  = 8 + fontMetrics().width("Address");
+	headerSize3  = 8 + fontMetrics().width("Slot");
+	headerSize4  = 8 + fontMetrics().width("Segment");
 	headerHeight = 8 + fontMetrics().height();
 }
 
@@ -73,7 +72,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	p.setClipRect(r);
 
 	// redraw background
-	p.fillRect( r, palette().color(QPalette::Base) );
+	p.fillRect(r, palette().color(QPalette::Base));
 	
 	QStyleOptionHeader so;
 	so.init(this);
@@ -114,7 +113,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	        fontMetrics().descent();
 
 	int isOn = isEnabled() && memLayout != NULL;
-	for(int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		QString str;
 		p.setPen(palette().color(QPalette::Text));
 
@@ -177,8 +176,8 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 
 QSize SlotViewer::sizeHint() const
 {
-	return QSize( headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
-	              headerHeight + 4*fontMetrics().height() );
+	return QSize(headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
+	             headerHeight + 4*fontMetrics().height());
 }
 
 void SlotViewer::refresh()

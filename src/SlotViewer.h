@@ -20,11 +20,10 @@ public:
 
 	QSize sizeHint() const;
 
-protected:
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 
-private:
 	int frameL, frameR, frameT, frameB;
 	int headerSize1, headerSize2, headerSize3, headerSize4;
 	int headerHeight;

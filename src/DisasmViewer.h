@@ -10,8 +10,8 @@
 class CommMemoryRequest;
 class QScrollBar;
 class Breakpoints;
-struct MemoryLayout;
 class SymbolTable;
+struct MemoryLayout;
 
 class DisasmViewer : public QFrame
 {
@@ -37,15 +37,14 @@ public slots:
 	void scrollBarChanged(int value);
 	void settingsChanged();
 	void symbolsChanged();
-	
-protected:
+
+private:
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 	void keyPressEvent(QKeyEvent* e);
 	void mousePressEvent(QMouseEvent* e);
 	void wheelEvent(QWheelEvent* e);
 
-private:
 	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
 
 	QScrollBar* scrollBar;
@@ -55,8 +54,8 @@ private:
 
 	quint16 programAddr;
 	quint16 cursorAddr;
-	int	cursorLine;
-	
+	int cursorLine;
+
 	// layout information
 	int frameL, frameR, frameT, frameB;
 	int labelFontHeight, labelFontAscent;
@@ -65,18 +64,18 @@ private:
 	int visibleLines, partialBottomLine;
 	int disasmTopLine;
 	DisasmLines disasmLines;
-	
+
 	// display data
 	unsigned char* memory;
 	bool waitingForData;
 	CommMemoryRequest* nextRequest;
 	Breakpoints* breakpoints;
-	MemoryLayout *memLayout;
-	SymbolTable *symTable;
+	MemoryLayout* memLayout;
+	SymbolTable* symTable;
 
 	int findDisasmLine(quint16 lineAddr, int infoLine = 0);
-	int lineAtPos( const QPoint& pos );
-	
+	int lineAtPos(const QPoint& pos);
+
 signals:
 	void toggleBreakpoint(int addr);
 };
