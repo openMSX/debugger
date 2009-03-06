@@ -1975,7 +1975,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resources &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -1985,7 +1985,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resources &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -1995,7 +1995,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resources &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -2005,7 +2005,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating qrc_$(InputName).cpp..."
-						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resource &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(LibQtToolsDir)\rcc.exe&quot; -name resources &quot;$(InputPath)&quot; -o &quot;$(QrcOutDir)\qrc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						Outputs="$(QrcOutDir)\qrc_$(InputName).cpp"
 					/>
 				</FileConfiguration>
