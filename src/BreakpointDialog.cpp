@@ -53,18 +53,18 @@ void BreakpointDialog::subslotChanged(int i)
 {
 	cmbxSegment->clear();
 	cmbxSegment->addItem("any");
-	
+
 	int ps = cmbxSlot->currentIndex() - 1;
 	int ss = i - 1;
-	
+
 	if (ps >=0 && !memLayout.isSubslotted[ps]) ss = 0;
-	
+
 	if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
 		cmbxSegment->setEnabled(false);
 		cmbxSegment->setCurrentIndex(0);
 		return;
 	}
-	
+
 	for (int s = 0; s < memLayout.mapperSize[ps][ss]; ++s) {
 		cmbxSegment->addItem(QString("%1").arg(s));
 	}

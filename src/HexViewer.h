@@ -15,7 +15,7 @@ class HexViewer : public QFrame
 public:
 	HexViewer(QWidget* parent = 0);
 	~HexViewer();
-	
+
 	void setDebuggable(const QString& name, int size);
 	void setIsInteractive(bool enabled);
 	void setUseMarker(bool enabled);

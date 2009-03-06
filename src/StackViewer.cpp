@@ -54,7 +54,7 @@ StackViewer::StackViewer(QWidget* parent)
 
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->hide();
-	
+
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
@@ -145,7 +145,7 @@ void StackViewer::setData(unsigned char* memPtr, int memLength)
 }
 
 void StackViewer::setLocation(int addr)
-{	
+{
 	if (waitingForData) {
 		// ignore
 		return;

@@ -17,7 +17,7 @@ class DockManager
 public:
 	void addDockArea(DockableWidgetArea* area);
 	int dockAreaIndex(DockableWidgetArea* area) const;
-	
+
 	void insertWidget(DockableWidget* widget, int index,
 	                  DockableWidgetLayout::DockSide side, int distance,
 	                  int w = -1, int h = -1);

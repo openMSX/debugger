@@ -36,7 +36,7 @@ void DockManager::undockWidget(DockableWidget* widget)
 
 void DockManager::insertWidget(
 		DockableWidget* widget, int index,
-		DockableWidgetLayout::DockSide side, int distance, int w , int h)
+		DockableWidgetLayout::DockSide side, int distance, int w, int h)
 {
 	if (index < 0 || index >= areas.size()) return;
 

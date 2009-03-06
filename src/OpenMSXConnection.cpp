@@ -58,9 +58,9 @@ static QString createDebugWriteCommand(const QString& debuggable,
 {
 	QString cmd = QString("debug write_block %1 %2 [ debug_hex2bin \"")
 	                  .arg(debuggable).arg(offset);
-	for( unsigned i = offset; i < offset+size; i++ )
+	for (unsigned i = offset; i < offset + size; ++i) {
 		cmd += QString("%1").arg(int(data[i]), 2, 16, QChar('0')).toUpper();
-	
+	}
 	cmd += "\" ]";
 	return cmd;
 }
@@ -125,18 +125,18 @@ void OpenMSXConnection::sendCommand(Command* command)
 
 void OpenMSXConnection::cleanup()
 {
-	if (connected) {
-		connected = false;
-		if (socket->isValid()) {
-			socket->disconnect( this, SLOT(processData()));
-			socket->disconnect( this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-			socket->disconnect( this, SLOT(socketError(QAbstractSocket::SocketError)));
-			socket->write("</openmsx-control>\n");
-			socket->disconnectFromHost();
-		}
-		cancelPending();
-		emit disconnected();
+	if (!connected) return;
+
+	connected = false;
+	if (socket->isValid()) {
+		socket->disconnect(this, SLOT(processData()));
+		socket->disconnect(this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+		socket->disconnect(this, SLOT(socketError(QAbstractSocket::SocketError)));
+		socket->write("</openmsx-control>\n");
+		socket->disconnectFromHost();
 	}
+	cancelPending();
+	emit disconnected();
 }
 
 void OpenMSXConnection::cancelPending()
@@ -177,9 +177,9 @@ void OpenMSXConnection::processData()
 
 bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
 {
-	qWarning( "Fatal error on line %i, column %i: %s",
-	          exception.lineNumber(), exception.columnNumber(),
-	          exception.message().toAscii().data());
+	qWarning("Fatal error on line %i, column %i: %s",
+	         exception.lineNumber(), exception.columnNumber(),
+	         exception.message().toAscii().data());
 	cleanup();
 	return false;
 }

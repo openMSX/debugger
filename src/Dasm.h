@@ -11,7 +11,7 @@ struct MemoryLayout;
 
 struct DisasmRow {
 	enum RowType { INSTRUCTION, LABEL };
-	
+
 	RowType rowType;
 	unsigned short addr;
 	char numBytes;

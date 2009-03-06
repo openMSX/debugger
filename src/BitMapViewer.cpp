@@ -77,7 +77,7 @@ void BitMapViewer::decodeVDPregs()
 	printf("\nlines acording to the bits %i,: %i\n", (regs[9] & 128), v1);
 	linesLabel->setText(QString("%1").arg(v1, 0, 10));
 	if (useVDP) linesVisible->setCurrentIndex((regs[9] & 128) ? 1 : 0);
-	
+
 	// Get the border color
 	int v2 = regs[7] & 15;
 	printf("\nborder acording to the regs %i,: %i\n", regs[7], v2);
@@ -148,7 +148,7 @@ void BitMapViewer::on_showPage_currentIndexChanged(int index)
 	// on_screenMode_currentIndexChanged we do nothing!
 	if (index == -1) return;
 
-	static const int m1[4] = { 0x00000 , 0x08000, 0x10000, 0x18000 };
+	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
 	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged( int %i);\n", index);
 	if (screenMod > 7) index *= 2;
 	int vramAddress = m1[index];

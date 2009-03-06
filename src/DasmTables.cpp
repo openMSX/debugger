@@ -4,7 +4,7 @@
 
 /*
  * Letter codes in the instructions:
- *   
+ *
  *   A - Address
  *   B - Byte value
  *   R - Relative jump offset

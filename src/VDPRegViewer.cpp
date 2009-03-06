@@ -480,7 +480,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r14->setText(hex5((regs[14] & 7) << 14));
 		label_dec_r15->setText(dec2(regs[15] & 15));
 		label_dec_r16->setText(dec2(regs[16] & 15));
-		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? " ,auto incr" : ""));
+		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? ", auto incr" : ""));
 	}
 
 	//V9958 registers
@@ -599,7 +599,7 @@ void VDPRegViewer::connectHighLights()
 	// register 9
 	monoGroup(pushButton_9_7, label_dec_ln);
 	list.clear();
-	list << pushButton_9_5 << pushButton_9_4 ;
+	list << pushButton_9_5 << pushButton_9_4;
 	makeGroup(list, label_dec_m); //TODO fix label
 	monoGroup(pushButton_9_3, label_dec_il);
 	monoGroup(pushButton_9_2, label_dec_eo);

@@ -54,7 +54,7 @@ void DockableWidgetLayout::addItem(
 	info->height = -1;
 	info->useHintWidth = true;
 	info->useHintHeight = true;
-	
+
 	if (info->widget->sizePolicy().horizontalPolicy() != QSizePolicy::Fixed &&
 	    w > 0) {
 		info->width = w;
@@ -208,7 +208,7 @@ void DockableWidgetLayout::setGeometry(const QRect& rect)
 void DockableWidgetLayout::calcSizeLimits()
 {
 	if (dockedWidgets.empty()) return;
-	
+
 	// layout with current sizes
 	doLayout();
 	DockInfo* d = dockedWidgets.first();
@@ -220,7 +220,7 @@ void DockableWidgetLayout::calcSizeLimits()
 	for (int i = 0; i < dockedWidgets.size(); ++i) {
 		distStore.push_back(dockedWidgets.at(i)->dockDistance);
 	}
-	
+
 	// first check minimum width (blunt method)
 	for (int i = d->widget->minimumWidth(); i <= curWidth; ++i) {
 		// trial layout
@@ -418,7 +418,7 @@ void DockableWidgetLayout::doLayout(bool check)
 		if (d->left < dx) dx = d->left;
 		if (d->top  < dy) dy = d->top;
 	}
-	
+
 	// translate widgets and calculate size
 	int& w = check ? checkWidth  : layoutWidth;
 	int& h = check ? checkHeight : layoutHeight;
@@ -459,7 +459,7 @@ bool DockableWidgetLayout::insertLocation(
 	int bestIndex = 0;
 	DockSide bestSide;
 	QRect bestRect;
-	
+
 	// loop over all widgets and find appropriate matching sides
 	for (int i = 0; i < dockedWidgets.size(); ++i) {
 		DockInfo* d = dockedWidgets[i];
@@ -779,7 +779,7 @@ bool DockableWidgetLayout::insertLocation(
 			}
 		}
 	}
-	
+
 	if (bestIndex) {
 		rect = bestRect;
 		index = bestIndex;
@@ -805,13 +805,13 @@ void DockableWidgetLayout::getConfig(QStringList& list)
 		// string format D [Hidden/Visible] [Side] [Distance] [Width] [Height]
 		QString s("%1 D %2 %3 %4 %5 %6");
 		s = s.arg(d->widget->id());
-		
+
 		if (d->widget->isHidden()) {
 			s = s.arg("H");
 		} else {
 			s = s.arg("V");
 		}
-		
+
 		switch (d->dockSide) {
 		case TOP:
 			s = s.arg("T");
@@ -826,7 +826,7 @@ void DockableWidgetLayout::getConfig(QStringList& list)
 			s = s.arg("B");
 			break;
 		}
-		
+
 		s = s.arg(d->dockDistance);
 
 		if (d->useHintWidth) {

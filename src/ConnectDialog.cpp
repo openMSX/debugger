@@ -85,7 +85,7 @@ static void deleteSocket(const QFileInfo& info)
 
 #ifdef _WIN32
 // This is a bit of a hack, but it does appear to work around
-// a problem on Vista where resolving "localhost" via 
+// a problem on Vista where resolving "localhost" via
 // QTcpSocket::connectToHost fails.
 static QString getLocalHostName()
 {

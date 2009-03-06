@@ -19,7 +19,7 @@ public:
 		w_rh = b;
 		w_rw = c;
 	}
-	
+
 	int getRL() const { return rl; }
 	int getRH() const { return rh; }
 	int getRW() const { return rw; }
@@ -110,7 +110,7 @@ private:
 			qe->setText(convert(val, mode));
 		}
 	}
-	
+
 	void updaterw()
 	{
 		if (w_rw == NULL) return;

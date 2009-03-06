@@ -26,7 +26,7 @@ public:
 
 	Breakpoints& breakpoints();
 	SymbolTable& symbolTable();
-	
+
 private:
 	void skipUnknownElement(QXmlStreamReader& ses);
 

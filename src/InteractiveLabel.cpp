@@ -13,7 +13,7 @@ void InteractiveLabel::highlight(bool state)
 {
 	// I first tried with style sheets, but then I found in the
 	// documentation that Qt style sheets are currently not supported for
-	// QMacStyle (the default style on Mac OS X). 
+	// QMacStyle (the default style on Mac OS X).
 	// So I use a QPalette for now.
 	if (state) {
 		QPalette fiddle = QApplication::palette();

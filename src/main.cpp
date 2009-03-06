@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 #endif
 	// restore main settings
 	app.setFont(Settings::get().font(Settings::APP_FONT));
-	
+
 	DebuggerForm debugger;
 	debugger.show();
 

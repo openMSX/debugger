@@ -63,7 +63,7 @@ private:
 
 	BreakpointList breakpoints;
 	MemoryLayout* memLayout;
-	
+
 	void parseCondition(Breakpoint& bp);
 	void insertBreakpoint(Breakpoint& bp);
 	bool inCurrentSlot(const Breakpoint& bp);

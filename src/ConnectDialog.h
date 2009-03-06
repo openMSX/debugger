@@ -29,7 +29,7 @@ private:
 	void connectionOk(OpenMSXConnection& connection,
 	                  const QString& title);
 	void connectionBad(OpenMSXConnection& connection);
-	
+
 	void timerEvent(QTimerEvent *event);
 
 	int delay;

@@ -23,7 +23,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	addressSourceList = new QComboBox();
 	addressSourceList->setEditable(false);
 	addressSourceList->addItem("Address:");
-	for (int i = 0; i < 10 ; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		QString txt = QString("Linked to ");
 		txt.append(CpuRegs::regNames[linkRegisters[i]]);
 		addressSourceList->addItem(txt);

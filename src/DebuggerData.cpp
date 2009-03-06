@@ -143,7 +143,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 {
 	if (memLayout == NULL) return true;
-	
+
 	int page = (bp.address & 0xC000) >> 14;
 	if (bp.ps == '*' || bp.ps == memLayout->primarySlot[page]) {
 		if (memLayout->isSubslotted[bp.ps & 3]) {
@@ -311,12 +311,12 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				bp.ps = xml.attributes().value("primarySlot").at(0).toAscii();
 				bp.ss = xml.attributes().value("secondarySlot").at(0).toAscii();
 				bp.segment = xml.attributes().value("segment").toString().toInt();
-				
+
 			} else if (xml.name() == "address" || xml.name() == "regionStart") {
 				// read symbol name
 				bp.address = xml.readElementText().toInt();
 				if (bp.type == BREAKPOINT) bp.regionEnd = bp.address;
-				
+
 			} else if (xml.name() == "regionEnd") {
 				// read symbol name
 				bp.regionEnd = xml.readElementText().toInt();

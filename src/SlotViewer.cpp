@@ -53,7 +53,7 @@ SlotViewer::SlotViewer(QWidget* parent)
 
 void SlotViewer::resizeEvent(QResizeEvent* e)
 {
-	QFrame::resizeEvent(e);	
+	QFrame::resizeEvent(e);
 }
 
 void SlotViewer::paintEvent(QPaintEvent* e)
@@ -73,7 +73,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 
 	// redraw background
 	p.fillRect(r, palette().color(QPalette::Base));
-	
+
 	QStyleOptionHeader so;
 	so.init(this);
 	so.state |= QStyle::State_Raised;
@@ -144,7 +144,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 		}
 
 		p.drawText(mid3 - fontMetrics().width(str) / 2, y, str);
-		
+
 		// print segment
 		if (isOn) {
 			int ms;

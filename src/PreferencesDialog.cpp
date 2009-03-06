@@ -21,7 +21,7 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 	        this, SLOT(fontSelectCustom()));
 	connect(btnFontColor,  SIGNAL(clicked()),
 	        this, SLOT(fontSelectColor()));
-	
+
 	initFontList();
 	listFonts->setCurrentRow(0);
 }
@@ -76,7 +76,7 @@ void PreferencesDialog::fontTypeChanged(bool state)
 
 	Settings::DebuggerFont f = (Settings::DebuggerFont)(listFonts->currentRow());
 	Settings& s = Settings::get();
-	
+
 	if (rbUseAppFont->isChecked()) {
 		s.setFontType(f, Settings::APPLICATION_DEFAULT);
 	} else if (rbUseFixedFont->isChecked()) {

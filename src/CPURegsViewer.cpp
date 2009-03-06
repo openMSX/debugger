@@ -35,10 +35,10 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
-	
+
 	QPainter p(this);
 	p.setPen(palette().color(QPalette::Text));
-	
+
 	rowHeight = fontMetrics().height();
 	int regWidth = fontMetrics().width("HLW");
 	int valWidth = fontMetrics().width("FFFFWW");
@@ -48,7 +48,7 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	leftValuePos = leftRegPos + regWidth;
 	rightRegPos = leftValuePos + valWidth;
 	rightValuePos = rightRegPos + regWidth;
-	
+
 	// calc and set drawing bounds
 	QRect r(e->rect());
 	if (r.left() < frameL) r.setLeft(frameL);
@@ -72,7 +72,7 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	// draw interrupt mode
 	p.drawText(leftRegPos, y, "IM");
 	drawValue(p, 14, leftValuePos, y);
-	
+
 	// draw interrupt state
 	if (regsChanged[CpuRegs::REG_IFF] & 1) {
 		p.setPen(Qt::red);
@@ -235,7 +235,7 @@ void CPURegsViewer::keyPressEvent(QKeyEvent* e)
 		regsModified[id] = true;
 		move = Qt::Key_Right;
 	}
-	
+
 	if (move == Qt::Key_Right) {
 		++cursorLoc;
 		if (cursorLoc == 4 * CpuRegs::REG_I ||
@@ -336,7 +336,7 @@ void CPURegsViewer::applyModifications()
 	getRegister(CpuRegs::REG_SP,  &data[22]);
 	data[24] = regs[CpuRegs::REG_I];
 	data[25] = regs[CpuRegs::REG_R];
-		
+
 	// send new data to openmsx
 	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
 			"{CPU regs}", 0, 26, data);

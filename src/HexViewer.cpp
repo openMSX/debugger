@@ -124,7 +124,7 @@ void HexViewer::setSizes()
 {
 	visibleLines = (height() - frameT - frameB) / lineHeight;
 	partialBottomLine = (height() - frameT - frameB) != lineHeight * visibleLines;
-	
+
 	frameR = frameL;
 	int w;
 	// fit display to width
@@ -139,7 +139,7 @@ void HexViewer::setSizes()
 			if ((horBytes & 7) == 0) w -= EXTRA_SPACING;
 		}
 	}
-	
+
 	// check if a scrollbar is needed
 	if (horBytes * visibleLines < debuggableSize) {
 		if (adjustToWidth && w < vertScrollBar->sizeHint().width()) {
@@ -159,7 +159,7 @@ void HexViewer::setSizes()
 		hexTopAddress = 0;
 		hexMarkAddress = 0;
 	}
-	
+
 	// now see were the chars are drawn
 	rightValuePos = xData + horBytes * dataWidth;
 	xChar = rightValuePos + charWidth + EXTRA_SPACING * (int(horBytes / 4) +
@@ -195,7 +195,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 	if (debuggableName.isEmpty()) return;
 
 	QPainter p(this);
-	
+
 	// set font info
 	p.setFont(Settings::get().font(Settings::HEX_FONT));
 	QColor fc(Settings::get().fontColor(Settings::HEX_FONT));
@@ -310,7 +310,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 			p.drawText(x, y + a, QString(chr));
 			x += charWidth;
 		}
-		
+
 		y += lineHeight;
 		address += horBytes;
 		if (address >= debuggableSize) break;
@@ -380,7 +380,7 @@ void HexViewer::setLocation(int addr)
 			emit locationChanged(addr);
 		}
 		hexMarkAddress = addr;
-		int size = horBytes * visibleLines ;
+		int size = horBytes * visibleLines;
 		if ((addr < hexTopAddress) || (addr >= (hexTopAddress+size))) {
 			setTopLocation(addr);
 		}

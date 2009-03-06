@@ -257,7 +257,7 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		1,	//screen 1
 		2,	// 2
 		3,	// 3
-		4,	
+		4,
 		128,	// 5
 		128,
 		256,	// 7

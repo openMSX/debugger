@@ -27,7 +27,7 @@ public:
 	void addWidget(DockableWidget* widget, DockSide side, int distance,
 	               int width = -1, int height = -1);
 	bool insertLocation(QRect& rect, const QSizePolicy& sizePol);
-	
+
 	QLayoutItem* itemAt(int index) const;
 	QLayoutItem* takeAt(int index);
 	int count() const;

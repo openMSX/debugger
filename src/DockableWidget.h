@@ -58,7 +58,7 @@ private:
 	QWidget* headerWidget;
 	QLabel* titleLabel;
 	QToolButton* closeButton;
-	
+
 signals:
 	void visibilityChanged(DockableWidget* w);
 };

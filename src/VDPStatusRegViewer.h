@@ -1,15 +1,10 @@
 #ifndef VDPSTATUSREGVIEWER_H
 #define VDPSTATUSREGVIEWER_H
 
+#include "SimpleHexRequest.h"
+#include "ui_VDPStatusRegisters.h"
 #include <QList>
 #include <QDialog>
-#include <QColor>
-#include "OpenMSXConnection.h"
-#include "CommClient.h"
-#include "Settings.h"
-#include "ui_VDPStatusRegisters.h"
-
-#include "SimpleHexRequest.h"
 
 /** The highlightDispatcher serves 2 purposes for the InteractiveLabel widgets
   * a) keep a correct state: Assume widget A and B are related (both are
@@ -23,17 +18,15 @@
   * b) serve as a central hub (star toplogy) to dispatch events from one widget
   * to all others. This way all InteractiveLabel widgets only need to connect
   * to this highlightDispatcher
-  *
   */
-
-class highlightDispatcher : public QObject 
+class highlightDispatcher : public QObject
 {
 	Q_OBJECT
 public:
 	highlightDispatcher();
 
 public slots:
-	void receiveState(bool state);	
+	void receiveState(bool state);
 
 signals:
 	void dispatchState(bool state);
@@ -42,30 +35,26 @@ private:
 	int counter;
 };
 
-class VDPStatusRegViewer : public QDialog, public SimpleHexRequestUser, private Ui::VDPStatusRegisters
+class VDPStatusRegViewer : public QDialog, public SimpleHexRequestUser,
+                           private Ui::VDPStatusRegisters
 {
 	Q_OBJECT
 public:
-	VDPStatusRegViewer( QWidget *parent = 0);
+	VDPStatusRegViewer(QWidget* parent = 0);
 	~VDPStatusRegViewer();
-
-private:
-	unsigned char* statusregs;
-
-	void decodeVDPStatusRegs();
-
-	void connectHighLights();
-
-	void doConnect( InteractiveLabel* lab, highlightDispatcher* dis);
-
-	void makeGroup( QList<InteractiveLabel*> list, InteractiveLabel* explained);
-
-protected:
-	virtual void DataHexRequestReceived();
-
 
 public slots:
 	void refresh();
+
+private:
+	void decodeVDPStatusRegs();
+	void connectHighLights();
+	void doConnect(InteractiveLabel* lab, highlightDispatcher* dis);
+	void makeGroup(QList<InteractiveLabel*> list, InteractiveLabel* explained);
+
+	virtual void DataHexRequestReceived();
+
+	unsigned char* statusregs;
 };
 
-#endif /* VDPSTATUSREGVIEWER_H */
+#endif // VDPSTATUSREGVIEWER_H

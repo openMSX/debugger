@@ -24,7 +24,7 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 	destroyable = true;
 	dragging = false;
 	setAttribute(Qt::WA_DeleteOnClose, true);
-	
+
 	titleLabel = new QLabel();
 	closeButton = new QToolButton();
 	closeButton->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
@@ -34,12 +34,12 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 		QStyle::SP_TitleBarCloseButton).actualSize(QSize(sz, sz)));
 	closeButton->setAutoRaise(true);
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-	
+
 	headerLayout = new QHBoxLayout();
 	headerLayout->setMargin(0);
 	headerLayout->addWidget(titleLabel, 1);
 	headerLayout->addWidget(closeButton, 0);
-	
+
 	headerWidget = new QWidget();
 	headerWidget->setLayout(headerLayout);
 
@@ -48,9 +48,9 @@ DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
 	widgetLayout->setSpacing(1);
 	widgetLayout->addWidget(headerWidget);
 	setLayout(widgetLayout);
-	
+
 	dockManager.attachWidget(this);
-	
+
 	rubberBand = new QRubberBand(QRubberBand::Rectangle);
 }
 
@@ -72,7 +72,7 @@ void DockableWidget::setWidget(QWidget* widget)
 		widgetLayout->removeWidget(mainWidget);
 	}
 	mainWidget = widget;
-	
+
 	if (widget) {
 		widgetLayout->addWidget(widget, 1);
 		int minW = sizeHint().width()  - widget->sizeHint().width()

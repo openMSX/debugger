@@ -23,18 +23,18 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget* parent)
 
 	treeLabelsUpdateCount = 0;
 	editColumn = -1;
-	
+
 	// put slot checkboxes in a convenience array
 	chkSlots[ 0] = chk00; chkSlots[ 1] = chk01; chkSlots[ 2] = chk02; chkSlots[ 3] = chk03;
 	chkSlots[ 4] = chk10; chkSlots[ 5] = chk11; chkSlots[ 6] = chk12; chkSlots[ 7] = chk13;
 	chkSlots[ 8] = chk20; chkSlots[ 9] = chk21; chkSlots[10] = chk22; chkSlots[11] = chk23;
 	chkSlots[12] = chk30; chkSlots[13] = chk31; chkSlots[14] = chk32; chkSlots[15] = chk33;
-	chkRegs[ 0] = chkRegA ; chkRegs[ 1] = chkRegB ; chkRegs[ 2] = chkRegC ; chkRegs[ 3] = chkRegD ;
-	chkRegs[ 4] = chkRegE ; chkRegs[ 5] = chkRegH ; chkRegs[ 6] = chkRegL ; chkRegs[ 7] = chkRegBC;
+	chkRegs[ 0] = chkRegA;  chkRegs[ 1] = chkRegB;  chkRegs[ 2] = chkRegC;  chkRegs[ 3] = chkRegD;
+	chkRegs[ 4] = chkRegE;  chkRegs[ 5] = chkRegH;  chkRegs[ 6] = chkRegL;  chkRegs[ 7] = chkRegBC;
 	chkRegs[ 8] = chkRegDE; chkRegs[ 9] = chkRegHL; chkRegs[10] = chkRegIX; chkRegs[11] = chkRegIY;
 	chkRegs[12] = chkRegIXL;chkRegs[13] = chkRegIXH;chkRegs[14] = chkRegIYL;chkRegs[15] = chkRegIYH;
 	chkRegs[16] = chkRegOffset; chkRegs[17] = chkRegI;
-	
+
 	connect(treeFiles, SIGNAL(itemSelectionChanged()), this, SLOT(fileSelectionChange()));
 	connect(btnAddFile, SIGNAL(clicked()), this, SLOT(addFile()));
 	connect(btnRemoveFile, SIGNAL(clicked()), this, SLOT(removeFile()));
@@ -332,7 +332,7 @@ void SymbolManager::labelSelectionChanged()
 {
 	// remove possible editor
 	closeEditor();
-	
+
 	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 	// check if is available at all
 	if (selection.empty()) {
@@ -359,7 +359,7 @@ void SymbolManager::labelSelectionChanged()
 		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
 		if (sym->source()) removeButActive = false;
-		
+
 		if (selit == selection.begin()) {
 			// first item, reference for slotMask and regMask
 			slotMask = sym->validSlots();
@@ -439,7 +439,7 @@ void SymbolManager::changeSlot(int id, int state)
 	// get selected items
 	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 
-	// update items		
+	// update items
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
 	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
@@ -468,7 +468,7 @@ void SymbolManager::changeRegister(int id, int state)
 	// get selected items
 	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 
-	// update items		
+	// update items
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
 	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
@@ -499,11 +499,11 @@ void SymbolManager::changeType(bool /*checked*/)
 	} else if (radValue->isChecked()) {
 		newType = Symbol::VALUE;
 	}
-	
+
 	// get selected items
 	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 
-	// update items		
+	// update items
 	beginTreeLabelsUpdate();
 	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
 	     selit != selection.end(); ++selit) {

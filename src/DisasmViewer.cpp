@@ -60,7 +60,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	setSizePolicy(QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred));
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
-	
+
 	memory = NULL;
 	cursorAddr = 0;
 	cursorLine = 0;
@@ -74,7 +74,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	scrollBar->setMaximum(0xFFFF);
 	scrollBar->setSingleStep(0);
 	scrollBar->setPageStep(0);
-	
+
 	settingsChanged();
 
 	// manual scrollbar handling routines (real size of the data is not known)
@@ -96,7 +96,7 @@ void DisasmViewer::resizeEvent(QResizeEvent* e)
 	scrollBar->setGeometry(width() - frameR, frameT,
 	                       scrollBar->sizeHint().width(),
 	                       height() - frameT - frameB);
-	
+
 	// reset the address in order to trigger a check on the disasmLines
 	if (!waitingForData) {
 		setAddress(scrollBar->value());
@@ -138,13 +138,13 @@ void DisasmViewer::symbolsChanged()
 {
 	int disasmStart = disasmLines.front().addr;
 	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
-	
+
 	CommMemoryRequest* req = new CommMemoryRequest(
 		disasmStart, disasmEnd - disasmStart, &memory[disasmStart], *this);
 	req->address = disasmLines[disasmTopLine].addr;
 	req->line = disasmLines[disasmTopLine].infoLine;
 	req->method = TopAlways;
-	
+
 	if (waitingForData) {
 		delete nextRequest;
 		nextRequest = req;
@@ -227,7 +227,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 			p.setFont(s.font(Settings::CODE_FONT));
 		} else {
 			// draw code line
-			// default to text pen 
+			// default to text pen
 			if (!isCursorLine) {
 				p.setPen(s.fontColor(Settings::CODE_FONT));
 			}
@@ -298,7 +298,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 			assert(false);
 			dt = db = 0; // avoid warning
 		}
-	
+
 		if ((line > dt || disasmLines[0].addr == 0) &&
 		    (line < int(disasmLines.size()) - db ||
 		     disasmLines.back().addr+disasmLines.back().numBytes > 0xFFFF)) {
@@ -363,7 +363,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	req->address = addr;
 	req->line = infoLine;
 	req->method = method;
-	
+
 	if (waitingForData) {
 		delete nextRequest;
 		nextRequest = req;
@@ -379,7 +379,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	dasm(memory, req->offset, req->offset + req->size - 1, disasmLines,
 	     memLayout, symTable, programAddr);
 
-	// locate the requested line 
+	// locate the requested line
 	disasmTopLine = findDisasmLine(req->address, req->line);
 
 	switch (req->method) {
@@ -619,7 +619,7 @@ void DisasmViewer::mousePressEvent(QMouseEvent* e)
 			} else {
 				return;
 			}
-		
+
 			// scroll if partial line
 			if (line == visibleLines) {
 				setAddress(disasmLines[disasmTopLine + 1].addr, TopAlways);
@@ -650,6 +650,6 @@ int DisasmViewer::lineAtPos(const QPoint& pos)
 			break;
 		}
 	} while (y < pos.y());
-	
+
 	return line;
 }

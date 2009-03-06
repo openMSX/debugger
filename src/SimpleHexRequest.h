@@ -3,7 +3,7 @@
 
 #include "OpenMSXConnection.h"
 
-/**  
+/**
  * A set of helper classes if code needs to read openmsx debugables into an array of unsigned chars
  * if class A needs to read a given debugable then this schem will suffice
  * - Class A inherits from SimpleHexRequestUser
@@ -13,7 +13,6 @@
  *	new SimpleHexRequest("{VDP status regs}",0,16,statusregs, *this);
  *
  */
-
 class SimpleHexRequestUser
 {
 protected:
@@ -40,4 +39,4 @@ private:
 	SimpleHexRequestUser& user;
 };
 
-#endif /* SIMPLEHEXREQUEST_H */
+#endif // SIMPLEHEXREQUEST_H

@@ -6,10 +6,10 @@
 #include "DockManager.h"
 #include "DebugSession.h"
 #include <QMainWindow>
+#include <QMap>
 
 class DockableWidgetArea;
 class DisasmViewer;
-class HexViewer;
 class MainMemoryViewer;
 class CPURegsViewer;
 class FlagsViewer;
@@ -19,7 +19,6 @@ class CommClient;
 class QAction;
 class QMenu;
 class QToolBar;
-class QSplitter;
 class VDPStatusRegViewer;
 class VDPRegViewer;
 class VDPCommandRegViewer;
@@ -31,13 +30,28 @@ public:
 	DebuggerForm(QWidget* parent = 0);
 	~DebuggerForm();
 
-protected:
-	void closeEvent( QCloseEvent *e );
-
 public slots:
 	void showAbout();
 
 private:
+	void closeEvent(QCloseEvent* e);
+
+	void createActions();
+	void createMenus();
+	void createToolbars();
+	void createStatusbar();
+	void createForm();
+
+	void finalizeConnection(bool halted);
+	void pauseStatusChanged(bool isPaused);
+	void breakOccured();
+	void setBreakMode();
+	void setRunMode();
+	void updateData();
+
+	void refreshBreakpoints();
+
+
 	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* viewMenu;
@@ -87,10 +101,9 @@ private:
 	QAction* helpAboutAction;
 
 	DockManager dockMan;
-	DockableWidgetArea *mainArea;
-	
+	DockableWidgetArea* mainArea;
+
 	DisasmViewer* disasmView;
-	//HexViewer* hexView;
 	MainMemoryViewer* mainMemoryView;
 	CPURegsViewer* regsView;
 	FlagsViewer* flagsView;
@@ -107,21 +120,6 @@ private:
 
 	bool mergeBreakpoints;
 	QMap<QString, int> debuggables;
-	
-	void createActions();
-	void createMenus();
-	void createToolbars();
-	void createStatusbar();
-	void createForm();
-
-	void finalizeConnection(bool halted);
-	void pauseStatusChanged(bool isPaused);
-	void breakOccured();
-	void setBreakMode();
-	void setRunMode();
-	void updateData();
-	
-	void refreshBreakpoints();
 
 private slots:
 	void fileNewSession();
@@ -153,13 +151,14 @@ private slots:
 	void breakpointToggle(int addr = -1);
 	void breakpointAdd();
 
-	void toggleView( DockableWidget* widget );
+	void toggleView(DockableWidget* widget);
 	void initConnection();
-	void handleUpdate(const QString& type, const QString& name, const QString& message);
-	void setDebuggables( const QString& list );
-	void setDebuggableSize(  const QString& debuggable, int size );
+	void handleUpdate(const QString& type, const QString& name,
+	                  const QString& message);
+	void setDebuggables(const QString& list);
+	void setDebuggableSize(const QString& debuggable, int size);
 	void connectionClosed();
-	void dockWidgetVisibilityChanged( DockableWidget *w );
+	void dockWidgetVisibilityChanged(DockableWidget* w);
 	void updateViewMenu();
 	void updateVDPViewMenu();
 	void updateWindowTitle();
@@ -170,11 +169,11 @@ private slots:
 	friend class CPURegRequest;
 	friend class ListDebuggablesHandler;
 	friend class DebuggableSizeHandler;
-	
+
 signals:
 	void settingsChanged();
 	void symbolsChanged();
-	void debuggablesChanged( const QMap<QString,int>& list );
+	void debuggablesChanged(const QMap<QString, int>& list);
 	void emulationChanged();
 };
 

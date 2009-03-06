@@ -1,11 +1,10 @@
 // $Id$
 
-#include "BitMapViewer.h"
 #include "DebuggerForm.h"
+#include "BitMapViewer.h"
 #include "DockableWidgetArea.h"
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
-#include "HexViewer.h"
 #include "MainMemoryViewer.h"
 #include "CPURegsViewer.h"
 #include "FlagsViewer.h"
@@ -92,9 +91,9 @@ public:
 
 	virtual void replyOk(const QString& message)
 	{
-		if( merge ) {
+		if (merge) {
 			QString bps = form.session.breakpoints().mergeBreakpoints(message);
-			if( !bps.isEmpty() ) {
+			if (!bps.isEmpty()) {
 				form.comm.sendCommand(new SimpleCommand(bps));
 				form.comm.sendCommand(new ListBreakPointsHandler(form, false));
 			} else {
@@ -114,6 +113,7 @@ private:
 	DebuggerForm& form;
 	bool merge;
 };
+
 
 class CPURegRequest : public ReadDebugBlockCommand
 {
@@ -136,6 +136,7 @@ private:
 	unsigned char buf[28];
 };
 
+
 class ListDebuggablesHandler : public SimpleCommand
 {
 public:
@@ -153,6 +154,7 @@ public:
 private:
 	DebuggerForm& form;
 };
+
 
 class DebuggableSizeHandler : public SimpleCommand
 {
@@ -179,12 +181,10 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
 	, comm(CommClient::instance())
 {
-	//simply making sure that the pointers are NULL
-	// TODO: Is this done by GCC by default ?
 	VDPRegView = NULL;
 	VDPStatusRegView = NULL;
 	VDPCommandRegView = NULL;
-	
+
 	createActions();
 	createMenus();
 	createToolbars();
@@ -393,14 +393,14 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu = viewMenu->addMenu("VDP");
 	viewMenu->addSeparator();
 	viewMenu->addAction(viewDebuggableViewerAction);
-	connect( viewMenu, SIGNAL( aboutToShow() ), this, SLOT( updateViewMenu() ) );
+	connect(viewMenu, SIGNAL(aboutToShow()), this, SLOT(updateViewMenu()));
 
 	// create VDP dialogs menu
 	viewVDPDialogsMenu->addAction(viewVDPRegsAction);
 	viewVDPDialogsMenu->addAction(viewVDPCommandRegsAction);
 	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
-	connect( viewVDPDialogsMenu, SIGNAL( aboutToShow() ), this, SLOT( updateVDPViewMenu() ) );
+	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
 
 
 	// create execute menu
@@ -455,17 +455,15 @@ void DebuggerForm::createForm()
 {
 	updateWindowTitle();
 
-	mainArea = new DockableWidgetArea;
-	dockMan.addDockArea( mainArea );
+	mainArea = new DockableWidgetArea();
+	dockMan.addDockArea(mainArea);
 	setCentralWidget(mainArea);
 
-	/*
-	 * Create main widgets and append them to the list first
-	 */
-	DockableWidget *dw = new DockableWidget( dockMan );
+	// Create main widgets and append them to the list first
+	DockableWidget* dw = new DockableWidget(dockMan);
 
 	// create the disasm viewer widget
-	disasmView = new DisasmViewer;
+	disasmView = new DisasmViewer();
 	dw->setWidget(disasmView);
 	dw->setTitle(tr("Code view"));
 	dw->setId("CODEVIEW");
@@ -473,16 +471,16 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(false);
 	dw->setClosable(false);
-	connect( this, SIGNAL( settingsChanged() ),
-	         disasmView, SLOT( settingsChanged() ) );
-	connect( this, SIGNAL( symbolsChanged() ),
-	         disasmView, SLOT( symbolsChanged() ) );
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(this, SIGNAL(settingsChanged()),
+	        disasmView, SLOT(settingsChanged()));
+	connect(this, SIGNAL(symbolsChanged()),
+	        disasmView, SLOT(symbolsChanged()));
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// create the memory view widget
-	mainMemoryView = new MainMemoryViewer; //HexViewer;
-	dw = new DockableWidget( dockMan );
+	mainMemoryView = new MainMemoryViewer();
+	dw = new DockableWidget(dockMan);
 	dw->setWidget(mainMemoryView);
 	dw->setTitle(tr("Main memory"));
 	dw->setId("MEMORY");
@@ -490,12 +488,12 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// create register viewer
-	regsView = new CPURegsViewer;
-	dw = new DockableWidget( dockMan );
+	regsView = new CPURegsViewer();
+	dw = new DockableWidget(dockMan);
 	dw->setWidget(regsView);
 	dw->setTitle(tr("CPU registers"));
 	dw->setId("REGISTERS");
@@ -503,18 +501,18 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// Hook up the register viewer with the MainMemory viewer
-	connect( regsView, SIGNAL( registerChanged(int,int) ),
-		mainMemoryView, SLOT( registerChanged(int,int) ));
+	connect(regsView, SIGNAL(registerChanged(int,int)),
+	        mainMemoryView, SLOT(registerChanged(int,int)));
 	mainMemoryView->setRegsView(regsView);
 
 
 	// create flags viewer
-	flagsView = new FlagsViewer;
-	dw = new DockableWidget( dockMan );
+	flagsView = new FlagsViewer();
+	dw = new DockableWidget(dockMan);
 	dw->setWidget(flagsView);
 	dw->setTitle(tr("Flags"));
 	dw->setId("FLAGS");
@@ -522,12 +520,12 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// create stack viewer
-	stackView = new StackViewer;
-	dw = new DockableWidget( dockMan );
+	stackView = new StackViewer();
+	dw = new DockableWidget(dockMan);
 	dw->setWidget(stackView);
 	dw->setTitle(tr("Stack"));
 	dw->setId("STACK");
@@ -535,12 +533,12 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// create slot viewer
-	slotView = new SlotViewer;
-	dw = new DockableWidget( dockMan );
+	slotView = new SlotViewer();
+	dw = new DockableWidget(dockMan);
 	dw->setWidget(slotView);
 	dw->setTitle(tr("Memory layout"));
 	dw->setId("SLOTS");
@@ -548,55 +546,57 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
 	// restore layout
-	restoreGeometry( Settings::get().value( "Layout/WindowGeometry", saveGeometry() ).toByteArray() );
+	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
 
-	QStringList list = Settings::get().value( "Layout/WidgetLayout" ).toStringList();
+	QStringList list = Settings::get().value("Layout/WidgetLayout").toStringList();
 	// defaults needed?
-	if( !list.size() || !list.at(0).startsWith("CODEVIEW ") ) {
+	if (list.empty() || !list.at(0).startsWith("CODEVIEW ")) {
 		list.clear();
-		list.append( "CODEVIEW D V R 0 -1 -1" );
-		list.append( "REGISTERS D V R 0 -1 -1" );
-		list.append( "FLAGS D V R 0 -1 -1" );
-		int regW = dockMan.findDockableWidget("REGISTERS")->sizeHint().width();
-		int regH = dockMan.findDockableWidget("REGISTERS")->sizeHint().height();
+		list.append("CODEVIEW D V R 0 -1 -1");
+		list.append("REGISTERS D V R 0 -1 -1");
+		list.append("FLAGS D V R 0 -1 -1");
+		int regW  = dockMan.findDockableWidget("REGISTERS")->sizeHint().width();
+		int regH  = dockMan.findDockableWidget("REGISTERS")->sizeHint().height();
 		int codeW = dockMan.findDockableWidget("CODEVIEW")->sizeHint().width();
 		int codeH = dockMan.findDockableWidget("CODEVIEW")->sizeHint().height();
 		int flagW = dockMan.findDockableWidget("FLAGS")->sizeHint().width();
 		int slotW = dockMan.findDockableWidget("SLOTS")->sizeHint().width();
-		list.append( QString("SLOTS D V R 0 -1 %1").arg(regH) );
-		list.append( QString("STACK D V R 0 -1 %1").arg(codeH) );
-		list.append( QString("MEMORY D V B %1 %2 %3").arg(codeW)
+		list.append(QString("SLOTS D V R 0 -1 %1").arg(regH));
+		list.append(QString("STACK D V R 0 -1 %1").arg(codeH));
+		list.append(QString("MEMORY D V B %1 %2 %3").arg(codeW)
 		                                             .arg(regW + flagW + slotW)
-		                                             .arg(codeH - regH) );
+		                                             .arg(codeH - regH));
 	}
 
 	// add widgets
-	for( int i = 0; i < list.size(); i++ ) {
+	for (int i = 0; i < list.size(); ++i) {
 		QStringList s = list.at(i).split(" ", QString::SkipEmptyParts);
 		// get widget
-		if( (dw = dockMan.findDockableWidget(s.at(0))) ) {
-			if( s.at(1) == "D" ) {
+		if ((dw = dockMan.findDockableWidget(s.at(0)))) {
+			if (s.at(1) == "D") {
 				// dock widget
 				DockableWidgetLayout::DockSide side;
-				if( s.at(3) == "T" )
+				if        (s.at(3) == "T") {
 					side = DockableWidgetLayout::TOP;
-				else if( s.at(3) == "L" )
+				} else if (s.at(3) == "L") {
 					side = DockableWidgetLayout::LEFT;
-				else if( s.at(3) == "R" )
+				} else if (s.at(3) == "R") {
 					side = DockableWidgetLayout::RIGHT;
-				else
+				} else {
 					side = DockableWidgetLayout::BOTTOM;
-				dockMan.insertWidget( dw, 0, side, s.at(4).toInt(), s.at(5).toInt(), s.at(6).toInt() );
-				if( s.at(2) == "H" ) dw->hide();
-			} else if( s.at(1) == "F" ) {
+				}
+				dockMan.insertWidget(dw, 0, side, s.at(4).toInt(),
+				                     s.at(5).toInt(), s.at(6).toInt());
+				if (s.at(2) == "H") dw->hide();
+			} else if (s.at(1) == "F") {
 				//  float widget
 				dw->setFloating(true, s.at(2) == "V");
-				dw->resize(  s.at(5).toInt(), s.at(6).toInt() );
-				dw->move(  s.at(3).toInt(), s.at(4).toInt() );
+				dw->resize(s.at(5).toInt(), s.at(6).toInt());
+				dw->move  (s.at(3).toInt(), s.at(4).toInt());
 			}
 		}
 	}
@@ -641,39 +641,39 @@ DebuggerForm::~DebuggerForm()
 	delete mainArea;
 }
 
-void DebuggerForm::closeEvent( QCloseEvent *e )
+void DebuggerForm::closeEvent(QCloseEvent* e)
 {
 	// handle unsaved session
 	fileNewSession();
 	// cancel if session is still modified
-	if( session.isModified() ) {
+	if (session.isModified()) {
 		e->ignore();
 		return;
 	}
-	
+
 	// store layout
-	Settings::get().setValue( "Layout/WindowGeometry", saveGeometry() );
+	Settings::get().setValue("Layout/WindowGeometry", saveGeometry());
 
 	QStringList layoutList;
 	// fill layout list with docked widgets
-	dockMan.getConfig( 0, layoutList );
+	dockMan.getConfig(0, layoutList);
 	// append floating widgets
-	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	while( it != dockMan.managedWidgets().end() ) {
-		if( (*it)->isFloating() ) {
+	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	     it != dockMan.managedWidgets().end(); ++it) {
+		if ((*it)->isFloating()) {
 			QString s("%1 F %2 %3 %4 %5 %6");
-			s = s.arg( (*it)->id() );
-			if( (*it)->isHidden() )
+			s = s.arg((*it)->id());
+			if ((*it)->isHidden()) {
 				s = s.arg("H");
-			else
+			} else {
 				s = s.arg("V");
-			s = s.arg( (*it)->x() ).arg( (*it)->y() )
-			     .arg( (*it)->width() ).arg( (*it)->height() );
-			layoutList.append( s );
+			}
+			s = s.arg((*it)->x()).arg((*it)->y())
+			     .arg((*it)->width()).arg((*it)->height());
+			layoutList.append(s);
 		}
-		it++;
 	}
-	Settings::get().setValue( "Layout/WidgetLayout", layoutList );
+	Settings::get().setValue("Layout/WidgetLayout", layoutList);
 
 	QMainWindow::closeEvent(e);
 }
@@ -681,16 +681,16 @@ void DebuggerForm::closeEvent( QCloseEvent *e )
 void DebuggerForm::updateWindowTitle()
 {
 	QString title = "openMSX debugger [%1%2]";
-	if( session.existsAsFile() )
-		title = title.arg( session.filename() );
-	else
-		title = title.arg( "unnamed session" );
-	
-	if( session.isModified() )
+	if (session.existsAsFile()) {
+		title = title.arg(session.filename());
+	} else {
+		title = title.arg("unnamed session");
+	}
+	if (session.isModified()) {
 		title = title.arg('*');
-	else
+	} else {
 		title = title.arg("");
-	
+	}
 	setWindowTitle(title);
 }
 
@@ -767,10 +767,9 @@ void DebuggerForm::connectionClosed()
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
 
-	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	while( it != dockMan.managedWidgets().end() ) {
+	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	     it != dockMan.managedWidgets().end(); ++it) {
 		(*it)->widget()->setEnabled(false);
-		it++;
 	}
 }
 
@@ -788,10 +787,9 @@ void DebuggerForm::finalizeConnection(bool halted)
 		updateData();
 	}
 
-	QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	while( it != dockMan.managedWidgets().end() ) {
+	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	     it != dockMan.managedWidgets().end(); ++it) {
 		(*it)->widget()->setEnabled(true);
-		it++;
 	}
 }
 
@@ -869,20 +867,19 @@ void DebuggerForm::setRunMode()
 
 void DebuggerForm::fileNewSession()
 {
-	if( session.isModified() ) {
+	if (session.isModified()) {
 		// save current session?
 		int choice = QMessageBox::warning(this, tr("Unsaved session"),
 		                tr("The current session has unsaved data.\n"
 		                   "Do you want to save your changes?"),
 		                QMessageBox::Save | QMessageBox::Discard |
 		                QMessageBox::Cancel, QMessageBox::Save);
-		
-		if( choice == QMessageBox::Cancel )
+		if (choice == QMessageBox::Cancel) {
 			return;
-		else if( choice == QMessageBox::Save ) {
+		} else if (choice == QMessageBox::Save) {
 			fileSaveSession();
 			// skip new if session is still modified (save was cancelled)
-			if( session.isModified() ) return;
+			if (session.isModified()) return;
 		}
 	}
 	session.clear();
@@ -891,15 +888,14 @@ void DebuggerForm::fileNewSession()
 
 void DebuggerForm::fileOpenSession()
 {
-	QString fileName =
-		QFileDialog::getOpenFileName(this, tr("Open debug session"),
-		                             QDir::currentPath(),
-		                             tr("Debug Session Files (*.omds)"));
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Open debug session"),
+		QDir::currentPath(), tr("Debug Session Files (*.omds)"));
 
-	if( !fileName.isEmpty() ) {
+	if (!fileName.isEmpty()) {
 		fileNewSession();
 		session.open(fileName);
-		if( systemDisconnectAction->isEnabled() ) {
+		if (systemDisconnectAction->isEnabled()) {
 			// active connection, merge loaded breakpoints
 			comm.sendCommand(new ListBreakPointsHandler(*this, true));
 		}
@@ -909,31 +905,31 @@ void DebuggerForm::fileOpenSession()
 
 void DebuggerForm::fileSaveSession()
 {
-	if( session.existsAsFile() )
+	if (session.existsAsFile()) {
 		session.save();
-	else
+	} else {
 		fileSaveSessionAs();
+	}
 	updateWindowTitle();
 }
 
 void DebuggerForm::fileSaveSessionAs()
 {
 	QFileDialog d(this, tr("Save debug session"));
-	d.setFilter( tr("Debug Session Files (*.omds)") );
+	d.setFilter(tr("Debug Session Files (*.omds)"));
 	d.setDefaultSuffix("omds");
-	d.setDirectory( QDir::currentPath() );
-	d.setAcceptMode( QFileDialog::AcceptSave );
-	d.setFileMode( QFileDialog::AnyFile );
-	if( d.exec() ) {
-		session.saveAs( d.selectedFiles().at(0) );
+	d.setDirectory(QDir::currentPath());
+	d.setAcceptMode(QFileDialog::AcceptSave);
+	d.setFileMode(QFileDialog::AnyFile);
+	if (d.exec()) {
+		session.saveAs(d.selectedFiles().at(0));
 	}
 	updateWindowTitle();
 }
 
 void DebuggerForm::systemConnect()
 {
-	OpenMSXConnection* connection = ConnectDialog::getConnection(this);
-	if (connection) {
+	if (OpenMSXConnection* connection = ConnectDialog::getConnection(this)) {
 		comm.connectToOpenMSX(connection);
 	}
 }
@@ -951,25 +947,28 @@ void DebuggerForm::systemPause()
 
 void DebuggerForm::systemReboot()
 {
-	if( systemPauseAction->isChecked() )
+	if (systemPauseAction->isChecked()) {
 		systemPauseAction->trigger();
-	if( executeRunAction->isEnabled() )
+	}
+	if (executeRunAction->isEnabled()) {
 		executeRun();
+	}
 	comm.sendCommand(new SimpleCommand("reset"));
 }
 
 void DebuggerForm::systemSymbolManager()
 {
-	SymbolManager symManager( session.symbolTable(), this );
-	connect( &symManager, SIGNAL( symbolTableChanged() ), &session, SLOT( sessionModified() ) );
+	SymbolManager symManager(session.symbolTable(), this);
+	connect(&symManager, SIGNAL(symbolTableChanged()),
+	        &session, SLOT(sessionModified()));
 	symManager.exec();
 	emit symbolsChanged();
-	updateWindowTitle();	
+	updateWindowTitle();
 }
 
 void DebuggerForm::systemPreferences()
 {
-	PreferencesDialog prefs( this );
+	PreferencesDialog prefs(this);
 	prefs.exec();
 	emit settingsChanged();
 }
@@ -1025,65 +1024,61 @@ void DebuggerForm::breakpointToggle(int addr)
 		            memLayout.mapperSegment[p]);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
-
 	comm.sendCommand(new ListBreakPointsHandler(*this));
 }
 
 void DebuggerForm::breakpointAdd()
 {
-	BreakpointDialog bpd( memLayout, this );
-	if( bpd.exec() ) {
-		if( bpd.address() > 0 ) {
+	BreakpointDialog bpd(memLayout, this);
+	if (bpd.exec()) {
+		if (bpd.address() > 0) {
 			QString cmd("debug set_bp %1 { [ pc_in_slot %2 %3 %4 ] }");
-			cmd = cmd.arg( bpd.address() );
-
-			if( bpd.slot() == -1 )
+			cmd = cmd.arg(bpd.address());
+			if (bpd.slot() == -1) {
 				cmd = cmd.arg('X');
-			else
+			} else {
 				cmd = cmd.arg(bpd.slot());
-
-			if( bpd.subslot() == -1 )
+			}
+			if (bpd.subslot() == -1) {
 				cmd = cmd.arg('X');
-			else
+			} else {
 				cmd = cmd.arg(bpd.subslot());
-
-			if( bpd.segment() == -1 )
+			}
+			if (bpd.segment() == -1) {
 				cmd = cmd.arg('X');
-			else
+			} else {
 				cmd = cmd.arg(bpd.segment());
-
+			}
 			comm.sendCommand(new SimpleCommand(cmd));
-
 			comm.sendCommand(new ListBreakPointsHandler(*this));
 		}
-	};
+	}
 }
 
 void DebuggerForm::showAbout()
 {
 	QMessageBox::about(
-		this, "openMSX Debugger", QString(Version::FULL_VERSION.c_str())
-		);
+		this, "openMSX Debugger", QString(Version::FULL_VERSION.c_str()));
 }
 
 void DebuggerForm::toggleRegisterDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(regsView->parentWidget()));
+	toggleView(qobject_cast<DockableWidget*>(regsView->parentWidget()));
 }
 
 void DebuggerForm::toggleFlagsDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(flagsView->parentWidget()));
+	toggleView(qobject_cast<DockableWidget*>(flagsView->parentWidget()));
 }
 
 void DebuggerForm::toggleStackDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(stackView->parentWidget()));
+	toggleView(qobject_cast<DockableWidget*>(stackView->parentWidget()));
 }
 
 void DebuggerForm::toggleSlotsDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(slotView->parentWidget()));
+	toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
 }
 
 void DebuggerForm::toggleBitMappedDisplay()
@@ -1092,8 +1087,8 @@ void DebuggerForm::toggleBitMappedDisplay()
 	// not sure if this a good idea for a docable widget
 
 	// create new debuggable viewer window
-	BitMapViewer *viewer = new BitMapViewer();
-	DockableWidget *dw = new DockableWidget( dockMan );
+	BitMapViewer* viewer = new BitMapViewer();
+	DockableWidget* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Bitmapped VRAM View"));
 	dw->setId("BITMAPVRAMVIEW");
@@ -1109,8 +1104,7 @@ void DebuggerForm::toggleBitMappedDisplay()
 	*/
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect( this, SIGNAL( emulationChanged() ),
-	         viewer, SLOT( refresh() ) );
+	connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
 
 	/*
 	viewer->setDebuggables( debuggables );
@@ -1120,9 +1114,9 @@ void DebuggerForm::toggleBitMappedDisplay()
 
 void DebuggerForm::toggleVDPCommandRegsDisplay()
 {
-	if (VDPCommandRegView == NULL){
+	if (VDPCommandRegView == NULL) {
 		VDPCommandRegView = new VDPCommandRegViewer();
-		DockableWidget *dw = new DockableWidget( dockMan );
+		DockableWidget* dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPCommandRegView);
 		dw->setTitle(tr("VDP registers view"));
 		dw->setId("VDPCommandRegView");
@@ -1130,16 +1124,16 @@ void DebuggerForm::toggleVDPCommandRegsDisplay()
 		dw->setDestroyable(true);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect( this, SIGNAL( emulationChanged() ),
-		         VDPCommandRegView, SLOT( refresh() ) );
+		connect(this, SIGNAL(emulationChanged()),
+		        VDPCommandRegView, SLOT(refresh()));
 	} else {
-		toggleView( qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
+		toggleView(qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
 	}
 }
 
 void DebuggerForm::toggleVDPRegsDisplay()
 {
-	if (VDPRegView == NULL){
+	if (VDPRegView == NULL) {
 		VDPRegView = new VDPRegViewer();
 		DockableWidget *dw = new DockableWidget( dockMan );
 		dw->setWidget(VDPRegView);
@@ -1149,18 +1143,18 @@ void DebuggerForm::toggleVDPRegsDisplay()
 		dw->setDestroyable(true);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect( this, SIGNAL( emulationChanged() ),
-		         VDPRegView, SLOT( refresh() ) );
+		connect(this, SIGNAL(emulationChanged()),
+		        VDPRegView, SLOT(refresh()));
 	} else {
-		toggleView( qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
+		toggleView(qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
 	}
 }
 
 void DebuggerForm::toggleVDPStatusRegsDisplay()
 {
-	if (VDPStatusRegView == NULL){
+	if (VDPStatusRegView == NULL) {
 		VDPStatusRegView = new VDPStatusRegViewer();
-		DockableWidget *dw = new DockableWidget( dockMan );
+		DockableWidget* dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPStatusRegView);
 		dw->setTitle(tr("VDP status registers view"));
 		dw->setId("VDPSTATUSREGVIEW");
@@ -1168,33 +1162,33 @@ void DebuggerForm::toggleVDPStatusRegsDisplay()
 		dw->setDestroyable(true);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect( this, SIGNAL( emulationChanged() ),
-		         VDPStatusRegView, SLOT( refresh() ) );
+		connect(this, SIGNAL(emulationChanged()),
+		        VDPStatusRegView, SLOT(refresh()));
 	} else {
-		toggleView( qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
+		toggleView(qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
 	}
 }
 
 void DebuggerForm::toggleMemoryDisplay()
 {
-	toggleView( qobject_cast<DockableWidget*>(mainMemoryView->parentWidget()));
+	toggleView(qobject_cast<DockableWidget*>(mainMemoryView->parentWidget()));
 }
 
-void DebuggerForm::toggleView( DockableWidget* widget )
+void DebuggerForm::toggleView(DockableWidget* widget)
 {
-	if( widget->isHidden() ) {
+	if (widget->isHidden()) {
 		widget->show();
 	} else {
 		widget->hide();
 	}
-	dockMan.visibilityChanged( widget );
+	dockMan.visibilityChanged(widget);
 }
 
 void DebuggerForm::addDebuggableViewer()
 {
 	// create new debuggable viewer window
-	DebuggableViewer *viewer = new DebuggableViewer;
-	DockableWidget *dw = new DockableWidget( dockMan );
+	DebuggableViewer* viewer = new DebuggableViewer();
+	DockableWidget* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Debuggable hex view"));
 	dw->setId("DEBUGVIEW");
@@ -1202,72 +1196,74 @@ void DebuggerForm::addDebuggableViewer()
 	dw->setDestroyable(true);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	connect( this, SIGNAL( debuggablesChanged(const QMap<QString,int>&) ),
-	         viewer, SLOT( setDebuggables(const QMap<QString,int>&) ) );
-	connect( this, SIGNAL( emulationChanged() ),
-	         viewer, SLOT( refresh() ) );
-	viewer->setDebuggables( debuggables );
-	viewer->setEnabled( disasmView->isEnabled() );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
+	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
+	connect(this, SIGNAL(emulationChanged()),
+	        viewer, SLOT(refresh()));
+	viewer->setDebuggables(debuggables);
+	viewer->setEnabled(disasmView->isEnabled());
 }
 
-void DebuggerForm::dockWidgetVisibilityChanged( DockableWidget *w )
+void DebuggerForm::dockWidgetVisibilityChanged(DockableWidget* w)
 {
-	dockMan.visibilityChanged( w );
+	dockMan.visibilityChanged(w);
 	updateViewMenu();
 }
 
 void DebuggerForm::updateViewMenu()
 {
-	viewRegistersAction->setChecked( regsView->parentWidget()->isVisible() );
-	viewFlagsAction->setChecked( flagsView->isVisible() );
-	viewStackAction->setChecked( stackView->isVisible() );
-	viewSlotsAction->setChecked( slotView->isVisible() );
-	viewMemoryAction->setChecked( mainMemoryView->isVisible() );
+	viewRegistersAction->setChecked(regsView->parentWidget()->isVisible());
+	viewFlagsAction->setChecked(flagsView->isVisible());
+	viewStackAction->setChecked(stackView->isVisible());
+	viewSlotsAction->setChecked(slotView->isVisible());
+	viewMemoryAction->setChecked(mainMemoryView->isVisible());
 }
 
 void DebuggerForm::updateVDPViewMenu()
 {
-	if (VDPCommandRegView)
-		viewVDPCommandRegsAction->setChecked( VDPCommandRegView->isVisible() );
-	if (VDPRegView)
-		viewVDPRegsAction->setChecked( VDPRegView->isVisible() );
-	if (VDPStatusRegView)
-		viewVDPStatusRegsAction->setChecked( VDPStatusRegView->isVisible() );
+	if (VDPCommandRegView) {
+		viewVDPCommandRegsAction->setChecked(VDPCommandRegView->isVisible());
+	}
+	if (VDPRegView) {
+		viewVDPRegsAction->setChecked(VDPRegView->isVisible());
+	}
+	if (VDPStatusRegView) {
+		viewVDPStatusRegsAction->setChecked(VDPStatusRegView->isVisible());
+	}
 }
 
-void DebuggerForm::setDebuggables( const QString& list )
+void DebuggerForm::setDebuggables(const QString& list)
 {
 	debuggables.clear();
 
 	// process result string
 	QStringList l = list.split(" ", QString::SkipEmptyParts);
-	QString d;
-	for( int i = 0; i < l.size(); i++ ) {
-		d = l[i];
+	for (int i = 0; i < l.size(); ++i) {
+		QString d = l[i];
 		// combine multiple words
-		if( d[0] == '{' ) {
-			while( !d.endsWith("}") ) {
+		if (d[0] == '{') {
+			while (!d.endsWith("}")) {
 				d.push_back(' ');
-				d.append( l[++i] );
+				d.append(l[++i]);
 			}
 		}
 		// set initial size to zero
 		debuggables[d] = 0;
 	}
 	// find the size for all debuggables
-	QMap<QString,int>::iterator it = debuggables.begin();
-	while( it != debuggables.end() ) {
+	for (QMap<QString, int>::iterator it = debuggables.begin();
+	     it != debuggables.end(); ++it) {
 		comm.sendCommand(new DebuggableSizeHandler(it.key(), *this));
-		it++;
 	}
 }
 
-void DebuggerForm::setDebuggableSize(  const QString& debuggable, int size )
+void DebuggerForm::setDebuggableSize(const QString& debuggable, int size)
 {
 	debuggables[debuggable] = size;
 	// emit update if size of last debuggable was set
-	if( debuggable == debuggables.keys().last() )
-		emit debuggablesChanged( debuggables );
+	if (debuggable == debuggables.keys().last()) {
+		emit debuggablesChanged(debuggables);
+	}
 }

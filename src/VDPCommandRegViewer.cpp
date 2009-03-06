@@ -254,7 +254,7 @@ void VDPCommandRegViewer::R45BitChanged(int state)
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
 	int val = lineEdit_r46->text().toInt(NULL, 0) & 0xFF;
-	lineEdit_r46->setText(QString("0x%1").arg(val, 2, 16 ,QChar('0')).toUpper());
+	lineEdit_r46->setText(QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper());
 	R46 = val;
 	decodeR46(R46);
 	comboBox_operator->setCurrentIndex(R46 & 15);

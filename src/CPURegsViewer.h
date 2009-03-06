@@ -27,7 +27,7 @@ private:
 	void keyPressEvent(QKeyEvent* e);
 	void focusOutEvent(QFocusEvent* e);
 	bool event(QEvent* e);
-	
+
 	// layout
 	int frameL, frameR, frameT, frameB;
 	int leftRegPos, leftValuePos, rightRegPos, rightValuePos;
