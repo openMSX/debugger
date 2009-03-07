@@ -280,7 +280,12 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 	};
 
 	int x = int(e->x() / zoomFactor);
-	int y = int(e->y() / zoomFactor) >> 1;
+	int y = int(e->y() / zoomFactor) / 2;
+
+	// I see negative y-coords sometimes, so for safety clip the coords
+	x = std::max(0, std::min(511, x));
+	y = std::max(0, std::min(255, y));
+
 	if ((screenMode != 6) && (screenMode != 7)) {
 		x /= 2;
 	}

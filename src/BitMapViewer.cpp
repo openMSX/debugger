@@ -25,6 +25,7 @@ static const unsigned char defaultPalette[32] = {
 
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
+	, screenMod(0) // avoid UMR
 {
 	setupUi(this);
 	// hand code entering the actual display widget in the scrollarea With
