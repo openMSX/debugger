@@ -246,7 +246,17 @@ CXXFLAGS:= -g
 COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(SOURCES_PATH) $(GEN_SRC_PATH))
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
+SDK_PATH:=/Developer/SDKs/MacOSX10.4u.sdk
+OSX_VER:=10.4
+OSX_MIN_REQ:=1040
+COMPILE_ENV:=NEXT_ROOT=$(SDK_PATH) MACOSX_DEPLOYMENT_TARGET=$(OSX_VER)
+LINK_ENV:=NEXT_ROOT=$(SDK_PATH) MACOSX_DEPLOYMENT_TARGET=$(OSX_VER)
+COMPILE_FLAGS+=-D__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=$(OSX_MIN_REQ)
+COMPILE_FLAGS+=-isysroot $(SDK_PATH)
+LINK_FLAGS+=-Wl,-syslibroot,$(SDK_PATH)
 else
+COMPILE_ENV:=
+LINK_ENV:=
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
 LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -lws2_32 -mwindows
 else
@@ -310,7 +320,7 @@ $(OBJECTS_FULL): $(OBJECTS_PATH)/%.o: $(SOURCES_PATH)/%.cpp $(DEPEND_PATH)/%.d
 	@echo "Compiling $(patsubst $(SOURCES_PATH)/%,%,$<)..."
 	@mkdir -p $(@D)
 	@mkdir -p $(patsubst $(OBJECTS_PATH)%,$(DEPEND_PATH)%,$(@D))
-	@$(CXX) \
+	@$(COMPILE_ENV) $(CXX) \
 		$(DEPEND_FLAGS) -MMD -MF $(SRC_DEPEND_SUBST) \
 		-o $@ $(CXXFLAGS) $(COMPILE_FLAGS) -c $<
 	@touch $@ # Force .o file to be newer than .d file.
@@ -318,7 +328,7 @@ $(GEN_OBJ_FULL): $(OBJECTS_PATH)/%.o: $(GEN_SRC_PATH)/%.cpp $(DEPEND_PATH)/%.d
 	@echo "Compiling $(patsubst $(GEN_SRC_PATH)/%,%,$<)..."
 	@mkdir -p $(@D)
 	@mkdir -p $(patsubst $(OBJECTS_PATH)%,$(DEPEND_PATH)%,$(@D))
-	@$(CXX) \
+	@$(COMPILE_ENV) $(CXX) \
 		$(DEPEND_FLAGS) -MMD -MF $(GEN_DEPEND_SUBST) \
 		-o $@ $(CXXFLAGS) $(COMPILE_FLAGS) -c $<
 	@touch $@ # Force .o file to be newer than .d file.
@@ -346,7 +356,7 @@ $(BINARY_FULL): $(OBJECTS_FULL) $(GEN_OBJ_FULL) $(RESOURCE_OBJ)
 ifeq ($(OPENMSX_SUBSET),)
 	@echo "Linking $(@F)..."
 	@mkdir -p $(@D)
-	@$(CXX) -o $@ $(CXXFLAGS) $^ $(LINK_FLAGS)
+	@$(LINK_ENV) $(CXX) -o $@ $(CXXFLAGS) $^ $(LINK_FLAGS)
 else
 	@echo "Not linking $(notdir $@) because only a subset was built."
 endif
