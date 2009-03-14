@@ -1121,7 +1121,7 @@ void DebuggerForm::toggleVDPCommandRegsDisplay()
 		dw->setTitle(tr("VDP registers view"));
 		dw->setId("VDPCommandRegView");
 		dw->setFloating(true);
-		dw->setDestroyable(true);
+		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
 		connect(this, SIGNAL(emulationChanged()),
@@ -1135,12 +1135,12 @@ void DebuggerForm::toggleVDPRegsDisplay()
 {
 	if (VDPRegView == NULL) {
 		VDPRegView = new VDPRegViewer();
-		DockableWidget *dw = new DockableWidget( dockMan );
+		DockableWidget *dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPRegView);
 		dw->setTitle(tr("VDP registers view"));
 		dw->setId("VDPREGVIEW");
 		dw->setFloating(true);
-		dw->setDestroyable(true);
+		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
 		connect(this, SIGNAL(emulationChanged()),
@@ -1159,7 +1159,7 @@ void DebuggerForm::toggleVDPStatusRegsDisplay()
 		dw->setTitle(tr("VDP status registers view"));
 		dw->setId("VDPSTATUSREGVIEW");
 		dw->setFloating(true);
-		dw->setDestroyable(true);
+		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
 		connect(this, SIGNAL(emulationChanged()),
