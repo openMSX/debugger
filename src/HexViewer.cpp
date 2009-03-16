@@ -143,9 +143,9 @@ void HexViewer::setSizes()
 	// check if a scrollbar is needed
 	if (horBytes * visibleLines < debuggableSize) {
 		if (adjustToWidth && w < vertScrollBar->sizeHint().width()) {
-			--horBytes;
+			horBytes = std::max(1, horBytes - 1);
 		}
-		int maxLine = int(ceil(double(debuggableSize)/horBytes)) - visibleLines;
+		int maxLine = int(ceil(double(debuggableSize) / horBytes)) - visibleLines;
 		maxLine = std::max(maxLine, 0);
 		vertScrollBar->setMaximum(maxLine);
 		vertScrollBar->setPageStep(visibleLines);
