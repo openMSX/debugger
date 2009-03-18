@@ -1005,7 +1005,8 @@ void DebuggerForm::executeRunTo()
 
 void DebuggerForm::executeStepOut()
 {
-	// TODO
+	comm.sendCommand(new SimpleCommand("step_out"));
+	setRunMode();
 }
 
 void DebuggerForm::breakpointToggle(int addr)
