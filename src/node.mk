@@ -2,6 +2,9 @@
 
 include build/node-start.mk
 
+SUBDIRS:= \
+	openmsx
+
 MOC_SRC_HDR:= \
 	DockableWidget DockableWidgetArea DockableWidgetLayout \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \

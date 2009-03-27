@@ -10,8 +10,12 @@
 #include <cassert>
 
 #ifdef _WIN32
+#include "SspiNegotiateClient.hh"
+#include "QAbstractSocketStreamWrapper.hh"
+#include <QHostAddress>
 #include <fstream>
 #include <winsock2.h>
+using namespace openmsx;
 #else
 #include <pwd.h>
 #include <sys/socket.h>
@@ -83,35 +87,6 @@ static void deleteSocket(const QFileInfo& info)
 	dir.rmdir(info.absolutePath()); // ignore errors
 }
 
-#ifdef _WIN32
-// This is a bit of a hack, but it does appear to work around
-// a problem on Vista where resolving "localhost" via
-// QTcpSocket::connectToHost fails.
-static QString getLocalHostName()
-{
-	static bool init = false;
-	if (!init) {
-		WSAData wsd;
-		if (WSAStartup(MAKEWORD(2,0), &wsd)) {
-			return NULL;
-		}
-		init = true;
-	}
-
-	hostent* host = gethostbyname("localhost");
-	if (!host->h_addr_list[0] || host->h_length != 4) {
-		return NULL;
-	}
-
-	in_addr in = {
-		host->h_addr_list[0][0],
-		host->h_addr_list[0][1],
-		host->h_addr_list[0][2],
-		host->h_addr_list[0][3] };
-	return inet_ntoa(in);
-}
-#endif
-
 static OpenMSXConnection* createConnection(const QDir& dir, const QString& socketName)
 {
 	QFileInfo info(dir, socketName);
@@ -126,14 +101,17 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	std::ifstream in(info.absoluteFilePath().toAscii().data());
 	in >> port;
 	if (port != -1) {
-		QString localhost = getLocalHostName();
-		if (!localhost.isEmpty()) {
-			socket = new QTcpSocket();
-			socket->connectToHost(localhost, port);
-			if (!socket->waitForConnected(1000)) {
-				delete socket;
-				socket = NULL;
-			}
+		QHostAddress localhost(QHostAddress::LocalHost);
+		socket = new QTcpSocket();
+		socket->connectToHost(localhost, port);
+		
+		QAbstractSocketStreamWrapper stream(socket);
+		SspiNegotiateClient client(stream);
+
+		if (!socket->waitForConnected(1000) ||
+			!client.Authenticate()) {
+			delete socket;
+			socket = NULL;
 		}
 	}
 #else

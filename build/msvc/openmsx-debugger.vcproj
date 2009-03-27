@@ -55,7 +55,7 @@
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;SECURITY_WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BrowseInformation="0"
@@ -75,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib ws2_32.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
@@ -147,7 +147,7 @@
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;SECURITY_WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BrowseInformation="0"
@@ -167,7 +167,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib ws2_32.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
@@ -233,7 +233,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;SECURITY_WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -255,7 +255,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib ws2_32.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
@@ -322,8 +322,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\src\openmsx;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				PreprocessorDefinitions="WIN32;SECURITY_WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -345,7 +345,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib ws2_32.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
@@ -2605,6 +2605,42 @@
 						Outputs="Version.ii"
 					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="openmsx"
+			>
+			<File
+				RelativePath="..\..\src\openmsx\MSXException.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\openmsx.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\SspiNegotiateClient.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\SspiNegotiateClient.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\SspiUtils.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\openmsx\SspiUtils.hh"
+				>
 			</File>
 		</Filter>
 	</Files>
