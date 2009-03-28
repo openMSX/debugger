@@ -8,7 +8,7 @@
 namespace openmsx {
 
 SspiNegotiateClient::SspiNegotiateClient(StreamWrapper& clientStream)
-	: SspiPackageBase(clientStream)
+	: SspiPackageBase(clientStream, NEGOSSP_NAME_W)
 {
 }
 
@@ -26,7 +26,7 @@ bool SspiNegotiateClient::Authenticate()
 		&hCreds,
 		&tsCredsExpiry);
 
-	PrintSecurityStatus("AcquireCredentialsHandleW", ss);
+	DebugPrintSecurityStatus("AcquireCredentialsHandleW", ss);
 	if (ss != SEC_E_OK) {
 		return false;
 	}
@@ -57,7 +57,7 @@ bool SspiNegotiateClient::Authenticate()
 			&fContextAttr,
 			&tsContextExpiry);
 		
-		PrintSecurityStatus("InitializeSecurityContextA", ss);
+		DebugPrintSecurityStatus("InitializeSecurityContextA", ss);
 		if (ss != SEC_E_OK && ss != SEC_I_CONTINUE_NEEDED) {
 			return false;
 		}
@@ -68,27 +68,29 @@ bool SspiNegotiateClient::Authenticate()
 			bool ret = SendChunk(stream, secClientBuffer.pvBuffer, secClientBuffer.cbBuffer);
 			ClearContextBuffers(&secClientBufferDesc);
 			if (!ret) {
+				PRT_DEBUG("SendChunk failed");
 				return false;
 			}
 		}
 
 		// SEC_E_OK means that we're done
 		if (ss == SEC_E_OK) {
-			PrintSecurityPackageName(&hContext);
-			PrintSecurityPrincipalName(&hContext);
+			DebugPrintSecurityPackageName(&hContext);
+			DebugPrintSecurityPrincipalName(&hContext);
 			return true;
 		}
 
 		// Receive another buffer from the server
 		PRT_DEBUG("Receiving server chunk");
-		unsigned cb = RecvChunk(stream, buffer, cbMaxTokenSize);
-		PRT_DEBUG("Received " << cb << " bytes");
-		if (!cb) {
+		bool ret = RecvChunk(stream, buffer, cbMaxTokenSize);
+		if (!ret) {
+			PRT_DEBUG("RecvChunk failed");
 			return false;
 		}
+		PRT_DEBUG("Received " << buffer.size() << " bytes");
 
 		// Another time around the loop
-		secServerBuffer.cbBuffer = cb;
+		secServerBuffer.cbBuffer = static_cast<unsigned long>(buffer.size());
 		secServerBuffer.pvBuffer = &buffer[0];
 
 		phContext = &hContext;

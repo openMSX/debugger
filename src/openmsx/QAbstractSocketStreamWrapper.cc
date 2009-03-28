@@ -11,23 +11,23 @@ QAbstractSocketStreamWrapper::QAbstractSocketStreamWrapper(QAbstractSocket* user
 {
 }
 
-unsigned QAbstractSocketStreamWrapper::Read(void* buffer, unsigned cb)
+unsigned int QAbstractSocketStreamWrapper::Read(void* buffer, unsigned int cb)
 {
 	sock->waitForReadyRead(30);
 	qint64 recvd = sock->read(static_cast<char*>(buffer), cb);
 	if (recvd == -1) {
 		return STREAM_ERROR;
 	}
-	return unsigned(recvd);
+	return static_cast<unsigned int>(recvd);
 }
 
-unsigned QAbstractSocketStreamWrapper::Write(void* buffer, unsigned cb)
+unsigned int QAbstractSocketStreamWrapper::Write(void* buffer, unsigned int cb)
 {
 	qint64 sent = sock->write(static_cast<char*>(buffer), cb);
 	if (sent == -1 || !sock->flush()) {
 		return STREAM_ERROR;
 	}
-	return unsigned(sent);
+	return static_cast<unsigned int>(sent);
 }
 
 } // namespace openmsx

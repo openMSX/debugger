@@ -10,6 +10,8 @@
 
 namespace openmsx {
 
+using namespace sspiutils;
+
 class QAbstractSocketStreamWrapper : public StreamWrapper
 {
 private:
@@ -17,8 +19,8 @@ private:
 public:
 	QAbstractSocketStreamWrapper(QAbstractSocket* userSock);
 
-	unsigned Read(void* buffer, unsigned cb);
-	unsigned Write(void* buffer, unsigned cb);
+	unsigned int Read(void* buffer, unsigned int cb);
+	unsigned int Write(void* buffer, unsigned int cb);
 };
 
 } // namespace openmsx
