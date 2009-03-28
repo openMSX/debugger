@@ -243,7 +243,8 @@ endif
 
 CXX:=g++
 CXXFLAGS:= -g
-COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(SOURCES_PATH) $(GEN_SRC_PATH))
+INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
+COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PATH))
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 SDK_PATH:=/Developer/SDKs/MacOSX10.4u.sdk
