@@ -2,7 +2,7 @@
 
 #ifdef _WIN32
 
-#include "QAbstractSocketStreamWrapper.hh"
+#include "QAbstractSocketStreamWrapper.h"
 
 namespace openmsx {
 

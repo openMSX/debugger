@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef OPENMSX_HH
-#define OPENMSX_HH
+#ifndef OPENMSX_H
+#define OPENMSX_H
 
 // don't just always include this, saves about 1 minute build time!!
 #ifdef DEBUG
@@ -54,4 +54,4 @@ typedef unsigned long long uint64;
 
 } // namespace openmsx
 
-#endif
+#endif // OPENMSX_H

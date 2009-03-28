@@ -1,11 +1,11 @@
 // $Id$
 
-#ifndef SSPI_NEGOTIATE_CLIENT_HH
-#define SSPI_NEGOTIATE_CLIENT_HH
+#ifndef SSPI_NEGOTIATE_CLIENT_H
+#define SSPI_NEGOTIATE_CLIENT_H
 
 #ifdef _WIN32
 
-#include "SspiUtils.hh"
+#include "SspiUtils.h"
 
 namespace openmsx {
 
@@ -22,4 +22,4 @@ public:
 
 #endif // _WIN32
 
-#endif // SSPI_NEGOTIATE_CLIENT_HH
+#endif // SSPI_NEGOTIATE_CLIENT_H

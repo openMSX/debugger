@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef MSXEXCEPTION_HH
-#define MSXEXCEPTION_HH
+#ifndef MSXEXCEPTION_H
+#define MSXEXCEPTION_H
 
 #include <string>
 
@@ -39,4 +39,4 @@ private:
 
 } // namespace openmsx
 
-#endif
+#endif // MSXEXCEPTION_H

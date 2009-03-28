@@ -2,8 +2,8 @@
 
 #ifdef _WIN32
 
-#include "SspiNegotiateClient.hh"
-#include "openmsx.hh"
+#include "SspiNegotiateClient.h"
+#include "openmsx.h"
 
 namespace openmsx {
 
@@ -56,7 +56,7 @@ bool SspiNegotiateClient::Authenticate()
 			&secClientBufferDesc,
 			&fContextAttr,
 			&tsContextExpiry);
-		
+
 		DebugPrintSecurityStatus("InitializeSecurityContextA", ss);
 		if (ss != SEC_E_OK && ss != SEC_I_CONTINUE_NEEDED) {
 			return false;

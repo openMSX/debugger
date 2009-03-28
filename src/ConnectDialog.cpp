@@ -10,8 +10,8 @@
 #include <cassert>
 
 #ifdef _WIN32
-#include "SspiNegotiateClient.hh"
-#include "QAbstractSocketStreamWrapper.hh"
+#include "SspiNegotiateClient.h"
+#include "QAbstractSocketStreamWrapper.h"
 #include <QHostAddress>
 #include <fstream>
 #include <winsock2.h>
@@ -104,7 +104,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 		QHostAddress localhost(QHostAddress::LocalHost);
 		socket = new QTcpSocket();
 		socket->connectToHost(localhost, port);
-		
+
 		QAbstractSocketStreamWrapper stream(socket);
 		SspiNegotiateClient client(stream);
 

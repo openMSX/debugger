@@ -1,12 +1,12 @@
 // $Id$
 
-#ifndef QTCP_SOCKET_STREAM_WRAPPER_HH
-#define QTCP_SOCKET_STREAM_WRAPPER_HH
+#ifndef QTCP_SOCKET_STREAM_WRAPPER_H
+#define QTCP_SOCKET_STREAM_WRAPPER_H
 
 #ifdef _WIN32
 
 #include <QAbstractSocket>
-#include "SspiUtils.hh"
+#include "SspiUtils.h"
 
 namespace openmsx {
 
@@ -27,4 +27,4 @@ public:
 
 #endif // _WIN32
 
-#endif // QTCP_SOCKET_STREAM_WRAPPER_HH
+#endif // QTCP_SOCKET_STREAM_WRAPPER_H

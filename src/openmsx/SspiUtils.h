@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef SSPI_UTILS_HH
-#define SSPI_UTILS_HH
+#ifndef SSPI_UTILS_H
+#define SSPI_UTILS_H
 
 #ifdef _WIN32
 
@@ -51,7 +51,7 @@ const DWORD ACCESS_WRITE = 0x2;
 const DWORD ACCESS_EXECUTE = 0x4;
 const DWORD ACCESS_ALL = ACCESS_READ | ACCESS_WRITE | ACCESS_EXECUTE;
 
-const GENERIC_MAPPING mapping = { 
+const GENERIC_MAPPING mapping = {
 	ACCESS_READ, ACCESS_WRITE, ACCESS_EXECUTE, ACCESS_ALL };
 
 void InitTokenContextBuffer(PSecBufferDesc pSecBufferDesc, PSecBuffer pSecBuffer);
@@ -72,4 +72,4 @@ bool RecvChunk(StreamWrapper& stream, std::vector<char>& buffer, unsigned int cb
 
 #endif // _WIN32
 
-#endif // SSPI_UTILS_HH
+#endif // SSPI_UTILS_H
