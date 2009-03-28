@@ -1,4 +1,4 @@
-# $Id:
+# $Id$
 
 include build/node-start.mk
 
@@ -6,7 +6,7 @@ SRC_HDR:= \
 	QAbstractSocketStreamWrapper SspiNegotiateClient SspiUtils
 
 HDR_ONLY:= \
-        openmsx \
-        MSXException \
+	openmsx \
+	MSXException
 
 include build/node-end.mk
