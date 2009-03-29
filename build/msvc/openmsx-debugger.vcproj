@@ -2611,35 +2611,35 @@
 			Name="openmsx"
 			>
 			<File
-				RelativePath="..\..\src\openmsx\MSXException.hh"
+				RelativePath="..\..\src\openmsx\MSXException.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\openmsx.hh"
+				RelativePath="..\..\src\openmsx\openmsx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.cc"
+				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.hh"
+				RelativePath="..\..\src\openmsx\QAbstractSocketStreamWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\SspiNegotiateClient.cc"
+				RelativePath="..\..\src\openmsx\SspiNegotiateClient.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\SspiNegotiateClient.hh"
+				RelativePath="..\..\src\openmsx\SspiNegotiateClient.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\SspiUtils.cc"
+				RelativePath="..\..\src\openmsx\SspiUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\openmsx\SspiUtils.hh"
+				RelativePath="..\..\src\openmsx\SspiUtils.h"
 				>
 			</File>
 		</Filter>

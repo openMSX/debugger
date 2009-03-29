@@ -1,7 +1,7 @@
 // $Id$
 
-#ifndef SSPI_UTILS_H
-#define SSPI_UTILS_H
+#ifndef SSPI_UTILS_HH
+#define SSPI_UTILS_HH
 
 #ifdef _WIN32
 
@@ -15,6 +15,7 @@
 #endif
 #include <security.h>
 #include <vector>
+#include "openmsx.h"
 
 //
 // NOTE: This file MUST be kept in sync between the openmsx and openmsx-debugger projects
@@ -28,8 +29,8 @@ const unsigned STREAM_ERROR = 0xffffffff;
 class StreamWrapper
 {
 public:
-	virtual unsigned Read(void* buffer, unsigned cb) = 0;
-	virtual unsigned Write(void* buffer, unsigned cb) = 0;
+	virtual uint32 Read(void* buffer, uint32 cb) = 0;
+	virtual uint32 Write(void* buffer, uint32 cb) = 0;
 };
 
 class SspiPackageBase
@@ -51,7 +52,7 @@ const DWORD ACCESS_WRITE = 0x2;
 const DWORD ACCESS_EXECUTE = 0x4;
 const DWORD ACCESS_ALL = ACCESS_READ | ACCESS_WRITE | ACCESS_EXECUTE;
 
-const GENERIC_MAPPING mapping = {
+const GENERIC_MAPPING mapping = { 
 	ACCESS_READ, ACCESS_WRITE, ACCESS_EXECUTE, ACCESS_ALL };
 
 void InitTokenContextBuffer(PSecBufferDesc pSecBufferDesc, PSecBuffer pSecBuffer);
@@ -64,12 +65,12 @@ void DebugPrintSecurityDescriptor(PSECURITY_DESCRIPTOR psd);
 PSECURITY_DESCRIPTOR CreateCurrentUserSecurityDescriptor();
 unsigned long GetPackageMaxTokenSize(wchar_t* package);
 
-bool SendChunk(StreamWrapper& stream, void* buffer, unsigned int cb);
-bool RecvChunk(StreamWrapper& stream, std::vector<char>& buffer, unsigned int cbMaxSize);
+bool SendChunk(StreamWrapper& stream, void* buffer, uint32 cb);
+bool RecvChunk(StreamWrapper& stream, std::vector<char>& buffer, uint32 cbMaxSize);
 
 } // namespace sspiutils
 } // namespace openmsx
 
 #endif // _WIN32
 
-#endif // SSPI_UTILS_H
+#endif // SSPI_UTILS_HH
