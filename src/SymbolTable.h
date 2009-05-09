@@ -73,7 +73,7 @@ private:
 class SymbolTable
 {
 public:
-	enum FileType { DETECT_FILE, TNIASM_FILE, ASMSX_FILE, LINKMAP_FILE };
+	enum FileType { DETECT_FILE, TNIASM_FILE, SJASM_FILE,  ASMSX_FILE, LINKMAP_FILE };
 
 	~SymbolTable();
 
@@ -108,6 +108,7 @@ private:
 	void appendFile(const QString& file, FileType type);
 	bool readTNIASM0File(const QString& filename);
 	bool readASMSXFile(const QString& filename);
+	bool readSJASMFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
 
 	void mapSymbol(Symbol* symbol);

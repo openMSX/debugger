@@ -163,8 +163,10 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 				QString line = in.readLine();
 				if (line[0] == ';') {
 					type = ASMSX_FILE;
-				} else if (line.contains(": equ ")) {
+				} else if (line.contains("; last def. pass")) {
 					type = TNIASM_FILE;
+				} else if (line.contains(": equ ")) {
+					type = SJASM_FILE;
 				}
 			}
 		}
@@ -173,6 +175,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 	switch (type) {
 	case TNIASM_FILE:
 		return readTNIASM0File(filename);
+	case SJASM_FILE:
+		return readSJASMFile(filename);
 	case ASMSX_FILE:
 		return readASMSXFile(filename);
 	case LINKMAP_FILE:
@@ -205,6 +209,28 @@ bool SymbolTable::readTNIASM0File(const QString& filename)
 		QStringList l = line.split(": equ ");
 		if (l.size() != 2) continue;
 		QStringList a = l.at(1).split("h ;");
+		if (a.size() != 2) continue;
+		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
+		sym->setSource(&symbolFiles.back().fileName);
+		add(sym);
+	}
+	return true;
+}
+
+bool SymbolTable::readSJASMFile(const QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+
+	appendFile(filename, TNIASM_FILE);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		QStringList l = line.split(": equ ");
+		if (l.size() != 2) continue;
+		QStringList a = l.at(1).split("h");
 		if (a.size() != 2) continue;
 		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
 		sym->setSource(&symbolFiles.back().fileName);
