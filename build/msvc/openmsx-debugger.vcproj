@@ -54,13 +54,14 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				AdditionalIncludeDirectories="&quot;$(SrcDir)\openmsx&quot;;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
 				PreprocessorDefinitions="WIN32;SECURITY_WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -146,13 +147,14 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				AdditionalIncludeDirectories="&quot;$(SrcDir)\openmsx&quot;;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtXml&quot;"
 				PreprocessorDefinitions="WIN32;SECURITY_WIN32;NDEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -232,7 +234,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				AdditionalIncludeDirectories="&quot;$(SrcDir)\openmsx&quot;;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
 				PreprocessorDefinitions="WIN32;SECURITY_WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -255,11 +257,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib ws2_32.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir)&quot;"
-				IgnoreDefaultLibraryNames=""
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -322,7 +325,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src\openmsx;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName)\Include\QtXml&quot;"
+				AdditionalIncludeDirectories="&quot;$(SrcDir)\openmsx&quot;;&quot;$(DebuggerConfigDir)&quot;;&quot;$(UiOutDir)&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtCore&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtGui&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtNetwork&quot;;&quot;$(3rdPartySrcDir)\$(LibQtName_64)\Include\QtXml&quot;"
 				PreprocessorDefinitions="WIN32;SECURITY_WIN32;_DEBUG;_CONSOLE;_MBCS;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -345,11 +348,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="secur32.lib ws2_32.lib QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtXmld4.lib qtmaind.lib"
+				AdditionalDependencies="secur32.lib ws2_32.lib QtCore4.lib QtGui4.lib QtNetwork4.lib QtXml4.lib qtmain.lib"
 				Version=""
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(3rdPartyOutDir_64)&quot;"
-				IgnoreDefaultLibraryNames=""
+				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"

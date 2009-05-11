@@ -5,6 +5,11 @@
 	Name="3rdparty"
 	>
 	<UserMacro
+		Name="SrcDir"
+		Value="..\..\src"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
 		Name="DerivedDir"
 		Value="..\..\derived"
 		PerformEnvironmentSet="true"
@@ -47,18 +52,23 @@
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
+		Name="3rdPartyOutDir_64"
+		Value="$(3rdPartySrcDir)\$(LibQtName_64)\lib"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
 		Name="MocOutDir"
-		Value="..\..\src\moc"
+		Value="$(SrcDir)\moc"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
 		Name="UiOutDir"
-		Value="..\..\src\ui"
+		Value="$(SrcDir)\ui"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
 		Name="QrcOutDir"
-		Value="..\..\src\qrc"
+		Value="$(SrcDir)\qrc"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
@@ -67,18 +77,13 @@
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
-		Name="LibQtToolsDir"
-		Value="$(3rdPartySrcDir)\$(LibQtName)\bin"
-		PerformEnvironmentSet="true"
-	/>
-	<UserMacro
 		Name="LibQtName_64"
 		Value="Qt-4.4.3-src"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
-		Name="3rdPartyOutDir_64"
-		Value="$(3rdPartySrcDir)\$(LibQtName_64)\lib"
+		Name="LibQtToolsDir"
+		Value="$(3rdPartySrcDir)\$(LibQtName)\bin"
 		PerformEnvironmentSet="true"
 	/>
 </VisualStudioPropertySheet>
