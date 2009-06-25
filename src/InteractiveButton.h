@@ -21,10 +21,17 @@ signals:
 
 public slots:
 	void highlight(bool state);
+	void mustBeSet(bool state);
 
 private slots:
 	// this one is specific for the VDPRegViewer
 	void newBitValueSlot(bool);
+
+private:
+	void setColor();
+	bool _mustBeSet;
+	bool _highlight;
+	bool _state;
 };
 
 #endif // INTERACTIVEBUTTON

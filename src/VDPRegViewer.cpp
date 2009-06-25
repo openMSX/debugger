@@ -354,25 +354,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_val_27->setText(hex2(regs[27]));
 	}
 
-	// update all the individual bits
-	int upper_r = (vdpid == VDP_TMS99X8) ? 7 : (vdpid == VDP_V9938) ? 23 : 27;
-	for (int r = 0; r <= upper_r; ++r) {
-		if (r == 24) continue;
-		for (int b = 7; b >= 0; --b) {
-			QString name = QString("pushButton_%1_%2").arg(r).arg(b);
-			InteractiveButton* i = qFindChild<InteractiveButton*>(this, name);
-			i->setChecked((regs[r] & (1 << b)) ? true : false);
-		}
-	}
-
-	// Start the interpretation
-	label_dec_ie2->setText((regs[0] & 32)
-		? "Interrupt from lightpen enabled"
-		: "Interrupt from lightpen disabled");
-	label_dec_ie1->setText((regs[0] & 16)
-		? "Reg 19 scanline interrupt enabled"
-		: "Reg 19 scanline interrupt disabled");
-
+	// determine screenmode
 	int m = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3);
 	const char* const screen[32] = {
 		"SCREEN 1", "SCREEN 3", "SCREEN 0",
@@ -387,6 +369,110 @@ void VDPRegViewer::decodeVDPRegs()
 		"let's find out 27", "SCREEN 8", "let's find out 29",
 		"let's find out 30", "let's find out 31"
 	};
+	int basicscreen;
+	switch (m){
+		case  2: basicscreen=0;break;
+		case  0: basicscreen=1;break;
+		case  4: basicscreen=2;break;
+		case  1: basicscreen=3;break;
+		case  8: basicscreen=4;break;
+		case 12: basicscreen=5;break;
+		case 16: basicscreen=6;break;
+		case 20: basicscreen=7;break;
+		case 28: basicscreen=8;break;
+		case 10: basicscreen=9;break; //screen 0 width 80
+		default: basicscreen=10;    //not a valid basic screen mode
+	};
+
+	// 2 vdps, 11 basic screenmodes, 12 registers
+	static const int mustbeone[][11][12] = {
+		{ // TMS99x8 MSX1 VDP chip
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 0;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 1;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 2;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 3;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 4;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 5;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 6;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 7;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 8;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 0 width 80;
+		{0, 0,    0,    0,    0,    0,    0,    0, 0,0, 0, 0} // undefined basic screen;
+		},
+		{ // V9938 and V9958 MSX2/2+ VDP chip
+		// Note that there is a hardcoded check for reg5 bit 2 (A9) in spritemode 2
+		// which deliberatly isn't set here in the table!
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 0;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 1;
+		{0, 0, 0x00, 0x7f, 0x03, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 2;
+		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 3;
+		{0, 0, 0x00, 0x7f, 0x03, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 4;
+		{0, 0, 0x1f, 0x00, 0x00, 0x03, 0x00, 0x00, 0,0,0,0}, // screen 5;
+		{0, 0, 0x1f, 0x00, 0x00, 0x03, 0x00, 0x00, 0,0,0,0}, // screen 6;
+		{0, 0, 0x1f, 0x00, 0x00, 0x03, 0x00, 0x00, 0,0,0,0}, // screen 7;
+		{0, 0, 0x1f, 0x00, 0x00, 0x03, 0x00, 0x00, 0,0,0,0}, // screen 8;
+		{0, 0, 0x03, 0x07, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 0 width 80;
+		{0, 0,    0,    0,    0,    0,    0,    0, 0,0, 0, 0} // undefined basic screen;
+		}
+
+	};
+	static const int bitsused[][11][12] = {
+		{// MSX1 = static const int VDP_TMS99X8 = 1
+		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // screen 0;
+		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // screen 1;
+		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // screen 2;
+		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // screen 3;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 4;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 5;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 6;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 7;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 8;
+		{0,1,    2,    3,    4,    5,    6, 7,8,9, 0x00, 0x00}, // screen 0 width 80;
+		{255,255,255,255,255,255,255,255,255,255,255,255} // undefined basic screen;
+		},
+		{ // MSX2 = static const int VDP_V9938 = 0;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 0;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 1;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 2;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 3;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 4;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 5;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 6;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 7;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 8;
+		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // screen 0 width 80;
+		{255,255,255,255,255,255,255,255,255,255,255,255} // undefined basic screen;
+		}
+	};
+
+	// update all the individual bits
+	int upper_r = (vdpid == VDP_TMS99X8) ? 7 : (vdpid == VDP_V9938) ? 23 : 27;
+	for (int r = 0; r <= upper_r; ++r) {
+		if (r == 24) continue;
+		for (int b = 7; b >= 0; --b) {
+			QString name = QString("pushButton_%1_%2").arg(r).arg(b);
+			InteractiveButton* i = qFindChild<InteractiveButton*>(this, name);
+			i->setChecked((regs[r] & (1 << b)) ? true : false);
+			if (r<12){
+				i->mustBeSet((mustbeone[ (vdpid == VDP_TMS99X8)?0:1 ][basicscreen][r] & (1 << b)) ? true : false);
+				// if A8 of R5 is a 'mustbeone' then we indicate this for A9 also
+				// This bit is cleared in the table since it isn't used in the Sprite
+				// Attribute Table address calculation otherwise, but will only impact the 
+				// Sprite Color Table
+				if (r==5 && b==2 && vdpid!=VDP_TMS99X8 && mustbeone[1][basicscreen][5] ){
+					i->mustBeSet(true);
+				}
+			}
+		}
+	}
+
+	// Start the interpretation
+	label_dec_ie2->setText((regs[0] & 32)
+		? "Interrupt from lightpen enabled"
+		: "Interrupt from lightpen disabled");
+	label_dec_ie1->setText((regs[0] & 16)
+		? "Reg 19 scanline interrupt enabled"
+		: "Reg 19 scanline interrupt disabled");
 
 	if (m == 28 && vdpid == VDP_V9958) {
 		bool yjk = (regs[25] &  8);
@@ -417,35 +503,89 @@ void VDPRegViewer::decodeVDPRegs()
 		? "magnified sprites"
 		: "regular sized");
 
-	/*TODO warn if mustbeone bits are not one.. and they should depend
-	 *     on the active screenmode
-	static const int mustbeone[][12] = {
-		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX2 = static const int VDP_V9938 = 0;
-		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}, // MSX1 = static const int VDP_TMS99X8 = 1;
-		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
-		{0, 1, 2   , 3   , 4   , 5   , 6   , 7   , 8,9,10,11}, // not used
-		{0, 1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 8,9,10,11}  // MSX2+ = static const int VDP_V9958 = 4;
-	};*/
-	static const int bitsused[][12] = {
-		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}, // MSX2 = static const int VDP_V9938 = 0;
-		{0,1, 0x0f, 0xff, 0x07, 0x7f, 0x07, 7,8,9, 0x00, 0x00}, // MSX1 = static const int VDP_TMS99X8 = 1;
-		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
-		{0,1, 2   , 3   , 4   , 5   , 6   , 7,8,9, 10  , 11  }, // not used
-		{0,1, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 7,8,9, 0x07, 0x03}  // MSX2+ = static const int VDP_V9958 = 4;
+
+
+	// Now calculate the addresses of all tables
+	// TODO : clean up code and get rid of all the mustbeset bits for regs>5 since there are never must bits.
+
+
+	// some variables used for readability of the code below
+	int row = vdpid==VDP_TMS99X8?0:1;
+	QString regtexttext;
+	int must,must2;
+
+	// the pattern name table address
+	must=mustbeone[row][basicscreen][2] ;
+	regtexttext = hex5(
+		((255^must) & bitsused[row][basicscreen][2] & regs[2]) << 10);
+
+	if ((must & regs[2]) != must ) {
+		label_dec_r2->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r2->setToolTip("Some of the obligatory 1 bits are reset!");
+	} else {
+		label_dec_r2->setText(regtexttext);
+		label_dec_r2->setToolTip(NULL);
+	}
+
+	// the color table address
+	must=mustbeone[row][basicscreen][3] ;
+	must2=mustbeone[row][basicscreen][10] ;
+	regtexttext=hex5(
+		(
+			((255^must) & bitsused[row][basicscreen][ 3] & regs[ 3]) <<  6
+		  ) | (
+			((255^must2) & bitsused[row][basicscreen][10] & regs[10]) << 14
+		)
+		);
+	if (((must & regs[3]) != must ) || ((must2 & regs[10]) != must2 ) ){
+		label_dec_r3->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r3->setToolTip("Some of the obligatory 1 bits are reset!");
+	} else {
+		label_dec_r3->setText(regtexttext);
+		label_dec_r3->setToolTip(NULL);
+	}
+
+	// the pattern generator address
+	must=mustbeone[row][basicscreen][4] ;
+	regtexttext=hex5(
+		(
+			( 255^must) & bitsused[row][basicscreen][4] & regs[4]) << 11
+		);
+	if ((must & regs[4]) != must ){
+		label_dec_r4->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r4->setToolTip("Some of the obligatory 1 bits are reset!");
+	} else {
+		label_dec_r4->setText(regtexttext);
+		label_dec_r4->setToolTip(NULL);
+	}
+
+	// the sprite attribute tabel address
+	must=mustbeone[row][basicscreen][5] ;
+	must2=mustbeone[row][basicscreen][11] ;
+	regtexttext=hex5(
+		(
+		(((255^must) & bitsused[row][basicscreen][ 5] & regs[ 5]) <<  7) |
+		(((255^must2) & bitsused[row][basicscreen][11] & regs[11]) << 15))
+		);
+	if (((must & regs[5]) != must ) || ((must2 & regs[11]) != must2 ) ){
+		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r5->setToolTip("Some of the obligatory 1 bits are reset!");
+	} else {
+		label_dec_r5->setText(regtexttext);
+		label_dec_r5->setToolTip(NULL);
+	};
+	// special case for sprite mode 2
+	if (must && !( 4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
+		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r5->setToolTip("Bit A9 should be set, to obtain the Sprite Color Table address this bit is masked<br>With the current bit reset the Color Tabel will use the same address as the Sprite Atribute Tabel!");
 	};
 
-	label_dec_r2->setText(hex5(
-		(bitsused[vdpid][2] & regs[2]) << 10));
-	label_dec_r3->setText(hex5(
-		((bitsused[vdpid][ 3] & regs[ 3]) <<  6) |
-		((bitsused[vdpid][10] & regs[10]) << 14)));
-	label_dec_r4->setText(hex5(
-		(bitsused[vdpid][4] & regs[4]) << 11));
-	label_dec_r5->setText(hex5(
-		((bitsused[vdpid][ 5] & regs[ 5]) <<  7) |
-		((bitsused[vdpid][11] & regs[11]) << 15)));
+
+	// the sprite pattern generator address
 	label_dec_r6->setText(hex5(
-		(bitsused[vdpid][6] & regs[6]) << 11));
+		((255^mustbeone[row][basicscreen][6]) & bitsused[row][basicscreen][6] & regs[6]) << 11));
+
+	// end of address calculations
 
 	label_dec_tc->setText(dec2((regs[7] >> 4) & 15));
 	label_dec_bd->setText(dec2((regs[7] >> 0) & 15));
