@@ -702,7 +702,7 @@ void DebuggerForm::initConnection()
 	comm.sendCommand(new QueryPauseHandler(*this));
 	comm.sendCommand(new QueryBreakedHandler(*this));
 
-	comm.sendCommand(new SimpleCommand("update enable status"));
+	comm.sendCommand(new SimpleCommand("openmsx_update enable status"));
 
 	comm.sendCommand(new ListDebuggablesHandler(*this));
 
