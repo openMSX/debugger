@@ -28,9 +28,9 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	const char* const flagNames[8] =
 		{ "C"   , "N", "P"   , "", "H", "", "Z"   , "S"   };
 	const char* const flagOn[8] =
-		{ "(C)" , "" , "(PO)", "", "",  "", "(Z)" , "(M)" };
+		{ "(C)" , "" , "(PE)", "", "",  "", "(Z)" , "(M)" };
 	const char* const flagOff[8] =
-		{ "(NC)", "" , "(PE)", "", "",  "", "(NZ)", "(P)" };
+		{ "(NC)", "" , "(PO)", "", "",  "", "(NZ)", "(P)" };
 
 	// call parent for drawing the actual frame
 	QFrame::paintEvent(e);
