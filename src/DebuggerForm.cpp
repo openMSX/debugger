@@ -307,6 +307,12 @@ void DebuggerForm::createActions()
 	executeStepOutAction->setIcon(QIcon(":/icons/stepout.png"));
 	executeStepOutAction->setEnabled(false);
 
+	executeStepBackAction = new QAction(tr("Step back"), this);
+	executeStepBackAction->setShortcut(tr("F12"));
+	executeStepBackAction->setStatusTip(tr("Reverse the last instruction"));
+	executeStepBackAction->setIcon(QIcon(":/icons/stepback.png"));
+	executeStepBackAction->setEnabled(false);
+
 	executeRunToAction = new QAction(tr("Run to"), this);
 	executeRunToAction->setShortcut(tr("F4"));
 	executeRunToAction->setStatusTip(tr("Resume execution until the selected line is reached"));
@@ -354,6 +360,7 @@ void DebuggerForm::createActions()
 	connect(executeStepOverAction, SIGNAL(triggered()), this, SLOT(executeStepOver()));
 	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
 	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
+	connect(executeStepBackAction, SIGNAL(triggered()), this, SLOT(executeStepBack()));
 	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(breakpointToggle()));
 	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(breakpointAdd()));
 	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
@@ -411,6 +418,7 @@ void DebuggerForm::createMenus()
 	executeMenu->addAction(executeStepAction);
 	executeMenu->addAction(executeStepOverAction);
 	executeMenu->addAction(executeStepOutAction);
+	executeMenu->addAction(executeStepBackAction);
 	executeMenu->addAction(executeRunToAction);
 
 	// create breakpoint menu
@@ -442,6 +450,7 @@ void DebuggerForm::createToolbars()
 	executeToolbar->addAction(executeStepAction);
 	executeToolbar->addAction(executeStepOverAction);
 	executeToolbar->addAction(executeStepOutAction);
+	executeToolbar->addAction(executeStepBackAction);
 	executeToolbar->addAction(executeRunToAction);
 }
 
@@ -763,6 +772,7 @@ void DebuggerForm::connectionClosed()
 	executeStepAction->setEnabled(false);
 	executeStepOverAction->setEnabled(false);
 	executeStepOutAction->setEnabled(false);
+	executeStepBackAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
@@ -848,6 +858,7 @@ void DebuggerForm::setBreakMode()
 	executeStepAction->setEnabled(true);
 	executeStepOverAction->setEnabled(true);
 	executeStepOutAction->setEnabled(true);
+	executeStepBackAction->setEnabled(true);
 	executeRunToAction->setEnabled(true);
 	breakpointToggleAction->setEnabled(true);
 	breakpointAddAction->setEnabled(true);
@@ -860,6 +871,7 @@ void DebuggerForm::setRunMode()
 	executeStepAction->setEnabled(false);
 	executeStepOverAction->setEnabled(false);
 	executeStepOutAction->setEnabled(false);
+	executeStepBackAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
 	breakpointToggleAction->setEnabled(false);
 	breakpointAddAction->setEnabled(false);
@@ -992,7 +1004,9 @@ void DebuggerForm::executeStep()
 
 void DebuggerForm::executeStepOver()
 {
-	comm.sendCommand(new SimpleCommand("step_over"));
+	SimpleCommand *sc = new SimpleCommand("step_over");
+	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
+	comm.sendCommand(sc);
 	setRunMode();
 }
 
@@ -1007,6 +1021,20 @@ void DebuggerForm::executeStepOut()
 {
 	comm.sendCommand(new SimpleCommand("step_out"));
 	setRunMode();
+}
+
+void DebuggerForm::executeStepBack()
+{
+	SimpleCommand *sc = new SimpleCommand("step_back");
+	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
+	comm.sendCommand(sc);
+}
+
+void DebuggerForm::handleCommandReplyStatus(bool status)
+{
+	if(status) {
+		finalizeConnection(true);
+	}
 }
 
 void DebuggerForm::breakpointToggle(int addr)

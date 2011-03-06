@@ -94,6 +94,7 @@ private:
 	QAction* executeStepOverAction;
 	QAction* executeRunToAction;
 	QAction* executeStepOutAction;
+	QAction* executeStepBackAction;
 
 	QAction* breakpointToggleAction;
 	QAction* breakpointAddAction;
@@ -148,9 +149,12 @@ private slots:
 	void executeStepOver();
 	void executeRunTo();
 	void executeStepOut();
+	void executeStepBack();
 	void breakpointToggle(int addr = -1);
 	void breakpointAdd();
 
+	void handleCommandReplyStatus(bool status);
+	
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,

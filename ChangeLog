@@ -1,5 +1,9 @@
 $Id$
 
+2011-03-06 Edwin Velds <e.velds@gmail.com>
+	* Added support for step_back
+	* Added a workaround for step_over leaving a breakpoint
+
 2009-06-25 David Heremans <david.heremans@gnu-linux.net>
 	* The VDP register viewer will now indicate  the bits which 
 	  must be set according to the VDP technical data book.

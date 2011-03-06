@@ -21,14 +21,19 @@ public:
 	virtual void cancel() = 0;
 };
 
-class SimpleCommand : public Command
+class SimpleCommand : public QObject, public Command
 {
+	Q_OBJECT
 public:
 	SimpleCommand(const QString& command);
 	virtual QString getCommand() const;
 	virtual void replyOk (const QString& message);
 	virtual void replyNok(const QString& message);
 	virtual void cancel();
+	
+signals:
+	void replyStatusOk(bool status);
+
 private:
 	QString command;
 };

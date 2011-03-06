@@ -10,6 +10,7 @@
     <file>icons/stepover.png</file>
     <file>icons/runto.png</file>
     <file>icons/stepout.png</file>
+    <file>icons/stepback.png</file>
     <file>icons/breakpoint.png</file>
     <file>icons/pcarrow.png</file>
     <file>icons/symmanager.png</file>
