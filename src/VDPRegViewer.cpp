@@ -457,7 +457,7 @@ void VDPRegViewer::decodeVDPRegs()
 				i->mustBeSet((mustbeone[ (vdpid == VDP_TMS99X8)?0:1 ][basicscreen][r] & (1 << b)) ? true : false);
 				// if A8 of R5 is a 'mustbeone' then we indicate this for A9 also
 				// This bit is cleared in the table since it isn't used in the Sprite
-				// Attribute Table address calculation otherwise, but will only impact the 
+				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table
 				if (r==5 && b==2 && vdpid!=VDP_TMS99X8 && mustbeone[1][basicscreen][5] ){
 					i->mustBeSet(true);
@@ -595,8 +595,8 @@ void VDPRegViewer::decodeVDPRegs()
 			? "Color 0 uses the color registers"
 			: "Color 0 is transparent (=shows border)");
 		label_dec_spd->setText((regs[8] & 2)
-			? "Sprites enabled"
-			: "Sprites disabled");
+			? "Sprites disabled"
+			: "Sprites enabled");
 
 		label_dec_ln->setText((regs[9] & 128) ? "212" : "192");
 		label_dec_il->setText((regs[9] &   8) ? "interlaced" : "non-interlaced");

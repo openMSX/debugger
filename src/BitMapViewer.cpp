@@ -151,7 +151,7 @@ void BitMapViewer::on_showPage_currentIndexChanged(int index)
 
 	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
 	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged( int %i);\n", index);
-	if (screenMod > 7) index *= 2;
+	if (screenMod >= 7) index *= 2;
 	int vramAddress = m1[index];
 	printf("vramAddress %i\n", vramAddress);
 	imageWidget->setVramAddress(vramAddress);
