@@ -203,15 +203,12 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_1_7->setToolTip("");
 
 			// all A16 bits of regs < 7
-			pushButton_2_6->setText("A16");
 			pushButton_4_5->setText("A16");
 			pushButton_6_5->setText("A16");
 			// all A15
-			pushButton_2_5->setText("A15");
 			pushButton_4_4->setText("A15");
 			pushButton_6_4->setText("A15");
 			// all A14
-			pushButton_2_4->setText("A14");
 			pushButton_4_3->setText("A14");
 			pushButton_6_3->setText("A14");
 			////pushButton_0_5->setText("IE2");
@@ -474,6 +471,26 @@ void VDPRegViewer::decodeVDPRegs()
 		? "Reg 19 scanline interrupt enabled"
 		: "Reg 19 scanline interrupt disabled");
 
+	if (vdpid != VDP_TMS99X8) {
+		if (m == 20 || m == 28) {
+			pushButton_2_6->setText("0");
+			pushButton_2_5->setText("A16");
+			pushButton_2_4->setText("A15");
+			pushButton_2_3->setText("A14");
+			pushButton_2_2->setText("A13");
+			pushButton_2_1->setText("A12");
+			pushButton_2_0->setText("A11");
+		} else {
+			pushButton_2_6->setText("A16");
+			pushButton_2_5->setText("A15");
+			pushButton_2_4->setText("A14");
+			pushButton_2_3->setText("A13");
+			pushButton_2_2->setText("A12");
+			pushButton_2_1->setText("A11");
+			pushButton_2_0->setText("A10");
+		}
+	}
+
 	if (m == 28 && vdpid == VDP_V9958) {
 		bool yjk = (regs[25] &  8);
 		bool yae = (regs[25] & 16);
@@ -516,8 +533,10 @@ void VDPRegViewer::decodeVDPRegs()
 
 	// the pattern name table address
 	must=mustbeone[row][basicscreen][2] ;
-	regtexttext = hex5(
-		((255^must) & bitsused[row][basicscreen][2] & regs[2]) << 10);
+	long nameTable = ((255^must) & bitsused[row][basicscreen][2] & regs[2]) << 10;
+	if ((m == 20 || m == 28) && vdpid != VDP_TMS99X8)
+		nameTable = ((nameTable & 0xffff) << 1) | ((nameTable & 0x10000) >> 16);
+	regtexttext = hex5(nameTable);
 
 	if ((must & regs[2]) != must ) {
 		label_dec_r2->setText("<font color=red>" + regtexttext +"</font>");
