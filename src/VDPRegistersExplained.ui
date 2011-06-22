@@ -7099,7 +7099,7 @@ p, li { white-space: pre-wrap; }
               <string>Color burst register 2</string>
              </property>
              <property name="text" >
-              <string>1</string>
+              <string>0</string>
              </property>
              <property name="checkable" >
               <bool>true</bool>
