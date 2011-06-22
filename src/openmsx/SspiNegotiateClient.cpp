@@ -18,7 +18,7 @@ bool SspiNegotiateClient::Authenticate()
 	SECURITY_STATUS ss = AcquireCredentialsHandleW(
 		NULL,
 		NEGOSSP_NAME_W,
-		SECPKG_CRED_OUTBOUND,
+		const_cast<SEC_WCHAR*>(SECPKG_CRED_OUTBOUND),
 		NULL,
 		NULL,
 		NULL,
