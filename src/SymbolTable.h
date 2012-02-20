@@ -107,6 +107,7 @@ public:
 private:
 	void appendFile(const QString& file, FileType type);
 	bool readTNIASM0File(const QString& filename);
+	bool readTNIASM1File(const QString& filename);
 	bool readASMSXFile(const QString& filename);
 	bool readSJASMFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
