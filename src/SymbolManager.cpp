@@ -125,6 +125,7 @@ void SymbolManager::addFile()
 	QStringList types;
 	types << "All supported files (*.sym *.map)"
 	      << "tniASM 0.x symbol files (*.sym)"
+	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech link map files (*.map)";
 	d->setFilters(types);
@@ -139,7 +140,9 @@ void SymbolManager::addFile()
 		// load file from the correct type
 		bool read = false;
 		if        (f.startsWith("tniASM 0")) {
-			read = symTable.readFile(n, SymbolTable::TNIASM_FILE);
+			read = symTable.readFile(n, SymbolTable::TNIASM0_FILE);
+		} else if (f.startsWith("tniASM 1")) {
+			read = symTable.readFile(n, SymbolTable::TNIASM1_FILE);
 		} else if (f.startsWith("asMSX")) {
 			read = symTable.readFile(n, SymbolTable::ASMSX_FILE);
 		} else if (f.startsWith("HiTech")) {

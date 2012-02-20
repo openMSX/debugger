@@ -164,7 +164,9 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 				if (line[0] == ';') {
 					type = ASMSX_FILE;
 				} else if (line.contains("; last def. pass")) {
-					type = TNIASM_FILE;
+					type = TNIASM0_FILE;
+				} else if (line.contains(": %equ ")) {
+					type = TNIASM1_FILE;
 				} else if (line.contains(": equ ")) {
 					type = SJASM_FILE;
 				}
@@ -173,8 +175,10 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 	}
 
 	switch (type) {
-	case TNIASM_FILE:
+	case TNIASM0_FILE:
 		return readTNIASM0File(filename);
+	case TNIASM1_FILE:
+		return readTNIASM1File(filename);
 	case SJASM_FILE:
 		return readSJASMFile(filename);
 	case ASMSX_FILE:
@@ -202,13 +206,35 @@ bool SymbolTable::readTNIASM0File(const QString& filename)
 		return false;
 	}
 
-	appendFile(filename, TNIASM_FILE);
+	appendFile(filename, TNIASM0_FILE);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList l = line.split(": equ ");
 		if (l.size() != 2) continue;
 		QStringList a = l.at(1).split("h ;");
+		if (a.size() != 2) continue;
+		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
+		sym->setSource(&symbolFiles.back().fileName);
+		add(sym);
+	}
+	return true;
+}
+
+bool SymbolTable::readTNIASM1File(const QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+
+	appendFile(filename, TNIASM1_FILE);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		QStringList l = line.split(": %equ ");
+		if (l.size() != 2) continue;
+		QStringList a = l.at(1).split("h");
 		if (a.size() != 2) continue;
 		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
 		sym->setSource(&symbolFiles.back().fileName);
@@ -224,7 +250,7 @@ bool SymbolTable::readSJASMFile(const QString& filename)
 		return false;
 	}
 
-	appendFile(filename, TNIASM_FILE);
+	appendFile(filename, SJASM_FILE);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
@@ -459,8 +485,11 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 		// write element
 		xml.writeStartElement("SymbolFile");
 		switch (symbolFiles[i].fileType) {
-		case TNIASM_FILE:
-			xml.writeAttribute("type","tniasm");
+		case TNIASM0_FILE:
+			xml.writeAttribute("type","tniasm0");
+			break;
+		case TNIASM1_FILE:
+			xml.writeAttribute("type","tniasm1");
 			break;
 		case ASMSX_FILE:
 			xml.writeAttribute("type","asmsx");
@@ -526,8 +555,10 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 				QString rtime = xml.attributes().value("refreshTime").toString();
 				QString fname = xml.readElementText();
 				// check type
-				FileType type = TNIASM_FILE;
-				if (ftype == "asmsx") {
+				FileType type = TNIASM0_FILE;
+				if (ftype == "tniasm1") {
+					type = TNIASM1_FILE;
+				} else if (ftype == "asmsx") {
 					type = ASMSX_FILE;
 				} else if (ftype == "linkmap") {
 					type = LINKMAP_FILE;

@@ -73,7 +73,7 @@ private:
 class SymbolTable
 {
 public:
-	enum FileType { DETECT_FILE, TNIASM_FILE, SJASM_FILE,  ASMSX_FILE, LINKMAP_FILE };
+	enum FileType { DETECT_FILE, TNIASM0_FILE, TNIASM1_FILE, SJASM_FILE, ASMSX_FILE, LINKMAP_FILE };
 
 	~SymbolTable();
 
