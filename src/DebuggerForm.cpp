@@ -776,6 +776,8 @@ void DebuggerForm::connectionClosed()
 	executeRunToAction->setEnabled(false);
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
+	breakpointToggleAction->setEnabled(false);
+	breakpointAddAction->setEnabled(false);
 
 	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
 	     it != dockMan.managedWidgets().end(); ++it) {
@@ -787,6 +789,8 @@ void DebuggerForm::finalizeConnection(bool halted)
 {
 	systemPauseAction->setEnabled(true);
 	systemRebootAction->setEnabled(true);
+	breakpointToggleAction->setEnabled(true);
+	breakpointAddAction->setEnabled(true);
 	// merge breakpoints on connect
 	mergeBreakpoints = true;
 	if (halted) {
@@ -860,8 +864,6 @@ void DebuggerForm::setBreakMode()
 	executeStepOutAction->setEnabled(true);
 	executeStepBackAction->setEnabled(true);
 	executeRunToAction->setEnabled(true);
-	breakpointToggleAction->setEnabled(true);
-	breakpointAddAction->setEnabled(true);
 }
 
 void DebuggerForm::setRunMode()
@@ -873,8 +875,6 @@ void DebuggerForm::setRunMode()
 	executeStepOutAction->setEnabled(false);
 	executeStepBackAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
-	breakpointToggleAction->setEnabled(false);
-	breakpointAddAction->setEnabled(false);
 }
 
 void DebuggerForm::fileNewSession()
