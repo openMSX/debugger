@@ -270,7 +270,8 @@ else
 COMPILE_ENV:=
 LINK_ENV:=
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
-LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -lws2_32 -lsecur32 -mwindows
+COMPILE_FLAGS+=-static-libgcc -static-libstdc++
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -lws2_32 -lsecur32 -mwindows -static-libgcc -static-libstdc++
 else
 LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_LIBS) -L$(QT_INSTALL_LIBS) $(addprefix -lQt,$(QT_COMPONENTS))
 endif
