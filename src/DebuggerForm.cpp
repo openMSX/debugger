@@ -1058,7 +1058,7 @@ void DebuggerForm::breakpointToggle(int addr)
 
 void DebuggerForm::breakpointAdd()
 {
-	BreakpointDialog bpd(memLayout, this);
+	BreakpointDialog bpd(memLayout, &session, this);
 	if (bpd.exec()) {
 		if (bpd.address() > 0) {
 			QString cmd("debug set_bp %1 { [ pc_in_slot %2 %3 %4 ] }");

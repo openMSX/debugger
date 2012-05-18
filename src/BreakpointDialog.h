@@ -6,11 +6,14 @@
 
 struct MemoryLayout;
 
+class DebugSession;
+class Symbol;
+
 class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 {
 	Q_OBJECT
 public:
-	BreakpointDialog(const MemoryLayout& ml, QWidget* parent = 0);
+	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = 0, QWidget* parent = 0);
 
 	int address();
 	int slot();
@@ -20,7 +23,12 @@ public:
 private:
 	const MemoryLayout& memLayout;
 
+	DebugSession *debugSession;
+	Symbol *currentSymbol;
+	int idxSlot, idxSubSlot;
+
 private slots:
+	void addressChanged(const QString& text);
 	void slotChanged(int i);
 	void subslotChanged(int i);
 };

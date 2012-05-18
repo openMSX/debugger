@@ -81,6 +81,7 @@ public:
 	void removeAt(int index);
 	void remove(Symbol *symbol);
 	void clear();
+	int size() const;
 
 	/* xml session file functions */
 	void saveSymbols(QXmlStreamWriter& xml);
@@ -92,6 +93,9 @@ public:
 	Symbol* findNextAddressSymbol(MemoryLayout* ml = 0);
 	Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = 0);
 	Symbol* getAddressSymbol(int val, MemoryLayout* ml = 0);
+	Symbol* getAddressSymbol(const QString& label, Qt::CaseSensitivity cs = Qt::CaseSensitive);
+
+	QStringList labelList() const;
 
 	void symbolTypeChanged(Symbol* symbol);
 	void symbolValueChanged(Symbol* symbol);

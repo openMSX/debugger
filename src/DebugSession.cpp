@@ -23,7 +23,10 @@ const QString& DebugSession::filename() const
 
 bool DebugSession::isModified() const
 {
-	return modified;
+	if(fileName.isEmpty() && symTable.size() == 0)
+		return false;
+	else
+		return modified;
 }
 
 Breakpoints& DebugSession::breakpoints()

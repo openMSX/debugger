@@ -46,6 +46,11 @@ void SymbolTable::clear()
 	symbols.clear();
 }
 
+int SymbolTable::size() const
+{
+	return symbols.size();
+}
+
 void SymbolTable::mapSymbol(Symbol* symbol)
 {
 	if (symbol->type() != Symbol::VALUE) {
@@ -132,6 +137,28 @@ Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 		}
 	}
 	return 0;
+}
+
+Symbol* SymbolTable::getAddressSymbol(const QString& label, Qt::CaseSensitivity cs)
+{
+	for (QMultiMap<int, Symbol*>::iterator it = addressSymbols.begin();
+	     it != addressSymbols.end(); ++it) {
+		if (it.value()->text().compare(label, cs)==0) {
+			return it.value();
+		}
+	}
+	return 0;
+}
+
+QStringList SymbolTable::labelList() const
+{
+	QStringList labels;
+	for (QMultiMap<int, Symbol*>::const_iterator it = addressSymbols.begin();
+	     it != addressSymbols.end(); ++it) {
+		if (it.value()->type() == Symbol::JUMPLABEL)
+			labels << it.value()->text();
+	}
+	return labels;
 }
 
 int SymbolTable::symbolFilesSize() const
