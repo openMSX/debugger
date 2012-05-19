@@ -1,6 +1,9 @@
 $Id$
 
 2012-05-19 Edwin Velds <e.velds@gmail.com>
+	* Added a goto dialog for disasm view navigation
+
+2012-05-19 Edwin Velds <e.velds@gmail.com>
 	* Added ability to add breakpoints by label
 
 2011-03-06 Edwin Velds <e.velds@gmail.com>

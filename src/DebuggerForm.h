@@ -54,6 +54,7 @@ private:
 
 	QMenu* fileMenu;
 	QMenu* systemMenu;
+	QMenu* searchMenu;
 	QMenu* viewMenu;
 	QMenu* viewVDPDialogsMenu;
 	QMenu* executeMenu;
@@ -75,6 +76,8 @@ private:
 	QAction* systemRebootAction;
 	QAction* systemSymbolManagerAction;
 	QAction* systemPreferencesAction;
+
+	QAction* searchGotoAction;
 
 	QAction* viewRegistersAction;
 	QAction* viewFlagsAction;
@@ -133,6 +136,7 @@ private slots:
 	void systemReboot();
 	void systemSymbolManager();
 	void systemPreferences();
+	void searchGoto();
 	void toggleRegisterDisplay();
 	void toggleFlagsDisplay();
 	void toggleStackDisplay();

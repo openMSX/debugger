@@ -4,7 +4,8 @@
 #include "Convert.h"
 #include <QCompleter>
 #include <QStandardItemModel>
-#include <QDebug>
+
+
 BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession *session, QWidget* parent)
 	: QDialog(parent), memLayout(ml), currentSymbol(0)
 {

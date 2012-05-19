@@ -150,13 +150,15 @@ Symbol* SymbolTable::getAddressSymbol(const QString& label, Qt::CaseSensitivity 
 	return 0;
 }
 
-QStringList SymbolTable::labelList() const
+QStringList SymbolTable::labelList(bool include_vars, const MemoryLayout* ml) const
 {
 	QStringList labels;
 	for (QMultiMap<int, Symbol*>::const_iterator it = addressSymbols.begin();
-	     it != addressSymbols.end(); ++it) {
-		if (it.value()->type() == Symbol::JUMPLABEL)
-			labels << it.value()->text();
+	     it != addressSymbols.end(); ++it) 
+	{
+		if (it.value()->type() == Symbol::JUMPLABEL || (include_vars && it.value()->type() == Symbol::JUMPLABEL ) )
+			if( ml == 0 || it.value()->isSlotValid(ml) )
+				labels << it.value()->text();
 	}
 	return labels;
 }
@@ -754,7 +756,7 @@ void Symbol::setType(SymbolType t)
 	if (table) table->symbolTypeChanged(this);
 }
 
-bool Symbol::isSlotValid(MemoryLayout* ml)
+bool Symbol::isSlotValid(const MemoryLayout* ml) const
 {
 	if (!ml) return true;
 	int page = symValue >> 14;

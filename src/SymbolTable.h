@@ -52,7 +52,7 @@ public:
 	SymbolType type() const;
 	void setType(SymbolType t);
 
-	bool isSlotValid(MemoryLayout* ml = 0);
+	bool isSlotValid(const MemoryLayout* ml = 0) const;
 
 private:
 	SymbolTable* table;
@@ -95,7 +95,7 @@ public:
 	Symbol* getAddressSymbol(int val, MemoryLayout* ml = 0);
 	Symbol* getAddressSymbol(const QString& label, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 
-	QStringList labelList() const;
+	QStringList labelList(bool include_vars = false, const MemoryLayout* ml = 0) const;
 
 	void symbolTypeChanged(Symbol* symbol);
 	void symbolValueChanged(Symbol* symbol);

@@ -15,6 +15,7 @@
 #include "SymbolManager.h"
 #include "PreferencesDialog.h"
 #include "BreakpointDialog.h"
+#include "GotoDialog.h"
 #include "DebuggableViewer.h"
 #include "VDPRegViewer.h"
 #include "VDPStatusRegViewer.h"
@@ -241,6 +242,10 @@ void DebuggerForm::createActions()
 	systemPreferencesAction = new QAction(tr("Pre&ferences ..."), this);
 	systemPreferencesAction->setStatusTip(tr("Set the global debugger preferences"));
 
+	searchGotoAction = new QAction(tr("&Goto ..."), this);
+	searchGotoAction->setStatusTip(tr("Jump to a specific address or label in the disassembly view"));
+	searchGotoAction->setShortcut(tr("Ctrl+G"));
+
 	viewRegistersAction = new QAction(tr("CPU &Registers"), this);
 	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
 	viewRegistersAction->setCheckable(true);
@@ -344,6 +349,7 @@ void DebuggerForm::createActions()
 	connect(systemRebootAction, SIGNAL(triggered()), this, SLOT(systemReboot()));
 	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
 	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
+	connect(searchGotoAction, SIGNAL(triggered()), this, SLOT(searchGoto()));
 	connect(viewRegistersAction, SIGNAL(triggered()), this, SLOT(toggleRegisterDisplay()));
 	connect(viewFlagsAction, SIGNAL(triggered()), this, SLOT(toggleFlagsDisplay()));
 	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
@@ -389,6 +395,10 @@ void DebuggerForm::createMenus()
 	systemMenu->addAction(systemSymbolManagerAction);
 	systemMenu->addSeparator();
 	systemMenu->addAction(systemPreferencesAction);
+
+	// create system menu
+	searchMenu = menuBar()->addMenu(tr("Se&arch"));
+	searchMenu->addAction(searchGotoAction);
 
 	// create view menu
 	viewMenu = menuBar()->addMenu(tr("&View"));
@@ -983,6 +993,17 @@ void DebuggerForm::systemPreferences()
 	PreferencesDialog prefs(this);
 	prefs.exec();
 	emit settingsChanged();
+}
+
+void DebuggerForm::searchGoto()
+{
+	GotoDialog gtd(memLayout, &session, this);
+	if (gtd.exec()) {
+		int addr = gtd.address();
+		if ( addr >= 0) {
+			disasmView->setAddress(addr);			
+		}
+	}
 }
 
 void DebuggerForm::executeBreak()
