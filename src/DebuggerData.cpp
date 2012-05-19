@@ -2,7 +2,7 @@
 
 #include "DebuggerData.h"
 #include <QStringList>
-
+#include <QDebug>
 
 // class MemoryLayout
 
@@ -121,17 +121,21 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 		p += 11;
 		QString arg = getNextArgument(bp.condition, p);
 		if (!arg.isEmpty()) {
-			int s = arg.toInt();
-			if (s < 0 || s > 3) return;
-			bp.ps = '0' + s;
+			if(arg != "X") {
+				int s = arg.toInt();
+				if (s < 0 || s > 3) return;
+				bp.ps = '0' + s;
+			}
 			arg = getNextArgument(bp.condition, p);
 			if (!arg.isEmpty()) {
-				s = arg.toInt();
-				if (s < 0 || s > 3) return;
-				bp.ss = '0' + s;
+				if(arg != "X") {
+					int s = arg.toInt();
+					if (s < 0 || s > 3) return;
+					bp.ss = '0' + s;
+				}
 				arg = getNextArgument(bp.condition, p);
-				if (!arg.isEmpty()) {
-					s = arg.toInt();
+				if (!arg.isEmpty() && arg != "X") {
+					int s = arg.toInt();
 					if (s < 0 || s > 255) return;
 					bp.segment = s;
 				}
