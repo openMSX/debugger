@@ -1,5 +1,8 @@
 $Id$
 
+2012-05-20 Edwin Velds <e.velds@gmail.com>
+	* Added recent sessions files to the File menu
+
 2012-05-19 Edwin Velds <e.velds@gmail.com>
 	* Added a goto dialog for disasm view navigation
 

@@ -191,6 +191,9 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	createToolbars();
 	createStatusbar();
 	createForm();
+
+	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
+	updateRecentFiles();
 }
 
 void DebuggerForm::createActions()
@@ -212,6 +215,11 @@ void DebuggerForm::createActions()
 	fileQuitAction = new QAction(tr("&Quit"), this);
 	fileQuitAction->setShortcut(tr("Ctrl+Q"));
 	fileQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
+
+	for (int i = 0; i < MaxRecentFiles; ++i) {
+		recentFileActions[i] = new QAction(this);
+		connect(recentFileActions[i], SIGNAL(triggered()), this, SLOT(fileRecentOpen()));
+	}
 
 	systemConnectAction = new QAction(tr("&Connect"), this);
 	systemConnectAction->setShortcut(tr("Ctrl+C"));
@@ -375,13 +383,18 @@ void DebuggerForm::createActions()
 void DebuggerForm::createMenus()
 {
 	// create file menu
-	systemMenu = menuBar()->addMenu(tr("&File"));
-	systemMenu->addAction(fileNewSessionAction);
-	systemMenu->addAction(fileOpenSessionAction);
-	systemMenu->addAction(fileSaveSessionAction);
-	systemMenu->addAction(fileSaveSessionAsAction);
-	systemMenu->addSeparator();
-	systemMenu->addAction(fileQuitAction);
+	fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu->addAction(fileNewSessionAction);
+	fileMenu->addAction(fileOpenSessionAction);
+	fileMenu->addAction(fileSaveSessionAction);
+	fileMenu->addAction(fileSaveSessionAsAction);
+
+	recentFileSeparator = fileMenu->addSeparator();
+	for (int i = 0; i < MaxRecentFiles; ++i)
+		fileMenu->addAction(recentFileActions[i]);
+
+	fileMenu->addSeparator();
+	fileMenu->addAction(fileQuitAction);
 
 	// create system menu
 	systemMenu = menuBar()->addMenu(tr("&System"));
@@ -697,6 +710,38 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 	QMainWindow::closeEvent(e);
 }
 
+void DebuggerForm::updateRecentFiles()
+{
+	// store settings
+	Settings::get().setValue("MainWindow/RecentFiles", recentFiles);
+	// update actions
+	for(int i = 0; i < MaxRecentFiles; i++)
+		if(i < recentFiles.size()) {
+			recentFileActions[i]->setVisible(true);
+			QString text = QString("&%1 %2").arg(i + 1).arg(QFileInfo(recentFiles[i]).fileName());
+			recentFileActions[i]->setText(text);
+         recentFileActions[i]->setData(recentFiles[i]);
+		} else
+			recentFileActions[i]->setVisible(false);
+	// show separator only when recent files exist
+	recentFileSeparator->setVisible(recentFiles.size());
+}
+
+void DebuggerForm::addRecentFile(const QString& file)
+{
+	recentFiles.removeAll(file);
+	recentFiles.prepend(file);
+	while (recentFiles.size() > MaxRecentFiles)
+		recentFiles.removeLast();
+	updateRecentFiles();
+}
+
+void DebuggerForm::removeRecentFile(const QString& file)
+{
+	recentFiles.removeAll(file);
+	updateRecentFiles();
+}
+
 void DebuggerForm::updateWindowTitle()
 {
 	QString title = "openMSX debugger [%1%2]";
@@ -914,14 +959,24 @@ void DebuggerForm::fileOpenSession()
 		this, tr("Open debug session"),
 		QDir::currentPath(), tr("Debug Session Files (*.omds)"));
 
-	if (!fileName.isEmpty()) {
-		fileNewSession();
-		session.open(fileName);
-		if (systemDisconnectAction->isEnabled()) {
-			// active connection, merge loaded breakpoints
-			comm.sendCommand(new ListBreakPointsHandler(*this, true));
-		}
+	if (!fileName.isEmpty())
+		openSession(fileName);
+}
+
+void DebuggerForm::openSession(const QString& file)
+{
+	fileNewSession();
+	session.open(file);
+	if (systemDisconnectAction->isEnabled()) {
+		// active connection, merge loaded breakpoints
+		comm.sendCommand(new ListBreakPointsHandler(*this, true));
 	}
+	// update recent
+	if(session.existsAsFile())
+		addRecentFile(file);
+	else
+		removeRecentFile(file);			
+
 	updateWindowTitle();
 }
 
@@ -945,8 +1000,18 @@ void DebuggerForm::fileSaveSessionAs()
 	d.setFileMode(QFileDialog::AnyFile);
 	if (d.exec()) {
 		session.saveAs(d.selectedFiles().at(0));
+		// update recent
+		if(session.existsAsFile())
+			addRecentFile(session.filename());
 	}
 	updateWindowTitle();
+}
+
+void DebuggerForm::fileRecentOpen()
+{
+	QAction *action = qobject_cast<QAction *>(sender());
+	if (action)
+		openSession(action->data().toString());
 }
 
 void DebuggerForm::systemConnect()

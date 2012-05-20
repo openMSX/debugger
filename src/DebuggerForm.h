@@ -42,6 +42,11 @@ private:
 	void createStatusbar();
 	void createForm();
 
+	void openSession(const QString& file);
+	void updateRecentFiles();
+	void addRecentFile(const QString& file);
+	void removeRecentFile(const QString& file);
+
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
 	void breakOccured();
@@ -69,6 +74,10 @@ private:
 	QAction* fileSaveSessionAction;
 	QAction* fileSaveSessionAsAction;
 	QAction* fileQuitAction;
+
+	enum { MaxRecentFiles = 5 };
+   QAction *recentFileActions[MaxRecentFiles];
+	QAction *recentFileSeparator;
 
 	QAction* systemConnectAction;
 	QAction* systemDisconnectAction;
@@ -106,6 +115,7 @@ private:
 
 	DockManager dockMan;
 	DockableWidgetArea* mainArea;
+	QStringList recentFiles;
 
 	DisasmViewer* disasmView;
 	MainMemoryViewer* mainMemoryView;
@@ -130,6 +140,7 @@ private slots:
 	void fileOpenSession();
 	void fileSaveSession();
 	void fileSaveSessionAs();
+	void fileRecentOpen();
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();
