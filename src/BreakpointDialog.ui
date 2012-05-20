@@ -211,6 +211,9 @@
        <property name="text">
         <string>OK</string>
        </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -224,6 +227,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>edtAddress</tabstop>
+  <tabstop>cmbxSlot</tabstop>
+  <tabstop>cmbxSubslot</tabstop>
+  <tabstop>cmbxSegment</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
