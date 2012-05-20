@@ -2,6 +2,8 @@ $Id$
 
 2012-05-20 Edwin Velds <e.velds@gmail.com>
 	* Added recent sessions files to the File menu
+	* Monitor symbol files for changes and immediately ask the user
+	  if they need to be reloaded.
 
 2012-05-19 Edwin Velds <e.velds@gmail.com>
 	* Added a goto dialog for disasm view navigation

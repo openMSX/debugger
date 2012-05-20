@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QFileSystemWatcher>
 
 struct MemoryLayout;
 class SymbolTable;
@@ -70,11 +71,13 @@ private:
 };
 
 
-class SymbolTable
+class SymbolTable : public QObject
 {
+	Q_OBJECT
 public:
 	enum FileType { DETECT_FILE, TNIASM0_FILE, TNIASM1_FILE, SJASM_FILE, ASMSX_FILE, LINKMAP_FILE };
 
+	SymbolTable();
 	~SymbolTable();
 
 	void add(Symbol* symbol);
@@ -130,6 +133,13 @@ private:
 		FileType fileType;
 	};
 	QList<SymbolFileRecord> symbolFiles;
+	QFileSystemWatcher fileWatcher;
+
+private slots:
+	void fileChanged(const QString & path);
+
+signals:
+	void symbolFileChanged();
 };
 
 #endif // SYMBOLTABLE_H

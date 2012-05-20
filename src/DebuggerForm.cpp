@@ -194,6 +194,8 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
+	
+	connect(&session.symbolTable(), SIGNAL(symbolFileChanged()), this, SLOT(symbolFileChanged()));
 }
 
 void DebuggerForm::createActions()
@@ -1381,4 +1383,18 @@ void DebuggerForm::setDebuggableSize(const QString& debuggable, int size)
 	if (debuggable == debuggables.keys().last()) {
 		emit debuggablesChanged(debuggables);
 	}
+}
+
+void DebuggerForm::symbolFileChanged()
+{
+	static bool shown(false);
+	if(shown) return;
+	shown = true;
+	int choice = QMessageBox::question(this, tr("Symbol file changed"),
+	                tr("One or more symbol file have changed.\n"
+	                   "Reload now?"),
+	                QMessageBox::Yes | QMessageBox::No);
+	shown = false;
+	if (choice == QMessageBox::Yes)
+		session.symbolTable().reloadFiles();
 }

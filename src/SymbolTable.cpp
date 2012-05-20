@@ -12,6 +12,11 @@
 
 // class SymbolTable
 
+SymbolTable::SymbolTable()
+{
+	connect(&fileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
+}
+
 SymbolTable::~SymbolTable()
 {
 	clear();
@@ -226,6 +231,7 @@ void SymbolTable::appendFile(const QString& file, FileType type)
 	rec.fileType = type;
 	rec.refreshTime = QDateTime::currentDateTime();
 	symbolFiles.append(rec);
+	fileWatcher.addPath(file);
 }
 
 bool SymbolTable::readTNIASM0File(const QString& filename)
@@ -399,6 +405,11 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 	return true;
 }
 
+void SymbolTable::fileChanged(const QString & /*path*/)
+{
+	emit symbolFileChanged();
+}
+
 void SymbolTable::reloadFiles()
 {
 	for (int i = 0; i < symbolFiles.size(); ++i) {
@@ -497,6 +508,7 @@ void SymbolTable::unloadFile(const QString& file, bool keepSymbols)
 			}
 		}
 		// remove record
+		fileWatcher.removePath(symbolFiles[index].fileName);
 		symbolFiles.removeAt(index);
 	}
 }
@@ -773,3 +785,4 @@ bool Symbol::isSlotValid(const MemoryLayout* ml) const
 	}
 	return false;
 }
+

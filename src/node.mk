@@ -12,7 +12,7 @@ MOC_SRC_HDR:= \
 	Settings PreferencesDialog BreakpointDialog DebuggableViewer \
 	DebugSession MainMemoryViewer BitMapViewer VramBitMappedView \
 	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
-	InteractiveButton VDPCommandRegViewer GotoDialog
+	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \

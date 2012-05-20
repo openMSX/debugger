@@ -181,6 +181,7 @@ private slots:
 	void updateViewMenu();
 	void updateVDPViewMenu();
 	void updateWindowTitle();
+	void symbolFileChanged();
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
