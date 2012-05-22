@@ -1,5 +1,8 @@
 $Id$
 
+2012-05-22 Edwin Velds <e.velds@gmail.com>
+	* Added display of rom blocks
+
 2012-05-20 Edwin Velds <e.velds@gmail.com>
 	* Added recent sessions files to the File menu
 	* Monitor symbol files for changes and immediately ask the user

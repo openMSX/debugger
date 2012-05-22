@@ -156,6 +156,12 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 			}
 			if (ms > 0) {
 				str.sprintf("%i", memLayout->mapperSegment[i]);
+			} else if(memLayout->romBlock[2*i] >= 0) {
+				if (memLayout->romBlock[2*i] == memLayout->romBlock[2*i+1]) {
+					str.sprintf("R%i", memLayout->romBlock[2*i]);
+				} else {
+					str.sprintf("R%i/%i", memLayout->romBlock[2*i], memLayout->romBlock[2*i+1]);
+				}
 			} else {
 				str = "-";
 			}
@@ -216,5 +222,12 @@ void SlotViewer::slotsUpdated(const QString& message)
 			memLayout->mapperSize[ps][0] = lines[l++].toUShort();
 		}
 	}
+	// parse rom blocks
+	for (int i = 0; i < 8; ++i, ++l) {
+		if (lines[l][0] == 'X')
+			memLayout->romBlock[i] = -1;
+		else
+			memLayout->romBlock[i] = lines[l].toInt();
+	}	
 	update();
 }

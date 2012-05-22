@@ -816,6 +816,18 @@ void DebuggerForm::initConnection()
 		"      append result [get_mapper_size $ps 0] \"\\n\"\n"
 		"    }\n"
 		"  }\n"
+		"  for { set page 0 } { $page &lt; 4 } { incr page } {\n"
+		"    set tmp [get_selected_slot $page]\n"
+		"    set ss [lindex $tmp 1]\n"
+		"    if { $ss == \"X\" } { set ss 0 }\n"
+		"    set name \"[machine_info slot [lindex $tmp 0] $ss $page] romblocks\"\n"
+		"    if { [lsearch [debug list] $name] != -1} {\n"
+		"      append result \"[debug read $name [expr {$page * 0x4000}] ]\\n\"\n"
+		"      append result \"[debug read $name [expr {$page * 0x4000 + 0x2000}] ]\\n\"\n"
+		"    } else {\n"
+		"      append result \"X\\nX\\n\"\n"
+		"    }\n"
+		"  }\n"
 		"  return $result\n"
 		"}\n"));
 }
@@ -1068,7 +1080,7 @@ void DebuggerForm::searchGoto()
 	if (gtd.exec()) {
 		int addr = gtd.address();
 		if ( addr >= 0) {
-			disasmView->setAddress(addr);			
+			disasmView->setAddress(addr, 0, DisasmViewer::MiddleAlways);
 		}
 	}
 }

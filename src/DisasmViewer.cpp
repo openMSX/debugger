@@ -444,7 +444,9 @@ void DisasmViewer::setProgramCounter(quint16 pc)
 int DisasmViewer::findDisasmLine(quint16 lineAddr, int infoLine)
 {
 	for (int line = 0; line < int(disasmLines.size()); ++line) {
-		if (lineAddr == disasmLines[line].addr) {
+		if (lineAddr >= disasmLines[line].addr && 
+		    lineAddr < disasmLines[line].addr+disasmLines[line].numBytes)
+		{
 			if (infoLine == FIRST_INFO_LINE) {
 				return line;
 			} else if (infoLine == LAST_INFO_LINE) {

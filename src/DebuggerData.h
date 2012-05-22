@@ -15,6 +15,7 @@ struct MemoryLayout
 	char primarySlot[4];
 	char secondarySlot[4];
 	unsigned char mapperSegment[4];
+	int romBlock[8];
 
 	bool isSubslotted[4];
 	int mapperSize[4][4];

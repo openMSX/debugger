@@ -30,6 +30,8 @@ public:
 
 	QSize sizeHint() const;
 
+	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
+
 public slots:
 	void setAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setProgramCounter(quint16 pc);
@@ -44,8 +46,6 @@ private:
 	void keyPressEvent(QKeyEvent* e);
 	void mousePressEvent(QMouseEvent* e);
 	void wheelEvent(QWheelEvent* e);
-
-	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
 
 	QScrollBar* scrollBar;
 
