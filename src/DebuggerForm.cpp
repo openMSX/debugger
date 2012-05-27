@@ -1128,6 +1128,7 @@ void DebuggerForm::executeStepBack()
 	SimpleCommand *sc = new SimpleCommand("step_back");
 	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
 	comm.sendCommand(sc);
+	setRunMode();
 }
 
 void DebuggerForm::handleCommandReplyStatus(bool status)
