@@ -524,6 +524,7 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	mainMemoryView->setSymbolTable(&session.symbolTable());
 
 	// create register viewer
 	regsView = new CPURegsViewer();

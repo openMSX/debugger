@@ -7,6 +7,7 @@
 
 class HexViewer;
 class CPURegsViewer;
+class SymbolTable;
 class QComboBox;
 class QLineEdit;
 
@@ -18,6 +19,7 @@ public:
 
 	void setDebuggable(const QString& name, int size);
 	void setRegsView(CPURegsViewer* viewer);
+	void setSymbolTable(SymbolTable* symtable);
 
 public slots:
 	void setLocation(int addr);
@@ -36,6 +38,7 @@ private:
 
 	static const int linkRegisters[];
 	CPURegsViewer* regsViewer;
+	SymbolTable* symTable;
 	int linkedId;
 	bool isLinked;
 };

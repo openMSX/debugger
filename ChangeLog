@@ -2,6 +2,7 @@ $Id$
 
 2012-05-27 Edwin Velds <e.velds@gmail.com>
 	* Cursor follows pc/breakpoints/pgup/pgdn.
+	* MainMemoryViewer now accepts proper formatted addresses and labels.
 
 2012-05-22 Edwin Velds <e.velds@gmail.com>
 	* Added display of rom blocks

@@ -4,11 +4,13 @@
 #include "HexViewer.h"
 #include "CPURegs.h"
 #include "CPURegsViewer.h"
+#include "SymbolTable.h"
+#include "Convert.h"
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLineEdit>
-
+#include <iostream>
 const int MainMemoryViewer::linkRegisters[] = {
 	CpuRegs::REG_BC, CpuRegs::REG_DE, CpuRegs::REG_HL,
 	CpuRegs::REG_IX, CpuRegs::REG_IY,
@@ -51,6 +53,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	isLinked = false;
 	linkedId = 0;
 	regsViewer = NULL;
+	symTable = 0;
 
 	connect(hexView, SIGNAL(locationChanged(int)),
 	        this, SLOT(hexViewChanged(int)));
@@ -81,6 +84,11 @@ void MainMemoryViewer::setRegsView(CPURegsViewer* viewer)
 	regsViewer = viewer;
 }
 
+void MainMemoryViewer::setSymbolTable(SymbolTable* symtable)
+{
+	symTable = symtable;
+}
+
 void MainMemoryViewer::refresh()
 {
 	hexView->refresh();
@@ -93,7 +101,16 @@ void MainMemoryViewer::hexViewChanged(int addr)
 
 void MainMemoryViewer::addressValueChanged()
 {
-	hexView->setLocation(addressValue->text().toInt(NULL, 16));
+	int addr = stringToValue(addressValue->text());
+	if (addr == -1 && symTable) {
+		// try finding a label
+		Symbol *s = symTable->getAddressSymbol(addressValue->text());
+		if (!s) s = symTable->getAddressSymbol(addressValue->text(), Qt::CaseInsensitive);
+		if (s) addr = s->value();
+	}
+
+	if(addr >= 0)
+		hexView->setLocation(addr);
 }
 
 void MainMemoryViewer::registerChanged(int id, int value)
