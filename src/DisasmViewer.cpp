@@ -201,9 +201,10 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 		}
 
 		// draw cursor line
-		bool isCursorLine = row->addr == cursorAddr &&
+		bool isCursorLine = cursorAddr >= row->addr && cursorAddr < row->addr+row->numBytes &&
 		                    row->infoLine == cursorLine;
 		if (isCursorLine) {
+			cursorAddr = row->addr;
 			p.fillRect(frameL + 32, y, width() - 32 - frameL - frameR, h,
 			           palette().color(QPalette::Highlight));
 			if (hasFocus()) {
@@ -269,6 +270,13 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	}
 	partialBottomLine = y > height() - frameB;
 	visibleLines -= partialBottomLine;
+}
+
+void DisasmViewer::setCursorAddress(quint16 addr, int infoLine, int method)
+{
+	cursorAddr = addr;
+	cursorLine = 0;
+	setAddress(addr, infoLine, method);
 }
 
 void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
@@ -437,36 +445,27 @@ quint16 DisasmViewer::programCounter() const
 
 void DisasmViewer::setProgramCounter(quint16 pc)
 {
+	cursorAddr = pc;
 	programAddr = pc;
 	setAddress(pc, 0, MiddleAlways);
 }
 
 int DisasmViewer::findDisasmLine(quint16 lineAddr, int infoLine)
 {
-	for (int line = 0; line < int(disasmLines.size()); ++line) {
-		if (lineAddr >= disasmLines[line].addr && 
-		    lineAddr < disasmLines[line].addr+disasmLines[line].numBytes)
-		{
-			if (infoLine == FIRST_INFO_LINE) {
+	int line = disasmLines.size() - 1;
+	while( line >= 0 ) {
+		if( lineAddr >= disasmLines[line].addr ) {
+			if( infoLine == 0 ) 
 				return line;
-			} else if (infoLine == LAST_INFO_LINE) {
-				for (/**/; line < int(disasmLines.size()) - 1; ++line) {
-					if (disasmLines[line + 1].addr != lineAddr) {
-						break;
-					}
-				}
-				return line;
-			} else {
-				while (lineAddr == disasmLines[line].addr) {
-					if (infoLine == disasmLines[line].infoLine) {
-						return line;
-					}
-					line++;
-					if (line == int(disasmLines.size())) break;
-				}
+			if (infoLine == LAST_INFO_LINE) 
+				return line-1;
+			while (disasmLines[line].infoLine != infoLine && disasmLines[line].addr == lineAddr) {
+				line--;
+				if (line < 0) return -1;
 			}
-			return -1;
+			return line;
 		}
+		line--;
 	}
 	return -1;
 }
@@ -569,20 +568,45 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 		e->accept();
 		break;
 	}
-	case Qt::Key_PageUp:
-		if (disasmTopLine > 0) {
-			setAddress(disasmLines[disasmTopLine - 1].addr,
-			           disasmLines[disasmTopLine - 1].infoLine,
-			           BottomAlways);
-		}
+	case Qt::Key_PageUp: {
+		int line = findDisasmLine(cursorAddr, cursorLine);
+		if( line >= disasmTopLine && line < disasmTopLine+visibleLines ) {
+			line -= visibleLines;
+			if(line >= 0) {
+				cursorAddr = disasmLines[line].addr;
+				cursorLine = disasmLines[line].infoLine;
+				setAddress(disasmLines[disasmTopLine - 1].addr,
+							  disasmLines[disasmTopLine - 1].infoLine,
+							  BottomAlways);
+			} else {
+				setCursorAddress(disasmLines[0].addr,
+							        disasmLines[0].infoLine,
+							        Closest);
+			}
+		} else
+			setAddress(cursorAddr, cursorLine, Closest);
 		e->accept();
 		break;
+	}
 	case Qt::Key_PageDown: {
-		int line = disasmTopLine + visibleLines + partialBottomLine - 1;
-		line = std::min(line, int(disasmLines.size()));
-		setAddress(disasmLines[line].addr,
-		           disasmLines[line].infoLine,
-		           TopAlways);
+		int line = findDisasmLine(cursorAddr, cursorLine);
+		if( line >= disasmTopLine && line < disasmTopLine+visibleLines ) {
+			line += visibleLines;
+			if( line < int(disasmLines.size()) ) {
+				cursorAddr = disasmLines[line].addr;
+				cursorLine = disasmLines[line].infoLine;
+				line = disasmTopLine + visibleLines + partialBottomLine - 1;
+				line = std::min(line, int(disasmLines.size()));
+				setAddress(disasmLines[line].addr,
+							  disasmLines[line].infoLine,
+							  TopAlways);
+			} else {
+				setCursorAddress(disasmLines.back().addr,
+							        disasmLines.back().infoLine,
+							        Closest);
+			}
+		} else
+			setAddress(cursorAddr, cursorLine, Closest);
 		e->accept();
 		break;
 	}

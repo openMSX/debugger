@@ -1,5 +1,8 @@
 $Id$
 
+2012-05-27 Edwin Velds <e.velds@gmail.com>
+	* Cursor follows pc/breakpoints/pgup/pgdn.
+
 2012-05-22 Edwin Velds <e.velds@gmail.com>
 	* Added display of rom blocks
 

@@ -34,6 +34,7 @@ public:
 
 public slots:
 	void setAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
+	void setCursorAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setProgramCounter(quint16 pc);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);

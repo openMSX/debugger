@@ -1080,7 +1080,7 @@ void DebuggerForm::searchGoto()
 	if (gtd.exec()) {
 		int addr = gtd.address();
 		if ( addr >= 0) {
-			disasmView->setAddress(addr, 0, DisasmViewer::MiddleAlways);
+			disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
 		}
 	}
 }
