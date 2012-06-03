@@ -1,4 +1,5 @@
 #include "Convert.h"
+#include "Settings.h"
 #include <QString>
 
 int stringToValue(const QString& str)
@@ -50,4 +51,22 @@ int stringToValue(const QString& str)
 	int value = s.toInt(&ok, base);
 	if (!ok) return -1;
 	return value;
+}
+
+QString hexValue(int value)
+{
+	Settings& s = Settings::get();
+	return s.value("Preferences/HexPrefix", "$").toString() + 
+	       QString::number(value, 16) +
+	       s.value("Preferences/HexPostfix", "").toString();
+}
+
+QString& escapeXML(QString& str)
+{
+	return str.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
+}
+
+QString& unescapeXML(QString& str)
+{
+	return str.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">");
 }

@@ -4,5 +4,8 @@
 class QString;
 
 int stringToValue(const QString& str);
+QString hexValue(int value);
+QString& escapeXML(QString& str);
+QString& unescapeXML(QString& str);
 
 #endif // CONVERT_H

@@ -38,7 +38,7 @@
 #include <QPixmap>
 #include <QFileDialog>
 #include <QCloseEvent>
-
+#include <iostream>
 class QueryPauseHandler : public SimpleCommand
 {
 public:
@@ -85,7 +85,7 @@ class ListBreakPointsHandler : public SimpleCommand
 {
 public:
 	ListBreakPointsHandler(DebuggerForm& form_, bool merge_ = false)
-		: SimpleCommand("debug list_bp")
+		: SimpleCommand("debug_list_all_breaks")
 		, form(form_), merge(merge_)
 	{
 	}
@@ -831,6 +831,16 @@ void DebuggerForm::initConnection()
 		"  }\n"
 		"  return $result\n"
 		"}\n"));
+
+	// define 'debug_list_all_breaks' proc for internal use
+	comm.sendCommand(new SimpleCommand(
+		"proc debug_list_all_breaks { } {\n"
+		"  set result [debug list_bp]\n"
+		"  append result [debug list_watchpoints]\n"
+		"  append result [debug list_conditions]\n"
+		"  return $result\n"
+		"}\n"));
+		
 }
 
 void DebuggerForm::connectionClosed()
@@ -1144,15 +1154,15 @@ void DebuggerForm::breakpointToggle(int addr)
 	// toggle address unspecified, use cursor address
 	if (addr < 0) addr = disasmView->cursorAddress();
 
-	QString cmd;
-	if (session.breakpoints().isBreakpoint(addr)) {
-		cmd = "debug remove_bp " + session.breakpoints().idString(addr);
+	QString cmd, id;
+	if (session.breakpoints().isBreakpoint(addr, &id)) {
+		cmd = Breakpoints::createRemoveCommand(id);
 	} else {
-		int p = (addr & 0xC000) >> 14;
-		cmd.sprintf("debug set_bp %i { [ pc_in_slot %c %c %i ] }",
-		            addr, memLayout.primarySlot[p],
-		            memLayout.secondarySlot[p],
-		            memLayout.mapperSegment[p]);
+		// get slot
+		int ps, ss, seg;
+		addressSlot(addr, ps, ss, seg);
+		// create command
+		cmd = Breakpoints::createSetCommand(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
 	comm.sendCommand(new ListBreakPointsHandler(*this));
@@ -1161,25 +1171,15 @@ void DebuggerForm::breakpointToggle(int addr)
 void DebuggerForm::breakpointAdd()
 {
 	BreakpointDialog bpd(memLayout, &session, this);
+	int addr = disasmView->cursorAddress();
+	int ps, ss, seg;
+	addressSlot(addr, ps, ss, seg);
+	bpd.setData(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
-		if (bpd.address() > 0) {
-			QString cmd("debug set_bp %1 { [ pc_in_slot %2 %3 %4 ] }");
-			cmd = cmd.arg(bpd.address());
-			if (bpd.slot() == -1) {
-				cmd = cmd.arg('X');
-			} else {
-				cmd = cmd.arg(bpd.slot());
-			}
-			if (bpd.subslot() == -1) {
-				cmd = cmd.arg('X');
-			} else {
-				cmd = cmd.arg(bpd.subslot());
-			}
-			if (bpd.segment() == -1) {
-				cmd = cmd.arg('X');
-			} else {
-				cmd = cmd.arg(bpd.segment());
-			}
+		if (bpd.address() >= 0) {
+			QString cmd = Breakpoints::createSetCommand(
+				bpd.type(), bpd.address(), bpd.slot(), bpd.subslot(), bpd.segment(),
+				bpd.addressEndRange(), bpd.condition() );
 			comm.sendCommand(new SimpleCommand(cmd));
 			comm.sendCommand(new ListBreakPointsHandler(*this));
 		}
@@ -1411,4 +1411,21 @@ void DebuggerForm::symbolFileChanged()
 	shown = false;
 	if (choice == QMessageBox::Yes)
 		session.symbolTable().reloadFiles();
+}
+
+void DebuggerForm::addressSlot(int addr, int& ps, int& ss, int& segment)
+{
+	int p = (addr & 0xC000) >> 14;
+	ps = memLayout.primarySlot[p];
+	// figure out secondary slot
+	ss = memLayout.isSubslotted[ps] ? memLayout.secondarySlot[p] : -1;
+	// figure out (rom) mapper segment
+	segment = -1;
+	if (memLayout.mapperSize[ps][ss==-1 ? 0 : ss] > 0)
+		segment = memLayout.mapperSegment[p];
+	else {
+		int q = 2*p + ((addr & 0x2000) >> 13);
+		if (memLayout.romBlock[q] >= 0)
+			segment = memLayout.romBlock[q];
+	}
 }

@@ -56,6 +56,7 @@ private:
 
 	void refreshBreakpoints();
 
+	void addressSlot(int addr, int& ps, int& ss, int& segment);
 
 	QMenu* fileMenu;
 	QMenu* systemMenu;

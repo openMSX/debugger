@@ -127,11 +127,11 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 
 		// print slot
 		if (isOn) {
-			if (memLayout->isSubslotted[memLayout->primarySlot[i] & 3]) {
-				str.sprintf("%c-%c", memLayout->primarySlot[i],
+			if (memLayout->isSubslotted[memLayout->primarySlot[i]]) {
+				str.sprintf("%i-%i", memLayout->primarySlot[i],
 				                     memLayout->secondarySlot[i]);
 			} else {
-				str = memLayout->primarySlot[i];
+				str = QString::number(memLayout->primarySlot[i]);
 			}
 		} else {
 			str = "-";
@@ -202,13 +202,13 @@ void SlotViewer::slotsUpdated(const QString& message)
 
 	// parse page slots and segments
 	for (int p = 0; p < 4; ++p) {
-		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0]) ||
-		                  (memLayout->secondarySlot[p] != lines[p * 2][1]);
-		memLayout->primarySlot  [p] = lines[p * 2][0].toAscii();
-		memLayout->secondarySlot[p] = lines[p * 2][1].toAscii();
+		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toAscii()-'0') ||
+		                  (memLayout->secondarySlot[p] != lines[p * 2][1].toAscii()-'0' && memLayout->isSubslotted[p]);
+		memLayout->primarySlot  [p] = lines[p * 2][0].toAscii()-'0';
+		memLayout->secondarySlot[p] = lines[p * 2][1].toAscii()-'0';
 		segmentsChanged[p] = memLayout->mapperSegment[p] !=
-		                     lines[p * 2 + 1].toUShort();
-		memLayout->mapperSegment[p] = lines[p * 2 + 1].toUShort();
+		                     lines[p * 2 + 1].toInt();
+		memLayout->mapperSegment[p] = lines[p * 2 + 1].toInt();
 	}
 	// parse slot layout
 	int l = 8;

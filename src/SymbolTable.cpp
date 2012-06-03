@@ -144,13 +144,14 @@ Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 	return 0;
 }
 
-Symbol* SymbolTable::getAddressSymbol(const QString& label, Qt::CaseSensitivity cs)
+Symbol* SymbolTable::getAddressSymbol(const QString& label, bool case_sensitive)
 {
 	for (QMultiMap<int, Symbol*>::iterator it = addressSymbols.begin();
 	     it != addressSymbols.end(); ++it) {
-		if (it.value()->text().compare(label, cs)==0) {
+		if (it.value()->text().compare(label, Qt::CaseSensitive)==0)
 			return it.value();
-		}
+		if (!case_sensitive && it.value()->text().compare(label, Qt::CaseInsensitive)==0)
+			return it.value();
 	}
 	return 0;
 }
@@ -161,7 +162,7 @@ QStringList SymbolTable::labelList(bool include_vars, const MemoryLayout* ml) co
 	for (QMultiMap<int, Symbol*>::const_iterator it = addressSymbols.begin();
 	     it != addressSymbols.end(); ++it) 
 	{
-		if (it.value()->type() == Symbol::JUMPLABEL || (include_vars && it.value()->type() == Symbol::JUMPLABEL ) )
+		if (it.value()->type() == Symbol::JUMPLABEL || (include_vars && it.value()->type() == Symbol::VARIABLELABEL ) )
 			if( ml == 0 || it.value()->isSlotValid(ml) )
 				labels << it.value()->text();
 	}

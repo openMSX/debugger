@@ -12,23 +12,22 @@ struct MemoryLayout
 {
 	MemoryLayout();
 
-	char primarySlot[4];
-	char secondarySlot[4];
-	unsigned char mapperSegment[4];
+	int primarySlot[4];
+	int secondarySlot[4];
+	int mapperSegment[4];
 	int romBlock[8];
 
 	bool isSubslotted[4];
 	int mapperSize[4][4];
 };
 
-
 class Breakpoints
 {
 public:
 	Breakpoints();
 
-	enum Type { BREAKPOINT, WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE,
-	            WATCHPOINT_MEMREAD, WATCHPOINT_MEMWRITE };
+	enum Type { BREAKPOINT = 0, WATCHPOINT_MEMREAD, WATCHPOINT_MEMWRITE,
+	            WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE, CONDITION };
 
 	void clear();
 
@@ -36,8 +35,7 @@ public:
 	void setBreakpoints(const QString& str);
 	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
-	bool isBreakpoint(quint16 addr);
-	const QString idString(quint16 addr);
+	bool isBreakpoint(quint16 addr, QString *id = 0);
 
 	/* xml session file functions */
 	void saveBreakpoints(QXmlStreamWriter& xml);
@@ -45,6 +43,11 @@ public:
 
 	int findBreakpoint(quint16 addr);
 	int findNextBreakpoint();
+
+	static QString createSetCommand(Type type, int address, 
+	                                char ps = -1, char ss = -1, int segment = -1,
+	                                int endRange = -1, QString condition = QString());
+	static QString createRemoveCommand(const QString& id);
 
 private:
 	struct Breakpoint {
@@ -59,6 +62,8 @@ private:
 		qint16 segment;
 		// general condition
 		QString condition;
+		// compare content
+		bool operator==(const Breakpoint &bp) const;
 	};
 	typedef QLinkedList<Breakpoint> BreakpointList;
 
