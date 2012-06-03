@@ -186,7 +186,6 @@ void Breakpoints::setBreakpoints(const QString& str)
 
 		newBp.condition = it->mid(p, q-p).simplified();
 		unescapeXML(newBp.condition);
-		newBp.regionEnd = newBp.address;
 		parseCondition(newBp);
 		insertBreakpoint(newBp);
 	}
@@ -229,7 +228,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 		
 		if (bp.type != CONDITION) {
 			// check for slot argument
-			QRegExp rx("^\\{\\s*\\[\\s*(pc|watch)_in_slot\\s([X0123])\\s([X0123])\\s(X|\\d{1,3})\\s*\\](|\\s*&&\\s*\\(\\s*(.+)\\)\\s*)\\}$");
+			QRegExp rx("^\\{\\s*\\[\\s*(pc|watch)_in_slot\\s([X0123])\\s([X0123])\\s(X|\\d{1,3})\\s*\\]\\s*(&&\\s*\\((.+)\\)\\s*)?\\}$");
 			if (rx.indexIn(bp.condition) == 0) {
 				bool ok;
 				bp.ps = rx.cap(2).toInt(&ok);
@@ -238,18 +237,14 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 				if (!ok) bp.ss = -1;
 				bp.segment = rx.cap(4).toInt(&ok);
 				if (!ok) bp.segment = -1;
-				if (!rx.cap(5).isEmpty()) {
-					bp.condition = rx.cap(6).trimmed();
-				} else {
-					bp.condition = "";
-				}
+				bp.condition = rx.cap(6).trimmed();
 			} else {
 				bp.condition.chop(1);
-				bp.condition =  bp.condition.mid(1).trimmed();
+				bp.condition = bp.condition.mid(1).trimmed();
 			}
 		} else {
 			bp.condition.chop(1);
-			bp.condition =  bp.condition.mid(1).trimmed();
+			bp.condition = bp.condition.mid(1).trimmed();
 		}
 	}	
 }
@@ -302,12 +297,29 @@ bool Breakpoints::isBreakpoint(quint16 addr, QString *id)
 {
 	for (BreakpointList::const_iterator it = breakpoints.constBegin();
 	     it != breakpoints.constEnd(); ++it) {
-		if (it->address == addr) {
+		if (it->type == BREAKPOINT && it->address == addr) {
 			if (inCurrentSlot(*it)) {
 				if (id) *id = it->id;
 				return true;
 			}
 		}
+	}
+	return false;
+}
+
+bool Breakpoints::isWatchpoint(quint16 addr, QString *id)
+{
+	for (BreakpointList::const_iterator it = breakpoints.constBegin();
+	     it != breakpoints.constEnd(); ++it) {
+		if (it->type == WATCHPOINT_MEMREAD || it->type == WATCHPOINT_MEMWRITE)
+			if ( (it->address == addr && it->regionEnd < it->address) ||
+			     (addr >= it->address && addr <= it->regionEnd) )
+			{
+				if (inCurrentSlot(*it)) {
+					if (id) *id = it->id;
+					return true;
+				}
+			}
 	}
 	return false;
 }
@@ -360,8 +372,8 @@ void Breakpoints::saveBreakpoints(QXmlStreamWriter& xml)
 		xml.writeAttribute("id", it->id);
 
 		// slot/segment
-		xml.writeAttribute("primarySlot", QString(it->ps));
-		xml.writeAttribute("secondarySlot", QString(it->ss));
+		xml.writeAttribute("primarySlot", QString(it->ps < 0 ? '*' : char('0'+it->ps)));
+		xml.writeAttribute("secondarySlot", QString(it->ss < 0 ? '*' : char('0'+it->ss)));
 		xml.writeAttribute("segment", QString::number(it->segment));
 
 		// address
@@ -416,8 +428,10 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				bp.id = xml.attributes().value("id").toString();
 
 				// slot/segment
-				bp.ps = xml.attributes().value("primarySlot").at(0).toAscii();
-				bp.ss = xml.attributes().value("secondarySlot").at(0).toAscii();
+				char c = xml.attributes().value("primarySlot").at(0).toAscii();
+				bp.ps = c >= '0' && c <= '3' ? c - '0' : -1;
+				c = xml.attributes().value("secondarySlot").at(0).toAscii();
+				bp.ss = c >= '0' && c <= '3' ? c - '0' : -1;
 				bp.segment = xml.attributes().value("segment").toString().toInt();
 
 			} else if (xml.name() == "address" || xml.name() == "regionStart") {
@@ -428,6 +442,8 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 			} else if (xml.name() == "regionEnd") {
 				// read symbol name
 				bp.regionEnd = xml.readElementText().toInt();
+			} else if (xml.name() == "condition") {
+				bp.condition = xml.readElementText().simplified();
 			}
 		}
 	}

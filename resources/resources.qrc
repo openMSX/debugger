@@ -12,6 +12,7 @@
     <file>icons/stepout.png</file>
     <file>icons/stepback.png</file>
     <file>icons/breakpoint.png</file>
+    <file>icons/watchpoint.png</file>
     <file>icons/pcarrow.png</file>
     <file>icons/symmanager.png</file>
     <file>icons/symman.png</file>

@@ -4,6 +4,7 @@ $Id$
 	* Reworked breakpoint system to also support watchpoints and 
 	  conditions.
 	* Several breakpoint related bugfixes.
+	* Made watchpoints visible in DisasmViewer.
 
 2012-05-27 Edwin Velds <e.velds@gmail.com>
 	* Cursor follows pc/breakpoints/pgup/pgdn.

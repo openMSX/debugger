@@ -51,6 +51,7 @@ private:
 	QScrollBar* scrollBar;
 
 	QPixmap breakMarker;
+	QPixmap watchMarker;
 	QPixmap pcMarker;
 
 	quint16 programAddr;

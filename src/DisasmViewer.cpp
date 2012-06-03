@@ -59,6 +59,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred));
 	breakMarker = QPixmap(":/icons/breakpoint.png");
+	watchMarker = QPixmap(":/icons/watchpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
 
 	memory = NULL;
@@ -234,13 +235,16 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 			}
 
 			// draw breakpoint marker
-			if (row->infoLine == 0 &&
-			    breakpoints->isBreakpoint(row->addr)) {
-				p.drawPixmap(frameL + 2, y + h / 2 -5, breakMarker);
-				if (!isCursorLine) {
-					p.fillRect(frameL + 32, y, width() - 32 - frameL - frameR, h,
-					           Qt::red);
-					p.setPen(Qt::white);
+			if (row->infoLine == 0) {
+				if (breakpoints->isBreakpoint(row->addr)) {
+					p.drawPixmap(frameL + 2, y + h / 2 -5, breakMarker);
+					if (!isCursorLine) {
+						p.fillRect(frameL + 32, y, width() - 32 - frameL - frameR, h,
+									  Qt::red);
+						p.setPen(Qt::white);
+					}
+				} else if (breakpoints->isWatchpoint(row->addr)) {
+					p.drawPixmap(frameL + 2, y + h / 2 -5, watchMarker);
 				}
 			}
 			// draw PC marker

@@ -36,6 +36,7 @@ public:
 	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
 	bool isBreakpoint(quint16 addr, QString *id = 0);
+	bool isWatchpoint(quint16 addr, QString *id = 0);
 
 	/* xml session file functions */
 	void saveBreakpoints(QXmlStreamWriter& xml);
