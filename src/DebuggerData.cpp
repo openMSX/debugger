@@ -3,7 +3,7 @@
 #include "DebuggerData.h"
 #include "Convert.h"
 #include <QStringList>
-
+#include <QDebug>
 // class MemoryLayout
 
 MemoryLayout::MemoryLayout()
@@ -48,13 +48,14 @@ static QString getNextArgument(QString& data, int& pos)
 bool Breakpoints::Breakpoint::operator==(const Breakpoint &bp) const
 {
 	if (bp.type != type) return false;
+
 	// compare address
 	if (type != CONDITION) {
 		if (bp.address != address) return false;
 		if (type != BREAKPOINT) {
 			int re1 = -1, re2 = -1;
 			if (bp.regionEnd != -1 && bp.regionEnd != bp.address) re1 = bp.regionEnd;
-			if (   regionEnd != -1 &&    regionEnd != bp.address) re2 =    regionEnd; 
+			if (   regionEnd != -1 &&    regionEnd !=    address) re2 =    regionEnd; 
 			if (re1 != re2) return false;
 		}
 		// compare slot
@@ -175,8 +176,10 @@ void Breakpoints::setBreakpoints(const QString& str)
 				int q = it->indexOf('}', p);
 				newBp.regionEnd = stringToValue(it->mid(p, q-p));
 				p = q+1;
-			} else
+			} else {
 				newBp.address = stringToValue(getNextArgument(*it, p));
+				newBp.regionEnd = newBp.address;
+			}
 		} else
 			newBp.address = -1;
 
