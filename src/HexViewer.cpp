@@ -647,9 +647,15 @@ int HexViewer::coorToOffset(int x, int y)
 {
 	int offset = -1;
 	if (x >= xData && x < rightValuePos) {
-		offset = (x - xData) / dataWidth;
-	}
-	if (x >= xChar && x < rightCharPos) {
+		offset = 0;
+		x -= xData;
+		while (x > 4*dataWidth) {
+			offset += 4;
+			x -= 4*dataWidth + EXTRA_SPACING;
+			if (offset % 8 == 0) x -= EXTRA_SPACING;
+		}
+		offset += x / dataWidth;
+	} else if (x >= xChar && x < rightCharPos) {
 		offset = (x - xChar) / charWidth;
 	}
 	int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
