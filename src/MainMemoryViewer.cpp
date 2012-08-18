@@ -32,7 +32,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	}
 
 	addressValue = new QLineEdit();
-	addressValue->setText("0000");
+	addressValue->setText(hexValue(0, 4));
 	//addressValue->setEditable(false);
 
 	hexView = new HexViewer();
@@ -70,7 +70,7 @@ void MainMemoryViewer::settingsChanged()
 
 void MainMemoryViewer::setLocation(int addr)
 {
-	addressValue->setText(QString().sprintf("%04X",addr));
+	addressValue->setText(hexValue(addr, 4).toUpper());
 	hexView->setLocation(addr);
 }
 
@@ -96,7 +96,7 @@ void MainMemoryViewer::refresh()
 
 void MainMemoryViewer::hexViewChanged(int addr)
 {
-	addressValue->setText(QString().sprintf("%04X",addr));
+	addressValue->setText(hexValue(addr, 4).toUpper());
 }
 
 void MainMemoryViewer::addressValueChanged()
@@ -119,7 +119,7 @@ void MainMemoryViewer::registerChanged(int id, int value)
 		return;
 	}
 
-	addressValue->setText(QString().sprintf("%04X",value));
+	addressValue->setText(hexValue(value, 4).toUpper());
 	hexView->setLocation(value);
 	//hexView->refresh();
 }

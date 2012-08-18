@@ -4,7 +4,7 @@
 class QString;
 
 int stringToValue(const QString& str);
-QString hexValue(int value);
+QString hexValue(int value, int width = 0);
 QString& escapeXML(QString& str);
 QString& unescapeXML(QString& str);
 
