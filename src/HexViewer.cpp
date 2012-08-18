@@ -136,7 +136,8 @@ void HexViewer::changeWidth()
 
 void HexViewer::setIsEditable(bool enabled)
 {
-	isEditable=enabled;
+	isEditable = enabled;
+	setUseMarker(true);
 }
 
 void HexViewer::setUseMarker(bool enabled)
