@@ -16,10 +16,15 @@ public:
 	HexViewer(QWidget* parent = 0);
 	~HexViewer();
 
+	enum Mode { FIXED, FILL_WIDTH, FILL_WIDTH_POWEROF2 };
+
 	void setDebuggable(const QString& name, int size);
 	void setIsInteractive(bool enabled);
 	void setUseMarker(bool enabled);
 	void setIsEditable(bool enabled);
+
+	void setDisplayMode(Mode mode);
+	void setDisplayWidth(short width);
 
 	QSize sizeHint() const;
 
@@ -31,6 +36,7 @@ public slots:
 	void refresh();
 
 private:
+	void wheelEvent(QWheelEvent* e);
 	void resizeEvent(QResizeEvent* e);
 	void paintEvent(QPaintEvent* e);
 	void mousePressEvent(QMouseEvent* e);
@@ -39,20 +45,27 @@ private:
 	void focusInEvent(QFocusEvent* e);
 	void focusOutEvent(QFocusEvent* e);
 
+	void createActions();
+
 	void setSizes();
 	void hexdataTransfered(HexRequest* r);
 	void transferCancelled(HexRequest* r);
 	int coorToOffset(int x, int y);
 
 	QScrollBar* vertScrollBar;
+	QAction *fillWidthAction;
+	QAction *fillWidth2Action;
+	QAction *setWith8Action;
+	QAction *setWith16Action; 
+	QAction *setWith32Action;
 
 	// layout
 	int frameL, frameR, frameT, frameB;
 	int leftCharPos, leftValuePos, rightValuePos, rightCharPos;
-	bool adjustToWidth;
+	Mode displayMode;
 	short horBytes;
 	int visibleLines, partialBottomLine;
-	int lineHeight, xAddr, xData, xChar, dataWidth, charWidth;
+	int lineHeight, xAddr, xData, xChar, dataWidth, charWidth, hexCharWidth;
 	int addressLength;
 
 	// data
@@ -73,6 +86,9 @@ private:
 	int cursorPosition,editValue;
 
 	friend class HexRequest;
+
+private slots:
+	void changeWidth();
 
 signals:
 	void locationChanged(int addr);

@@ -8,6 +8,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QToolTip>
+#include <QAction>
 #include <algorithm>
 #include <cmath>
 
@@ -57,7 +58,7 @@ HexViewer::HexViewer(QWidget* parent)
 	previousHexData = NULL;
 	debuggableSize = 0;
 	waitingForData = false;
-	adjustToWidth = true;
+	displayMode = FILL_WIDTH;
 	highlitChanges = true;
 	addressLength = 4;
 	isEditable = false;
@@ -76,6 +77,8 @@ HexViewer::HexViewer(QWidget* parent)
 
 	settingsChanged();
 
+	createActions();
+
 	connect(vertScrollBar, SIGNAL(valueChanged(int)),
 	        this, SLOT(scrollBarChanged(int)));
 }
@@ -84,6 +87,51 @@ HexViewer::~HexViewer()
 {
 	delete[] hexData;
 	delete[] previousHexData;
+}
+
+void HexViewer::createActions()
+{
+	fillWidthAction = new QAction(tr("&Fill with"), this);
+	fillWidthAction->setShortcut(tr("Ctrl+F"));
+	fillWidthAction->setStatusTip(tr("Fill the width with as many bytes as possible."));
+
+	fillWidth2Action = new QAction(tr("Power of &2"), this);
+	fillWidth2Action->setShortcut(tr("Ctrl+2"));
+	fillWidth2Action->setStatusTip(tr("Fill the with with the maximum power of 2 possible."));
+
+	setWith8Action = new QAction(tr("&8 bytes."), this);
+	setWith8Action->setShortcut(tr("Ctrl+8"));
+	setWith8Action->setStatusTip(tr("Set width to 8 bytes."));
+
+	setWith16Action = new QAction(tr("&16 bytes."), this);
+	setWith16Action->setShortcut(tr("Ctrl+6"));
+	setWith16Action->setStatusTip(tr("Set width to 16 bytes."));
+
+	setWith32Action = new QAction(tr("&32 bytes."), this);
+	setWith32Action->setShortcut(tr("Ctrl+3"));
+	setWith32Action->setStatusTip(tr("Set width to 32 bytes."));
+	
+	connect(fillWidthAction,  SIGNAL(triggered()), this, SLOT(changeWidth()));
+	connect(fillWidth2Action, SIGNAL(triggered()), this, SLOT(changeWidth()));
+	connect(setWith8Action,   SIGNAL(triggered()), this, SLOT(changeWidth()));
+	connect(setWith16Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
+	connect(setWith32Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
+	
+	addAction(fillWidthAction);
+	addAction(fillWidth2Action);
+	addAction(setWith8Action);
+	addAction(setWith16Action);
+	addAction(setWith32Action);
+	setContextMenuPolicy(Qt::ActionsContextMenu);
+}
+
+void HexViewer::changeWidth()
+{
+	if (sender() == fillWidthAction) setDisplayMode(FILL_WIDTH);
+	else if (sender() == fillWidth2Action) setDisplayMode(FILL_WIDTH_POWEROF2);
+	else if (sender() == setWith8Action) setDisplayWidth(8);
+	else if (sender() == setWith16Action) setDisplayWidth(16);
+	else if (sender() == setWith32Action) setDisplayWidth(32);
 }
 
 void HexViewer::setIsEditable(bool enabled)
@@ -109,14 +157,28 @@ void HexViewer::setIsInteractive(bool enabled)
 	vertScrollBar->setEnabled(enabled);
 }
 
+void HexViewer::setDisplayMode(Mode mode)
+{
+	displayMode = mode;
+	setSizes();
+}
+
+void HexViewer::setDisplayWidth(short width)
+{
+	displayMode = FIXED;
+	horBytes = width;
+	setSizes();
+}
+
 void HexViewer::settingsChanged()
 {
 	QFontMetrics fm(Settings::get().font(Settings::HEX_FONT));
 	lineHeight = fm.height();
 	charWidth = fm.width("W");
+	hexCharWidth = fm.width("0ABCDEF") / 7;
 	xAddr = frameL + 8;
-	xData = xAddr + addressLength * charWidth + charWidth;
-	dataWidth = 5 * charWidth / 2;
+	xData = xAddr + addressLength * hexCharWidth + charWidth;
+	dataWidth = 3 * hexCharWidth;
 	setSizes();
 }
 
@@ -127,24 +189,31 @@ void HexViewer::setSizes()
 
 	frameR = frameL;
 	int w;
+
 	// fit display to width
-	if (adjustToWidth) {
+	if (displayMode != FIXED) {
+		// scrollbar width
+		int sbw = vertScrollBar->sizeHint().width();
 		horBytes = 1;
+		int hb2 = 1;
 		w = width() - frameL - frameR - xData - dataWidth - 2 * charWidth - 8;
 		// calculate how many additional bytes can by displayed
-		while (w >= dataWidth + charWidth) {
+		while (w-sbw >= dataWidth + charWidth) {
 			++horBytes;
+			if( horBytes == 2*hb2 ) hb2 = horBytes;
 			w -= dataWidth + charWidth;
 			if ((horBytes & 3) == 0) w -= EXTRA_SPACING;
 			if ((horBytes & 7) == 0) w -= EXTRA_SPACING;
+			// remove scrollbar
+			if (horBytes * visibleLines >= debuggableSize) sbw = 0;
 		}
+		// limit to power of two if needed
+		if (displayMode == FILL_WIDTH_POWEROF2)
+			horBytes = hb2;
 	}
 
 	// check if a scrollbar is needed
 	if (horBytes * visibleLines < debuggableSize) {
-		if (adjustToWidth && w < vertScrollBar->sizeHint().width()) {
-			horBytes = std::max(1, horBytes - 1);
-		}
 		int maxLine = int(ceil(double(debuggableSize) / horBytes)) - visibleLines;
 		maxLine = std::max(maxLine, 0);
 		vertScrollBar->setMaximum(maxLine);
@@ -184,6 +253,13 @@ void HexViewer::resizeEvent(QResizeEvent* e)
 {
 	QFrame::resizeEvent(e);
 	setSizes();
+}
+
+void HexViewer::wheelEvent(QWheelEvent* e)
+{
+	int v = vertScrollBar->value() - e->delta() / 40;
+	vertScrollBar->setValue(v);
+	e->accept();
 }
 
 void HexViewer::paintEvent(QPaintEvent* e)

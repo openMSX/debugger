@@ -39,6 +39,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	hexView->setUseMarker(true);
 	hexView->setIsEditable(true);
 	hexView->setIsInteractive(true);
+	hexView->setDisplayMode(HexViewer::FILL_WIDTH_POWEROF2);
 	QHBoxLayout* hbox = new QHBoxLayout();
 	hbox->setMargin(0);
 	hbox->addWidget(addressSourceList);
