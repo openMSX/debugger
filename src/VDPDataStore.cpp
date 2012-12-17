@@ -64,14 +64,16 @@ void VDPDataStore::refresh()
 			"[ debug read_block {VRAM} 0 0x20000 ]"
 			"[ debug read_block {VDP palette} 0 32 ]"
 			"[ debug read_block {VDP status regs} 0 16 ]"
-			"[ debug read_block {VDP regs} 0 64 ]");
+			"[ debug read_block {VDP regs} 0 64 ]"
+			"[ debug read_block {VRAM pointer} 0 2 ]");
 	} else {
 		req = QString(
 			"debug_bin2hex "
 			"[ debug read_block {physical VRAM} 0 0x20000 ]"
 			"[ debug read_block {VDP palette} 0 32 ]"
 			"[ debug read_block {VDP status regs} 0 16 ]"
-			"[ debug read_block {VDP regs} 0 64 ]");
+			"[ debug read_block {VDP regs} 0 64 ]"
+			"[ debug read_block {VRAM pointer} 0 2 ]");
 	}
 	new SimpleHexRequest(req, TOTAL_SIZE, vram, *this);
 }
@@ -97,4 +99,8 @@ const unsigned char* VDPDataStore::getStatusRegsPointer() const
 const unsigned char* VDPDataStore::getRegsPointer() const
 {
 	return vram + 0x20000 + 32 + 16;
+}
+const unsigned char* VDPDataStore::getVdpVramPointer() const
+{
+	return vram + 0x20000 + 32 + 16 + 64;
 }

@@ -37,7 +37,7 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs =  new unsigned char[64 + 16];
+	regs =  new unsigned char[64 + 16 + 2];
 	vdpid = 99; // make sure that we parse the first time the status registers are read
 	vdpid = VDP_V9958; //quick hack for now
 
@@ -636,7 +636,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r19->setText(dec3(regs[19]));
 		label_dec_r23->setText(dec3(regs[23]));
 
-		label_dec_r14->setText(hex5((regs[14] & 7) << 14));
+		label_dec_r14->setText(hex5(((regs[14] & 7) << 14) | ((regs[81] & 63) << 8) | regs[80]));
 		label_dec_r15->setText(dec2(regs[15] & 15));
 		label_dec_r16->setText(dec2(regs[16] & 15));
 		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? ", auto incr" : ""));
@@ -916,8 +916,9 @@ void VDPRegViewer::refresh()
 	new SimpleHexRequest(
 		"debug_bin2hex "
 		"[ debug read_block {VDP regs} 0 64 ]"
-		"[ debug read_block {VDP status regs} 0 16 ]",
-		64 + 16, regs, *this);
+		"[ debug read_block {VDP status regs} 0 16 ]"
+		"[ debug read_block {VRAM pointer} 0 2 ]",
+		64 + 16 + 2, regs, *this);
 }
 
 void VDPRegViewer::DataHexRequestReceived()

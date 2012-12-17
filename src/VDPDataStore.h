@@ -14,6 +14,7 @@ public:
 	const unsigned char* getPalettePointer() const;
 	const unsigned char* getRegsPointer() const;
 	const unsigned char* getStatusRegsPointer() const;
+	const unsigned char* getVdpVramPointer() const;
 
 private:
 	VDPDataStore();
