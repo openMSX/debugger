@@ -99,7 +99,7 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 	label_I_2_5->setText((statusregs[2] &  32) ? "Horizontal scanning" : "Not hor scan");
 	label_I_2_4->setText((statusregs[2] &  16) ? "Boundary color detected" : "BC not deteced");
 	label_I_2_1->setText((statusregs[2] & 2) ? "First field" : "Second field");
-	label_I_2_0->setText((statusregs[2] & 2) ? "Command execution" : "No command exec");
+	label_I_2_0->setText((statusregs[2] & 1) ? "Command execution" : "No command exec");
 
 	label_I_3->setText(QString("Column: %1").arg(statusregs[3] | ((statusregs[4] & 1) << 8)));
 	label_I_5->setText(QString("Row: %1").arg(statusregs[5] | ((statusregs[6] & 3) << 8)));
