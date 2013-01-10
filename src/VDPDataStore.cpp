@@ -30,7 +30,7 @@ private:
 };
 
 
-static const unsigned TOTAL_SIZE = 0x20000 + 32 + 16 + 64;
+static const unsigned TOTAL_SIZE = 0x20000 + 32 + 16 + 64 + 2;
 
 VDPDataStore::VDPDataStore()
 {
