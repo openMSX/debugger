@@ -336,10 +336,10 @@ void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 			OpenMSXConnection* conn = confirmedConnections.takeAt(id);
 			QListWidgetItem* item = ui.listConnections->takeItem(id);
 			delete item;
-			delete conn;
+			conn->deleteLater();
                 }
 		return;
 	}
 	pendingConnections.erase(it);
-	delete &connection;
+	connection.deleteLater();
 }
