@@ -9,11 +9,11 @@ class Version {
 public:
 	// Defined by build system:
 	static const bool RELEASE;
-	static const std::string VERSION;
-	static const std::string CHANGELOG_REVISION;
+	static const char* const VERSION;
+	static const char* const REVISION;
 
 	// Computed using constants above:
-	static const std::string FULL_VERSION;
+	static std::string full();
 };
 
 #endif // VERSION_H

@@ -1190,7 +1190,7 @@ void DebuggerForm::breakpointAdd()
 void DebuggerForm::showAbout()
 {
 	QMessageBox::about(
-		this, "openMSX Debugger", QString(Version::FULL_VERSION.c_str()));
+		this, "openMSX Debugger", QString(Version::full().c_str()));
 }
 
 void DebuggerForm::toggleRegisterDisplay()

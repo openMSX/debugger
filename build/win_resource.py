@@ -1,8 +1,7 @@
-# $Id$
 # Generates Windows resource header.
 
 from outpututils import rewriteIfChanged
-from version import extractRevision, packageVersion
+from version import extractRevisionNumber, packageVersion
 
 import sys
 
@@ -11,7 +10,8 @@ def iterResourceHeader():
 		versionNumber = packageVersion[ : packageVersion.index('-')]
 	else:
 		versionNumber = packageVersion
-	versionComponents = versionNumber.split('.') + [ extractRevision() ]
+	revision = str(extractRevisionNumber())
+	versionComponents = versionNumber.split('.') + [ revision ]
 	assert len(versionComponents) == 4, versionComponents
 
 	yield '#define OPENMSXDEBUGGER_VERSION_INT %s' % ', '.join(versionComponents)
