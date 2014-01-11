@@ -235,70 +235,60 @@ void SymbolTable::appendFile(const QString& file, FileType type)
 	fileWatcher.addPath(file);
 }
 
+// Universal value parsing routine. Accepts:
+//  - 0123h, 1234h, 1234H  (hex)
+//  - 0x1234               (hex)
+//  - 1234                 (dec)
+//  - 0123                 (oct)
+// The string may (optionally) end with a '; comment' part (with or without
+// whitespace around the ';' character).
+static bool parseValue(const QString& str, int& result)
+{
+	QStringList l = str.split(";"); // ignore stuff after ';'
+	QString s = l.at(0).trimmed();
+	bool success;
+	if (s.endsWith('h', Qt::CaseInsensitive)) {
+		s.chop(1);
+		result = s.toInt(&success, 16);
+	} else {
+		result = s.toInt(&success, 0); // any base (e.g. 0x..)
+	}
+	return success;
+}
+
+bool SymbolTable::readSymbolFile(
+	const QString& filename, FileType type, const QString& equ)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+
+	appendFile(filename, type);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		QStringList l = line.split(equ);
+		if (l.size() != 2) continue;
+		int value;
+		if (!parseValue(l.at(1), value)) continue;
+		Symbol* sym = new Symbol(l.at(0), value);
+		sym->setSource(&symbolFiles.back().fileName);
+		add(sym);
+	}
+	return true;
+}
 bool SymbolTable::readTNIASM0File(const QString& filename)
 {
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		return false;
-	}
-
-	appendFile(filename, TNIASM0_FILE);
-	QTextStream in(&file);
-	while (!in.atEnd()) {
-		QString line = in.readLine();
-		QStringList l = line.split(": equ ");
-		if (l.size() != 2) continue;
-		QStringList a = l.at(1).split("h ;");
-		if (a.size() != 2) continue;
-		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
-		sym->setSource(&symbolFiles.back().fileName);
-		add(sym);
-	}
-	return true;
+	return readSymbolFile(filename, TNIASM0_FILE, ": equ ");
 }
-
 bool SymbolTable::readTNIASM1File(const QString& filename)
 {
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		return false;
-	}
-
-	appendFile(filename, TNIASM1_FILE);
-	QTextStream in(&file);
-	while (!in.atEnd()) {
-		QString line = in.readLine();
-		QStringList l = line.split(": %equ ");
-		if (l.size() != 2) continue;
-		QStringList a = l.at(1).split("h");
-		if (a.size() != 2) continue;
-		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
-		sym->setSource(&symbolFiles.back().fileName);
-		add(sym);
-	}
-	return true;
+	return readSymbolFile(filename, TNIASM1_FILE, ": %equ ");
 }
-
 bool SymbolTable::readSJASMFile(const QString& filename)
 {
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		return false;
-	}
-
-	appendFile(filename, SJASM_FILE);
-	QTextStream in(&file);
-	while (!in.atEnd()) {
-		QString line = in.readLine();
-		QStringList l = line.split(": equ ");
-		if (l.size() != 2) continue;
-		QStringList a = l.at(1).split("h");
-		if (a.size() != 2) continue;
-		Symbol* sym = new Symbol(l.at(0), a.at(0).toInt(0, 16));
-		sym->setSource(&symbolFiles.back().fileName);
-		add(sym);
-	}
-	return true;
+	return readSymbolFile(filename, SJASM_FILE, ": equ ");
 }
 
 bool SymbolTable::readASMSXFile(const QString& filename)
