@@ -242,6 +242,7 @@ QT_HEADER_DIRS+=$(patsubst %,/Library/Frameworks/Qt%.framework/Headers,$(QT_COMP
 endif
 
 CXX:=g++
+WINDRES?=windres
 CXXFLAGS:= -g
 INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
 INCLUDE_INTERNAL+=$(BUILD_PATH)/config
