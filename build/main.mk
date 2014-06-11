@@ -234,7 +234,7 @@ QT_INSTALL_HEADERS:=$(subst \,/,$(QT_INSTALL_HEADERS))
 QT_INSTALL_LIBS:=$(subst \,/,$(QT_INSTALL_LIBS))
 QT_INSTALL_BINS:=$(subst \,/,$(QT_INSTALL_BINS))
 endif
-QT_COMPONENTS:=Core Gui Network Xml
+QT_COMPONENTS:=Core Widgets Gui Network Xml
 QT_HEADER_DIRS:=$(addprefix $(QT_INSTALL_HEADERS)/Qt,$(QT_COMPONENTS))
 QT_HEADER_DIRS+=$(QT_INSTALL_HEADERS)
 ifeq ($(OPENMSX_TARGET_OS),darwin)
@@ -243,7 +243,7 @@ endif
 
 CXX:=g++
 WINDRES?=windres
-CXXFLAGS:= -g
+CXXFLAGS:= -g -fPIC
 INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
 INCLUDE_INTERNAL+=$(BUILD_PATH)/config
 COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PATH))
@@ -262,9 +262,9 @@ COMPILE_ENV:=
 LINK_ENV:=
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
 COMPILE_FLAGS+=-static-libgcc -static-libstdc++
-LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 4,$(QT_COMPONENTS))) -lws2_32 -lsecur32 -mwindows -static-libgcc -static-libstdc++
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 5,$(QT_COMPONENTS))) -lws2_32 -lsecur32 -mwindows -static-libgcc -static-libstdc++
 else
-LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_LIBS) -L$(QT_INSTALL_LIBS) $(addprefix -lQt,$(QT_COMPONENTS))
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_LIBS) -L$(QT_INSTALL_LIBS) $(addprefix -lQt5,$(QT_COMPONENTS))
 endif
 endif
 DEPEND_FLAGS:=

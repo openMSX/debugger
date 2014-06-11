@@ -202,10 +202,10 @@ void SlotViewer::slotsUpdated(const QString& message)
 
 	// parse page slots and segments
 	for (int p = 0; p < 4; ++p) {
-		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toAscii()-'0') ||
-		                  (memLayout->secondarySlot[p] != lines[p * 2][1].toAscii()-'0' && memLayout->isSubslotted[p]);
-		memLayout->primarySlot  [p] = lines[p * 2][0].toAscii()-'0';
-		memLayout->secondarySlot[p] = lines[p * 2][1].toAscii()-'0';
+		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toLatin1()-'0') ||
+		                  (memLayout->secondarySlot[p] != lines[p * 2][1].toLatin1()-'0' && memLayout->isSubslotted[p]);
+		memLayout->primarySlot  [p] = lines[p * 2][0].toLatin1()-'0';
+		memLayout->secondarySlot[p] = lines[p * 2][1].toLatin1()-'0';
 		segmentsChanged[p] = memLayout->mapperSegment[p] !=
 		                     lines[p * 2 + 1].toInt();
 		memLayout->mapperSegment[p] = lines[p * 2 + 1].toInt();

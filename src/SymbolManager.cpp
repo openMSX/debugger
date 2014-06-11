@@ -128,14 +128,14 @@ void SymbolManager::addFile()
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech link map files (*.map)";
-	d->setFilters(types);
+	d->setNameFilters(types);
 	d->setAcceptMode(QFileDialog::AcceptOpen);
 	d->setFileMode(QFileDialog::ExistingFile);
 	// set default directory
 	d->setDirectory(Settings::get().value("SymbolManager/OpenDir", QDir::currentPath()).toString());
 	// run
 	if (d->exec()) {
-		QString f = d->selectedFilter();
+		QString f = d->selectedNameFilter();
 		QString n = d->selectedFiles().at(0);
 		// load file from the correct type
 		bool read = false;

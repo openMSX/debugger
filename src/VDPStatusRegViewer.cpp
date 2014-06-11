@@ -64,7 +64,7 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 	for (int r = 0; r <= 9; ++r) {
 		for (int b = 7; b >= 0; --b) {
 			QString name = QString("label_%1_%2").arg(r).arg(b);
-			InteractiveLabel* l = qFindChild<InteractiveLabel*>(this, name);
+			InteractiveLabel* l = findChild<InteractiveLabel*>(name);
 			l->setText((statusregs[r] & (1 << b)) ? "1" : "0");
 		}
 	}

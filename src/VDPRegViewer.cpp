@@ -58,16 +58,16 @@ VDPRegViewer::~VDPRegViewer()
 void VDPRegViewer::setRegisterVisible(int r, bool visible)
 {
 	QString name1 = QString("label_R%1").arg(r);
-	QLabel* l1 = qFindChild<QLabel*>(this, name1);
+	QLabel* l1 = findChild<QLabel*>(name1);
 	l1->setVisible(visible);
 
 	QString name2 = QString("label_val_%1").arg(r);
-	QLabel* l2 = qFindChild<QLabel*>(this, name2);
+	QLabel* l2 = findChild<QLabel*>(name2);
 	l2->setVisible(visible);
 
 	for (int b = 7; b >= 0; --b) {
 		QString name3 = QString("pushButton_%1_%2").arg(r).arg(b);
-		InteractiveButton *i = qFindChild<InteractiveButton*>(this, name3);
+		InteractiveButton *i = findChild<InteractiveButton*>(name3);
 		i->setVisible(visible);
 	}
 
@@ -448,7 +448,7 @@ void VDPRegViewer::decodeVDPRegs()
 		if (r == 24) continue;
 		for (int b = 7; b >= 0; --b) {
 			QString name = QString("pushButton_%1_%2").arg(r).arg(b);
-			InteractiveButton* i = qFindChild<InteractiveButton*>(this, name);
+			InteractiveButton* i = findChild<InteractiveButton*>(name);
 			i->setChecked((regs[r] & (1 << b)) ? true : false);
 			if (r<12){
 				i->mustBeSet((mustbeone[ (vdpid == VDP_TMS99X8)?0:1 ][basicscreen][r] & (1 << b)) ? true : false);

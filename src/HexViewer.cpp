@@ -591,7 +591,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		update();
 		return;
 	} else if (editedChars) {
-		editValue = (e->text().toAscii())[0];
+		editValue = (e->text().toLatin1())[0];
 		setValue = true;
 		++newAddress;
 	} else {

@@ -3,6 +3,7 @@
 #include "StackViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
+#include "Settings.h"
 #include <QScrollBar>
 #include <QPaintEvent>
 #include <QPainter>
@@ -46,7 +47,7 @@ StackViewer::StackViewer(QWidget* parent)
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred));
 
-	setFont(QFont("Courier New", 12));
+	setFont(Settings::get().font(Settings::HEX_FONT));
 
 	stackPointer = 0;
 	topAddress = 0;
@@ -120,7 +121,7 @@ void StackViewer::paintEvent(QPaintEvent* e)
 
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
-	int xStack = xAddr + fontMetrics().width("FFFF ");
+	int xStack = xAddr + fontMetrics().width("FFFFF");
 	int y = frameT + h - 1;
 	int address = topAddress;
 

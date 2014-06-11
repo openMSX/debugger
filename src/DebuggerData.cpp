@@ -431,9 +431,9 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				bp.id = xml.attributes().value("id").toString();
 
 				// slot/segment
-				char c = xml.attributes().value("primarySlot").at(0).toAscii();
+				char c = xml.attributes().value("primarySlot").at(0).toLatin1();
 				bp.ps = c >= '0' && c <= '3' ? c - '0' : -1;
-				c = xml.attributes().value("secondarySlot").at(0).toAscii();
+				c = xml.attributes().value("secondarySlot").at(0).toLatin1();
 				bp.ss = c >= '0' && c <= '3' ? c - '0' : -1;
 				bp.segment = xml.attributes().value("segment").toString().toInt();
 

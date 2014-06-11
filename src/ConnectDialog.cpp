@@ -99,7 +99,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	QAbstractSocket* socket = NULL;
 #ifdef _WIN32
 	int port = -1;
-	std::ifstream in(info.absoluteFilePath().toAscii().data());
+	std::ifstream in(info.absoluteFilePath().toLatin1().data());
 	in >> port;
 	if (port != -1) {
 		QHostAddress localhost(QHostAddress::LocalHost);
@@ -120,7 +120,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	if (sd != -1) {
 		sockaddr_un addr;
 		addr.sun_family = AF_UNIX;
-		strcpy(addr.sun_path, info.absoluteFilePath().toAscii().data());
+		strcpy(addr.sun_path, info.absoluteFilePath().toLatin1().data());
 		if (connect(sd, (sockaddr*)&addr, sizeof(addr)) != -1) {
 			socket = new QTcpSocket();
 			if (!socket->setSocketDescriptor(sd)) {

@@ -9,7 +9,7 @@ int stringToValue(const QString& str)
 
 	// find base (prefix or postfix)
 	if (s.startsWith("&") && s.size() >= 2) {
-		switch (s[1].toUpper().toAscii()) {
+		switch (s[1].toUpper().toLatin1()) {
 		case 'H':
 			base = 16;
 			break;
@@ -31,7 +31,7 @@ int stringToValue(const QString& str)
 		base = 2;
 		s = s.remove(0, 1);
 	} else if (!s.isEmpty()) {
-		switch (s.right(1)[0].toUpper().toAscii()) {
+		switch (s.right(1)[0].toUpper().toLatin1()) {
 			case 'H':
 			case '#':
 				base = 16;

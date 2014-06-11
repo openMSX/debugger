@@ -1019,7 +1019,7 @@ void DebuggerForm::fileSaveSession()
 void DebuggerForm::fileSaveSessionAs()
 {
 	QFileDialog d(this, tr("Save debug session"));
-	d.setFilter(tr("Debug Session Files (*.omds)"));
+	d.setNameFilter(tr("Debug Session Files (*.omds)"));
 	d.setDefaultSuffix("omds");
 	d.setDirectory(QDir::currentPath());
 	d.setAcceptMode(QFileDialog::AcceptSave);

@@ -81,8 +81,8 @@ void ReadDebugBlockCommand::copyData(const QString& message)
 {
 	assert(static_cast<unsigned>(message.size()) == 2 * size);
 	for (unsigned i = 0; i < size; ++i) {
-		target[i] = (hex2val(message[2 * i + 0].toAscii()) << 4) +
-		            (hex2val(message[2 * i + 1].toAscii()) << 0);
+		target[i] = (hex2val(message[2 * i + 0].toLatin1()) << 4) +
+		            (hex2val(message[2 * i + 1].toLatin1()) << 0);
 	}
 }
 
@@ -181,7 +181,7 @@ bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
 {
 	qWarning("Fatal error on line %i, column %i: %s",
 	         exception.lineNumber(), exception.columnNumber(),
-	         exception.message().toAscii().data());
+	         exception.message().toLatin1().data());
 	cleanup();
 	return false;
 }
@@ -218,7 +218,7 @@ bool OpenMSXConnection::endElement(
 	} else if (qName == "update") {
 		emit updateParsed(xmlAttrs.value("type"), xmlAttrs.value("name"), xmlData);
 	} else {
-		qWarning("Unknown XML tag: %s", qName.toAscii().data());
+		qWarning("Unknown XML tag: %s", qName.toLatin1().data());
 	}
 	return true;
 }
