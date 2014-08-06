@@ -247,6 +247,8 @@ CXXFLAGS:= -g -fPIC
 INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
 INCLUDE_INTERNAL+=$(BUILD_PATH)/config
 COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PATH))
+# Enable C++11
+COMPILE_FLAGS+=-std=c++11
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 SDK_PATH:=/Developer/SDKs/MacOSX10.4u.sdk
@@ -262,7 +264,7 @@ COMPILE_ENV:=
 LINK_ENV:=
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
 COMPILE_FLAGS+=-static-libgcc -static-libstdc++
-LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt,$(addsuffix 5,$(QT_COMPONENTS))) -lws2_32 -lsecur32 -mwindows -static-libgcc -static-libstdc++
+LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_BINS) -L$(QT_INSTALL_BINS) $(addprefix -lQt5,$(QT_COMPONENTS)) -lws2_32 -lsecur32 -mwindows -static-libgcc -static-libstdc++
 else
 LINK_FLAGS:=-Wl,-rpath,$(QT_INSTALL_LIBS) -L$(QT_INSTALL_LIBS) $(addprefix -lQt5,$(QT_COMPONENTS))
 endif

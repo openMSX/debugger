@@ -1,5 +1,3 @@
-// $Id$
-
 #ifdef _WIN32
 
 #include "SspiUtils.h"
@@ -36,7 +34,7 @@ void InitTokenContextBuffer(PSecBufferDesc pSecBufferDesc, PSecBuffer pSecBuffer
 {
 	pSecBuffer->BufferType = SECBUFFER_TOKEN;
 	pSecBuffer->cbBuffer = 0;
-	pSecBuffer->pvBuffer = NULL;
+	pSecBuffer->pvBuffer = nullptr;
 
 	pSecBufferDesc->ulVersion = SECBUFFER_VERSION;
 	pSecBufferDesc->cBuffers = 1;
@@ -49,7 +47,7 @@ void ClearContextBuffers(PSecBufferDesc pSecBufferDesc)
 	{
 		FreeContextBuffer(pSecBufferDesc->pBuffers[i].pvBuffer);
 		pSecBufferDesc->pBuffers[i].cbBuffer = 0;
-		pSecBufferDesc->pBuffers[i].pvBuffer = NULL;
+		pSecBufferDesc->pBuffers[i].pvBuffer = nullptr;
 	}
 }
 
@@ -133,7 +131,7 @@ void DebugPrintSecurityDescriptor(PSECURITY_DESCRIPTOR psd)
 		OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
 		DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION | LABEL_SECURITY_INFORMATION, 
 		&sddl, 
-		NULL);
+		nullptr);
 	if (ret) {
 		PRT_DEBUG("SecurityDescriptor: " << sddl);
 		LocalFree(sddl);
@@ -145,7 +143,7 @@ void DebugPrintSecurityDescriptor(PSECURITY_DESCRIPTOR psd)
 // If unsuccessful, returns null
 PTOKEN_USER GetProcessToken()
 {
-	PTOKEN_USER pToken = NULL;
+	PTOKEN_USER pToken = nullptr;
 
 	HANDLE hProcessToken;
 	BOOL ret = OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &hProcessToken);
@@ -153,7 +151,7 @@ PTOKEN_USER GetProcessToken()
 	if (ret) {
 
 		DWORD cbToken;
-		ret = GetTokenInformation(hProcessToken, TokenUser, NULL, 0, &cbToken);
+		ret = GetTokenInformation(hProcessToken, TokenUser, nullptr, 0, &cbToken);
 		assert(!ret && GetLastError() == ERROR_INSUFFICIENT_BUFFER && cbToken);
 
 		pToken = (TOKEN_USER*)LocalAlloc(LMEM_ZEROINIT, cbToken);
@@ -162,7 +160,7 @@ PTOKEN_USER GetProcessToken()
 			DebugPrintSecurityBool("GetTokenInformation", ret);
 			if (!ret) {
 				LocalFree(pToken);
-				pToken = NULL;
+				pToken = nullptr;
 			}
 		}
 
@@ -176,7 +174,7 @@ PTOKEN_USER GetProcessToken()
 // If unsuccessful, returns null
 PSECURITY_DESCRIPTOR CreateCurrentUserSecurityDescriptor()
 {
-	PSECURITY_DESCRIPTOR psd = NULL;
+	PSECURITY_DESCRIPTOR psd = nullptr;
 	PTOKEN_USER pToken = GetProcessToken();
 	if (pToken) {
 		PSID pUserSid = pToken->User.Sid;
@@ -199,9 +197,9 @@ PSECURITY_DESCRIPTOR CreateCurrentUserSecurityDescriptor()
 				SetSecurityDescriptorGroup(psd, &pUserAce->SidStart, FALSE) &&
 				SetSecurityDescriptorOwner(psd, &pUserAce->SidStart, FALSE))
 			{
-				buffer = NULL;
+				buffer = nullptr;
 			} else {
-				psd = NULL;
+				psd = nullptr;
 			}
 
 			LocalFree(buffer);
@@ -232,12 +230,12 @@ unsigned long GetPackageMaxTokenSize(const SEC_WCHAR* package)
 	return cbMaxToken;
 }
 
-bool Send(StreamWrapper& stream, void* buffer, uint32 cb)
+bool Send(StreamWrapper& stream, void* buffer, uint32_t cb)
 {
-	uint32 sent = 0;
+	uint32_t sent = 0;
 	while (sent < cb)
 	{
-		uint32 ret = stream.Write((char*)buffer + sent, cb - sent);
+		uint32_t ret = stream.Write((char*)buffer + sent, cb - sent);
 		if (ret == STREAM_ERROR) {
 			return false;
 		}
@@ -246,20 +244,20 @@ bool Send(StreamWrapper& stream, void* buffer, uint32 cb)
 	return true;
 }
 
-bool SendChunk(StreamWrapper& stream, void* buffer, uint32 cb)
+bool SendChunk(StreamWrapper& stream, void* buffer, uint32_t cb)
 {
-	uint32 nl = htonl(cb);
+	uint32_t nl = htonl(cb);
 	if (!Send(stream, &nl, sizeof(nl))) {
 		return false;
 	}
 	return Send(stream, buffer, cb);
 }
 
-bool Recv(StreamWrapper& stream, void* buffer, uint32 cb)
+bool Recv(StreamWrapper& stream, void* buffer, uint32_t cb)
 {
-	uint32 recvd = 0;
+	uint32_t recvd = 0;
 	while (recvd < cb) {
-		uint32 ret = stream.Read((char*)buffer + recvd, cb - recvd);
+		uint32_t ret = stream.Read((char*)buffer + recvd, cb - recvd);
 		if (ret == STREAM_ERROR) {
 			return false;
 		}
@@ -269,9 +267,9 @@ bool Recv(StreamWrapper& stream, void* buffer, uint32 cb)
 	return true;
 }
 
-bool RecvChunkSize(StreamWrapper& stream, uint32* pcb)
+bool RecvChunkSize(StreamWrapper& stream, uint32_t* pcb)
 {
-	uint32 cb;
+	uint32_t cb;
 	bool ret = Recv(stream, &cb, sizeof(cb));
 	if (ret) {
 		*pcb = ntohl(cb);
@@ -279,9 +277,9 @@ bool RecvChunkSize(StreamWrapper& stream, uint32* pcb)
 	return ret;
 }
 
-bool RecvChunk(StreamWrapper& stream, std::vector<char>& buffer, uint32 cbMaxSize)
+bool RecvChunk(StreamWrapper& stream, std::vector<char>& buffer, uint32_t cbMaxSize)
 {
-	uint32 cb;
+	uint32_t cb;
 	if (!RecvChunkSize(stream, &cb) || cb > cbMaxSize) {
 		return false;
 	}
