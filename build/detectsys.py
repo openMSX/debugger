@@ -20,11 +20,15 @@ def detectCPU():
 		return 'x86_64'
 	elif cpu in ('x86', 'i386', 'i486', 'i586', 'i686'):
 		return 'x86'
-	elif cpu.startswith('ppc') or cpu.startswith('power'):
+	elif cpu.startswith('ppc') or cpu.endswith('ppc') or cpu.startswith('power'):
 		return 'ppc64' if cpu.endswith('64') else 'ppc'
 	elif cpu.startswith('arm'):
 		return 'arm'
-	elif cpu.startswith('mips'):
+	elif cpu == 'aarch64':
+		return 'aarch64'
+	elif cpu == 'aarch64_be':
+		return 'aarch64_be'
+	elif cpu.startswith('mips') or cpu == 'sgi':
 		return 'mipsel' if cpu.endswith('el') else 'mips'
 	elif cpu == 'm68k':
 		return 'm68k'
