@@ -225,9 +225,25 @@ else
 all: $(BINARY_FULL)
 endif
 
-QT_INSTALL_HEADERS:=$(shell qmake -query QT_INSTALL_HEADERS)
-QT_INSTALL_LIBS:=$(shell qmake -query QT_INSTALL_LIBS)
-QT_INSTALL_BINS:=$(shell qmake -query QT_INSTALL_BINS)
+ifeq ($(QMAKE),)
+QMAKE:=qmake
+QT_VERSION:=$(shell $(QMAKE) -query QT_VERSION 2> /dev/null)
+ifeq ($(QT_VERSION),)
+QMAKE:=/usr/local/opt/qt5/bin/qmake
+QT_VERSION:=$(shell $(QMAKE) -query QT_VERSION)
+endif
+else
+QT_VERSION:=$(shell $(QMAKE) -query QT_VERSION)
+endif
+ifeq ($(QT_VERSION),)
+$(error qmake not found, please install and/or pass QMAKE)
+else ifeq ($(filter 5.%,$(QT_VERSION)),)
+$(error Qt version $(QT_VERSION) found; please pass QMAKE pointing to Qt 5.x instead)
+endif
+
+QT_INSTALL_HEADERS:=$(shell $(QMAKE) -query QT_INSTALL_HEADERS)
+QT_INSTALL_LIBS:=$(shell $(QMAKE) -query QT_INSTALL_LIBS)
+QT_INSTALL_BINS:=$(shell $(QMAKE) -query QT_INSTALL_BINS)
 # On MingW32 you get backslashes from qmake -query, which we don't want:
 ifeq ($(OPENMSX_TARGET_OS),mingw32)
 QT_INSTALL_HEADERS:=$(subst \,/,$(QT_INSTALL_HEADERS))
@@ -241,7 +257,7 @@ ifeq ($(OPENMSX_TARGET_OS),darwin)
 QT_HEADER_DIRS+=$(patsubst %,/Library/Frameworks/Qt%.framework/Headers,$(QT_COMPONENTS))
 endif
 
-CXX:=g++
+CXX?=c++
 WINDRES?=windres
 CXXFLAGS:= -g -fPIC
 INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
@@ -251,14 +267,9 @@ COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PA
 COMPILE_FLAGS+=-std=c++11
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
-SDK_PATH:=/Developer/SDKs/MacOSX10.4u.sdk
-OSX_VER:=10.4
-OSX_MIN_REQ:=1040
-COMPILE_ENV:=NEXT_ROOT=$(SDK_PATH) MACOSX_DEPLOYMENT_TARGET=$(OSX_VER)
-LINK_ENV:=NEXT_ROOT=$(SDK_PATH) MACOSX_DEPLOYMENT_TARGET=$(OSX_VER)
-COMPILE_FLAGS+=-D__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__=$(OSX_MIN_REQ)
-COMPILE_FLAGS+=-isysroot $(SDK_PATH)
-LINK_FLAGS+=-Wl,-syslibroot,$(SDK_PATH)
+OSX_VER:=10.7
+COMPILE_FLAGS+=-mmacosx-version-min=$(OSX_VER)
+LINK_FLAGS+=-mmacosx-version-min=$(OSX_VER)
 else
 COMPILE_ENV:=
 LINK_ENV:=
