@@ -3,6 +3,7 @@
 
 #include "SimpleHexRequest.h"
 #include <QObject>
+#include <string>
 
 class VDPDataStore : public QObject, public SimpleHexRequestUser
 {
@@ -22,11 +23,16 @@ private:
 
 	virtual void DataHexRequestReceived();
 
-	unsigned char* vram;
+	void refresh1();
+	void refresh2();
 
-	bool old_version; // VRAM debuggable has old or new name?
+	unsigned char* vram;
+	int vramSize;
+
+	std::string debuggableNameVRAM; // VRAM debuggable name
 	bool got_version; // is the above boolean already filled in?
 	friend class VDPDataStoreVersionCheck;
+	friend class VDPDataStoreVRAMSizeCheck;
 
 public slots:
 	void refresh();
