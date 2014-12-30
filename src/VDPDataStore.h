@@ -17,6 +17,8 @@ public:
 	const unsigned char* getStatusRegsPointer() const;
 	const unsigned char* getVdpVramPointer() const;
 
+	const size_t getVRAMSize() const;
+
 private:
 	VDPDataStore();
 	~VDPDataStore();
@@ -27,7 +29,7 @@ private:
 	void refresh2();
 
 	unsigned char* vram;
-	int vramSize;
+	size_t vramSize;
 
 	std::string debuggableNameVRAM; // VRAM debuggable name
 	bool got_version; // is the above boolean already filled in?

@@ -143,6 +143,9 @@ void BitMapViewer::decodeVDPregs()
 		q <<= 1;
 	}
 	printf("visible page according to the bits: %i\n",p);
+
+	setPages();
+
 	addressLabel->setText(QString("0x%1").arg(p * q, 5, 16, QChar('0')));
 	if (useVDP) showPage->setCurrentIndex(p);
 }
@@ -164,10 +167,15 @@ void BitMapViewer::on_screenMode_currentIndexChanged(const QString& text)
 	// page 3 of screen5 and then switching to screen 8 without changing the
 	// starting vram address....
 	imageWidget->setScreenMode(screenMod);
+	setPages();
+}
+
+void BitMapViewer::setPages()
+{
 	showPage->clear();
 	showPage->insertItem(0, "0");
 	showPage->insertItem(1, "1");
-	if (screenMod < 7) {
+	if (screenMod < 7 && VDPDataStore::instance().getVRAMSize() > 0x10000) {
 		showPage->insertItem(2, "2");
 		showPage->insertItem(3, "3");
 	}

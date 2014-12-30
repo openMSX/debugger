@@ -126,3 +126,8 @@ const unsigned char* VDPDataStore::getVdpVramPointer() const
 {
 	return vram + vramSize + 32 + 16 + 64;
 }
+
+const size_t VDPDataStore::getVRAMSize() const
+{
+	return vramSize;
+}

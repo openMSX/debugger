@@ -14,6 +14,7 @@ public:
 
 private:
 	void decodeVDPregs();
+	void setPages();
 
 	VramBitMappedView* imageWidget;
 	int screenMod;
