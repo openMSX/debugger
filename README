@@ -8,11 +8,11 @@ interface.
 
 * Requirements
 
-The debugger requires the Qt4 GUI library to be installed.
+The debugger requires the Qt5 GUI library to be installed.
 If you are installing from binary packages, make sure you install the
 development package (name ending with "-dev" or "-devel") as well.
 
-A (reasonably) new CVS version of openMSX.
+A (reasonably) new version of openMSX.
 
 * Building
 
