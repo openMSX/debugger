@@ -11,6 +11,7 @@ interface.
 The debugger requires the Qt5 GUI library to be installed.
 If you are installing from binary packages, make sure you install the
 development package (name ending with "-dev" or "-devel") as well.
+For Mac OS X use "brew install qt5" to install the library.
 
 A (reasonably) new version of openMSX.
 
