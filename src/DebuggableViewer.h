@@ -22,6 +22,7 @@ public slots:
 private:
 	HexViewer* hexView;
 	QComboBox* debuggableList;
+	QString lastSelected;
 
 private slots:
 	void debuggableSelected(int index);

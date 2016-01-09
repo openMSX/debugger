@@ -21,9 +21,6 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
 	setLayout(vbox);
-
-	connect(debuggableList, SIGNAL(currentIndexChanged(int)),
-	        this, SLOT(debuggableSelected(int)));
 }
 
 void DebuggableViewer::settingsChanged()
@@ -40,6 +37,9 @@ void DebuggableViewer::debuggableSelected(int index)
 {
 	QString name = debuggableList->itemText(index);
 	int size = debuggableList->itemData(index).toInt();
+
+	if (index >= 0)
+		lastSelected = name;
 	// add braces when the name contains a space
 	if (name.contains(QChar(' '))) {
 		name.append(QChar('}'));
@@ -50,6 +50,11 @@ void DebuggableViewer::debuggableSelected(int index)
 
 void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 {
+	int select = 0;
+
+	// disconnect signal to prevent updates
+	debuggableList->disconnect(this, SLOT(debuggableSelected(int)));
+
 	debuggableList->clear();
 	for (QMap<QString, int>::const_iterator it = list.begin();
 	     it != list.end(); ++it) {
@@ -58,8 +63,17 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 		if (name.contains(QChar(' '))) {
 			name = name.mid(1, name.size() - 2);
 		}
+		// check if this was the previous selection
+		if (name == lastSelected)
+			select = debuggableList->count();
+
 		debuggableList->addItem(name, it.value());
 	}
-	// activate the first item
-	if (!list.empty()) debuggableSelected(0);
+
+	// reconnect signal before selecting item
+	connect(debuggableList, SIGNAL(currentIndexChanged(int)),
+	        this, SLOT(debuggableSelected(int)));
+
+	if (!list.empty()) 
+		debuggableList->setCurrentIndex(select);
 }
