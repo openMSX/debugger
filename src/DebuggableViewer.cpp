@@ -21,6 +21,9 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
 	setLayout(vbox);
+	
+	connect(hexView, SIGNAL(locationChanged(int)),
+	        this, SLOT(locationChanged(int)));
 }
 
 void DebuggableViewer::settingsChanged()
@@ -48,9 +51,14 @@ void DebuggableViewer::debuggableSelected(int index)
 	hexView->setDebuggable(name, size);
 }
 
+void DebuggableViewer::locationChanged(int loc)
+{
+	lastLocation = loc;
+}
+	
 void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 {
-	int select = 0;
+	int select = -1;
 
 	// disconnect signal to prevent updates
 	debuggableList->disconnect(this, SLOT(debuggableSelected(int)));
@@ -74,6 +82,8 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 	connect(debuggableList, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(debuggableSelected(int)));
 
-	if (!list.empty()) 
+	if (!list.empty() && select >= 0) {
 		debuggableList->setCurrentIndex(select);
+		hexView->setLocation(lastLocation);
+	}
 }

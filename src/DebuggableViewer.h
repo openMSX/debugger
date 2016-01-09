@@ -23,9 +23,11 @@ private:
 	HexViewer* hexView;
 	QComboBox* debuggableList;
 	QString lastSelected;
+	int lastLocation;
 
 private slots:
 	void debuggableSelected(int index);
+	void locationChanged(int loc);
 };
 
 #endif // DEBUGGABLEVIEWER_H
