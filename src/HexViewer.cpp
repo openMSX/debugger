@@ -572,9 +572,14 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		cursorPosition = 0;
 	} else if (useMarker && e->key() == Qt::Key_Backspace) {
 		editedChars = !editedChars;
-	} else if (!editedChars && (e->key() == Qt::Key_Return ||
-		                    e->key() == Qt::Key_Enter)) {
-		setValue = true;
+	} else if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+		if (beingEdited)
+			setValue = true;
+		else
+			cursorPosition = 0;
+		if (editedChars)
+			editValue = previousHexData[hexMarkAddress];
+		newAddress++;
 	} else if (e->key() == Qt::Key_Shift    ||
 		   e->key() == Qt::Key_Control  ||
 		   e->key() == Qt::Key_Meta     ||
