@@ -91,10 +91,10 @@ private:
 	                const QString& qName);
 	bool characters(const QString& ch);
 
-	//std::auto_ptr<QAbstractSocket> socket;
+	//std::unique_ptr<QAbstractSocket> socket;
 	QAbstractSocket* socket;
-	std::auto_ptr<QXmlInputSource> input;
-	std::auto_ptr<QXmlSimpleReader> reader;
+	std::unique_ptr<QXmlInputSource> input;
+	std::unique_ptr<QXmlSimpleReader> reader;
 
 	QString xmlData;
 	QXmlAttributes xmlAttrs;
