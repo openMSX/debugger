@@ -1,5 +1,3 @@
-// $Id$
-
 #include "SymbolTable.h"
 #include "DebuggerData.h"
 #include <QFile>
@@ -187,10 +185,10 @@ const QDateTime& SymbolTable::symbolFileRefresh(int index) const
 bool SymbolTable::readFile(const QString& filename, FileType type)
 {
 	if (type == DETECT_FILE) {
-		if (filename.endsWith(".map")) {
+		if (filename.toLower().endsWith(".map")) {
 			// HiTech link map file
 			type = LINKMAP_FILE;
-		} else if (filename.endsWith(".sym")) {
+		} else if (filename.toLower().endsWith(".sym")) {
 			// auto detect which sym file
 			QFile file(filename);
 			if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -204,11 +202,15 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = TNIASM1_FILE;
 				} else if (line.contains(": equ ")) {
 					type = SJASM_FILE;
+				} else {
+					// this is a blunt conclusion but I
+					// don't know a way to detect this file
+					// type
+					type = HTC_FILE;
 				}
 			}
 		}
 	}
-
 	switch (type) {
 	case TNIASM0_FILE:
 		return readTNIASM0File(filename);
@@ -218,6 +220,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 		return readSJASMFile(filename);
 	case ASMSX_FILE:
 		return readASMSXFile(filename);
+	case HTC_FILE:
+		return readHTCFile(filename);
 	case LINKMAP_FILE:
 		return readLinkMapFile(filename);
 	default:
@@ -331,6 +335,28 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 				}
 			}
 		}
+	}
+	return true;
+}
+
+bool SymbolTable::readHTCFile(const QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+
+	appendFile(filename, HTC_FILE);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		QStringList l = line.split(' ');
+		if (l.size() != 3) continue;
+		int value;
+		if (!parseValue("0x" + l.at(1), value)) continue;
+		Symbol* sym = new Symbol(l.at(0), value);
+		sym->setSource(&symbolFiles.back().fileName);
+		add(sym);
 	}
 	return true;
 }

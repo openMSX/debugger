@@ -127,7 +127,8 @@ void SymbolManager::addFile()
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
-	      << "HiTech link map files (*.map)";
+	      << "HiTech C symbol files (*.sym)"
+	      << "HiTech C link map files (*.map)";
 	d->setNameFilters(types);
 	d->setAcceptMode(QFileDialog::AcceptOpen);
 	d->setFileMode(QFileDialog::ExistingFile);
@@ -145,7 +146,9 @@ void SymbolManager::addFile()
 			read = symTable.readFile(n, SymbolTable::TNIASM1_FILE);
 		} else if (f.startsWith("asMSX")) {
 			read = symTable.readFile(n, SymbolTable::ASMSX_FILE);
-		} else if (f.startsWith("HiTech")) {
+		} else if (f.startsWith("HiTech C symbol")) {
+			read = symTable.readFile(n, SymbolTable::HTC_FILE);
+		} else if (f.startsWith("HiTech C link")) {
 			read = symTable.readFile(n, SymbolTable::LINKMAP_FILE);
 		} else {
 			read = symTable.readFile(n);

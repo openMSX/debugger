@@ -75,7 +75,15 @@ class SymbolTable : public QObject
 {
 	Q_OBJECT
 public:
-	enum FileType { DETECT_FILE, TNIASM0_FILE, TNIASM1_FILE, SJASM_FILE, ASMSX_FILE, LINKMAP_FILE };
+	enum FileType {
+		DETECT_FILE,
+		TNIASM0_FILE,
+		TNIASM1_FILE,
+		SJASM_FILE,
+		ASMSX_FILE,
+		LINKMAP_FILE,
+		HTC_FILE
+	};
 
 	SymbolTable();
 	~SymbolTable();
@@ -119,6 +127,7 @@ private:
 	bool readTNIASM1File(const QString& filename);
 	bool readASMSXFile(const QString& filename);
 	bool readSJASMFile(const QString& filename);
+	bool readHTCFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
 
 	void mapSymbol(Symbol* symbol);
