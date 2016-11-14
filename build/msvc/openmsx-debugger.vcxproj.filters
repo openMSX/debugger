@@ -1,0 +1,421 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d10bffda-03ce-4fc1-806b-60d0691c4f3d}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="UI Header Files">
+      <UniqueIdentifier>{8389e4f3-199a-41f9-9ac6-ee09f539bd31}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{0e0c2a83-0825-437e-8c46-f9ddd76f91ee}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Moc files">
+      <UniqueIdentifier>{2862c03e-1d7e-477e-94db-e6571e6b1b7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="openmsx">
+      <UniqueIdentifier>{16070eac-bd01-46d0-97ec-caed480f2586}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(OpenMSXSrcDir)\BitMapViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\BreakpointDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\CommClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\ConnectDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\Convert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\CPURegs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\CPURegsViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\Dasm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DasmTables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DebuggableViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DebuggerData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DebuggerForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DebugSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DisasmViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DockableWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DockableWidgetArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DockableWidgetLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\DockManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\FlagsViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\HexViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\InteractiveButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\InteractiveLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\MainMemoryViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\OpenMSXConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\PreferencesDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\qrc\qrc_resources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\Settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\SimpleHexRequest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\SlotViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\StackViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\SymbolManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\SymbolTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\VDPCommandRegViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\VDPDataStore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\VDPRegViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\VDPStatusRegViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\VramBitMappedView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\GotoDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_BitMapViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_BreakpointDialog.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_CommClient.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_ConnectDialog.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_CPURegsViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DebuggableViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DebuggerForm.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DebugSession.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DisasmViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DockableWidget.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DockableWidgetArea.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_DockableWidgetLayout.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_FlagsViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_GotoDialog.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_HexViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_InteractiveButton.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_InteractiveLabel.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_MainMemoryViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_OpenMSXConnection.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_PreferencesDialog.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_Settings.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_SlotViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_StackViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_SymbolManager.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_VDPCommandRegViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_VDPDataStore.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_VDPRegViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_VDPStatusRegViewer.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_VramBitMappedView.cpp">
+      <Filter>Moc files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\openmsx\QAbstractSocketStreamWrapper.cpp">
+      <Filter>openmsx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\openmsx\SspiNegotiateClient.cpp">
+      <Filter>openmsx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\openmsx\SspiUtils.cpp">
+      <Filter>openmsx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(OpenMSXSrcDir)\moc\moc_SymbolTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(OpenMSXSrcDir)\openmsx\MSXException.h">
+      <Filter>openmsx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\openmsx\openmsx.h">
+      <Filter>openmsx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\openmsx\QAbstractSocketStreamWrapper.h">
+      <Filter>openmsx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\openmsx\SspiNegotiateClient.h">
+      <Filter>openmsx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\openmsx\SspiUtils.h">
+      <Filter>openmsx</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_BitMapViewer.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_BreakpointDialog.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_ConnectDialog.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_GotoDialog.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_PreferencesDialog.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_SymbolManager.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_VDPCommandRegisters.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_VDPRegistersExplained.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(OpenMSXSrcDir)\ui\ui_VDPStatusRegisters.h">
+      <Filter>UI Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="$(OpenMSXSrcDir)\BitMapViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\BreakpointDialog.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\CommClient.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\ConnectDialog.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\CPURegsViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DebuggableViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DebuggerData.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DebuggerForm.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DebugSession.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DisasmViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DockableWidget.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DockableWidgetArea.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DockableWidgetLayout.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\FlagsViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\HexViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\InteractiveButton.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\InteractiveLabel.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\MainMemoryViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\PreferencesDialog.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\Settings.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\SimpleHexRequest.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\SlotViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\StackViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\SymbolManager.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\SymbolTable.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPCommandRegViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPDataStore.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPRegViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPStatusRegViewer.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\Version.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\VramBitMappedView.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\BitMapViewer.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\BreakpointDialog.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\ConnectDialog.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\PreferencesDialog.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\SymbolManager.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPCommandRegisters.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPRegistersExplained.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\VDPStatusRegisters.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\GotoDialog.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\GotoDialog.ui" />
+    <CustomBuild Include="$(OpenMSXSrcDir)\OpenMSXConnection.h">
+      <Filter>UI Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\Convert.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\CPURegs.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\Dasm.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DasmTables.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXSrcDir)\DockManager.h">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="$(OpenMSXRootDir)\resources\resources.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(OpenMSXRootDir)\resources\openmsx-debugger.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
