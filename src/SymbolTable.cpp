@@ -357,7 +357,7 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		return false;
 	}
-	appendFile(filename, ASMSX_FILE);
+	appendFile(filename, PASMO_FILE);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line;	
