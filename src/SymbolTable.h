@@ -82,7 +82,8 @@ public:
 		SJASM_FILE,
 		ASMSX_FILE,
 		LINKMAP_FILE,
-		HTC_FILE
+		HTC_FILE,
+		PASMO_FILE
 	};
 
 	SymbolTable();
@@ -129,6 +130,7 @@ private:
 	bool readSJASMFile(const QString& filename);
 	bool readHTCFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
+	bool readPASMOFile(const QString& filename);
 
 	void mapSymbol(Symbol* symbol);
 	void unmapSymbol(Symbol* symbol);

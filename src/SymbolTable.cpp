@@ -209,6 +209,16 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = HTC_FILE;
 				}
 			}
+		} else {
+			QString ext = filename.toLower();	
+			/* They are the same type of file. For some reason the Debian
+			 * manpage uses the extension ".sys" 
+			 * pasmo doc -> pasmo [options] file.asm file.bin [file.symbol [file.publics] ]
+			 * pasmo manpage in Debian -> pasmo [options]  file.asm file.bin [file.sys]
+			*/
+			if (ext.endsWith(".symbol") || ext.endsWith(".publics") || ext.endsWith(".sys") ) {
+				type = PASMO_FILE;
+			}
 		}
 	}
 	switch (type) {
@@ -224,6 +234,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 		return readHTCFile(filename);
 	case LINKMAP_FILE:
 		return readLinkMapFile(filename);
+	case PASMO_FILE:
+		return readPASMOFile(filename);
 	default:
 		return false;
 	}
@@ -335,6 +347,30 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 				}
 			}
 		}
+	}
+	return true;
+}
+
+bool SymbolTable::readPASMOFile(const QString& filename)
+{
+	QFile file( filename );
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+	appendFile(filename, PASMO_FILE);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line;	
+		QStringList l;
+		Symbol* sym;
+		line = in.readLine();
+		l = line.split(QRegExp("(\t+)|( +)"));
+		if (l.size() == 3) {
+			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(0, 16));
+			sym->setSource(&symbolFiles.back().fileName);
+			add(sym);
+		} else
+			return false;
 	}
 	return true;
 }

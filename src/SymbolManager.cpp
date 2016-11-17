@@ -123,12 +123,13 @@ void SymbolManager::addFile()
 	// create dialog
 	QFileDialog* d = new QFileDialog(this);
 	QStringList types;
-	types << "All supported files (*.sym *.map)"
+	types << "All supported files (*.sym *.map *.symbol *.publics *.sys)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech C symbol files (*.sym)"
-	      << "HiTech C link map files (*.map)";
+	      << "HiTech C link map files (*.map)"
+	      << "pasmo symbol files (*.symbol *.publics *.sys)";
 	d->setNameFilters(types);
 	d->setAcceptMode(QFileDialog::AcceptOpen);
 	d->setFileMode(QFileDialog::ExistingFile);
@@ -150,6 +151,8 @@ void SymbolManager::addFile()
 			read = symTable.readFile(n, SymbolTable::HTC_FILE);
 		} else if (f.startsWith("HiTech C link")) {
 			read = symTable.readFile(n, SymbolTable::LINKMAP_FILE);
+		} else if (f.startsWith("pasmo")) {
+			read = symTable.readFile(n, SymbolTable::PASMO_FILE);
 		} else {
 			read = symTable.readFile(n);
 		}
