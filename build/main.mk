@@ -268,8 +268,8 @@ COMPILE_FLAGS+=-std=c++11
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 OSX_VER:=10.7
-COMPILE_FLAGS+=-mmacosx-version-min=$(OSX_VER)
-LINK_FLAGS+=-mmacosx-version-min=$(OSX_VER)
+COMPILE_FLAGS+=-mmacosx-version-min=$(OSX_VER) -stdlib=libc++
+LINK_FLAGS+=-mmacosx-version-min=$(OSX_VER) -stdlib=libc++
 else
 COMPILE_ENV:=
 LINK_ENV:=
