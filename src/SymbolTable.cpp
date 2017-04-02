@@ -359,6 +359,7 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 	}
 	appendFile(filename, PASMO_FILE);
 	QTextStream in(&file);
+	QList<Symbol*> symList;
 	while (!in.atEnd()) {
 		QString line;	
 		QStringList l;
@@ -368,10 +369,13 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 		if (l.size() == 3) {
 			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(0, 16));
 			sym->setSource(&symbolFiles.back().fileName);
-			add(sym);
+			symList.append(sym);
 		} else
 			return false;
 	}
+	while (!symList.isEmpty())
+		add(symList.takeFirst());
+
 	return true;
 }
 
