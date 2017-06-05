@@ -369,8 +369,7 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(0, 16));
 			sym->setSource(&symbolFiles.back().fileName);
 			add(sym);
-		} else
-			return false;
+		}
 	}
 	return true;
 }
