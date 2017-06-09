@@ -132,7 +132,6 @@ SOURCES_FULL:=
 HEADERS_FULL:=
 MOC_HDR_FULL:=
 UI_FULL:=
-DIST_FULL:=
 # Include root node.
 CURDIR:=
 include node.mk
@@ -142,7 +141,6 @@ SOURCES_FULL:=$(SOURCES_FULL:./%=%)
 HEADERS_FULL:=$(HEADERS_FULL:./%=%)
 MOC_HDR_FULL:=$(MOC_HDR_FULL:./%=%)
 UI_FULL:=$(UI_FULL:./%=%)
-DIST_FULL:=$(DIST_FULL:./%=%)
 # Apply subset to sources list.
 SOURCES_FULL:=$(filter $(SOURCES_PATH)/$(OPENMSX_SUBSET)%,$(SOURCES_FULL))
 ifeq ($(SOURCES_FULL),)
@@ -387,20 +385,7 @@ endif
 # Source Packaging
 # ================
 
-DIST_BASE:=$(BUILD_BASE)/dist
-DIST_PATH:=$(DIST_BASE)/$(PACKAGE_FULL)
-
-dist: $(DETECTSYS_SCRIPT)
-	@echo "Removing any old distribution files..."
-	@rm -rf $(DIST_PATH)
-	@echo "Gathering files for distribution..."
-	@mkdir -p $(DIST_PATH)
-	@build/install-recursive.sh $(DIST_FULL) $(DIST_PATH)
-	@build/install-recursive.sh $(HEADERS_FULL) $(DIST_PATH)
-	@build/install-recursive.sh $(SOURCES_FULL) $(DIST_PATH)
-	@build/install-recursive.sh $(UI_FULL) $(DIST_PATH)
-	@echo "Creating tarball..."
-	@cd $(DIST_BASE) && \
-		GZIP=--best tar zcf $(PACKAGE_FULL).tar.gz $(PACKAGE_FULL)
+dist:
+	@$(PYTHON) build/gitdist.py
 
 endif # PLATFORM

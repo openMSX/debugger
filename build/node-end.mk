@@ -17,9 +17,6 @@ UI_FULL+=$(sort \
 	$(addprefix $(CURDIR),$(addsuffix .ui, \
 		$(UI) \
 	)))
-DIST_FULL+=$(sort \
-	$(addprefix $(CURDIR),$(DIST) node.mk) \
-	)
 
 # Process subnodes.
 ifneq ($(SUBDIRS),)
