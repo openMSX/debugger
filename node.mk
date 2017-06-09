@@ -4,7 +4,7 @@ SUBDIRS:= \
 	src build resources
 
 DIST:= \
-	ChangeLog AUTHORS GPL README GNUmakefile
+	AUTHORS GPL README GNUmakefile
 
 include build/node-end.mk
 
