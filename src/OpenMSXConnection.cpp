@@ -1,5 +1,3 @@
-// $Id$
-
 #include "OpenMSXConnection.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>

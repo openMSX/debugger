@@ -1,5 +1,3 @@
-// $Id$
-
 #include "CPURegsViewer.h"
 #include "CPURegs.h"
 #include "CommClient.h"

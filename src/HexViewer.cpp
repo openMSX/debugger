@@ -1,5 +1,3 @@
-// $Id$
-
 #include "HexViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"

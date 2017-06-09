@@ -1,5 +1,3 @@
-// $Id$
-
 #include "ConnectDialog.h"
 #include <QProcess>
 #include <QString>

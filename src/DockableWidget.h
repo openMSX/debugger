@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DOCKABLEWIDGET_H
 #define DOCKABLEWIDGET_H
 

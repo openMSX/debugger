@@ -1,5 +1,3 @@
-// $Id$
-
 #include "SymbolManager.h"
 #include "SymbolTable.h"
 #include "Settings.h"

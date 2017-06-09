@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef SSPI_NEGOTIATE_CLIENT_H
 #define SSPI_NEGOTIATE_CLIENT_H
 

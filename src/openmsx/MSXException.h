@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef MSXEXCEPTION_H
 #define MSXEXCEPTION_H
 

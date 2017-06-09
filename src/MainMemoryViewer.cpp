@@ -1,5 +1,3 @@
-// $Id: $
-
 #include "MainMemoryViewer.h"
 #include "HexViewer.h"
 #include "CPURegs.h"

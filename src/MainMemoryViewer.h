@@ -1,5 +1,3 @@
-// $Id: $
-
 #ifndef MAINMEMORYVIEWER_H
 #define MAINMEMORYVIEWER_H
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DISASMVIEWER_H
 #define DISASMVIEWER_H
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef SLOTVIEWER_H
 #define SLOTVIEWER_H
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #include "SlotViewer.h"
 #include "DebuggerData.h"
 #include "OpenMSXConnection.h"

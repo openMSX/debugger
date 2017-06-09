@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef STACKVIEWER_H
 #define STACKVIEWER_H
 

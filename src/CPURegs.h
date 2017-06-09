@@ -1,5 +1,3 @@
-// $Id: $
-
 #ifndef CPUREGS_H
 #define CPUREGS_H
 

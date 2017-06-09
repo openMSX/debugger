@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef CONNECTDIALOG_HH
 #define CONNECTDIALOG_HH
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DOCKMANAGER_H
 #define DOCKMANAGER_H
 

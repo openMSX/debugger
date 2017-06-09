@@ -1,5 +1,3 @@
-// $Id$
-
 #include "Version.h"
 #include "Version.ii"
 

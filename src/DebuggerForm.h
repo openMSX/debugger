@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DEBUGGERFORM_H
 #define DEBUGGERFORM_H
 

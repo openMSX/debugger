@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DEBUGGERDATA_H
 #define DEBUGGERDATA_H
 

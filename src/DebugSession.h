@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DEBUGSESSION_H
 #define DEBUGSESSION_H
 

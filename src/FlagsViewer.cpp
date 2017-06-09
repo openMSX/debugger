@@ -1,5 +1,3 @@
-// $Id$
-
 #include "FlagsViewer.h"
 #include <QPainter>
 #include <QPaintEvent>

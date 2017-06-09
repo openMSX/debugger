@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef OPENMSX_H
 #define OPENMSX_H
 

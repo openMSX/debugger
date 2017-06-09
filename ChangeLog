@@ -1,5 +1,3 @@
-$Id$
-
 2012-06-03 Edwin Velds <e.velds@gmail.com>
 	* Reworked breakpoint system to also support watchpoints and 
 	  conditions.

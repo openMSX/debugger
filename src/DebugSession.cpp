@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DebugSession.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>

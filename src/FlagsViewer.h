@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef FLAGSVIEWER_H
 #define FLAGSVIEWER_H
 

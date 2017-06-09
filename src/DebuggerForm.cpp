@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DebuggerForm.h"
 #include "BitMapViewer.h"
 #include "DockableWidgetArea.h"

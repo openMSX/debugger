@@ -1,5 +1,3 @@
-// $Id$
-
 #include "StackViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"

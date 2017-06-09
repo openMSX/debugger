@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DockableWidget.h"
 #include "DockManager.h"
 #include <QLabel>

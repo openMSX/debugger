@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DOCKABLETWIDGETAREA_H
 #define DOCKABLETWIDGETAREA_H
 

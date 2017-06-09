@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DebuggableViewer.h"
 #include "HexViewer.h"
 #include <QComboBox>

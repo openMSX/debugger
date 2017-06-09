@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DisasmViewer.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"

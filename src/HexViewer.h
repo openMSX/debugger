@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef HEXVIEWER_H
 #define HEXVIEWER_H
 

@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DebuggerForm.h"
 #include "Settings.h"
 #include <QApplication>

@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DockableWidgetArea.h"
 #include "DockableWidgetLayout.h"
 #include "DockableWidget.h"

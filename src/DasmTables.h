@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef DASMTABLES_H
 #define DASMTABLES_H
 

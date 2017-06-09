@@ -1,4 +1,3 @@
-# $Id$
 # Should be included at the start of each node.mk file.
 
 # Get name of current directory.

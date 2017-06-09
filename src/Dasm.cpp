@@ -1,5 +1,3 @@
-// $Id$
-
 #include "Dasm.h"
 #include "DasmTables.h"
 #include "SymbolTable.h"

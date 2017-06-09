@@ -1,5 +1,3 @@
-// $Id: $
-
 #include "CPURegs.h"
 
 const int CpuRegs::REG_AF  = 0;

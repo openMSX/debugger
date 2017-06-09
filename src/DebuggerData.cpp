@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DebuggerData.h"
 #include "Convert.h"
 #include <QStringList>

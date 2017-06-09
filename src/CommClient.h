@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef COMMCLIENT_H
 #define COMMCLIENT_H
 

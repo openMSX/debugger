@@ -1,5 +1,3 @@
-// $Id$
-
 #ifndef CPUREGSVIEWER_H
 #define CPUREGSVIEWER_H
 

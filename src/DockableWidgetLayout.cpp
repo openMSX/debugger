@@ -1,5 +1,3 @@
-// $Id$
-
 #include "DockableWidgetLayout.h"
 #include "DockableWidget.h"
 #include <QLayoutItem>
