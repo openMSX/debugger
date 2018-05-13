@@ -145,7 +145,23 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 
 static void collectServers(QList<OpenMSXConnection*>& servers)
 {
+#ifdef _WIN32
+	DWORD len = GetTempPathW(0, nullptr);
+	assert(len > 0); // nothing we can do to recover this
+	//VLA(wchar_t, bufW, (len+1));
+	//wchar_t bufW[len+1];
+	auto bufW = static_cast<wchar_t*>(_alloca(sizeof(wchar_t) * (len+1)));
+
+	len = GetTempPathW(len, bufW);
+	assert(len > 0); // nothing we can do to recover this
+	// Strip last backslash
+	if (bufW[len-1] == L'\\') {
+		bufW[len-1] = L'\0';
+	}
+	QDir dir(QString::fromWCharArray(bufW, len));
+#else
 	QDir dir((getenv("TMPDIR")) ? getenv("TMPDIR") : QDir::tempPath());
+#endif
 	dir.cd("openmsx-" + getUserName());
 	if (!checkSocketDir(dir)) {
 		// no correct socket directory
