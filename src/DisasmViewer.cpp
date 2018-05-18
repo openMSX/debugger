@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cassert>
+#include <regex>
 
 class CommMemoryRequest : public ReadDebugBlockCommand
 {
@@ -609,6 +610,46 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 			}
 		} else
 			setAddress(cursorAddr, cursorLine, Closest);
+		e->accept();
+		break;
+	}
+	case Qt::Key_Home: {
+		setCursorAddress(0, 0, Middle);
+		e->accept();
+		break;
+	}
+	case Qt::Key_End: {
+		setCursorAddress(0xffff, 0, Middle);
+		e->accept();
+		break;
+	}
+	case Qt::Key_Right:
+	case Qt::Key_Return: {
+		int line = findDisasmLine(cursorAddr, cursorLine);
+		if (line >= 0 && line < int(disasmLines.size())) {
+			int naddr = INT_MAX;
+			const DisasmRow &row = disasmLines[line];
+			std::string instr = row.instr;
+			std::regex re_absolute("(call|jp)\\ .*");
+			std::regex re_relative("(djnz|jr)\\ .*");
+			if (std::regex_match(instr, re_absolute))
+				naddr = memory[row.addr + 1] + memory[row.addr + 2] * 256;
+			else if (std::regex_match(instr, re_relative))
+				naddr = (row.addr + 2 + (signed char)memory[row.addr + 1]) & 0xFFFF;
+			if(naddr != INT_MAX) {
+				jumpStack.push_back(cursorAddr);
+				setCursorAddress(naddr, 0, Middle);
+			}
+		}
+		e->accept();
+		break;
+	}
+	case Qt::Key_Left:
+	case Qt::Key_Backspace: {
+		if(!jumpStack.empty()){
+			int addr = jumpStack.takeLast();
+			setCursorAddress(addr, 0, Middle);
+		}
 		e->accept();
 		break;
 	}

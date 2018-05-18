@@ -56,6 +56,8 @@ private:
 	quint16 cursorAddr;
 	int cursorLine;
 
+	QList<int> jumpStack;
+
 	// layout information
 	int frameL, frameR, frameT, frameB;
 	int labelFontHeight, labelFontAscent;
