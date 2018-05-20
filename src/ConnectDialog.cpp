@@ -49,7 +49,7 @@ static bool checkSocketDir(const QDir& dir)
 	int all = QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
 	          QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup |
 	          QFile::ReadOther | QFile::WriteOther | QFile::ExeOther;
-	int needed = QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner;
+  QFile::Permissions needed = QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner;
 	if ((info.permissions() & all) != needed) {
 		return false;
 	}
@@ -68,7 +68,7 @@ static bool checkSocket(const QFileInfo& info)
 	int all = QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
 	          QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup |
 	          QFile::ReadOther | QFile::WriteOther | QFile::ExeOther;
-	int needed = QFile::ReadOwner | QFile::WriteOwner;
+  QFile::Permissions needed = QFile::ReadOwner | QFile::WriteOwner;
 	if ((info.permissions() & all) != needed) {
 		return false;
 	}
