@@ -4,6 +4,8 @@
 <dict>
 	<key>NSRequiresAquaSystemAppearance</key>
 	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	<key>CFBundleExecutable</key>
 	<string>openmsx-debugger</string>
 	<key>CFBundleGetInfoHTML</key>
