@@ -179,6 +179,11 @@ void BitMapViewer::setPages()
 		showPage->insertItem(2, "2");
 		showPage->insertItem(3, "3");
 	}
+	//allow display of expansion RAM data.
+	if (VDPDataStore::instance().getVRAMSize() > 0x20000) {
+		showPage->insertItem(4, "E0");
+		showPage->insertItem(5, "E1");
+	}
 }
 
 void BitMapViewer::on_showPage_currentIndexChanged(int index)
@@ -187,7 +192,7 @@ void BitMapViewer::on_showPage_currentIndexChanged(int index)
 	// on_screenMode_currentIndexChanged we do nothing!
 	if (index == -1) return;
 
-	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
+	static const int m1[6] = { 0x00000, 0x08000, 0x10000, 0x18000, 0x20000, 0x28000 };
 	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged( int %i);\n", index);
 	if (screenMod >= 7) index *= 2;
 	int vramAddress = m1[index];
