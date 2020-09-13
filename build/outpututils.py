@@ -26,12 +26,12 @@ def rewriteIfChanged(path, lines):
 			inp.close()
 
 		if newLines == oldLines:
-			print 'Up to date: %s' % path
+			print('Up to date: %s' % path)
 			return False
 		else:
-			print 'Updating %s...' % path
+			print('Updating %s...' % path)
 	else:
-		print 'Creating %s...' % path
+		print('Creating %s...' % path)
 		createDirFor(path)
 
 	out = open(path, 'w')

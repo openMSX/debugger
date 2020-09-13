@@ -19,7 +19,7 @@
 # you might have to be more specific, for example "python2" or "python2.6".
 # Or if the Python interpreter is not in the search path, you can specify its
 # full path.
-PYTHON?=python
+PYTHON?=python3
 
 
 # Logical Targets

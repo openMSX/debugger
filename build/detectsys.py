@@ -79,18 +79,18 @@ def detectOS():
 
 if __name__ == '__main__':
 	try:
-		print >> sys.stderr, '  Using Python %s native system detection...' % (
+		print('  Using Python %s native system detection...' % (
 			python_version()
-			)
+			), file = sys.stderr)
 		hostCPU = detectCPU()
 		hostOS = detectOS()
 		if hostOS == 'mingw32' and hostCPU == 'x86_64':
 			# It is possible to run MinGW on 64-bit Windows, but producing
 			# 64-bit code is not supported yet.
 			hostCPU = 'x86'
-		print >> sys.stderr, '  Detected system: %s-%s' % (hostCPU, hostOS)
-		print 'OPENMSX_TARGET_CPU=%s' % hostCPU
-		print 'OPENMSX_TARGET_OS=%s' % hostOS
-	except ValueError, ex:
-		print >> sys.stderr, ex
+		print('  Detected system: %s-%s' % (hostCPU, hostOS), file = sys.stderr)
+		print('OPENMSX_TARGET_CPU=%s' % hostCPU)
+		print('OPENMSX_TARGET_OS=%s' % hostOS)
+	except ValueError as ex:
+		print(ex, file = sys.stderr)
 		sys.exit(1)

@@ -28,11 +28,11 @@ def _extractRevisionFromStdout(log, command, regex):
 	# pylint 0.18.0 somehow thinks captureStdout() returns a list, not a string.
 	lines = text.split('\n') # pylint: disable-msg=E1103
 	for revision, in filterLines(lines, regex):
-		print >> log, 'Revision number found by "%s": %s' % (command, revision)
+		print('Revision number found by "%s": %s' % (command, revision), file = log)
 		return revision
 	else:
-		print >> log, 'Revision number not found in "%s" output:' % command
-		print >> log, text
+		print('Revision number not found in "%s" output:' % command, file = log)
+		print(text, file = log)
 		return None
 
 def extractGitRevision(log):
@@ -57,11 +57,11 @@ def extractRevision():
 	if not isdir('derived'):
 		makedirs('derived')
 	log = open('derived/version.log', 'w')
-	print >> log, 'Extracting revision info...'
+	print('Extracting revision info...', file = log)
 	try:
 		revision = extractGitRevision(log)
-		print >> log, 'Revision string: %s' % revision
-		print >> log, 'Revision number: %s' % extractNumberFromGitRevision(revision)
+		print('Revision string: %s' % revision, file = log)
+		print('Revision number: %s' % extractNumberFromGitRevision(revision), file = log)
 	finally:
 		log.close()
 	_cachedRevision = revision
