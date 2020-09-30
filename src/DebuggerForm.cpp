@@ -344,7 +344,7 @@ void DebuggerForm::createActions()
 	breakpointAddAction->setEnabled(false);
 
 	helpAboutAction = new QAction(tr("&About"), this);
-	executeRunToAction->setStatusTip(tr("Show the appliction information"));
+	executeRunToAction->setStatusTip(tr("Show the application information"));
 
 	connect(fileNewSessionAction, SIGNAL(triggered()), this, SLOT(fileNewSession()));
 	connect(fileOpenSessionAction, SIGNAL(triggered()), this, SLOT(fileOpenSession()));

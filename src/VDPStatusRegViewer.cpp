@@ -94,7 +94,7 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 	}
 	label_I_1_1->setText(id);
 
-	label_I_2_7->setText((statusregs[2] & 128) ? "Transfer ready" : "Transfering");
+	label_I_2_7->setText((statusregs[2] & 128) ? "Transfer ready" : "Transferring");
 	label_I_2_6->setText((statusregs[2] &  64) ? "Vertical scanning" : "Not vert scan");
 	label_I_2_5->setText((statusregs[2] &  32) ? "Horizontal scanning" : "Not hor scan");
 	label_I_2_4->setText((statusregs[2] &  16) ? "Boundary color detected" : "BC not deteced");

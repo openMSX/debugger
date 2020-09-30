@@ -596,7 +596,7 @@ void VDPRegViewer::decodeVDPRegs()
 	// special case for sprite mode 2
 	if (must && !( 4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
 		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
-		label_dec_r5->setToolTip("Bit A9 should be set, to obtain the Sprite Color Table address this bit is masked<br>With the current bit reset the Color Tabel will use the same address as the Sprite Atribute Tabel!");
+		label_dec_r5->setToolTip("Bit A9 should be set, to obtain the Sprite Color Table address this bit is masked<br>With the current bit reset the Color Tabel will use the same address as the Sprite Attribute Table!");
 	};
 
 

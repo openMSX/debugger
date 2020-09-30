@@ -1423,7 +1423,7 @@ When 0, non-interlace (Incomplete NTSC timing)</string>
               </font>
              </property>
              <property name="toolTip" >
-              <string>When 1, displays two graphic screens interchangably by
+              <string>When 1, displays two graphic screens interchangeably by
                  Even field/Odd field.
 When 0, displays the same graphic screen by Even field/Odd field.</string>
              </property>
