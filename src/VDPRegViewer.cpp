@@ -272,11 +272,11 @@ void VDPRegViewer::decodeStatusVDPRegs()
 				groupBox_dec_V9958->setVisible(false);
 				label_dec_ie2->setVisible(true);
 				pushButton_0_5->setText("IE2");
-				pushButton_0_5->setToolTip("Enables interrupt from Lightpen by Interrupt Enable 2.");
+				pushButton_0_5->setToolTip("Enables interrupt from light pen by Interrupt Enable 2.");
 				pushButton_8_6->setText("LP");
-				pushButton_8_6->setToolTip("");
+				pushButton_8_6->setToolTip("When 1, enables light pen. When 0, disables light pen.");
 				pushButton_8_7->setText("MS");
-				pushButton_8_7->setToolTip("");
+				pushButton_8_7->setToolTip("When 1, sets the color bus to input mode and enables mouse. When 0, sets the color bus to output mode and disables mouse.");
 			} else {
 				groupBox_V9958->setVisible(true);
 				groupBox_dec_V9958->setVisible(true);
