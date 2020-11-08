@@ -639,7 +639,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r14->setText(hex5(((regs[14] & 7) << 14) | ((regs[81] & 63) << 8) | regs[80]));
 		label_dec_r15->setText(dec2(regs[15] & 15));
 		label_dec_r16->setText(dec2(regs[16] & 15));
-		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? ", auto incr" : ""));
+		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? "" : ", auto incr"));
 	}
 
 	//V9958 registers
