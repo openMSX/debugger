@@ -422,6 +422,7 @@ void DebuggerForm::createMenus()
 	viewMenu->addAction(viewMemoryAction);
 	viewVDPDialogsMenu = viewMenu->addMenu("VDP");
 	viewMenu->addSeparator();
+	viewFloatingWidgetsMenu = viewMenu->addMenu("Floating widgets:");
 	viewMenu->addAction(viewDebuggableViewerAction);
 	connect(viewMenu, SIGNAL(aboutToShow()), this, SLOT(updateViewMenu()));
 
@@ -432,6 +433,8 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
 	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
 
+	// create Debuggable Viewers menu (so the user can focus an existing one)
+	connect(viewFloatingWidgetsMenu, SIGNAL(aboutToShow()), this, SLOT(updateViewFloatingWidgetsMenu()));
 
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
@@ -1321,7 +1324,9 @@ void DebuggerForm::addDebuggableViewer()
 	DockableWidget* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Debuggable hex view"));
-	dw->setId("DEBUGVIEW");
+	QString uuid = QUuid::createUuid().toString();
+	QString widget_id = QString::fromStdString("DEBUGVIEW-") + uuid;
+	dw->setId(widget_id);
 	dw->setFloating(true);
 	dw->setDestroyable(true);
 	dw->setMovable(true);
@@ -1334,6 +1339,16 @@ void DebuggerForm::addDebuggableViewer()
 	        viewer, SLOT(refresh()));
 	viewer->setDebuggables(debuggables);
 	viewer->setEnabled(disasmView->isEnabled());
+}
+
+void DebuggerForm::showFloatingWidget()
+{
+	QObject * s = sender();
+	QString widget_id = s->property("widget_id").toString();
+	DockableWidget* w = dockMan.findDockableWidget(widget_id);
+	w->show();
+	w->activateWindow();
+	w->raise();
 }
 
 void DebuggerForm::dockWidgetVisibilityChanged(DockableWidget* w)
@@ -1361,6 +1376,24 @@ void DebuggerForm::updateVDPViewMenu()
 	}
 	if (VDPStatusRegView) {
 		viewVDPStatusRegsAction->setChecked(VDPStatusRegView->isVisible());
+	}
+}
+
+void DebuggerForm::updateViewFloatingWidgetsMenu()
+{
+	viewFloatingWidgetsMenu->clear();
+	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
+	it != dockMan.managedWidgets().end(); ++it) {
+		if ((*it)->isFloating()) {
+			// Build up the window title 
+			QString widget_title = (*it)->title();
+			QString widget_id = (*it)->id();
+			QAction* action = new QAction(widget_title);
+			// Set the widget_id as a property on the menu item action, so we can read it out later again via sender() on the receiving functor
+			action->setProperty("widget_id", widget_id);
+			connect(action, SIGNAL(triggered()), this, SLOT(showFloatingWidget()));
+			viewFloatingWidgetsMenu->addAction(action);
+		}
 	}
 }
 
