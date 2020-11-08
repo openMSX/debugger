@@ -653,8 +653,8 @@ void VDPRegViewer::decodeVDPRegs()
 			? "Hide 8 leftmost pixels"
 			: "No masking");
 		label_dec_wte->setText((regs[25] & 4)
-			? "Disabled CPU Waitstate"
-			: "Enable CPU Waitstate");
+			? "CPU Waitstate enabled"
+			: "CPU Waitstate disabled");
 		if (regs[25] & 8) {
 			label_dec_yjk->setText("YJK System");
 			label_dec_yae->setText((regs[25] & 16)
