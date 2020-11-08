@@ -610,6 +610,9 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_bd->setText(dec2((regs[7] >> 0) & 15));
 
 	if (vdpid != VDP_TMS99X8) {
+		label_dec_dg->setText((regs[0] & 64)
+			? "Color bus set for input"
+			: "Color bus set for output");
 		label_dec_tp->setText((regs[8] & 32)
 			? "Color 0 uses the color registers"
 			: "Color 0 is transparent (=shows border)");
