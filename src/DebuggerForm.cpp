@@ -176,6 +176,8 @@ private:
 };
 
 
+int DebuggerForm::counter = 0;
+
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
 	, comm(CommClient::instance())
@@ -1324,9 +1326,7 @@ void DebuggerForm::addDebuggableViewer()
 	DockableWidget* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Debuggable hex view"));
-	QString uuid = QUuid::createUuid().toString();
-	QString widget_id = QString::fromStdString("DEBUGVIEW-") + uuid;
-	dw->setId(widget_id);
+	dw->setId("DEBUGVIEW-" + QString::number(++counter));
 	dw->setFloating(true);
 	dw->setDestroyable(true);
 	dw->setMovable(true);
@@ -1385,7 +1385,7 @@ void DebuggerForm::updateViewFloatingWidgetsMenu()
 	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
 	it != dockMan.managedWidgets().end(); ++it) {
 		if ((*it)->isFloating()) {
-			// Build up the window title 
+			// Build up the window title
 			QString widget_title = (*it)->title();
 			QString widget_id = (*it)->id();
 			QAction* action = new QAction(widget_title);

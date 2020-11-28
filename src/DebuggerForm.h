@@ -3,7 +3,6 @@
 
 #include "DockManager.h"
 #include "DebugSession.h"
-#include <QUuid>
 #include <QMainWindow>
 #include <QMap>
 
@@ -135,6 +134,8 @@ private:
 
 	bool mergeBreakpoints;
 	QMap<QString, int> debuggables;
+
+	static int counter;
 
 private slots:
 	void fileNewSession();
