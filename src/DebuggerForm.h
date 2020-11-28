@@ -3,6 +3,7 @@
 
 #include "DockManager.h"
 #include "DebugSession.h"
+#include <QUuid>
 #include <QMainWindow>
 #include <QMap>
 
@@ -61,6 +62,7 @@ private:
 	QMenu* searchMenu;
 	QMenu* viewMenu;
 	QMenu* viewVDPDialogsMenu;
+	QMenu* viewFloatingWidgetsMenu;
 	QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
@@ -179,8 +181,10 @@ private slots:
 	void dockWidgetVisibilityChanged(DockableWidget* w);
 	void updateViewMenu();
 	void updateVDPViewMenu();
+	void updateViewFloatingWidgetsMenu();
 	void updateWindowTitle();
 	void symbolFileChanged();
+	void showFloatingWidget();
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
