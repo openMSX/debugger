@@ -32,7 +32,7 @@ def archiveFromGit(versionedPackageName, committish):
 			)
 	try:
 		outTarPath = distBase + versionedPackageName + '.tar.gz'
-		print 'archive:', outTarPath
+		print('archive:', outTarPath)
 		if not isdir(distBase):
 			makedirs(distBase)
 		outTar = TarFile.open(outTarPath, 'w:gz')
@@ -45,11 +45,11 @@ def archiveFromGit(versionedPackageName, committish):
 				for info in inTar:
 					if exclude(info):
 						if verbose:
-							print 'EX', info.name
+							print('EX', info.name)
 						numExcluded += 1
 					else:
 						if verbose:
-							print 'IN', info.name
+							print('IN', info.name)
 						numIncluded += 1
 						info.uid = info.gid = 1000
 						info.uname = info.gname = 'openmsx'
@@ -57,8 +57,8 @@ def archiveFromGit(versionedPackageName, committish):
 						outTar.addfile(info, inTar.extractfile(info))
 			finally:
 				inTar.close()
-			print 'entries: %d included, %d excluded' % (
-					numIncluded, numExcluded)
+			print('entries: %d included, %d excluded' % (
+					numIncluded, numExcluded))
 		except:
 			# Clean up partial output file.
 			outTar.close()
@@ -72,9 +72,8 @@ def archiveFromGit(versionedPackageName, committish):
 	else:
 		data, _ = proc.communicate()
 		if len(data) != 0:
-			print >> sys.stderr, (
-					'WARNING: %d more bytes of data from "git archive" after '
-					'tar stream ended' % len(data))
+			print('WARNING: %d more bytes of data from "git archive" after '
+					'tar stream ended' % len(data), file = sys.stderr)
 
 def niceVersionFromGitDescription(description):
 	'''Our release tag names are still based on naming limitations from CVS;
@@ -106,9 +105,9 @@ def getDescription(committish):
 	try:
 		return check_output(args).rstrip('\n')
 	except CalledProcessError as ex:
-		print >> sys.stderr, '"%s" returned %d' % (
+		print('"%s" returned %d' % (
 				' '.join(args), ex.returncode
-				)
+				), file = sys.stderr)
 		raise
 
 def main(committish = None):
@@ -120,7 +119,7 @@ def main(committish = None):
 	try:
 		archiveFromGit('openmsx-debugger-%s' % version, description)
 	except (OSError, TarError) as ex:
-		print >> sys.stderr, 'ERROR: %s' % ex
+		print('ERROR: %s' % ex, sys.stderr)
 		sys.exit(1)
 
 if __name__ == '__main__':
@@ -129,5 +128,5 @@ if __name__ == '__main__':
 	elif len(sys.argv) == 2:
 		main(sys.argv[1])
 	else:
-		print >> sys.stderr, 'Usage: gitdist.py [branch | tag]'
+		print('Usage: gitdist.py [branch | tag]', file = sys.stderr)
 		sys.exit(2)
