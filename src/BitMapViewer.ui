@@ -107,6 +107,16 @@
             <string>3</string>
            </property>
           </item>
+          <item>
+           <property name="text" >
+            <string>E0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>E1</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="3" column="0" >
