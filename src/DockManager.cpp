@@ -17,7 +17,7 @@ int DockManager::dockAreaIndex(DockableWidgetArea* area) const
 
 void DockManager::dockWidget(DockableWidget* widget, const QPoint& p, const QRect& r)
 {
-	AreaMap::iterator it = areaMap.begin(); // TODO
+	auto it = areaMap.begin(); // TODO
 	if (it != areaMap.end()) {
 		areaMap[widget] = it.value();
 		return it.value()->addWidget(widget, r);
@@ -26,7 +26,7 @@ void DockManager::dockWidget(DockableWidget* widget, const QPoint& p, const QRec
 
 void DockManager::undockWidget(DockableWidget* widget)
 {
-	AreaMap::iterator it = areaMap.find(widget);
+	auto it = areaMap.find(widget);
 	if (it != areaMap.end()) {
 		it.value()->removeWidget(widget);
 	}
@@ -46,7 +46,7 @@ void DockManager::insertWidget(
 
 bool DockManager::insertLocation(QRect& r, const QSizePolicy& sizePol)
 {
-	AreaMap::iterator it = areaMap.begin(); // TODO
+	auto it = areaMap.begin(); // TODO
 	if (it == areaMap.end()) return false;
 
 	return it.value()->insertLocation(r, sizePol);
@@ -54,7 +54,7 @@ bool DockManager::insertLocation(QRect& r, const QSizePolicy& sizePol)
 
 void DockManager::visibilityChanged(DockableWidget* widget)
 {
-	AreaMap::iterator it = areaMap.find(widget);
+	auto it = areaMap.find(widget);
 	if (it != areaMap.end()) {
 		it.value()->layout->changed();
 	}

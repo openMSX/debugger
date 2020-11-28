@@ -121,8 +121,7 @@ Symbol* SymbolTable::findNextAddressSymbol(MemoryLayout* ml)
 
 Symbol* SymbolTable::getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml)
 {
-	for (QMultiHash<int, Symbol*>::iterator it = valueSymbols.find(val);
-	     it != valueSymbols.end() && it.key() == val; ++it) {
+	for (auto it = valueSymbols.find(val); it != valueSymbols.end() && it.key() == val; ++it) {
 		if ((it.value()->validRegisters() & reg) &&
 		    it.value()->isSlotValid(ml)) {
 			return it.value();
@@ -133,8 +132,7 @@ Symbol* SymbolTable::getValueSymbol(int val, Symbol::Register reg, MemoryLayout*
 
 Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 {
-	for (QMultiMap<int, Symbol*>::iterator it = addressSymbols.find(addr);
-	     it != addressSymbols.end() && it.key() == addr; ++it) {
+	for (auto it = addressSymbols.find(addr); it != addressSymbols.end() && it.key() == addr; ++it) {
 		if (it.value()->isSlotValid(ml)) {
 			return it.value();
 		}
@@ -144,8 +142,7 @@ Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 
 Symbol* SymbolTable::getAddressSymbol(const QString& label, bool case_sensitive)
 {
-	for (QMultiMap<int, Symbol*>::iterator it = addressSymbols.begin();
-	     it != addressSymbols.end(); ++it) {
+	for (auto it = addressSymbols.begin(); it != addressSymbols.end(); ++it) {
 		if (it.value()->text().compare(label, Qt::CaseSensitive)==0)
 			return it.value();
 		if (!case_sensitive && it.value()->text().compare(label, Qt::CaseInsensitive)==0)
@@ -494,7 +491,7 @@ void SymbolTable::reloadFiles()
 			if (ni.value()->source() != newFile) continue;
 
 			// find symbol in old list
-			QMap<QString, Symbol>::iterator sit = symCopy.find(ni.value()->text());
+			auto sit = symCopy.find(ni.value()->text());
 			if (sit == symCopy.end()) continue;
 
 			// symbol existed before, copy settings
@@ -509,8 +506,7 @@ void SymbolTable::reloadFiles()
 			symCopy.erase(sit);
 		}
 		// all symbols left in map are lost
-		for (QMap<QString, Symbol>::iterator sit = symCopy.begin();
-		     sit != symCopy.end(); ++sit) {
+		for (auto sit = symCopy.begin(); sit != symCopy.end(); ++sit) {
 			Symbol* sym = new Symbol(sit.value());
 			sym->setStatus(Symbol::LOST);
 			sym->setSource(newFile);
@@ -599,10 +595,8 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 		xml.writeEndElement();
 	}
 	// write symbols
-	for (QList<Symbol*>::iterator sit = symbols.begin();
-	     sit != symbols.end(); ++sit) {
-		Symbol* sym = *sit;
-		xml.writeStartElement("Symbol");
+	for (auto* sym : symbols) {
+	     	xml.writeStartElement("Symbol");
 		// status
 		if (sym->status() == Symbol::HIDDEN) {
 			xml.writeAttribute("status", "hidden");
@@ -837,4 +831,3 @@ bool Symbol::isSlotValid(const MemoryLayout* ml) const
 	}
 	return false;
 }
-

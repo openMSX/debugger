@@ -294,10 +294,9 @@ void SymbolManager::removeLabel()
 	if (selection.empty()) return;
 	// remove selected items
 	bool deleted = false;
-	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
-	     selit != selection.end(); ++selit) {
+	for (auto* sel : selection) {
 		// get symbol
-		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
 		if (!sym->source()) {
 			// remove from table
@@ -360,8 +359,7 @@ void SymbolManager::labelSelectionChanged()
 	Symbol::SymbolType type;
 	int slotMask, slotMaskMultiple = 0;
 	int regMask, regMaskMultiple = 0;
-	for (QList<QTreeWidgetItem *>::iterator selit = selection.begin();
-	     selit != selection.end(); ++selit) {
+	for (auto selit = selection.begin(); selit != selection.end(); ++selit) {
 		// get symbol
 		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
@@ -449,9 +447,8 @@ void SymbolManager::changeSlot(int id, int state)
 	// update items
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
-	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
-	     selit != selection.end(); ++selit) {
-		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+	for (auto* sel : selection) {
+		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
 		// set or clear bit
 		if (state == Qt::Checked) {
 			sym->setValidSlots(sym->validSlots() |  bit);
@@ -459,7 +456,7 @@ void SymbolManager::changeSlot(int id, int state)
 			sym->setValidSlots(sym->validSlots() & ~bit);
 		}
 		// update item in treewidget
-		updateItemSlots(*selit);
+		updateItemSlots(sel);
 	}
 	endTreeLabelsUpdate();
 	// notify change
@@ -478,9 +475,8 @@ void SymbolManager::changeRegister(int id, int state)
 	// update items
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
-	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
-	     selit != selection.end(); ++selit) {
-		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+	for (auto* sel : selection) {
+		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
 		// set or clear bit
 		if (state == Qt::Checked) {
 			sym->setValidRegisters(sym->validRegisters() |  bit);
@@ -488,7 +484,7 @@ void SymbolManager::changeRegister(int id, int state)
 			sym->setValidRegisters(sym->validRegisters() & ~bit);
 		}
 		// update item in treewidget
-		updateItemRegisters(*selit);
+		updateItemRegisters(sel);
 	}
 	endTreeLabelsUpdate();
 	// notify change
@@ -512,11 +508,10 @@ void SymbolManager::changeType(bool /*checked*/)
 
 	// update items
 	beginTreeLabelsUpdate();
-	for (QList<QTreeWidgetItem*>::iterator selit = selection.begin();
-	     selit != selection.end(); ++selit) {
-		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+	for (auto* sel : selection) {
+		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
 		sym->setType(newType);
-		updateItemType(*selit);
+		updateItemType(sel);
 	}
 	endTreeLabelsUpdate();
 	// notify change

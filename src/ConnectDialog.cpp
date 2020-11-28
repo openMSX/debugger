@@ -316,11 +316,9 @@ void ConnectDialog::on_rescanButton_clicked()
 void ConnectDialog::connectionOk(OpenMSXConnection& connection,
                                  const QString& title)
 {
-	OpenMSXConnections::iterator it = qFind(pendingConnections.begin(),
-	                                        pendingConnections.end(),
-	                                        &connection);
+	auto it = std::find(pendingConnections.begin(), pendingConnections.end(), &connection);
 	if (it == pendingConnections.end()) {
-		// connection is already beiing destoyed
+		// connection is already being destoyed
 		return;
 	}
 	pendingConnections.erase(it);
@@ -336,9 +334,7 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 
 void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 {
-	OpenMSXConnections::iterator it = qFind(pendingConnections.begin(),
-	                                        pendingConnections.end(),
-	                                        &connection);
+	auto it = std::find(pendingConnections.begin(), pendingConnections.end(), &connection);
 	if (it == pendingConnections.end()) {
 		// was this connection established but terminated?
 		int id = confirmedConnections.indexOf(&connection);

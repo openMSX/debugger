@@ -489,7 +489,7 @@ bool DockableWidgetLayout::insertLocation(
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QSet<int>::iterator it = sidePoints.begin();
+				auto it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
 					unsigned newDist1 = dist + abs(*it - rect.left());
@@ -519,10 +519,8 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
-					     ita != sidePoints.end(); ++ita) {
-						for (QSet<int>::iterator itb = sidePoints.begin();
-						     ita != itb; ++itb) {
+					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
 							if (isClose(sp_mid, mid)) {
@@ -569,7 +567,7 @@ bool DockableWidgetLayout::insertLocation(
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QSet<int>::iterator it = sidePoints.begin();
+				auto it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
 					unsigned newDist1 = dist + abs(*it - rect.left());
@@ -598,10 +596,8 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
-					     ita != sidePoints.end(); ++ita) {
-						for (QSet<int>::iterator itb = sidePoints.begin();
-						     ita != itb; ++itb) {
+					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
 							if (isClose(sp_mid, mid)) {
@@ -648,7 +644,7 @@ bool DockableWidgetLayout::insertLocation(
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QSet<int>::iterator it = sidePoints.begin();
+				auto it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
 					unsigned newDist1 = dist + abs(*it - rect.top());
@@ -678,10 +674,8 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
-					     ita != sidePoints.end(); ++ita) {
-						for (QSet<int>::iterator itb = sidePoints.begin();
-						     ita != itb; ++itb) {
+					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
 							if (isClose(sp_mid, mid)) {
@@ -727,7 +721,7 @@ bool DockableWidgetLayout::insertLocation(
 					}
 				}
 				// widget placement can occur at all points, find the closest
-				QSet<int>::iterator it = sidePoints.begin();
+				auto it = sidePoints.begin();
 				for (int j = 0; j < sidePoints.size() - 1; ++j) {
 					// check after point
 					unsigned newDist1 = dist + abs(*it - rect.top());
@@ -756,10 +750,8 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					for (QSet<int>::iterator ita = sidePoints.begin() + 1;
-					     ita != sidePoints.end(); ++ita) {
-						for (QSet<int>::iterator itb = sidePoints.begin();
-						     ita != itb; ++itb) {
+					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
 							if (isClose(sp_mid, mid)) {

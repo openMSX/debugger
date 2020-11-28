@@ -1416,8 +1416,7 @@ void DebuggerForm::setDebuggables(const QString& list)
 		debuggables[d] = 0;
 	}
 	// find the size for all debuggables
-	for (QMap<QString, int>::iterator it = debuggables.begin();
-	     it != debuggables.end(); ++it) {
+	for (auto it = debuggables.begin(); it != debuggables.end(); ++it) {
 		comm.sendCommand(new DebuggableSizeHandler(it.key(), *this));
 	}
 }
