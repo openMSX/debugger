@@ -537,10 +537,10 @@ void SymbolManager::updateItemName(QTreeWidgetItem* item)
 	// set color based on status as well as status in 2nd column
 	switch (sym->status()) {
 	case Symbol::HIDDEN:
-		item->setTextColor(0, QColor(128, 128, 128));
+		item->setForeground(0, QColor(128, 128, 128));
 		break;
 	case Symbol::LOST:
-		item->setTextColor(0, QColor(128, 0, 0));
+		item->setForeground(0, QColor(128, 0, 0));
 		break;
 	default:
 		break;

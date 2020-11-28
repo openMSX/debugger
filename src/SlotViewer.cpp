@@ -42,10 +42,10 @@ SlotViewer::SlotViewer(QWidget* parent)
 
 	frameR = frameL = frameT = frameB = frameWidth();
 
-	headerSize1  = 8 + fontMetrics().width("Page");
-	headerSize2  = 8 + fontMetrics().width("Address");
-	headerSize3  = 8 + fontMetrics().width("Slot");
-	headerSize4  = 8 + fontMetrics().width("Segment");
+	headerSize1  = 8 + fontMetrics().horizontalAdvance("Page");
+	headerSize2  = 8 + fontMetrics().horizontalAdvance("Address");
+	headerSize3  = 8 + fontMetrics().horizontalAdvance("Slot");
+	headerSize4  = 8 + fontMetrics().horizontalAdvance("Segment");
 	headerHeight = 8 + fontMetrics().height();
 }
 
@@ -116,18 +116,18 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 		p.setPen(palette().color(QPalette::Text));
 
 		// print page nr
-		str.sprintf("%i", i);
-		p.drawText(mid1 - fontMetrics().width(str) / 2, y, str);
+		str.asprintf("%i", i);
+		p.drawText(mid1 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		// print address
-		str.sprintf("$%04X", i * 0x4000);
-		p.drawText(mid2 - fontMetrics().width(str) / 2, y, str);
+		str.asprintf("$%04X", i * 0x4000);
+		p.drawText(mid2 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		// print slot
 		if (isOn) {
 			if (memLayout->isSubslotted[memLayout->primarySlot[i]]) {
-				str.sprintf("%i-%i", memLayout->primarySlot[i],
-				                     memLayout->secondarySlot[i]);
+				str.asprintf("%i-%i", memLayout->primarySlot[i],
+				                      memLayout->secondarySlot[i]);
 			} else {
 				str = QString::number(memLayout->primarySlot[i]);
 			}
@@ -141,7 +141,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 			p.setPen(palette().color(QPalette::Text));
 		}
 
-		p.drawText(mid3 - fontMetrics().width(str) / 2, y, str);
+		p.drawText(mid3 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		// print segment
 		if (isOn) {
@@ -153,12 +153,12 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3][0];
 			}
 			if (ms > 0) {
-				str.sprintf("%i", memLayout->mapperSegment[i]);
+				str.asprintf("%i", memLayout->mapperSegment[i]);
 			} else if(memLayout->romBlock[2*i] >= 0) {
 				if (memLayout->romBlock[2*i] == memLayout->romBlock[2*i+1]) {
-					str.sprintf("R%i", memLayout->romBlock[2*i]);
+					str.asprintf("R%i", memLayout->romBlock[2*i]);
 				} else {
-					str.sprintf("R%i/%i", memLayout->romBlock[2*i], memLayout->romBlock[2*i+1]);
+					str.asprintf("R%i/%i", memLayout->romBlock[2*i], memLayout->romBlock[2*i+1]);
 				}
 			} else {
 				str = "-";
@@ -172,7 +172,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 		} else {
 			p.setPen(palette().color(QPalette::Text));
 		}
-		p.drawText(mid4 - fontMetrics().width(str) / 2, y, str);
+		p.drawText(mid4 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		y += dy;
 	}

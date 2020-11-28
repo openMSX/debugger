@@ -65,7 +65,7 @@ StackViewer::StackViewer(QWidget* parent)
 
 QSize StackViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().width("FFFFWFFFF ") + 4 + frameR,
+	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF ") + 4 + frameR,
 	             frameT + 8 * fontMetrics().height() + frameB);
 }
 
@@ -119,16 +119,16 @@ void StackViewer::paintEvent(QPaintEvent* e)
 
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
-	int xStack = xAddr + fontMetrics().width("FFFFF");
+	int xStack = xAddr + fontMetrics().horizontalAdvance("FFFFF");
 	int y = frameT + h - 1;
 	int address = topAddress;
 
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
 		// print address
 		QString hexStr;
-		hexStr.sprintf("%04X", address);
+		hexStr.asprintf("%04X", address);
 		p.drawText(xAddr,  y - d, hexStr);
-		hexStr.sprintf("%02X%02X", memory[address + 1], memory[address]);
+		hexStr.asprintf("%02X%02X", memory[address + 1], memory[address]);
 		p.drawText(xStack, y - d, hexStr);
 		y += h;
 		address += 2;

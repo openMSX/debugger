@@ -119,7 +119,7 @@ void DisasmViewer::settingsChanged()
 	codeFontAscent  = cfm.ascent();
 
 	// calculate layout locations
-	int charWidth = cfm.width("0");
+	int charWidth = cfm.horizontalAdvance("0");
 	xAddr = frameL + 40;
 	xMCode[0] = xAddr     + 6 * charWidth;
 	xMCode[1] = xMCode[0] + 3 * charWidth;
@@ -252,12 +252,12 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 			}
 
 			// print the address
-			hexStr.sprintf("%04X", row->addr);
+			hexStr.asprintf("%04X", row->addr);
 			p.drawText(xAddr, y + a, hexStr);
 
 			// print 1 to 4 bytes
 			for (int j = 0; j < row->numBytes; ++j) {
-				hexStr.sprintf("%02X", displayDisasm ? memory[row->addr + j] : 0);
+				hexStr.asprintf("%02X", displayDisasm ? memory[row->addr + j] : 0);
 				p.drawText(xMCode[j], y + a, hexStr);
 			}
 

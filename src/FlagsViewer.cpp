@@ -48,8 +48,8 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 	p.fillRect(r, palette().color(QPalette::Base));
 
 	int h = fontMetrics().height();
-	int flagWidth = fontMetrics().width("ZW");
-	int valWidth  = fontMetrics().width("0 ");
+	int flagWidth = fontMetrics().horizontalAdvance("ZW");
+	int valWidth  = fontMetrics().horizontalAdvance("0 ");
 	int d = fontMetrics().descent();
 	int y = frameT + h - 1 - d;
 	for (int flag = 7; flag >= 0; --flag) {
@@ -66,7 +66,7 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 
 QSize FlagsViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().width("ZW0 (PE) ") + 4 + frameR,
+	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("ZW0 (PE) ") + 4 + frameR,
 	             frameT + 8 * fontMetrics().height() + frameB);
 }
 

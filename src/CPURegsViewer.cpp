@@ -38,8 +38,8 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 	p.setPen(palette().color(QPalette::Text));
 
 	rowHeight = fontMetrics().height();
-	int regWidth = fontMetrics().width("HLW");
-	int valWidth = fontMetrics().width("FFFFWW");
+	int regWidth = fontMetrics().horizontalAdvance("HLW");
+	int valWidth = fontMetrics().horizontalAdvance("FFFFWW");
 	int d = fontMetrics().descent();
 
 	leftRegPos = frameL + 4;
@@ -80,7 +80,7 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 
 QSize CPURegsViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().width("HLWFFFFWWHLWFFFFW") + 4 + frameR,
+	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("HLWFFFFWWHLWFFFFW") + 4 + frameR,
 	             frameT + 8 * fontMetrics().height() + frameB );
 }
 
@@ -113,13 +113,13 @@ void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
 				// draw curser background
 				QBrush b(palette().color(QPalette::Highlight));
 				p.fillRect(x, frameT + (cursorLoc >> 3) * rowHeight,
-				           fontMetrics().width(digitTxt), rowHeight, b);
+				           fontMetrics().horizontalAdvance(digitTxt), rowHeight, b);
 				p.setPen(palette().color(QPalette::HighlightedText));
 			} else {
 				p.setPen(penClr);
 			}
 			p.drawText(x, y, digitTxt);
-			x += fontMetrics().width(digitTxt);
+			x += fontMetrics().horizontalAdvance(digitTxt);
 		}
 	} else {
 		// regular value print
@@ -127,11 +127,11 @@ void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
 		// create string
 		QString str;
 		if (id < CpuRegs::REG_I) {
-			str.sprintf("%04X", regs[id]);
+			str.asprintf("%04X", regs[id]);
 		} else if (id < CpuRegs::REG_IM) {
-			str.sprintf("%02X", regs[id]);
+			str.asprintf("%02X", regs[id]);
 		} else {
-			str.sprintf("%01X", regs[id]);
+			str.asprintf("%01X", regs[id]);
 		}
 		// draw
 		p.drawText(x, y, str);

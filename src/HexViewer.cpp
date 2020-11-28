@@ -173,8 +173,8 @@ void HexViewer::settingsChanged()
 {
 	QFontMetrics fm(Settings::get().font(Settings::HEX_FONT));
 	lineHeight = fm.height();
-	charWidth = fm.width("W");
-	hexCharWidth = fm.width("0ABCDEF") / 7;
+	charWidth = fm.horizontalAdvance("W");
+	hexCharWidth = fm.horizontalAdvance("0ABCDEF") / 7;
 	xAddr = frameL + 8;
 	xData = xAddr + addressLength * hexCharWidth + charWidth;
 	dataWidth = 3 * hexCharWidth;
@@ -244,7 +244,7 @@ void HexViewer::setSizes()
 
 QSize HexViewer::sizeHint() const
 {
-	return QSize(frameL + 16 + (6 + 3 * horBytes / 2) * fontMetrics().width("A") + frameR,
+	return QSize(frameL + 16 + (6 + 3 * horBytes / 2) * fontMetrics().horizontalAdvance("A") + frameR,
 	             frameT + 10 * fontMetrics().height() + frameB );
 }
 
@@ -302,7 +302,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		for (int j = 0; j < horBytes; ++j) {
 			// print data
 			if (address + j < debuggableSize) {
-				hexStr.sprintf("%02X", hexData[address + j]);
+				hexStr.asprintf("%02X", hexData[address + j]);
 				// draw marker if needed
 				if (useMarker || beingEdited) {
 					QRect b(x, y, dataWidth, lineHeight);
@@ -316,7 +316,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 						if (beingEdited) {
 							p.fillRect(b, Qt::darkGreen);
 							if (cursorPosition) {
-								hexStr.sprintf("%2X", editValue);
+								hexStr.asprintf("%2X", editValue);
 							}
 						} else {
 							p.drawRect(b);
