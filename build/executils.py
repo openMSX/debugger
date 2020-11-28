@@ -33,10 +33,10 @@ def captureStdout(log, commandLine):
 	try:
 		proc = Popen(
 			commandParts, bufsize = -1, env = env,
-			stdin = None, stdout = PIPE, stderr = PIPE,
+			stdin = None, stdout = PIPE, stderr = PIPE, encoding = 'utf-8'
 			)
-	except OSError, ex:
-		print >> log, 'Failed to execute "%s": %s' % (commandLine, ex)
+	except OSError as ex:
+		print('Failed to execute "%s": %s' % (commandLine, ex), file = log)
 		return None
 	stdoutdata, stderrdata = proc.communicate()
 	if stderrdata:
@@ -51,7 +51,7 @@ def captureStdout(log, commandLine):
 	if proc.returncode == 0:
 		return stdoutdata
 	else:
-		print >> log, 'Execution failed with exit code %d' % proc.returncode
+		print('Execution failed with exit code %d' % proc.returncode, file = log)
 		return None
 
 def shjoin(parts):
