@@ -17,13 +17,13 @@ public:
 	const unsigned char* getStatusRegsPointer() const;
 	const unsigned char* getVdpVramPointer() const;
 
-	const size_t getVRAMSize() const;
+	size_t getVRAMSize() const;
 
 private:
 	VDPDataStore();
-	~VDPDataStore();
+	~VDPDataStore() override;
 
-	virtual void DataHexRequestReceived();
+	void DataHexRequestReceived() override;
 
 	void refresh1();
 	void refresh2();

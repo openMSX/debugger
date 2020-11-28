@@ -80,7 +80,7 @@ void Breakpoints::setMemoryLayout(MemoryLayout* ml)
 	memLayout = ml;
 }
 
-QString Breakpoints::createSetCommand(Type type, int address, char ps, char ss, int segment, 
+QString Breakpoints::createSetCommand(Type type, int address, char ps, char ss, int segment,
                                       int endRange, QString condition)
 {
 	QString cmd("debug %1 %2 %3");
@@ -159,7 +159,7 @@ void Breakpoints::setBreakpoints(const QString& str)
 		} else { // unknown
 			continue;
 		}
-		
+
 		// get address
 		p++;
 		if (newBp.type != CONDITION) {
@@ -241,7 +241,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 			bp.condition.chop(1);
 			bp.condition = bp.condition.mid(1).trimmed();
 		}
-	}	
+	}
 }
 
 bool Breakpoints::inCurrentSlot(const Breakpoint& bp)

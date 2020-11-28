@@ -93,20 +93,20 @@ private:
 	QString getWidgetText(QWidget* wdg)
 	{
 		if (wdg == nullptr) return QString();
-		if (QLabel* ql = dynamic_cast<QLabel*>(wdg)) {
+		if (auto* ql = dynamic_cast<QLabel*>(wdg)) {
 			return ql->text();
 		} else {
-			QLineEdit* qe = dynamic_cast<QLineEdit*>(wdg);
+			auto* qe = dynamic_cast<QLineEdit*>(wdg);
 			return qe->text();
 		}
 	}
 
 	void updateWidget(QWidget* wdg, int val, int mode)
 	{
-		if (QLabel* ql = dynamic_cast<QLabel*>(wdg)) {
+		if (auto* ql = dynamic_cast<QLabel*>(wdg)) {
 			ql->setText(convert(val, mode));
 		} else {
-			QLineEdit* qe = dynamic_cast<QLineEdit*>(wdg);
+			auto* qe = dynamic_cast<QLineEdit*>(wdg);
 			qe->setText(convert(val, mode));
 		}
 	}
@@ -137,11 +137,11 @@ class VDPCommandRegViewer : public QDialog, public SimpleHexRequestUser,
 {
 	Q_OBJECT
 public:
-	VDPCommandRegViewer(QWidget* parent = 0);
-	~VDPCommandRegViewer();
+	VDPCommandRegViewer(QWidget* parent = nullptr);
+	~VDPCommandRegViewer() override;
 
 private:
-	virtual void DataHexRequestReceived();
+	void DataHexRequestReceived() override;
 	void decodeR46(int val);
 	void syncRegToCmd();
 

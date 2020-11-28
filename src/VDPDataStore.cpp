@@ -10,14 +10,14 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		dataStore.debuggableNameVRAM = "physical VRAM";
 		dataStore.got_version = true;
 		dataStore.refresh();
 		delete this;
 	}
-	virtual void replyNok(const QString& message)
+	void replyNok(const QString& message) override
 	{
 		dataStore.debuggableNameVRAM = "VRAM";
 		dataStore.got_version = true;
@@ -38,13 +38,13 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		dataStore.vramSize = message.toInt();
 		dataStore.refresh2();
 		delete this;
 	}
-	virtual void replyNok(const QString& message)
+	void replyNok(const QString& message) override
 	{
 		delete this;
 	}
@@ -127,7 +127,7 @@ const unsigned char* VDPDataStore::getVdpVramPointer() const
 	return vram + vramSize + 32 + 16 + 64;
 }
 
-const size_t VDPDataStore::getVRAMSize() const
+size_t VDPDataStore::getVRAMSize() const
 {
 	return vramSize;
 }

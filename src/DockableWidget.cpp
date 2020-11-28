@@ -12,10 +12,10 @@
 #include <algorithm>
 
 
-DockableWidget::DockableWidget( DockManager& manager, QWidget* parent)
+DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	: QWidget(parent), dockManager(manager)
 {
-	mainWidget = 0;
+	mainWidget = nullptr;
 	floating = false;
 	movable = true;
 	closable = true;
@@ -199,7 +199,7 @@ void DockableWidget::mouseMoveEvent(QMouseEvent* event)
 		// dragging of widget in progress, update rubberband
 		if (!rubberBand->isVisible()) {
 			if (abs(event->globalX() - dragStart.x()) > 20 ||
-			    abs(event->globalY() - dragStart.y()) > 20 ) {
+			    abs(event->globalY() - dragStart.y()) > 20) {
 				rubberBand->resize(width(), height());
 				rubberBand->move(event->globalX()-dragOffset.x(),
 				                 event->globalY()-dragOffset.y());

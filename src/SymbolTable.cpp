@@ -207,13 +207,13 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 				}
 			}
 		} else {
-			QString ext = filename.toLower();	
+			QString ext = filename.toLower();
 			/* They are the same type of file. For some reason the Debian
-			 * manpage uses the extension ".sys" 
+			 * manpage uses the extension ".sys"
 			 * pasmo doc -> pasmo [options] file.asm file.bin [file.symbol [file.publics] ]
 			 * pasmo manpage in Debian -> pasmo [options]  file.asm file.bin [file.sys]
 			*/
-			if (ext.endsWith(".symbol") || ext.endsWith(".publics") || ext.endsWith(".sys") ) {
+			if (ext.endsWith(".symbol") || ext.endsWith(".publics") || ext.endsWith(".sys")) {
 				type = PASMO_FILE;
 			}
 		}
@@ -306,7 +306,7 @@ bool SymbolTable::readSJASMFile(const QString& filename)
 
 bool SymbolTable::readASMSXFile(const QString& filename)
 {
-	QFile file( filename );
+	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		return false;
 	}
@@ -329,12 +329,11 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 					QStringList l = line.split(" ");
 					Symbol* sym;
 					if (line[0] == '$') {
-						sym = new Symbol(l.at(1).trimmed(), l.at(0).right(4).toInt(0, 16));
+						sym = new Symbol(l.at(1).trimmed(), l.at(0).right(4).toInt(nullptr, 16));
 					} else if ((line[4] == 'h') || (line[5] == 'h')) {
 						sym = new Symbol(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16));
 					} else {
-						QString m = l.at(0);
-						QStringList n = m.split(":"); // n.at(0) = MegaROM page
+						QStringList n = l.at(0).split(":"); // n.at(0) = MegaROM page
 						sym = new Symbol(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16));
 					}
 					sym->setSource(&symbolFiles.back().fileName);
@@ -350,20 +349,20 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 
 bool SymbolTable::readPASMOFile(const QString& filename)
 {
-	QFile file( filename );
+	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		return false;
 	}
 	appendFile(filename, PASMO_FILE);
 	QTextStream in(&file);
 	while (!in.atEnd()) {
-		QString line;	
+		QString line;
 		QStringList l;
 		Symbol* sym;
 		line = in.readLine();
 		l = line.split(QRegExp("(\t+)|( +)"));
 		if (l.size() == 3) {
-			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(0, 16));
+			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(nullptr, 16));
 			sym->setSource(&symbolFiles.back().fileName);
 			add(sym);
 		}
@@ -445,7 +444,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 			QString part = line.mid(pos, l);
 			if (rp.indexIn(part) == 0) {
 				QStringList l = rp.capturedTexts();
-				auto* sym = new Symbol(l.at(1), l.last().toInt(0, 16));
+				auto* sym = new Symbol(l.at(1), l.last().toInt(nullptr, 16));
 				sym->setSource(&symbolFiles.back().fileName);
 				add(sym);
 			}
@@ -548,7 +547,7 @@ void SymbolTable::unloadFile(const QString& file, bool keepSymbols)
 			Symbol* sym = i.value();
 			if (sym->source() == name) {
 				if (keepSymbols) {
-					sym->setSource(0);
+					sym->setSource(nullptr);
 				} else {
 					i.remove();
 					delete sym;
@@ -663,7 +662,7 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 				QString stat = xml.attributes().value("status").toString().toLower();
 				if (stat == "hidden") {
 					sym->setStatus(Symbol::HIDDEN);
-				} else if( stat == "lost" ) {
+				} else if (stat == "lost") {
 					sym->setStatus(Symbol::LOST);
 				}
 
@@ -672,9 +671,9 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 				QString type = xml.readElementText().trimmed().toLower();
 				if (type == "jump") {
 					sym->setType(Symbol::JUMPLABEL);
-				} else if( type == "variable" ) {
+				} else if (type == "variable") {
 					sym->setType(Symbol::VARIABLELABEL);
-				} else if( type == "value" ) {
+				} else if (type == "value") {
 					sym->setType(Symbol::VALUE);
 				}
 
@@ -713,18 +712,18 @@ Symbol::Symbol(const QString& str, int addr, int val)
 {
 	symStatus = ACTIVE;
 	symType = JUMPLABEL;
-	symSource = 0;
+	symSource = nullptr;
 	if (addr & 0xFF00) {
 		symRegisters = REG_ALL16;
 	} else {
 		symRegisters = REG_ALL;
 	}
-	table = 0;
+	table = nullptr;
 }
 
 Symbol::Symbol(const Symbol& symbol)
 {
-	table = 0;
+	table = nullptr;
 	symStatus    = symbol.symStatus;
 	symText      = symbol.symText;
 	symValue     = symbol.symValue;
@@ -823,8 +822,8 @@ bool Symbol::isSlotValid(const MemoryLayout* ml) const
 	if (ml->isSubslotted[page]) ss = ml->secondarySlot[page] & 3;
 	if (symSlots & (1 << (4 * ps + ss))) {
 		if (symSegments.empty()) return true;
-		for (int i = 0; i < symSegments.size(); ++i) {
-			if (ml->mapperSegment[page] == symSegments[i]) {
+		for (const auto& seg : symSegments) {
+			if (ml->mapperSegment[page] == seg) {
 				return true;
 			}
 		}

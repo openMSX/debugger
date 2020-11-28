@@ -58,16 +58,16 @@ VDPRegViewer::~VDPRegViewer()
 void VDPRegViewer::setRegisterVisible(int r, bool visible)
 {
 	QString name1 = QString("label_R%1").arg(r);
-	QLabel* l1 = findChild<QLabel*>(name1);
+	auto* l1 = findChild<QLabel*>(name1);
 	l1->setVisible(visible);
 
 	QString name2 = QString("label_val_%1").arg(r);
-	QLabel* l2 = findChild<QLabel*>(name2);
+	auto* l2 = findChild<QLabel*>(name2);
 	l2->setVisible(visible);
 
 	for (int b = 7; b >= 0; --b) {
 		QString name3 = QString("pushButton_%1_%2").arg(r).arg(b);
-		InteractiveButton *i = findChild<InteractiveButton*>(name3);
+		auto *i = findChild<InteractiveButton*>(name3);
 		i->setVisible(visible);
 	}
 
@@ -159,13 +159,13 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			pushButton_2_4->setText("0");
 			pushButton_4_3->setText("0");
 			pushButton_6_3->setText("0");
-			disconnect(modeBitsDispat, 0, pushButton_0_2, 0);
-			disconnect(modeBitsDispat, 0, pushButton_0_3, 0);
-			disconnect(pushButton_0_2, 0, 0, 0);
-			disconnect(pushButton_0_3, 0, 0, 0);
-			disconnect(pushButton_0_4, 0, 0, 0);
-			disconnect(pushButton_0_5, 0, 0, 0);
-			disconnect(pushButton_0_6, 0, 0, 0);
+			disconnect(modeBitsDispat, nullptr, pushButton_0_2, nullptr);
+			disconnect(modeBitsDispat, nullptr, pushButton_0_3, nullptr);
+			disconnect(pushButton_0_2, nullptr, nullptr, nullptr);
+			disconnect(pushButton_0_3, nullptr, nullptr, nullptr);
+			disconnect(pushButton_0_4, nullptr, nullptr, nullptr);
+			disconnect(pushButton_0_5, nullptr, nullptr, nullptr);
+			disconnect(pushButton_0_6, nullptr, nullptr, nullptr);
 			monoGroup(pushButton_1_7, label_dec_416K);
 		} else {
 			// V9938 = MSX2 VDP
@@ -257,8 +257,8 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			////pushButton_1_7->setToolTip("");
 
 			pushButton_1_7->setToolTip("");
-			disconnect(pushButton_0_7, 0, 0, 0);
-			disconnect(label_dec_416K, 0, 0, 0);
+			disconnect(pushButton_0_7, nullptr, nullptr, nullptr);
+			disconnect(label_dec_416K, nullptr, nullptr, nullptr);
 
 			reGroup(pushButton_0_2, modeBitsDispat);
 			reGroup(pushButton_0_3, modeBitsDispat);
@@ -267,7 +267,7 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			monoGroup(pushButton_0_5, label_dec_ie2);
 			monoGroup(pushButton_0_6, label_dec_dg);
 
-			if (vdpid == VDP_V9938){
+			if (vdpid == VDP_V9938) {
 				groupBox_V9958->setVisible(false);
 				groupBox_dec_V9958->setVisible(false);
 				label_dec_ie2->setVisible(true);
@@ -367,7 +367,7 @@ void VDPRegViewer::decodeVDPRegs()
 		"let's find out 30", "let's find out 31"
 	};
 	int basicscreen;
-	switch (m){
+	switch (m) {
 		case  2: basicscreen=0;break;
 		case  0: basicscreen=1;break;
 		case  4: basicscreen=2;break;
@@ -448,15 +448,15 @@ void VDPRegViewer::decodeVDPRegs()
 		if (r == 24) continue;
 		for (int b = 7; b >= 0; --b) {
 			QString name = QString("pushButton_%1_%2").arg(r).arg(b);
-			InteractiveButton* i = findChild<InteractiveButton*>(name);
-			i->setChecked((regs[r] & (1 << b)) ? true : false);
-			if (r<12){
-				i->mustBeSet((mustbeone[ (vdpid == VDP_TMS99X8)?0:1 ][basicscreen][r] & (1 << b)) ? true : false);
+			auto* i = findChild<InteractiveButton*>(name);
+			i->setChecked(regs[r] & (1 << b));
+			if (r < 12) {
+				i->mustBeSet(mustbeone[(vdpid == VDP_TMS99X8) ? 0 : 1][basicscreen][r] & (1 << b));
 				// if A8 of R5 is a 'mustbeone' then we indicate this for A9 also
 				// This bit is cleared in the table since it isn't used in the Sprite
 				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table
-				if (r==5 && b==2 && vdpid!=VDP_TMS99X8 && mustbeone[1][basicscreen][5] ){
+				if (r==5 && b==2 && vdpid!=VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
 					i->mustBeSet(true);
 				}
 			}
@@ -538,7 +538,7 @@ void VDPRegViewer::decodeVDPRegs()
 		nameTable = ((nameTable & 0xffff) << 1) | ((nameTable & 0x10000) >> 16);
 	regtexttext = hex5(nameTable);
 
-	if ((must & regs[2]) != must ) {
+	if ((must & regs[2]) != must) {
 		label_dec_r2->setText("<font color=red>" + regtexttext +"</font>");
 		label_dec_r2->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
@@ -551,12 +551,12 @@ void VDPRegViewer::decodeVDPRegs()
 	must2=mustbeone[row][basicscreen][10] ;
 	regtexttext=hex5(
 		(
-			((255^must) & bitsused[row][basicscreen][ 3] & regs[ 3]) <<  6
+			((255 ^ must ) & bitsused[row][basicscreen][ 3] & regs[ 3]) <<  6
 		  ) | (
-			((255^must2) & bitsused[row][basicscreen][10] & regs[10]) << 14
+			((255 ^ must2) & bitsused[row][basicscreen][10] & regs[10]) << 14
 		)
 		);
-	if (((must & regs[3]) != must ) || ((must2 & regs[10]) != must2 ) ){
+	if (((must & regs[3]) != must) || ((must2 & regs[10]) != must2)) {
 		label_dec_r3->setText("<font color=red>" + regtexttext +"</font>");
 		label_dec_r3->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
@@ -568,9 +568,9 @@ void VDPRegViewer::decodeVDPRegs()
 	must=mustbeone[row][basicscreen][4] ;
 	regtexttext=hex5(
 		(
-			( 255^must) & bitsused[row][basicscreen][4] & regs[4]) << 11
+			(255 ^ must) & bitsused[row][basicscreen][4] & regs[4]) << 11
 		);
-	if ((must & regs[4]) != must ){
+	if ((must & regs[4]) != must) {
 		label_dec_r4->setText("<font color=red>" + regtexttext +"</font>");
 		label_dec_r4->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
@@ -579,14 +579,14 @@ void VDPRegViewer::decodeVDPRegs()
 	}
 
 	// the sprite attribute tabel address
-	must=mustbeone[row][basicscreen][5] ;
-	must2=mustbeone[row][basicscreen][11] ;
-	regtexttext=hex5(
+	must  = mustbeone[row][basicscreen][ 5];
+	must2 = mustbeone[row][basicscreen][11];
+	regtexttext = hex5(
 		(
 		(((255^must) & bitsused[row][basicscreen][ 5] & regs[ 5]) <<  7) |
 		(((255^must2) & bitsused[row][basicscreen][11] & regs[11]) << 15))
 		);
-	if (((must & regs[5]) != must ) || ((must2 & regs[11]) != must2 ) ){
+	if (((must & regs[5]) != must) || ((must2 & regs[11]) != must2)) {
 		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
 		label_dec_r5->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
@@ -594,7 +594,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r5->setToolTip(nullptr);
 	};
 	// special case for sprite mode 2
-	if (must && !( 4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
+	if (must && !(4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
 		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
 		label_dec_r5->setToolTip("Bit A9 should be set, to obtain the Sprite Color Table address this bit is masked<br>With the current bit reset the Color Tabel will use the same address as the Sprite Attribute Table!");
 	};
@@ -701,21 +701,20 @@ void  VDPRegViewer::reGroup(InteractiveButton* item, buttonHighlightDispatcher* 
 }
 
 buttonHighlightDispatcher* VDPRegViewer::makeGroup(
-		QList<InteractiveButton*> list, InteractiveLabel* explained)
+		const QList<InteractiveButton*>& list, InteractiveLabel* explained)
 {
 	// First "steal" the Tooltip of the explained widget.
-	InteractiveButton* item;
-	//foreach(item, list) {
+	//for (auto* item : list) {
 	//	item->setToolTip(explained->toolTip());
 	//}
 
 	// Create a dispatcher and connect all to them
-	buttonHighlightDispatcher* dispat = new buttonHighlightDispatcher();
+	auto* dispat = new buttonHighlightDispatcher();
 	connect(explained, SIGNAL(mouseOver(bool)),
 	        dispat, SLOT(receiveState(bool)));
 	connect(dispat, SIGNAL(dispatchState(bool)),
 	        explained, SLOT(highlight(bool)));
-	foreach(item, list){
+	for (auto* item : list) {
 		doConnect(item, dispat);
 	}
 	return dispat;
@@ -728,8 +727,7 @@ void VDPRegViewer::connectHighLights()
 	// Warning: This function is not available with MSVC 6!! Not that it
 	// matters to me on my Linux environment :-)
 	QList<InteractiveButton*> list = findChildren<InteractiveButton*>();
-	InteractiveButton* item;
-	foreach(item, list) {
+	for (auto* item : list) {
 		connect(item, SIGNAL(newBitValue(int,int,bool)),
 		        this, SLOT(registerBitChanged(int,int,bool)));
         }

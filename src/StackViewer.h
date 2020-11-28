@@ -11,18 +11,18 @@ class StackViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	StackViewer(QWidget* parent = 0);
+	StackViewer(QWidget* parent = nullptr);
 
 	void setData(unsigned char* memPtr, int memLength);
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 public slots:
 	void setLocation(int addr);
 	void setStackPointer(quint16 addr);
 
 private:
-	void resizeEvent(QResizeEvent* e);
-	void paintEvent(QPaintEvent* e);
+	void resizeEvent(QResizeEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
 
 	void setScrollBarValues();
 	void memdataTransfered(StackRequest* r);

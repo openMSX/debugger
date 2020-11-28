@@ -12,19 +12,19 @@ class FlagsViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	FlagsViewer(QWidget* parent = 0);
+	FlagsViewer(QWidget* parent = nullptr);
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 public slots:
 	void setFlags(quint8 newFlags);
 
 private:
-	void resizeEvent(QResizeEvent* e);
-	void paintEvent(QPaintEvent* e);
+	void resizeEvent(QResizeEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
 
 	void drawValue(QPainter& p, int x, int y, const QString& str,
-	               const bool changed);
+	               bool changed);
 
 	int frameL, frameR, frameT, frameB;
 	unsigned char flags;

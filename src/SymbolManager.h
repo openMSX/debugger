@@ -10,10 +10,10 @@ class SymbolManager : public QDialog, private Ui::SymbolManager
 {
 	Q_OBJECT
 public:
-	SymbolManager(SymbolTable& symtable, QWidget* parent = 0);
+	SymbolManager(SymbolTable& symtable, QWidget* parent = nullptr);
 
 private:
-	void closeEvent(QCloseEvent* e);
+	void closeEvent(QCloseEvent* e) override;
 
 	void initFileList();
 	void initSymbolList();

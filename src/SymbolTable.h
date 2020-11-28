@@ -51,7 +51,7 @@ public:
 	SymbolType type() const;
 	void setType(SymbolType t);
 
-	bool isSlotValid(const MemoryLayout* ml = 0) const;
+	bool isSlotValid(const MemoryLayout* ml = nullptr) const;
 
 private:
 	SymbolTable* table;
@@ -85,7 +85,7 @@ public:
 	};
 
 	SymbolTable();
-	~SymbolTable();
+	~SymbolTable() override;
 
 	void add(Symbol* symbol);
 	void removeAt(int index);
@@ -98,14 +98,14 @@ public:
 	void loadSymbols(QXmlStreamReader& xml);
 
 	/* Symbol access functions */
-	Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = 0);
+	Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = nullptr);
 	Symbol* getCurrentAddressSymbol();
-	Symbol* findNextAddressSymbol(MemoryLayout* ml = 0);
-	Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = 0);
-	Symbol* getAddressSymbol(int val, MemoryLayout* ml = 0);
+	Symbol* findNextAddressSymbol(MemoryLayout* ml = nullptr);
+	Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = nullptr);
+	Symbol* getAddressSymbol(int val, MemoryLayout* ml = nullptr);
 	Symbol* getAddressSymbol(const QString& label, bool case_sensitive = false);
 
-	QStringList labelList(bool include_vars = false, const MemoryLayout* ml = 0) const;
+	QStringList labelList(bool include_vars = false, const MemoryLayout* ml = nullptr) const;
 
 	void symbolTypeChanged(Symbol* symbol);
 	void symbolValueChanged(Symbol* symbol);

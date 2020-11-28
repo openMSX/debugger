@@ -23,13 +23,13 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		copyData(message);
 		viewer.hexdataTransfered(this);
 	}
 
-	virtual void cancel()
+	void cancel() override
 	{
 		viewer.transferCancelled(this);
 	}
@@ -47,7 +47,7 @@ HexViewer::HexViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy(QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding));
+	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	horBytes = 16;
 	hexTopAddress = 0;
@@ -108,13 +108,13 @@ void HexViewer::createActions()
 	setWith32Action = new QAction(tr("&32 bytes."), this);
 	setWith32Action->setShortcut(tr("Ctrl+3"));
 	setWith32Action->setStatusTip(tr("Set width to 32 bytes."));
-	
+
 	connect(fillWidthAction,  SIGNAL(triggered()), this, SLOT(changeWidth()));
 	connect(fillWidth2Action, SIGNAL(triggered()), this, SLOT(changeWidth()));
 	connect(setWith8Action,   SIGNAL(triggered()), this, SLOT(changeWidth()));
 	connect(setWith16Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
 	connect(setWith32Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
-	
+
 	addAction(fillWidthAction);
 	addAction(fillWidth2Action);
 	addAction(setWith8Action);
@@ -144,7 +144,7 @@ void HexViewer::setUseMarker(bool enabled)
 	// below we should check if current marker is visible etc
 	// but since in the debugger we will set this at instanciation
 	// and then never change it again this is a quicky in case we do later on
-	if (useMarker){
+	if (useMarker) {
 		hexMarkAddress = hexTopAddress;
 	}
 	update();
@@ -199,7 +199,7 @@ void HexViewer::setSizes()
 		// calculate how many additional bytes can by displayed
 		while (w-sbw >= dataWidth + charWidth) {
 			++horBytes;
-			if( horBytes == 2*hb2 ) hb2 = horBytes;
+			if (horBytes == 2 * hb2) hb2 = horBytes;
 			w -= dataWidth + charWidth;
 			if ((horBytes & 3) == 0) w -= EXTRA_SPACING;
 			if ((horBytes & 7) == 0) w -= EXTRA_SPACING;
@@ -244,8 +244,8 @@ void HexViewer::setSizes()
 
 QSize HexViewer::sizeHint() const
 {
-	return QSize(frameL + 16 + (6 + 3 * horBytes / 2) * fontMetrics().horizontalAdvance("A") + frameR,
-	             frameT + 10 * fontMetrics().height() + frameB );
+	return {frameL + 16 + (6 + 3 * horBytes / 2) * fontMetrics().horizontalAdvance("A") + frameR,
+	        frameT + 10 * fontMetrics().height() + frameB};
 }
 
 void HexViewer::resizeEvent(QResizeEvent* e)
@@ -332,7 +332,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 							penClr = Qt::red;
 						}
 					}
-					if (((address + j) == hexMarkAddress ) &&
+					if (((address + j) == hexMarkAddress) &&
 					    beingEdited && (cursorPosition == 0)) {
 						penClr = Qt::white;
 					}
@@ -376,7 +376,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 				if (hexData[address + j] != previousHexData[address + j]) {
 					penClr = Qt::red;
 				}
-				if (((address + j) == hexMarkAddress ) && beingEdited &&
+				if (((address + j) == hexMarkAddress) && beingEdited &&
 				    (cursorPosition == 0)) {
 					penClr = Qt::white;
 				}
@@ -498,7 +498,7 @@ void HexViewer::refresh()
 	size = std::min(size, debuggableSize - hexTopAddress);
 
 	// send data request
-	HexRequest* req = new HexRequest(
+	auto* req = new HexRequest(
 		debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
@@ -525,7 +525,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		if (beingEdited) {
 			editValue = (editValue << 4) + v;
 			++cursorPosition;
-			if (cursorPosition == 2){
+			if (cursorPosition == 2) {
 				setValue = true;
 				++newAddress;
 			}
@@ -594,7 +594,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		update();
 		return;
 	} else if (editedChars) {
-		editValue = (e->text().toLatin1())[0];
+		editValue = static_cast<unsigned char>((e->text().toLatin1())[0]);
 		setValue = true;
 		++newAddress;
 	} else {
@@ -607,7 +607,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		//TODO actually write the values to openMSX memory
 		//for now we change the value in our local buffer
 		previousHexData[hexMarkAddress] = char(editValue);
-		WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
+		auto* req = new WriteDebugBlockCommand(
 			debuggableName, hexMarkAddress, 1, previousHexData);
 		CommClient::instance().sendCommand(req);
 
@@ -676,7 +676,7 @@ bool HexViewer::event(QEvent* e)
 	}
 
 	// calculate address for tooltip
-	QHelpEvent* helpEvent = static_cast<QHelpEvent*>(e);
+	auto* helpEvent = static_cast<QHelpEvent*>(e);
 	int offset = coorToOffset(helpEvent->x(), helpEvent->y());
 	if (offset >= 0 && (hexTopAddress + offset) < debuggableSize) {
 		// create text with binary and decimal values
@@ -693,7 +693,7 @@ bool HexViewer::event(QEvent* e)
 
 		// print 16 bit values if possible
 		if ((address + 1) < debuggableSize) {
-			unsigned int wd = chr;
+			unsigned wd = chr;
 			wd += 256 * hexData[address + 1];
 			text += QString("\n\nWord: %1").arg(wd, 4, 16, QChar('0'));
 			text += "\nBinary: ";
@@ -731,7 +731,7 @@ void HexViewer::mousePressEvent(QMouseEvent* e)
 	}
 }
 
-void HexViewer::focusInEvent(QFocusEvent* e)
+void HexViewer::focusInEvent(QFocusEvent* /*e*/)
 {
 	hasFocus = true;
 	update();

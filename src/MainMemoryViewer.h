@@ -13,7 +13,7 @@ class MainMemoryViewer : public QWidget
 {
 	Q_OBJECT
 public:
-	MainMemoryViewer(QWidget* parent = 0);
+	MainMemoryViewer(QWidget* parent = nullptr);
 
 	void setDebuggable(const QString& name, int size);
 	void setRegsView(CPURegsViewer* viewer);
@@ -34,7 +34,6 @@ private:
 	QComboBox* addressSourceList;
 	QLineEdit* addressValue;
 
-	static const int linkRegisters[];
 	CPURegsViewer* regsViewer;
 	SymbolTable* symTable;
 	int linkedId;

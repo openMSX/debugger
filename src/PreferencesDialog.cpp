@@ -51,7 +51,7 @@ void PreferencesDialog::fontSelectionChange(int row)
 	rbUseFixedFont->setEnabled(row > 1);
 	rbUseCustomFont->setEnabled(row >= 0);
 
-	switch (Settings::get().fontType( (Settings::DebuggerFont)row)) {
+	switch (Settings::get().fontType((Settings::DebuggerFont)row)) {
 	case Settings::APPLICATION_DEFAULT:
 		rbUseAppFont->setChecked(true);
 		break;
@@ -74,7 +74,7 @@ void PreferencesDialog::fontTypeChanged(bool state)
 {
 	if (!state || updating) return;
 
-	Settings::DebuggerFont f = (Settings::DebuggerFont)(listFonts->currentRow());
+	auto f = (Settings::DebuggerFont)(listFonts->currentRow());
 	Settings& s = Settings::get();
 
 	if (rbUseAppFont->isChecked()) {
@@ -91,7 +91,7 @@ void PreferencesDialog::fontTypeChanged(bool state)
 void PreferencesDialog::fontSelectCustom()
 {
 	bool ok;
-	Settings::DebuggerFont f = (Settings::DebuggerFont)(listFonts->currentRow());
+	auto f = (Settings::DebuggerFont)(listFonts->currentRow());
 	QFont newFont = QFontDialog::getFont(&ok, Settings::get().font(f));
 	if (ok) {
 		lblPreview->setFont(newFont);
@@ -101,7 +101,7 @@ void PreferencesDialog::fontSelectCustom()
 
 void PreferencesDialog::fontSelectColor()
 {
-	Settings::DebuggerFont f = (Settings::DebuggerFont)(listFonts->currentRow());
+	auto f = (Settings::DebuggerFont)(listFonts->currentRow());
 	QColor newColor = QColorDialog::getColor(Settings::get().fontColor(f), this);
 	if (newColor.isValid()) {
 		Settings::get().setFontColor(f, newColor);

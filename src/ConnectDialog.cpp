@@ -169,7 +169,7 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 #else
 		QDir::System; // sockets for *nix
 #endif
-	foreach (QString name, dir.entryList(filters)) {
+	for (QString name : dir.entryList(filters)) {
 		if (OpenMSXConnection* connection = createConnection(dir, name)) {
 			servers.push_back(connection);
 		}
@@ -253,7 +253,7 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 
 	// if there is only one valid connection, use it immediately,
 	// otherwise execute the dialog.
-	if (dialog.pendingConnections.empty() && dialog.confirmedConnections.size() == 1 ) {
+	if (dialog.pendingConnections.empty() && dialog.confirmedConnections.size() == 1) {
 		dialog.on_connectButton_clicked();
 	} else {
 		dialog.exec();
@@ -308,7 +308,7 @@ void ConnectDialog::on_rescanButton_clicked()
 {
 	clear();
 	collectServers(pendingConnections);
-	foreach (OpenMSXConnection* connection, pendingConnections) {
+	for (OpenMSXConnection* connection : pendingConnections) {
 		connectionInfos.append(new ConnectionInfoRequest(*this, *connection));
 	}
 }

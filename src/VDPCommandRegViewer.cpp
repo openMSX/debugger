@@ -1,9 +1,6 @@
 #include "VDPCommandRegViewer.h"
 #include "CommClient.h"
 
-static const int VIEW_HEX = 1;
-static const int VIEW_SEPERATE = 2;
-
 static QString hex8bit(int val)
 {
 	return QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper();
@@ -59,8 +56,7 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 
 	//Connect the checkboxes
 	QList<QCheckBox*> list = this->findChildren<QCheckBox*>();
-	QCheckBox* item;
-	foreach(item, list) {
+	for (auto* item : list) {
 		connect(item, SIGNAL(stateChanged(int)),
 		        this, SLOT(R45BitChanged(int)));
 	}
@@ -87,9 +83,7 @@ void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 	//for now simply recheck all the checkBoxes and recreate R45
 	int val = lineEdit_r45->text().toInt(nullptr, 0);
 	int r45 = 0;
-	QList<QCheckBox*> list = findChildren<QCheckBox*>();
-	QCheckBox* item;
-	foreach(item, list) {
+	for (auto* item : findChildren<QCheckBox*>()) {
 	        int order = QString(item->objectName().right(1)).toInt();
 		if (val & (1 << order)) {
 			r45 = r45 | (1 << order);
@@ -181,7 +175,7 @@ void VDPCommandRegViewer::decodeR46(int val)
 	fontB.setBold(true);
 	//set the checkbox font in bold if command uses the corresponding bit
 	for (int b = 0; b < 7; ++b) {
-		QCheckBox* item = findChild<QCheckBox*>(QString("checkBoxBit_%1").arg(b));
+		auto* item = findChild<QCheckBox*>(QString("checkBoxBit_%1").arg(b));
 		item->setFont((argbold[cmd] & (1 << b)) ? fontB : fontN);
 	}
 	labelSX   ->setFont((regbold[cmd] & 0x01) ? fontB : fontN);
@@ -222,8 +216,7 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 	newregs[45] = lineEdit_r45->text().toInt(nullptr, 0);
 	newregs[46] = lineEdit_r46->text().toInt(nullptr, 0);
 
-	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
-		"{VDP regs}", 32, 15, newregs);
+	auto* req = new WriteDebugBlockCommand("{VDP regs}", 32, 15, newregs);
 	CommClient::instance().sendCommand(req);
 }
 
@@ -235,13 +228,11 @@ void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()
 			arg((val >> 0) & 15, 4, 2, QChar('0')));
 }
 
-void VDPCommandRegViewer::R45BitChanged(int state)
+void VDPCommandRegViewer::R45BitChanged(int /*state*/)
 {
 	//for now simply recheck all the checkBoxes and recreate R45
 	int r45 = 0;
-	QList<QCheckBox*> list = findChildren<QCheckBox*>();
-	QCheckBox* item;
-	foreach(item, list) {
+	for (auto* item : findChildren<QCheckBox*>()) {
 		if (item->isChecked()) {
 			int order = QString(item->objectName().right(1)).toInt();
 			r45 = r45 | (1 << order);

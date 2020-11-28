@@ -14,13 +14,13 @@ QString SimpleCommand::getCommand() const
 	return command;
 }
 
-void SimpleCommand::replyOk (const QString& message)
+void SimpleCommand::replyOk (const QString& /*message*/)
 {
 	emit replyStatusOk(true);
 	delete this;
 }
 
-void SimpleCommand::replyNok(const QString& message)
+void SimpleCommand::replyNok(const QString& /*message*/)
 {
 	emit replyStatusOk(false);
 	cancel();
@@ -54,7 +54,7 @@ ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& debuggable,
 }
 
 static QString createDebugWriteCommand(const QString& debuggable,
-		unsigned offset, unsigned size, unsigned char *data )
+		unsigned offset, unsigned size, unsigned char *data)
 {
 	QString cmd = QString("debug write_block %1 %2 [ debug_hex2bin \"")
 	                  .arg(debuggable).arg(offset);
@@ -163,7 +163,7 @@ void OpenMSXConnection::socketError(QAbstractSocket::SocketError /*state*/)
 
 void OpenMSXConnection::processData()
 {
-	if (input.get()) {
+	if (input) {
 		// continue
 		input->setData(socket->readAll());
 		reader->parseContinue();

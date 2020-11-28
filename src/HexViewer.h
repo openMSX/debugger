@@ -11,8 +11,8 @@ class HexViewer : public QFrame
 {
 	Q_OBJECT
 public:
-	HexViewer(QWidget* parent = 0);
-	~HexViewer();
+	HexViewer(QWidget* parent = nullptr);
+	~HexViewer() override;
 
 	enum Mode { FIXED, FILL_WIDTH, FILL_WIDTH_POWEROF2 };
 
@@ -24,7 +24,7 @@ public:
 	void setDisplayMode(Mode mode);
 	void setDisplayWidth(short width);
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 public slots:
 	void setLocation(int addr);
@@ -34,14 +34,14 @@ public slots:
 	void refresh();
 
 private:
-	void wheelEvent(QWheelEvent* e);
-	void resizeEvent(QResizeEvent* e);
-	void paintEvent(QPaintEvent* e);
-	void mousePressEvent(QMouseEvent* e);
-	bool event(QEvent* e);
-	void keyPressEvent(QKeyEvent* e);
-	void focusInEvent(QFocusEvent* e);
-	void focusOutEvent(QFocusEvent* e);
+	void wheelEvent(QWheelEvent* e) override;
+	void resizeEvent(QResizeEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	bool event(QEvent* e) override;
+	void keyPressEvent(QKeyEvent* e) override;
+	void focusInEvent(QFocusEvent* e) override;
+	void focusOutEvent(QFocusEvent* e) override;
 
 	void createActions();
 
@@ -51,11 +51,11 @@ private:
 	int coorToOffset(int x, int y);
 
 	QScrollBar* vertScrollBar;
-	QAction *fillWidthAction;
-	QAction *fillWidth2Action;
-	QAction *setWith8Action;
-	QAction *setWith16Action; 
-	QAction *setWith32Action;
+	QAction* fillWidthAction;
+	QAction* fillWidth2Action;
+	QAction* setWith8Action;
+	QAction* setWith16Action;
+	QAction* setWith32Action;
 
 	// layout
 	int frameL, frameR, frameT, frameB;

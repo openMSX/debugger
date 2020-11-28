@@ -5,14 +5,14 @@
 
 
 GotoDialog::GotoDialog(const MemoryLayout& ml, DebugSession *session, QWidget* parent)
-	: QDialog(parent), memLayout(ml), currentSymbol(0)
+	: QDialog(parent), memLayout(ml), currentSymbol(nullptr)
 {
 	setupUi(this);
 
 	debugSession = session;
-	if( session ) {
+	if (session) {
 		// create address completer
-		QCompleter *completer = new QCompleter(session->symbolTable().labelList(true, &ml), this);
+		auto* completer = new QCompleter(session->symbolTable().labelList(true, &ml), this);
 		completer->setCaseSensitivity(Qt::CaseInsensitive);
 		edtAddress->setCompleter(completer);
 		connect(completer,  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
@@ -23,10 +23,8 @@ GotoDialog::GotoDialog(const MemoryLayout& ml, DebugSession *session, QWidget* p
 
 int GotoDialog::address()
 {
-	if(currentSymbol)
-		return currentSymbol->value();
-	else
-		return stringToValue(edtAddress->text());
+	return currentSymbol ? currentSymbol->value()
+	                     : stringToValue(edtAddress->text());
 }
 
 void GotoDialog::addressChanged(const QString& text)
@@ -43,4 +41,3 @@ void GotoDialog::addressChanged(const QString& text)
 	pal.setColor(QPalette::Text, addr==-1 ? Qt::red : Qt::black);
 	edtAddress->setPalette(pal);
 }
-

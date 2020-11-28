@@ -18,13 +18,13 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		copyData(message);
 		viewer.memdataTransfered(this);
 	}
 
-	virtual void cancel()
+	void cancel() override
 	{
 		viewer.transferCancelled(this);
 	}
@@ -65,8 +65,8 @@ StackViewer::StackViewer(QWidget* parent)
 
 QSize StackViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF ") + 4 + frameR,
-	             frameT + 8 * fontMetrics().height() + frameB);
+	return {frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF ") + 4 + frameR,
+	        frameT + 8 * fontMetrics().height() + frameB};
 }
 
 void StackViewer::setScrollBarValues()
@@ -146,8 +146,7 @@ void StackViewer::setData(unsigned char* memPtr, int memLength)
 void StackViewer::setLocation(int addr)
 {
 	if (waitingForData) {
-		// ignore
-		return;
+		return; // ignore
 	}
 	int start = (addr & ~1) | (stackPointer & 1);
 	int size = 2 * int(ceil(visibleLines));
@@ -155,8 +154,7 @@ void StackViewer::setLocation(int addr)
 	if (start + size >= memoryLength) {
 		size = memoryLength - start;
 	}
-	StackRequest* req = new StackRequest(start, size,
-	                                     &memory[start], *this);
+	auto* req = new StackRequest(start, size, &memory[start], *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
 }

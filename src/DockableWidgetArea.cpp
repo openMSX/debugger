@@ -12,7 +12,7 @@ DockableWidgetArea::DockableWidgetArea(QWidget* parent)
 void DockableWidgetArea::removeWidget(DockableWidget* widget)
 {
 	layout->removeWidget(widget);
-	widget->setParent(0);
+	widget->setParent(nullptr);
 }
 
 void DockableWidgetArea::addWidget(DockableWidget* widget, const QRect& rect)

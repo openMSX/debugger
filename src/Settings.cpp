@@ -22,10 +22,6 @@ Settings::Settings()
 	getFontsFromSettings();
 }
 
-Settings::~Settings()
-{
-}
-
 Settings& Settings::get()
 {
 	static Settings instance;

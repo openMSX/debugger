@@ -13,7 +13,7 @@ class QXmlSimpleReader;
 class Command
 {
 public:
-	virtual ~Command() {}
+	virtual ~Command() = default;
 
 	virtual QString getCommand() const = 0;
 	virtual void replyOk (const QString& message) = 0;
@@ -26,11 +26,11 @@ class SimpleCommand : public QObject, public Command
 	Q_OBJECT
 public:
 	SimpleCommand(const QString& command);
-	virtual QString getCommand() const;
-	virtual void replyOk (const QString& message);
-	virtual void replyNok(const QString& message);
-	virtual void cancel();
-	
+	QString getCommand() const override;
+	void replyOk (const QString& message) override;
+	void replyNok(const QString& message) override;
+	void cancel() override;
+
 signals:
 	void replyStatusOk(bool status);
 
@@ -65,7 +65,7 @@ class OpenMSXConnection : public QObject, private QXmlDefaultHandler
 public:
 	/** require: socket must be in connected state */
 	OpenMSXConnection(QAbstractSocket* socket);
-	~OpenMSXConnection();
+	~OpenMSXConnection() override;
 
 	void sendCommand(Command* command);
 
@@ -84,12 +84,12 @@ private:
 	void cancelPending();
 
 	// QXmlDefaultHandler
-	bool fatalError(const QXmlParseException& exception);
+	bool fatalError(const QXmlParseException& exception) override;
 	bool startElement(const QString& namespaceURI, const QString& localName,
-	                  const QString& qName, const QXmlAttributes& atts);
+	                  const QString& qName, const QXmlAttributes& atts) override;
 	bool endElement(const QString& namespaceURI, const QString& localName,
-	                const QString& qName);
-	bool characters(const QString& ch);
+	                const QString& qName) override;
+	bool characters(const QString& ch) override;
 
 	//std::unique_ptr<QAbstractSocket> socket;
 	QAbstractSocket* socket;

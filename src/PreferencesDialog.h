@@ -8,7 +8,7 @@ class PreferencesDialog : public QDialog, private Ui::PreferencesDialog
 {
 	Q_OBJECT
 public:
-	PreferencesDialog(QWidget* parent = 0);
+	PreferencesDialog(QWidget* parent = nullptr);
 
 private:
 	void initFontList();

@@ -28,7 +28,7 @@ public:
 
 private:
 	Settings();
-	~Settings();
+	~Settings() override = default;
 
 	QFont fonts[FONT_END];
 	DebuggerFontType fontTypes[FONT_END];

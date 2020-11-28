@@ -15,7 +15,7 @@ class DisasmViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	DisasmViewer(QWidget* parent = 0);
+	DisasmViewer(QWidget* parent = nullptr);
 
 	void setMemory(unsigned char* memPtr);
 	void setBreakpoints(Breakpoints* bps);
@@ -26,7 +26,7 @@ public:
 	quint16 programCounter() const;
 	quint16 cursorAddress() const;
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
 
@@ -40,11 +40,11 @@ public slots:
 	void symbolsChanged();
 
 private:
-	void resizeEvent(QResizeEvent* e);
-	void paintEvent(QPaintEvent* e);
-	void keyPressEvent(QKeyEvent* e);
-	void mousePressEvent(QMouseEvent* e);
-	void wheelEvent(QWheelEvent* e);
+	void resizeEvent(QResizeEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
+	void keyPressEvent(QKeyEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	void wheelEvent(QWheelEvent* e) override;
 
 	QScrollBar* scrollBar;
 

@@ -60,10 +60,10 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	connect(refreshButton, SIGNAL(clicked(bool)),
 	        &VDPDataStore::instance(), SLOT(refresh()));
 
-	connect(imageWidget, SIGNAL(imagePosition(int,int,int,unsigned int,int)),
-	        this, SLOT(imagePositionUpdate(int,int,int,unsigned int,int)));
-	connect(imageWidget, SIGNAL(imageClicked (int,int,int,unsigned int,int)),
-	        this, SLOT(imagePositionUpdate(int,int,int,unsigned int,int)));
+	connect(imageWidget, SIGNAL(imagePosition(int,int,int,unsigned,int)),
+	        this, SLOT(imagePositionUpdate(int,int,int,unsigned,int)));
+	connect(imageWidget, SIGNAL(imageClicked (int,int,int,unsigned,int)),
+	        this, SLOT(imagePositionUpdate(int,int,int,unsigned,int)));
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -188,7 +188,7 @@ void BitMapViewer::on_showPage_currentIndexChanged(int index)
 	if (index == -1) return;
 
 	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
-	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged( int %i);\n", index);
+	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged(int %i);\n", index);
 	if (screenMod >= 7) index *= 2;
 	int vramAddress = m1[index];
 	printf("vramAddress %i\n", vramAddress);
@@ -224,7 +224,7 @@ void BitMapViewer::on_zoomLevel_valueChanged(double d)
 	imageWidget->setZoom(float(d));
 }
 
-void BitMapViewer::on_saveImageButton_clicked(bool checked)
+void BitMapViewer::on_saveImageButton_clicked(bool /*checked*/)
 {
 	QMessageBox::information(
 		this,
@@ -232,7 +232,7 @@ void BitMapViewer::on_saveImageButton_clicked(bool checked)
 		"Sorry, the save image dialog is not yet implemented");
 }
 
-void BitMapViewer::on_editPaletteButton_clicked(bool checked)
+void BitMapViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
 	useVDPPalette->setChecked(false);
 	QMessageBox::information(

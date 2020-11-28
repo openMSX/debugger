@@ -15,8 +15,8 @@ class DockableWidget : public QWidget
 {
 	Q_OBJECT;
 public:
-	DockableWidget(DockManager& manager, QWidget* parent = 0);
-	~DockableWidget();
+	DockableWidget(DockManager& manager, QWidget* parent = nullptr);
+	~DockableWidget() override;
 
 	QWidget* widget() const;
 	void setWidget(QWidget* widget);
@@ -36,10 +36,10 @@ public:
 	void setDestroyable(bool enable);
 
 private:
-	virtual void mousePressEvent(QMouseEvent* event);
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	virtual void closeEvent(QCloseEvent* event);
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
+	void closeEvent(QCloseEvent* event) override;
 
 	DockManager& dockManager;
 	QString widgetId;

@@ -194,7 +194,7 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
-	
+
 	connect(&session.symbolTable(), SIGNAL(symbolFileChanged()), this, SLOT(symbolFileChanged()));
 }
 
@@ -720,14 +720,15 @@ void DebuggerForm::updateRecentFiles()
 	// store settings
 	Settings::get().setValue("MainWindow/RecentFiles", recentFiles);
 	// update actions
-	for(int i = 0; i < MaxRecentFiles; i++)
-		if(i < recentFiles.size()) {
+	for (int i = 0; i < MaxRecentFiles; i++)
+		if (i < recentFiles.size()) {
 			recentFileActions[i]->setVisible(true);
 			QString text = QString("&%1 %2").arg(i + 1).arg(QFileInfo(recentFiles[i]).fileName());
 			recentFileActions[i]->setText(text);
-         recentFileActions[i]->setData(recentFiles[i]);
-		} else
+        		recentFileActions[i]->setData(recentFiles[i]);
+		} else {
 			recentFileActions[i]->setVisible(false);
+		}
 	// show separator only when recent files exist
 	recentFileSeparator->setVisible(!recentFiles.empty());
 }
@@ -843,7 +844,7 @@ void DebuggerForm::initConnection()
 		"  append result [debug list_conditions]\n"
 		"  return $result\n"
 		"}\n"));
-		
+
 }
 
 void DebuggerForm::connectionClosed()
@@ -998,10 +999,11 @@ void DebuggerForm::openSession(const QString& file)
 		comm.sendCommand(new ListBreakPointsHandler(*this, true));
 	}
 	// update recent
-	if(session.existsAsFile())
+	if (session.existsAsFile()) {
 		addRecentFile(file);
-	else
-		removeRecentFile(file);			
+	} else {
+		removeRecentFile(file);
+	}
 
 	updateWindowTitle();
 }
@@ -1027,8 +1029,9 @@ void DebuggerForm::fileSaveSessionAs()
 	if (d.exec()) {
 		session.saveAs(d.selectedFiles().at(0));
 		// update recent
-		if(session.existsAsFile())
+		if (session.existsAsFile()) {
 			addRecentFile(session.filename());
+		}
 	}
 	updateWindowTitle();
 }
@@ -1091,7 +1094,7 @@ void DebuggerForm::searchGoto()
 	GotoDialog gtd(memLayout, &session, this);
 	if (gtd.exec()) {
 		int addr = gtd.address();
-		if ( addr >= 0) {
+		if (addr >= 0) {
 			disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
 		}
 	}
@@ -1181,7 +1184,7 @@ void DebuggerForm::breakpointAdd()
 		if (bpd.address() >= 0) {
 			QString cmd = Breakpoints::createSetCommand(
 				bpd.type(), bpd.address(), bpd.slot(), bpd.subslot(), bpd.segment(),
-				bpd.addressEndRange(), bpd.condition() );
+				bpd.addressEndRange(), bpd.condition());
 			comm.sendCommand(new SimpleCommand(cmd));
 			comm.sendCommand(new ListBreakPointsHandler(*this));
 		}
@@ -1216,7 +1219,7 @@ void DebuggerForm::toggleSlotsDisplay()
 
 void DebuggerForm::toggleBitMappedDisplay()
 {
-	//toggleView( qobject_cast<DockableWidget*>(slotView->parentWidget()));
+	//toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
 	// not sure if this a good idea for a docable widget
 
 	// create new debuggable viewer window
@@ -1230,18 +1233,18 @@ void DebuggerForm::toggleBitMappedDisplay()
 	dw->setMovable(true);
 	dw->setClosable(true);
 	/*
-	connect( dw, SIGNAL( visibilityChanged(DockableWidget*) ),
-	         this, SLOT( dockWidgetVisibilityChanged(DockableWidget*) ) );
-	connect( this, SIGNAL( debuggablesChanged(const QMap<QString,int>&) ),
-	         viewer, SLOT( setDebuggables(const QMap<QString,int>&) ) );
+	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
+	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
+	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
 	*/
 
 	// TODO: refresh should be being hanled by VDPDataStore...
 	connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
 
 	/*
-	viewer->setDebuggables( debuggables );
-	viewer->setEnabled( disasmView->isEnabled() );
+	viewer->setDebuggables(debuggables);
+	viewer->setEnabled(disasmView->isEnabled());
 	*/
 }
 
@@ -1428,7 +1431,7 @@ void DebuggerForm::setDebuggableSize(const QString& debuggable, int size)
 void DebuggerForm::symbolFileChanged()
 {
 	static bool shown(false);
-	if(shown) return;
+	if (shown) return;
 	shown = true;
 	int choice = QMessageBox::question(this, tr("Symbol file changed"),
 	                tr("One or more symbol file have changed.\n"

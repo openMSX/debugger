@@ -40,10 +40,6 @@ void SimpleHexRequest::cancel()
 
 // class SimpleHexRequestUser
 
-SimpleHexRequestUser::~SimpleHexRequestUser()
-{
-}
-
 void SimpleHexRequestUser::DataHexRequestReceived()
 {
 }

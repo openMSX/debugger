@@ -16,7 +16,7 @@
 class SimpleHexRequestUser
 {
 protected:
-	virtual ~SimpleHexRequestUser();
+	virtual ~SimpleHexRequestUser() = default;
 	virtual void DataHexRequestReceived();
 	virtual void DataHexRequestCanceled();
 	friend class SimpleHexRequest;
@@ -30,8 +30,8 @@ public:
 	SimpleHexRequest(const QString& debuggable, unsigned offset, unsigned size,
 	           unsigned char* target, SimpleHexRequestUser& user);
 
-	virtual void replyOk(const QString& message);
-	virtual void cancel();
+	void replyOk(const QString& message) override;
+	void cancel() override;
 
 	unsigned offset;
 

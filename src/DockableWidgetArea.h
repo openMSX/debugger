@@ -11,10 +11,10 @@ class DockableWidgetArea : public QWidget
 {
 	Q_OBJECT;
 public:
-	DockableWidgetArea(QWidget* parent = 0);
+	DockableWidgetArea(QWidget* parent = nullptr);
 
 private:
-	void paintEvent(QPaintEvent* e);
+	void paintEvent(QPaintEvent* e) override;
 
 	void removeWidget(DockableWidget* widget);
 	void addWidget(DockableWidget* widget, const QRect& rect);

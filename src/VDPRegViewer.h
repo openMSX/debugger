@@ -32,8 +32,8 @@ class VDPRegViewer : public QDialog, public SimpleHexRequestUser,
 {
 	Q_OBJECT
 public:
-	VDPRegViewer(QWidget* parent = 0);
-	~VDPRegViewer();
+	VDPRegViewer(QWidget* parent = nullptr);
+	~VDPRegViewer() override;
 
 private:
 	void decodeVDPRegs();
@@ -44,11 +44,11 @@ private:
 
 	void doConnect(InteractiveButton* lab, buttonHighlightDispatcher* dis);
 	buttonHighlightDispatcher* makeGroup(
-		QList<InteractiveButton*>, InteractiveLabel*);
+		const QList<InteractiveButton*>&, InteractiveLabel*);
 	void reGroup(InteractiveButton*, buttonHighlightDispatcher*);
 	void monoGroup(InteractiveButton*, InteractiveLabel*);
 
-        virtual void DataHexRequestReceived();
+        void DataHexRequestReceived() override;
 
 	unsigned char* regs;
 	buttonHighlightDispatcher* modeBitsDispat;

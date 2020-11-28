@@ -26,13 +26,13 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		copyData(message);
 		viewer.memoryUpdated(this);
 	}
 
-	virtual void cancel()
+	void cancel() override
 	{
 		viewer.updateCancelled(this);
 	}
@@ -56,7 +56,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy(QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred));
+	setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
 	breakMarker = QPixmap(":/icons/breakpoint.png");
 	watchMarker = QPixmap(":/icons/watchpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
@@ -86,7 +86,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 
 QSize DisasmViewer::sizeHint() const
 {
-	return QSize(xMnemArg + xMCode[0], 20 * codeFontHeight);
+	return {xMnemArg + xMCode[0], 20 * codeFontHeight};
 }
 
 void DisasmViewer::resizeEvent(QResizeEvent* e)
@@ -139,7 +139,7 @@ void DisasmViewer::symbolsChanged()
 	int disasmStart = disasmLines.front().addr;
 	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
 
-	CommMemoryRequest* req = new CommMemoryRequest(
+	auto* req = new CommMemoryRequest(
 		disasmStart, disasmEnd - disasmStart, &memory[disasmStart], *this);
 	req->address = disasmLines[disasmTopLine].addr;
 	req->line = disasmLines[disasmTopLine].infoLine;
@@ -369,7 +369,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	disasmStart = std::max(disasmStart, 0);
 	disasmEnd   = std::min(disasmEnd,   0xFFFF);
 
-	CommMemoryRequest* req = new CommMemoryRequest(
+	auto* req = new CommMemoryRequest(
 		disasmStart, disasmEnd - disasmStart + 1, &memory[disasmStart], *this);
 	req->address = addr;
 	req->line = infoLine;
@@ -456,12 +456,14 @@ void DisasmViewer::setProgramCounter(quint16 pc)
 int DisasmViewer::findDisasmLine(quint16 lineAddr, int infoLine)
 {
 	int line = disasmLines.size() - 1;
-	while( line >= 0 ) {
-		if( lineAddr >= disasmLines[line].addr ) {
-			if( infoLine == 0 ) 
+	while (line >= 0) {
+		if (lineAddr >= disasmLines[line].addr) {
+			if (infoLine == 0) {
 				return line;
-			if (infoLine == LAST_INFO_LINE) 
-				return line-1;
+			}
+			if (infoLine == LAST_INFO_LINE) {
+				return line - 1;
+			}
 			while (disasmLines[line].infoLine != infoLine && disasmLines[line].addr == lineAddr) {
 				line--;
 				if (line < 0) return -1;
@@ -573,9 +575,9 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	}
 	case Qt::Key_PageUp: {
 		int line = findDisasmLine(cursorAddr, cursorLine);
-		if( line >= disasmTopLine && line < disasmTopLine+visibleLines ) {
+		if (line >= disasmTopLine && line < disasmTopLine+visibleLines) {
 			line -= visibleLines;
-			if(line >= 0) {
+			if (line >= 0) {
 				cursorAddr = disasmLines[line].addr;
 				cursorLine = disasmLines[line].infoLine;
 				setAddress(disasmLines[disasmTopLine - 1].addr,
@@ -593,9 +595,9 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	}
 	case Qt::Key_PageDown: {
 		int line = findDisasmLine(cursorAddr, cursorLine);
-		if( line >= disasmTopLine && line < disasmTopLine+visibleLines ) {
+		if (line >= disasmTopLine && line < disasmTopLine+visibleLines) {
 			line += visibleLines;
-			if( line < int(disasmLines.size()) ) {
+			if (line < int(disasmLines.size())) {
 				cursorAddr = disasmLines[line].addr;
 				cursorLine = disasmLines[line].infoLine;
 				line = disasmTopLine + visibleLines + partialBottomLine - 1;
@@ -636,7 +638,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 				naddr = memory[row.addr + 1] + memory[row.addr + 2] * 256;
 			else if (std::regex_match(instr, re_relative))
 				naddr = (row.addr + 2 + (signed char)memory[row.addr + 1]) & 0xFFFF;
-			if(naddr != INT_MAX) {
+			if (naddr != INT_MAX) {
 				jumpStack.push_back(cursorAddr);
 				setCursorAddress(naddr, 0, Middle);
 			}
@@ -646,7 +648,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	}
 	case Qt::Key_Left:
 	case Qt::Key_Backspace: {
-		if(!jumpStack.empty()){
+		if (!jumpStack.empty()) {
 			int addr = jumpStack.takeLast();
 			setCursorAddress(addr, 0, Middle);
 		}

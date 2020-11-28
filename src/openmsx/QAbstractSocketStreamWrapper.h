@@ -17,8 +17,8 @@ private:
 public:
 	QAbstractSocketStreamWrapper(QAbstractSocket* userSock);
 
-	unsigned int Read(void* buffer, unsigned int cb);
-	unsigned int Write(void* buffer, unsigned int cb);
+	unsigned Read (void* buffer, unsigned cb);
+	unsigned Write(void* buffer, unsigned cb);
 };
 
 } // namespace openmsx

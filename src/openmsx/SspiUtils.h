@@ -43,7 +43,7 @@ protected:
 	CtxtHandle hContext;
 
 	StreamWrapper& stream;
-	const unsigned int cbMaxTokenSize;
+	const unsigned cbMaxTokenSize;
 
 	SspiPackageBase(StreamWrapper& stream, const SEC_WCHAR* securityPackage);
 	~SspiPackageBase();
@@ -55,7 +55,7 @@ const DWORD ACCESS_WRITE = 0x2;
 const DWORD ACCESS_EXECUTE = 0x4;
 const DWORD ACCESS_ALL = ACCESS_READ | ACCESS_WRITE | ACCESS_EXECUTE;
 
-const GENERIC_MAPPING mapping = { 
+const GENERIC_MAPPING mapping = {
 	ACCESS_READ, ACCESS_WRITE, ACCESS_EXECUTE, ACCESS_ALL };
 
 void InitTokenContextBuffer(PSecBufferDesc pSecBufferDesc, PSecBuffer pSecBuffer);

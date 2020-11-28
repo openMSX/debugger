@@ -59,7 +59,7 @@ void DockableWidgetLayout::addItem(
 		info->useHintWidth = false;
 	}
 	if (info->widget->sizePolicy().verticalPolicy() != QSizePolicy::Fixed &&
-	    h > 0 ) {
+	    h > 0) {
 		info->height = h;
 		info->useHintHeight = false;
 	}

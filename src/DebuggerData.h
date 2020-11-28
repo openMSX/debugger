@@ -43,7 +43,7 @@ public:
 	int findBreakpoint(quint16 addr);
 	int findNextBreakpoint();
 
-	static QString createSetCommand(Type type, int address, 
+	static QString createSetCommand(Type type, int address,
 	                                char ps = -1, char ss = -1, int segment = -1,
 	                                int endRange = -1, QString condition = QString());
 	static QString createRemoveCommand(const QString& id);

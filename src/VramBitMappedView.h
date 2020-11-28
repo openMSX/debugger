@@ -12,7 +12,7 @@ class VramBitMappedView : public QWidget
 {
 	Q_OBJECT
 public:
-	VramBitMappedView(QWidget* parent = 0);
+	VramBitMappedView(QWidget* parent = nullptr);
 
 	void setZoom(float zoom);
 
@@ -23,8 +23,8 @@ public:
 	void setPaletteSource(const unsigned char* adr);
 	void setBorderColor(int value);
 
-	void mousePressEvent(QMouseEvent* e);
-	void mouseMoveEvent (QMouseEvent* e);
+	void mousePressEvent(QMouseEvent* e) override;
+	void mouseMoveEvent (QMouseEvent* e) override;
 
 public slots:
 	void refresh();
@@ -37,7 +37,7 @@ signals:
 	                   unsigned addr, int byte);
 
 private:
-	void paintEvent(QPaintEvent*);
+	void paintEvent(QPaintEvent* e) override;
 
 	void decode();
 	void decodePallet();
@@ -57,7 +57,7 @@ private:
 	const unsigned char* pallet;
 	const unsigned char* vramBase;
 	float zoomFactor;
-	unsigned int vramAddress;
+	unsigned vramAddress;
 	int lines;
 	int screenMode;
 	int borderColor;

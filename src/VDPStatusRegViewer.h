@@ -40,8 +40,8 @@ class VDPStatusRegViewer : public QDialog, public SimpleHexRequestUser,
 {
 	Q_OBJECT
 public:
-	VDPStatusRegViewer(QWidget* parent = 0);
-	~VDPStatusRegViewer();
+	VDPStatusRegViewer(QWidget* parent = nullptr);
+	~VDPStatusRegViewer() override;
 
 public slots:
 	void refresh();
@@ -52,7 +52,7 @@ private:
 	void doConnect(InteractiveLabel* lab, highlightDispatcher* dis);
 	void makeGroup(QList<InteractiveLabel*> list, InteractiveLabel* explained);
 
-	virtual void DataHexRequestReceived();
+	void DataHexRequestReceived() override;
 
 	unsigned char* statusregs;
 };

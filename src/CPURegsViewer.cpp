@@ -18,7 +18,7 @@ CPURegsViewer::CPURegsViewer(QWidget* parent)
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy(QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed));
+	setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
 	frameR = frameL = frameT = frameB = frameWidth();
 	cursorLoc = -1;
@@ -221,7 +221,7 @@ void CPURegsViewer::keyPressEvent(QKeyEvent* e)
 
 	int move = e->key();
 	if ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
-	    (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F) ) {
+	    (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F)) {
 		// calculate numercial value
 		int v = e->key() - Qt::Key_0;
 		if (v > 9) v -= Qt::Key_A - Qt::Key_0 - 10;
@@ -279,7 +279,7 @@ void CPURegsViewer::keyPressEvent(QKeyEvent* e)
 				cursorLoc = 4 * CpuRegs::REG_I + 2;
 			} else if (cursorLoc <  4 * CpuRegs::REG_R) {
 				cursorLoc = 4 * CpuRegs::REG_I + 3;
-			} else if( cursorLoc == 4 * CpuRegs::REG_R) {
+			} else if (cursorLoc == 4 * CpuRegs::REG_R) {
 				cursorLoc = 4 * CpuRegs::REG_R + 2;
 			} else {
 				cursorLoc = 4 * CpuRegs::REG_R + 3;

@@ -110,7 +110,7 @@ void SymbolManager::initFileList()
 {
 	treeFiles->clear();
 	for (int i = 0; i < symTable.symbolFilesSize(); ++i) {
-		QTreeWidgetItem* item = new QTreeWidgetItem(treeFiles);
+		auto* item = new QTreeWidgetItem(treeFiles);
 		item->setText(0, symTable.symbolFile(i));
 		item->setText(1, symTable.symbolFileRefresh(i).toString(Qt::LocaleDate));
 	}
@@ -119,7 +119,7 @@ void SymbolManager::initFileList()
 void SymbolManager::addFile()
 {
 	// create dialog
-	QFileDialog* d = new QFileDialog(this);
+	auto* d = new QFileDialog(this);
 	QStringList types;
 	types << "All supported files (*.sym *.map *.symbol *.publics *.sys)"
 	      << "tniASM 0.x symbol files (*.sym)"
@@ -194,7 +194,7 @@ void SymbolManager::reloadFiles()
 
 void SymbolManager::fileSelectionChange()
 {
-	btnRemoveFile->setEnabled(treeFiles->selectedItems().size());
+	btnRemoveFile->setEnabled(!treeFiles->selectedItems().empty());
 }
 
 void SymbolManager::labelEdit(QTreeWidgetItem* item, int column)
@@ -202,8 +202,8 @@ void SymbolManager::labelEdit(QTreeWidgetItem* item, int column)
 	// only symbol name and value are editable
 	if (column == 0 || column == 2) {
 		// open editor if manually added symbol
-		Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
-		if (sym->source() == 0) {
+		auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
+		if (!sym->source()) {
 			// first close possible existing editor
 			closeEditor();
 			// open new editor
@@ -223,9 +223,9 @@ void SymbolManager::initSymbolList()
 	treeLabels->clear();
 	beginTreeLabelsUpdate();
 	for (Symbol* sym = symTable.findFirstAddressSymbol(0);
-	     sym != 0;
+	     sym != nullptr;
 	     sym = symTable.findNextAddressSymbol()) {
-		QTreeWidgetItem* item = new QTreeWidgetItem(treeLabels);
+		auto* item = new QTreeWidgetItem(treeLabels);
 		// attach a pointer to the symbol object to the tree item
 		item->setData(0L, Qt::UserRole, quintptr(sym));
 		// update columns
@@ -262,11 +262,11 @@ void SymbolManager::closeEditor()
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
-	Symbol* sym = new Symbol(tr("New symbol"), 0);
+	auto* sym = new Symbol(tr("New symbol"), 0);
 	symTable.add(sym);
 
 	beginTreeLabelsUpdate();
-	QTreeWidgetItem* item = new QTreeWidgetItem(treeLabels);
+	auto* item = new QTreeWidgetItem(treeLabels);
 	item->setData(0, Qt::UserRole, quintptr(sym));
 	updateItemName(item);
 	updateItemType(item);
@@ -296,7 +296,7 @@ void SymbolManager::removeLabel()
 	bool deleted = false;
 	for (auto* sel : selection) {
 		// get symbol
-		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
+		Symbol* sym = reinterpret_cast<Symbol*>(sel->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
 		if (!sym->source()) {
 			// remove from table
@@ -314,7 +314,7 @@ void SymbolManager::removeLabel()
 void SymbolManager::labelChanged(QTreeWidgetItem* item, int column)
 {
 	if (!treeLabelsUpdateCount) {
-		Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+		auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 		// Set symbol text from tree item if any
 		QString symText = item->text(0).trimmed();
 		if (symText.isEmpty()) symText = "[unnamed]";
@@ -361,7 +361,7 @@ void SymbolManager::labelSelectionChanged()
 	int regMask, regMaskMultiple = 0;
 	for (auto selit = selection.begin(); selit != selection.end(); ++selit) {
 		// get symbol
-		Symbol* sym = (Symbol*)((*selit)->data(0, Qt::UserRole).value<quintptr>());
+		auto* sym = reinterpret_cast<Symbol*>((*selit)->data(0, Qt::UserRole).value<quintptr>());
 		// check if symbol is from symbol file
 		if (sym->source()) removeButActive = false;
 
@@ -392,27 +392,27 @@ void SymbolManager::labelSelectionChanged()
 	beginTreeLabelsUpdate();
 
 	// set slot selection
-	for (int i = 0; i < 16; ++i) {
-		chkSlots[i]->setTristate(false);
+	for (auto* chkSlot : chkSlots) {
+		chkSlot->setTristate(false);
 		if (slotMaskMultiple & 1) {
-			chkSlots[i]->setCheckState(Qt::PartiallyChecked);
+			chkSlot->setCheckState(Qt::PartiallyChecked);
 		} else if (slotMask & 1) {
-			chkSlots[i]->setCheckState(Qt::Checked);
+			chkSlot->setCheckState(Qt::Checked);
 		} else {
-			chkSlots[i]->setCheckState(Qt::Unchecked);
+			chkSlot->setCheckState(Qt::Unchecked);
 		}
 		slotMask >>= 1;
 		slotMaskMultiple >>= 1;
 	}
 	// set register selection
-	for (int i = 0; i < 18; ++i) {
-		chkRegs[i]->setTristate(false);
+	for (auto* chkReg : chkRegs) {
+		chkReg->setTristate(false);
 		if (regMaskMultiple & 1) {
-			chkRegs[i]->setCheckState(Qt::PartiallyChecked);
+			chkReg->setCheckState(Qt::PartiallyChecked);
 		} else if (regMask & 1) {
-			chkRegs[i]->setCheckState(Qt::Checked);
+			chkReg->setCheckState(Qt::Checked);
 		} else {
-			chkRegs[i]->setCheckState(Qt::Unchecked);
+			chkReg->setCheckState(Qt::Unchecked);
 		}
 		regMask >>= 1;
 		regMaskMultiple >>= 1;
@@ -448,7 +448,7 @@ void SymbolManager::changeSlot(int id, int state)
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
 	for (auto* sel : selection) {
-		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
+		auto* sym = reinterpret_cast<Symbol*>(sel->data(0, Qt::UserRole).value<quintptr>());
 		// set or clear bit
 		if (state == Qt::Checked) {
 			sym->setValidSlots(sym->validSlots() |  bit);
@@ -476,7 +476,7 @@ void SymbolManager::changeRegister(int id, int state)
 	beginTreeLabelsUpdate();
 	int bit = 1 << id;
 	for (auto* sel : selection) {
-		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
+		auto* sym = reinterpret_cast<Symbol*>(sel->data(0, Qt::UserRole).value<quintptr>());
 		// set or clear bit
 		if (state == Qt::Checked) {
 			sym->setValidRegisters(sym->validRegisters() |  bit);
@@ -509,7 +509,7 @@ void SymbolManager::changeType(bool /*checked*/)
 	// update items
 	beginTreeLabelsUpdate();
 	for (auto* sel : selection) {
-		Symbol* sym = (Symbol*)(sel->data(0, Qt::UserRole).value<quintptr>());
+		auto* sym = reinterpret_cast<Symbol*>(sel->data(0, Qt::UserRole).value<quintptr>());
 		sym->setType(newType);
 		updateItemType(sel);
 	}
@@ -525,7 +525,7 @@ void SymbolManager::changeType(bool /*checked*/)
 
 void SymbolManager::updateItemName(QTreeWidgetItem* item)
 {
-	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 	// set text and icon
 	item->setText(0, sym->text());
 	if (sym->source()) {
@@ -549,7 +549,7 @@ void SymbolManager::updateItemName(QTreeWidgetItem* item)
 
 void SymbolManager::updateItemType(QTreeWidgetItem* item)
 {
-	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 	// set symbol type in 2nd column
 	switch (sym->type()) {
 	case Symbol::JUMPLABEL:
@@ -566,7 +566,7 @@ void SymbolManager::updateItemType(QTreeWidgetItem* item)
 
 void SymbolManager::updateItemValue(QTreeWidgetItem* item)
 {
-	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 
 	// symbol value in 3rd column
 	// TODO: Custom prefix/postfix
@@ -575,7 +575,7 @@ void SymbolManager::updateItemValue(QTreeWidgetItem* item)
 
 void SymbolManager::updateItemSlots(QTreeWidgetItem* item)
 {
-	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 
 	QString slotText;
 	int slotmask = sym->validSlots();
@@ -620,7 +620,7 @@ void SymbolManager::updateItemSegments(QTreeWidgetItem* item)
 
 void SymbolManager::updateItemRegisters(QTreeWidgetItem* item)
 {
-	Symbol* sym = (Symbol*)(item->data(0, Qt::UserRole).value<quintptr>());
+	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 
 	QString regText;
 	int regmask = sym->validRegisters();
@@ -644,9 +644,9 @@ void SymbolManager::updateItemRegisters(QTreeWidgetItem* item)
 			"A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL",
 		        "IX", "IY", "IXL", "IXH", "IYL", "IYH", "Offset", "I"
 		};
-		for (int i = 0; i < 18; ++i) {
+		for (const char* reg : registers) {
 			if (regmask & 1) {
-				regText += QString("%1, ").arg(registers[i]);
+				regText += QString("%1, ").arg(reg);
 			}
 			regmask >>= 1;
 		}

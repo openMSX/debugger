@@ -76,10 +76,7 @@ int BreakpointDialog::segment()
 
 QString BreakpointDialog::condition()
 {
-	if( cbCondition->checkState() == Qt::Checked )
-		return txtCondition->toPlainText();
-	else
-		return QString();
+	return (cbCondition->checkState() == Qt::Checked) ? txtCondition->toPlainText() : "";
 }
 
 void BreakpointDialog::setData(Breakpoints::Type type, int address, int ps, int ss, int segment,
@@ -88,13 +85,13 @@ void BreakpointDialog::setData(Breakpoints::Type type, int address, int ps, int 
 	// set type
 	cmbxType->setCurrentIndex(int(type));
 	typeChanged(cmbxType->currentIndex());
-	
+
 	// set address
 	if (address >= 0) {
-		edtAddress->setText( hexValue(address) );
+		edtAddress->setText(hexValue(address));
 		addressChanged(edtAddress->text());
 	}
-	
+
 	// primary slot
 	if (cmbxSlot->isEnabled() && ps >= 0) {
 		cmbxSlot->setCurrentIndex(ps+1);
@@ -111,13 +108,13 @@ void BreakpointDialog::setData(Breakpoints::Type type, int address, int ps, int 
 	if (cmbxSegment->isEnabled() && segment >= 0) {
 		cmbxSegment->setCurrentIndex(segment+1);
 	}
-	
+
 	// end address
 	if (edtAddressRange->isEnabled() && addressEnd >= 0) {
-		edtAddressRange->setText( hexValue(addressEnd) );
+		edtAddressRange->setText(hexValue(addressEnd));
 		addressChanged(edtAddressRange->text());
 	}
-	
+
 	// condition
 	condition = condition.trimmed();
 	if (cbCondition->isChecked() == condition.isEmpty())
@@ -134,7 +131,7 @@ void BreakpointDialog::addressChanged(const QString& text)
 	else
 		ed = edtAddressRange;
 	bool first = ed == edtAddress;
-	
+
 	// convert value
 	int v = stringToValue(text);
 	if (v == -1 && debugSession) {
@@ -153,7 +150,7 @@ void BreakpointDialog::addressChanged(const QString& text)
 			valueEnd = -1;
 			v = -1;
 		}
-	}			
+	}
 
 	// adjust controls for (in)correct values
 	auto* model = qobject_cast<QStandardItemModel*>(cmbxSlot->model());
@@ -168,13 +165,13 @@ void BreakpointDialog::addressChanged(const QString& text)
 		}
 	} else {
 		//pal.setColor(QPalette::Normal, QPalette::Text, Qt::black);
-		ed->setPalette(pal);		
+		ed->setPalette(pal);
 
 		if (!first) return;
 
 		cmbxSlot->setEnabled(true);
 
-		if(currentSymbol) {
+		if (currentSymbol) {
 			// enable allowed slots
 			int s = currentSymbol->validSlots();
 			int num = 0;
@@ -184,13 +181,13 @@ void BreakpointDialog::addressChanged(const QString& text)
 				if (i) {
 					bool ena = (s & (15 << (4 * (i - 1)))) != 0;
 					model->itemFromIndex(index)->setEnabled(ena);
-					if(ena) {
+					if (ena) {
 						num++;
 						last = i;
-					}	
+					}
 				} else {
 					model->itemFromIndex(index)->setEnabled(num == 4);
-					if(num == 4) last = 0;
+					if (num == 4) last = 0;
 				}
 			}
 			cmbxSlot->setCurrentIndex(last);
@@ -238,7 +235,7 @@ void BreakpointDialog::typeChanged(int s)
 			lblInSlot->setText(tr("With PC in"));
 	}
 
-	if(s == 5) {
+	if (s == 5) {
 		lblAddress->setEnabled(false);
 		edtAddress->setEnabled(false);
 		lblSlot->setEnabled(false);
@@ -257,7 +254,7 @@ void BreakpointDialog::typeChanged(int s)
 		lblSegment->setEnabled(true);
 		addressChanged(edtAddress->text());
 		cbCondition->setEnabled(true);
-		cbCondition->setCheckState( txtCondition->toPlainText().isEmpty() ? Qt::Unchecked : Qt::Checked );
+		cbCondition->setCheckState(txtCondition->toPlainText().isEmpty() ? Qt::Unchecked : Qt::Checked);
 	}
 }
 
@@ -265,7 +262,7 @@ void BreakpointDialog::slotChanged(int s)
 {
 	if (!currentSymbol) idxSlot = s;
 	if (s && memLayout.isSubslotted[s - 1]) {
-		if(currentSymbol) {
+		if (currentSymbol) {
 			// enable subslots
 			int v = (currentSymbol->validSlots() >> (4*(s-1))) & 15;
 			int num = 0;
@@ -273,13 +270,13 @@ void BreakpointDialog::slotChanged(int s)
 			auto* model = qobject_cast<QStandardItemModel*>(cmbxSubslot->model());
 			for (int i = 4; i >= 0; i--) {
 				QModelIndex index = model->index(i, 0, cmbxSubslot->rootModelIndex());
-				if(i) {
+				if (i) {
 					bool ena = (v & (1 << (i - 1))) != 0;
 					model->itemFromIndex(index)->setEnabled(ena);
 					if (ena) {
 						num++;
 						last = i;
-					}	
+					}
 				} else {
 					model->itemFromIndex(index)->setEnabled(num == 4);
 					if (num == 4) last = 0;
@@ -299,7 +296,7 @@ void BreakpointDialog::slotChanged(int s)
 
 void BreakpointDialog::subslotChanged(int i)
 {
-	if(!currentSymbol) idxSubSlot = i;
+	if (!currentSymbol) idxSubSlot = i;
 	int oldseg = cmbxSegment->currentIndex()-1;
 	cmbxSegment->clear();
 	cmbxSegment->addItem("any");
@@ -332,14 +329,14 @@ void BreakpointDialog::subslotChanged(int i)
 
 void BreakpointDialog::hasCondition(int state)
 {
-	if( state == Qt::Checked ) {
+	if (state == Qt::Checked) {
 		txtCondition->setVisible(true);
 		layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
-		resize( width(), conditionHeight );
+		resize(width(), conditionHeight);
 	} else {
 		conditionHeight = height();
 		txtCondition->setVisible(false);
-		resize( width(), sizeHint().height() );
+		resize(width(), sizeHint().height());
 		layout()->setSizeConstraint(QLayout::SetMaximumSize);
 	}
 }

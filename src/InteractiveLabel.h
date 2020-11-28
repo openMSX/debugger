@@ -7,11 +7,11 @@ class InteractiveLabel : public QLabel
 {
 	Q_OBJECT
 public:
-	InteractiveLabel(QWidget* parent = 0);
+	InteractiveLabel(QWidget* parent = nullptr);
 
 protected:
-	virtual void enterEvent(QEvent* event);
-	virtual void leaveEvent(QEvent* event);
+	void enterEvent(QEvent* event) override;
+	void leaveEvent(QEvent* event) override;
 
 signals:
 	void mouseOver(bool state);

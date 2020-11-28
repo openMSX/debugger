@@ -234,7 +234,7 @@ void VramBitMappedView::decodeSCR5()
 	}
 }
 
-void VramBitMappedView::paintEvent(QPaintEvent* event)
+void VramBitMappedView::paintEvent(QPaintEvent* /*event*/)
 {
 	QRect srcRect(0, 0, 512, 2 * lines);
 	QRect dstRect(0, 0, int(512 * zoomFactor), int(2 * lines * zoomFactor));

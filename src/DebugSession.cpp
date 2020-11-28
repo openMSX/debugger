@@ -21,10 +21,11 @@ const QString& DebugSession::filename() const
 
 bool DebugSession::isModified() const
 {
-	if(fileName.isEmpty() && symTable.size() == 0)
+	if (fileName.isEmpty() && symTable.size() == 0) {
 		return false;
-	else
+	} else {
 		return modified;
+	}
 }
 
 Breakpoints& DebugSession::breakpoints()
@@ -50,7 +51,7 @@ void DebugSession::open(const QString& file)
 {
 	QFile f(file);
 	if (!f.open(QFile::ReadOnly | QFile::Text)) {
-		QMessageBox::warning(0, tr("Open session ..."),
+		QMessageBox::warning(nullptr, tr("Open session ..."),
 		                     tr("Cannot read file %1:\n%2.")
 		                        .arg(file)
 		                        .arg(f.errorString()));
@@ -106,7 +107,7 @@ bool DebugSession::saveAs(const QString& newFileName)
 	// open file for save
 	QFile file(newFileName);
 	if (!file.open(QFile::WriteOnly | QFile::Text)) {
-		QMessageBox::warning(0, tr("Save session ..."),
+		QMessageBox::warning(nullptr, tr("Save session ..."),
 		                     tr("Cannot write file %1:\n%2.")
 		                      .arg(fileName)
 		                      .arg(file.errorString()));

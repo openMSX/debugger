@@ -16,7 +16,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		viewer.slotsUpdated(message);
 		delete this;
@@ -154,7 +154,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 			}
 			if (ms > 0) {
 				str.asprintf("%i", memLayout->mapperSegment[i]);
-			} else if(memLayout->romBlock[2*i] >= 0) {
+			} else if (memLayout->romBlock[2*i] >= 0) {
 				if (memLayout->romBlock[2*i] == memLayout->romBlock[2*i+1]) {
 					str.asprintf("R%i", memLayout->romBlock[2*i]);
 				} else {
@@ -180,8 +180,8 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 
 QSize SlotViewer::sizeHint() const
 {
-	return QSize(headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
-	             headerHeight + 4*fontMetrics().height());
+	return {headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
+	        headerHeight + 4*fontMetrics().height()};
 }
 
 void SlotViewer::refresh()
@@ -226,6 +226,6 @@ void SlotViewer::slotsUpdated(const QString& message)
 			memLayout->romBlock[i] = -1;
 		else
 			memLayout->romBlock[i] = lines[l].toInt();
-	}	
+	}
 	update();
 }

@@ -9,7 +9,8 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <iostream>
-const int MainMemoryViewer::linkRegisters[] = {
+
+static const int linkRegisters[] = {
 	CpuRegs::REG_BC, CpuRegs::REG_DE, CpuRegs::REG_HL,
 	CpuRegs::REG_IX, CpuRegs::REG_IY,
 	CpuRegs::REG_BC2, CpuRegs::REG_DE2, CpuRegs::REG_HL2,
@@ -23,9 +24,9 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	addressSourceList = new QComboBox();
 	addressSourceList->setEditable(false);
 	addressSourceList->addItem("Address:");
-	for (int i = 0; i < 10; ++i) {
+	for (int lr : linkRegisters) {
 		QString txt = QString("Linked to ");
-		txt.append(CpuRegs::regNames[linkRegisters[i]]);
+		txt.append(CpuRegs::regNames[lr]);
 		addressSourceList->addItem(txt);
 	}
 
@@ -38,12 +39,12 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	hexView->setIsEditable(true);
 	hexView->setIsInteractive(true);
 	hexView->setDisplayMode(HexViewer::FILL_WIDTH_POWEROF2);
-	QHBoxLayout* hbox = new QHBoxLayout();
+	auto* hbox = new QHBoxLayout();
 	hbox->setMargin(0);
 	hbox->addWidget(addressSourceList);
 	hbox->addWidget(addressValue);
 
-	QVBoxLayout* vbox = new QVBoxLayout();
+	auto* vbox = new QVBoxLayout();
 	vbox->setMargin(0);
 	vbox->addLayout(hbox);
 	vbox->addWidget(hexView);
@@ -52,7 +53,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	isLinked = false;
 	linkedId = 0;
 	regsViewer = nullptr;
-	symTable = 0;
+	symTable = nullptr;
 
 	connect(hexView, SIGNAL(locationChanged(int)),
 	        this, SLOT(hexViewChanged(int)));
@@ -108,8 +109,9 @@ void MainMemoryViewer::addressValueChanged()
 		if (s) addr = s->value();
 	}
 
-	if(addr >= 0)
+	if (addr >= 0) {
 		hexView->setLocation(addr);
+	}
 }
 
 void MainMemoryViewer::registerChanged(int id, int value)

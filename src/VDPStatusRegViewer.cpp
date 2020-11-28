@@ -64,7 +64,7 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 	for (int r = 0; r <= 9; ++r) {
 		for (int b = 7; b >= 0; --b) {
 			QString name = QString("label_%1_%2").arg(r).arg(b);
-			InteractiveLabel* l = findChild<InteractiveLabel*>(name);
+			auto* l = findChild<InteractiveLabel*>(name);
 			l->setText((statusregs[r] & (1 << b)) ? "1" : "0");
 		}
 	}
@@ -116,14 +116,13 @@ void VDPStatusRegViewer::doConnect(InteractiveLabel* lab, highlightDispatcher* d
 void VDPStatusRegViewer::makeGroup(QList<InteractiveLabel*> list, InteractiveLabel* explained)
 {
 	// First "steal" the Tooltip of the explained widget.
-	InteractiveLabel* item;
-	foreach (item, list) {
+	for (auto* item : list) {
 		item->setToolTip(explained->toolTip());
 	}
 	// now create a dispatcher and connect all to them
 	list << explained;
-	highlightDispatcher* dispat = new highlightDispatcher();
-	foreach (item, list) {
+	auto* dispat = new highlightDispatcher();
+	for (auto* item : list) {
 		doConnect(item, dispat);
 	}
 }

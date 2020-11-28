@@ -13,15 +13,15 @@ class GotoDialog : public QDialog, private Ui::GotoDialog
 {
 	Q_OBJECT
 public:
-	GotoDialog(const MemoryLayout& ml, DebugSession *session = 0, QWidget* parent = 0);
+	GotoDialog(const MemoryLayout& ml, DebugSession* session = nullptr, QWidget* parent = nullptr);
 
 	int address();
 
 private:
 	const MemoryLayout& memLayout;
 
-	DebugSession *debugSession;
-	Symbol *currentSymbol;
+	DebugSession* debugSession;
+	Symbol* currentSymbol;
 
 private slots:
 	void addressChanged(const QString& text);

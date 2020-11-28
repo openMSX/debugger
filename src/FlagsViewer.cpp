@@ -66,8 +66,8 @@ void FlagsViewer::paintEvent(QPaintEvent* e)
 
 QSize FlagsViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("ZW0 (PE) ") + 4 + frameR,
-	             frameT + 8 * fontMetrics().height() + frameB);
+	return {frameL + 4 + fontMetrics().horizontalAdvance("ZW0 (PE) ") + 4 + frameR,
+	        frameT + 8 * fontMetrics().height() + frameB};
 }
 
 void FlagsViewer::drawValue(QPainter& p, int x, int y, const QString& str,

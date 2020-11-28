@@ -25,7 +25,7 @@ public:
 	int segment();
 	QString condition();
 
-	void setData(Breakpoints::Type type, int address = -1, 
+	void setData(Breakpoints::Type type, int address = -1,
 	             int ps = -1, int ss = -1, int segment = -1,
 	             int addressEnd = -1, QString condition = QString());
 

@@ -7,11 +7,11 @@ class InteractiveButton : public QPushButton
 {
 	Q_OBJECT
 public:
-	InteractiveButton(QWidget* parent = 0);
+	InteractiveButton(QWidget* parent = nullptr);
 
 protected:
-	virtual void enterEvent(QEvent* event);
-	virtual void leaveEvent(QEvent* event);
+	void enterEvent(QEvent* event) override;
+	void leaveEvent(QEvent* event) override;
 
 signals:
 	void mouseOver(bool state);

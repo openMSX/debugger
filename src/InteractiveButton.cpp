@@ -15,10 +15,10 @@ InteractiveButton::InteractiveButton(QWidget* parent)
 void InteractiveButton::highlight(bool state)
 {
 	if (_highlight == state) return;
-	
-	_highlight=state;
+
+	_highlight = state;
 	setColor();
-	
+
 }
 
 void InteractiveButton::setColor()
@@ -40,8 +40,8 @@ void InteractiveButton::setColor()
 		case 2:
 			fiddle.setColor(QPalette::Active, QPalette::Button, Qt::yellow);
 			break;
-		case 5: 
-		case 1: 
+		case 5:
+		case 1:
 			fiddle.setColor(QPalette::Active, QPalette::Button, Qt::darkRed);
 			break;
 	};
@@ -49,12 +49,12 @@ void InteractiveButton::setColor()
 	update();
 }
 
-void InteractiveButton::enterEvent(QEvent* event)
+void InteractiveButton::enterEvent(QEvent* /*event*/)
 {
 	emit mouseOver(true);
 }
 
-void InteractiveButton::leaveEvent(QEvent* event)
+void InteractiveButton::leaveEvent(QEvent* /*event*/)
 {
 	emit mouseOver(false);
 }
