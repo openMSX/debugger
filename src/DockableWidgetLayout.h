@@ -14,11 +14,11 @@ class DockableWidgetLayout : public QLayout
 public:
 	enum DockSide { TOP, LEFT, RIGHT, BOTTOM };
 
-	DockableWidgetLayout(QWidget* parent = 0, int margin = 0, int spacing = -1);
+	DockableWidgetLayout(QWidget* parent = nullptr, int margin = 0, int spacing = -1);
 	DockableWidgetLayout(int spacing);
-	~DockableWidgetLayout();
+	~DockableWidgetLayout() override;
 
-	void addItem(QLayoutItem* item);
+	void addItem(QLayoutItem* item) override;
 	void addItem(QLayoutItem* item, int index, DockSide side = RIGHT,
 	             int dist = 0, int w = -1, int h = -1);
 	void addWidget(DockableWidget* widget, const QRect& rect);
@@ -26,18 +26,18 @@ public:
 	               int width = -1, int height = -1);
 	bool insertLocation(QRect& rect, const QSizePolicy& sizePol);
 
-	QLayoutItem* itemAt(int index) const;
-	QLayoutItem* takeAt(int index);
-	int count() const;
+	QLayoutItem* itemAt(int index) const override;
+	QLayoutItem* takeAt(int index) override;
+	int count() const override;
 
-	Qt::Orientations expandingDirections() const;
-	bool hasHeightForWidth() const;
+	Qt::Orientations expandingDirections() const override;
+	bool hasHeightForWidth() const override;
 
-	QSize minimumSize() const;
-	QSize maximumSize() const;
-	void setGeometry(const QRect &rect);
+	QSize minimumSize() const override;
+	QSize maximumSize() const override;
+	void setGeometry(const QRect &rect) override;
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 	void changed();
 
 	void getConfig(QStringList& list);
@@ -46,7 +46,7 @@ private:
 	class DockInfo
 	{
 	public:
-		QRect bounds() const { return QRect(left, top, width, height); }
+		QRect bounds() const { return {left, top, width, height}; }
 		int right()  const { return left + width;  }
 		int bottom() const { return top  + height; }
 

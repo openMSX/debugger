@@ -21,8 +21,8 @@ VramBitMappedView::VramBitMappedView(QWidget* parent)
 	lines = 212;
 	screenMode = 5;
 	borderColor = 0;
-	pallet = NULL;
-	vramBase = NULL;
+	pallet = nullptr;
+	vramBase = nullptr;
 	vramAddress = 0;
 	for (int i = 0; i < 15; ++i) {
 		msxpallet[i] = qRgb(80, 80, 80);

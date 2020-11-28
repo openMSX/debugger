@@ -51,7 +51,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 
 	isLinked = false;
 	linkedId = 0;
-	regsViewer = NULL;
+	regsViewer = nullptr;
 	symTable = 0;
 
 	connect(hexView, SIGNAL(locationChanged(int)),

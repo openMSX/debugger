@@ -33,7 +33,7 @@ public:
 	DockableWidget* findDockableWidget(const QString& id) const;
 
 private:
-	typedef QMap<DockableWidget*, DockableWidgetArea*> AreaMap;
+	using AreaMap = QMap<DockableWidget*, DockableWidgetArea*>;
 	AreaMap areaMap;
 	QList<DockableWidgetArea*> areas;
 	QList<DockableWidget*> dockWidgets;

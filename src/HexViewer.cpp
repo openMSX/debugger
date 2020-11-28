@@ -52,8 +52,8 @@ HexViewer::HexViewer(QWidget* parent)
 	horBytes = 16;
 	hexTopAddress = 0;
 	hexMarkAddress = 0;
-	hexData = NULL;
-	previousHexData = NULL;
+	hexData = nullptr;
+	previousHexData = nullptr;
 	debuggableSize = 0;
 	waitingForData = false;
 	displayMode = FILL_WIDTH;
@@ -397,9 +397,9 @@ void HexViewer::paintEvent(QPaintEvent* e)
 void HexViewer::setDebuggable(const QString& name, int size)
 {
 	delete[] hexData;
-	hexData = NULL;
+	hexData = nullptr;
 	delete[] previousHexData;
-	previousHexData = NULL;
+	previousHexData = nullptr;
 
 	if (size) {
 		debuggableName = name;

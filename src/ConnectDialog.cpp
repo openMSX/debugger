@@ -18,7 +18,7 @@ using namespace openmsx;
 #include <pwd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <string.h>
+#include <cstring>
 #include <unistd.h>
 #endif
 
@@ -91,10 +91,10 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	QFileInfo info(dir, socketName);
 	if (!checkSocket(info)) {
 		// invalid socket
-		return NULL;
+		return nullptr;
 	}
 
-	QAbstractSocket* socket = NULL;
+	QAbstractSocket* socket = nullptr;
 #ifdef _WIN32
 	int port = -1;
 	std::ifstream in(info.absoluteFilePath().toLatin1().data());
@@ -110,7 +110,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 		if (!socket->waitForConnected(1000) ||
 			!client.Authenticate()) {
 			delete socket;
-			socket = NULL;
+			socket = nullptr;
 		}
 	}
 #else
@@ -124,7 +124,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 			if (!socket->setSocketDescriptor(sd)) {
 				// failed to wrap socket in QTcpSocket
 				delete socket;
-				socket = NULL;
+				socket = nullptr;
 				close(sd);
 			}
 		} else {
@@ -139,7 +139,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 	} else {
 		// cannot connect, must be a stale socket, try to clean it up
 		deleteSocket(socketName);
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -263,7 +263,7 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 
 ConnectDialog::ConnectDialog(QWidget* parent)
 	: QDialog(parent)
-	, result(NULL)
+	, result(nullptr)
 {
 	ui.setupUi(this);
 	on_rescanButton_clicked();

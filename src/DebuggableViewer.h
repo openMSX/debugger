@@ -10,7 +10,7 @@ class DebuggableViewer : public QWidget
 {
 	Q_OBJECT
 public:
-	DebuggableViewer(QWidget* parent = 0);
+	DebuggableViewer(QWidget* parent = nullptr);
 
 public slots:
 	void settingsChanged();

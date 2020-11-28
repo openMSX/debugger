@@ -2,7 +2,7 @@
 #include "OpenMSXConnection.h"
 
 CommClient::CommClient()
-	: connection(NULL)
+	: connection(nullptr)
 {
 }
 
@@ -36,7 +36,7 @@ void CommClient::closeConnection()
 	if (connection) {
 		connection->disconnect(this, SLOT(closeConnection()));
 		delete connection;
-		connection = NULL;
+		connection = nullptr;
 		emit connectionTerminated();
 	}
 }

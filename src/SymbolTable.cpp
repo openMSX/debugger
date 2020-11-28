@@ -100,12 +100,12 @@ Symbol* SymbolTable::findFirstAddressSymbol(int addr, MemoryLayout* ml)
 			}
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 Symbol* SymbolTable::getCurrentAddressSymbol()
 {
-	return currentAddress != addressSymbols.end() ? *currentAddress : 0;
+	return currentAddress != addressSymbols.end() ? *currentAddress : nullptr;
 }
 
 Symbol* SymbolTable::findNextAddressSymbol(MemoryLayout* ml)
@@ -116,7 +116,7 @@ Symbol* SymbolTable::findNextAddressSymbol(MemoryLayout* ml)
 			return *currentAddress;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 Symbol* SymbolTable::getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml)
@@ -127,7 +127,7 @@ Symbol* SymbolTable::getValueSymbol(int val, Symbol::Register reg, MemoryLayout*
 			return it.value();
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
@@ -137,7 +137,7 @@ Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 			return it.value();
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 Symbol* SymbolTable::getAddressSymbol(const QString& label, bool case_sensitive)
@@ -148,18 +148,18 @@ Symbol* SymbolTable::getAddressSymbol(const QString& label, bool case_sensitive)
 		if (!case_sensitive && it.value()->text().compare(label, Qt::CaseInsensitive)==0)
 			return it.value();
 	}
-	return 0;
+	return nullptr;
 }
 
 QStringList SymbolTable::labelList(bool include_vars, const MemoryLayout* ml) const
 {
 	QStringList labels;
-	for (QMultiMap<int, Symbol*>::const_iterator it = addressSymbols.begin();
-	     it != addressSymbols.end(); ++it) 
-	{
-		if (it.value()->type() == Symbol::JUMPLABEL || (include_vars && it.value()->type() == Symbol::VARIABLELABEL ) )
-			if( ml == 0 || it.value()->isSlotValid(ml) )
+	for (auto it = addressSymbols.begin(); it != addressSymbols.end(); ++it) {
+		if (it.value()->type() == Symbol::JUMPLABEL || (include_vars && it.value()->type() == Symbol::VARIABLELABEL)) {
+			if (ml == nullptr || it.value()->isSlotValid(ml)) {
 				labels << it.value()->text();
+			}
+		}
 	}
 	return labels;
 }
@@ -285,7 +285,7 @@ bool SymbolTable::readSymbolFile(
 		if (l.size() != 2) continue;
 		int value;
 		if (!parseValue(l.at(1), value)) continue;
-		Symbol* sym = new Symbol(l.at(0), value);
+		auto* sym = new Symbol(l.at(0), value);
 		sym->setSource(&symbolFiles.back().fileName);
 		add(sym);
 	}
@@ -331,11 +331,11 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 					if (line[0] == '$') {
 						sym = new Symbol(l.at(1).trimmed(), l.at(0).right(4).toInt(0, 16));
 					} else if ((line[4] == 'h') || (line[5] == 'h')) {
-						sym = new Symbol(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(0, 16));
+						sym = new Symbol(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16));
 					} else {
 						QString m = l.at(0);
 						QStringList n = m.split(":"); // n.at(0) = MegaROM page
-						sym = new Symbol(l.at(1).trimmed(), n.at(1).left(4).toInt(0, 16));
+						sym = new Symbol(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16));
 					}
 					sym->setSource(&symbolFiles.back().fileName);
 					add(sym);
@@ -386,7 +386,7 @@ bool SymbolTable::readHTCFile(const QString& filename)
 		if (l.size() != 3) continue;
 		int value;
 		if (!parseValue("0x" + l.at(1), value)) continue;
-		Symbol* sym = new Symbol(l.at(0), value);
+		auto* sym = new Symbol(l.at(0), value);
 		sym->setSource(&symbolFiles.back().fileName);
 		add(sym);
 	}
@@ -445,7 +445,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 			QString part = line.mid(pos, l);
 			if (rp.indexIn(part) == 0) {
 				QStringList l = rp.capturedTexts();
-				Symbol* sym = new Symbol(l.at(1), l.last().toInt(0, 16));
+				auto* sym = new Symbol(l.at(1), l.last().toInt(0, 16));
 				sym->setSource(&symbolFiles.back().fileName);
 				add(sym);
 			}
@@ -507,7 +507,7 @@ void SymbolTable::reloadFiles()
 		}
 		// all symbols left in map are lost
 		for (auto sit = symCopy.begin(); sit != symCopy.end(); ++sit) {
-			Symbol* sym = new Symbol(sit.value());
+			auto* sym = new Symbol(sit.value());
 			sym->setStatus(Symbol::LOST);
 			sym->setSource(newFile);
 			add(sym);

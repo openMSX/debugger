@@ -13,7 +13,7 @@ class ConnectDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	static OpenMSXConnection* getConnection(QWidget* parent = 0);
+	static OpenMSXConnection* getConnection(QWidget* parent = nullptr);
 
 private slots:
 	void on_connectButton_clicked();
@@ -21,18 +21,18 @@ private slots:
 
 private:
 	ConnectDialog(QWidget* parent);
-	~ConnectDialog();
+	~ConnectDialog() override;
 
 	void clear();
 	void connectionOk(OpenMSXConnection& connection,
 	                  const QString& title);
 	void connectionBad(OpenMSXConnection& connection);
 
-	void timerEvent(QTimerEvent *event);
+	void timerEvent(QTimerEvent *event) override;
 
 	int delay;
 	Ui::ConnectDialog ui;
-	typedef QList<OpenMSXConnection*> OpenMSXConnections;
+	using OpenMSXConnections = QList<OpenMSXConnection*>;
 	OpenMSXConnections pendingConnections;
 	OpenMSXConnections confirmedConnections;
 	OpenMSXConnection* result;
@@ -49,10 +49,10 @@ class ConnectionInfoRequest : public QObject, Command
 public:
 	ConnectionInfoRequest(ConnectDialog& dialog, OpenMSXConnection& connection);
 
-	virtual QString getCommand() const;
-	virtual void replyOk (const QString& message);
-	virtual void replyNok(const QString& message);
-	virtual void cancel();
+	QString getCommand() const override;
+	void replyOk (const QString& message) override;
+	void replyNok(const QString& message) override;
+	void cancel() override;
 
 private:
 	enum State { GET_MACHINE, GET_TITLE, DONE };

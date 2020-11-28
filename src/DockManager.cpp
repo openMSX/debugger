@@ -82,9 +82,8 @@ const QList<DockableWidget*>& DockManager::managedWidgets() const
 
 DockableWidget* DockManager::findDockableWidget(const QString& id) const
 {
-	for (QList<DockableWidget*>::const_iterator it = dockWidgets.begin();
-	     it != dockWidgets.end(); ++it) {
-		if ((*it)->id() == id) return *it;
+	for (auto* w : dockWidgets) {
+		if (w->id() == id) return w;
 	}
-	return 0;
+	return nullptr;
 }

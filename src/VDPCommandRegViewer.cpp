@@ -85,7 +85,7 @@ VDPCommandRegViewer::~VDPCommandRegViewer()
 void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 {
 	//for now simply recheck all the checkBoxes and recreate R45
-	int val = lineEdit_r45->text().toInt(NULL, 0);
+	int val = lineEdit_r45->text().toInt(nullptr, 0);
 	int r45 = 0;
 	QList<QCheckBox*> list = findChildren<QCheckBox*>();
 	QCheckBox* item;
@@ -206,21 +206,21 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 {
 	unsigned char newregs[64];
 	memset(newregs, 0, 64);
-	newregs[32] = lineEdit_r32->text().toInt(NULL, 0);
-	newregs[33] = lineEdit_r33->text().toInt(NULL, 0);
-	newregs[34] = lineEdit_r34->text().toInt(NULL, 0);
-	newregs[35] = lineEdit_r35->text().toInt(NULL, 0);
-	newregs[36] = lineEdit_r36->text().toInt(NULL, 0);
-	newregs[37] = lineEdit_r37->text().toInt(NULL, 0);
-	newregs[38] = lineEdit_r38->text().toInt(NULL, 0);
-	newregs[39] = lineEdit_r39->text().toInt(NULL, 0);
-	newregs[40] = lineEdit_r40->text().toInt(NULL, 0);
-	newregs[41] = lineEdit_r41->text().toInt(NULL, 0);
-	newregs[42] = lineEdit_r42->text().toInt(NULL, 0);
-	newregs[43] = lineEdit_r43->text().toInt(NULL, 0);
-	newregs[44] = lineEdit_r44->text().toInt(NULL, 0);
-	newregs[45] = lineEdit_r45->text().toInt(NULL, 0);
-	newregs[46] = lineEdit_r46->text().toInt(NULL, 0);
+	newregs[32] = lineEdit_r32->text().toInt(nullptr, 0);
+	newregs[33] = lineEdit_r33->text().toInt(nullptr, 0);
+	newregs[34] = lineEdit_r34->text().toInt(nullptr, 0);
+	newregs[35] = lineEdit_r35->text().toInt(nullptr, 0);
+	newregs[36] = lineEdit_r36->text().toInt(nullptr, 0);
+	newregs[37] = lineEdit_r37->text().toInt(nullptr, 0);
+	newregs[38] = lineEdit_r38->text().toInt(nullptr, 0);
+	newregs[39] = lineEdit_r39->text().toInt(nullptr, 0);
+	newregs[40] = lineEdit_r40->text().toInt(nullptr, 0);
+	newregs[41] = lineEdit_r41->text().toInt(nullptr, 0);
+	newregs[42] = lineEdit_r42->text().toInt(nullptr, 0);
+	newregs[43] = lineEdit_r43->text().toInt(nullptr, 0);
+	newregs[44] = lineEdit_r44->text().toInt(nullptr, 0);
+	newregs[45] = lineEdit_r45->text().toInt(nullptr, 0);
+	newregs[46] = lineEdit_r46->text().toInt(nullptr, 0);
 
 	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
 		"{VDP regs}", 32, 15, newregs);
@@ -229,7 +229,7 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 
 void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()
 {
-	int val = lineEdit_r44->text().toInt(NULL, 0);
+	int val = lineEdit_r44->text().toInt(nullptr, 0);
 	label_color->setText(QString("%1 %2").
 			arg((val >> 4) & 15, 4, 2, QChar('0')).
 			arg((val >> 0) & 15, 4, 2, QChar('0')));
@@ -253,7 +253,7 @@ void VDPCommandRegViewer::R45BitChanged(int state)
 
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
-	int val = lineEdit_r46->text().toInt(NULL, 0) & 0xFF;
+	int val = lineEdit_r46->text().toInt(nullptr, 0) & 0xFF;
 	lineEdit_r46->setText(QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper());
 	R46 = val;
 	decodeR46(R46);
@@ -316,4 +316,3 @@ void VDPCommandRegViewer::DataHexRequestReceived()
 	label_r_46->setText(hex8bit(regs[46]));
 	if (autoSyncRadioButton->isChecked()) syncRegToCmd();
 }
-

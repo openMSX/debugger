@@ -68,7 +68,7 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 		dest.instr.clear();
 
 		const char* s;
-		const char* r = 0;
+		const char* r = nullptr;
 		switch (membuf[pc]) {
 		case 0xCB:
 			s = mnemonic_cb[membuf[pc + 1]];

@@ -9,22 +9,22 @@ class CPURegsViewer : public QFrame
 {
 	Q_OBJECT;
 public:
-	CPURegsViewer(QWidget* parent = 0);
+	CPURegsViewer(QWidget* parent = nullptr);
 
 	void setData(unsigned char* datPtr);
 	int readRegister(int id);
 
-	QSize sizeHint() const;
+	QSize sizeHint() const override;
 
 private:
-	void resizeEvent(QResizeEvent* e);
-	void paintEvent(QPaintEvent* e);
-	void mousePressEvent(QMouseEvent* e);
-	//void mouseMoveEvent(QMouseEvent* e);
-	//void mouseReleaseEvent(QMouseEvent* e);
-	void keyPressEvent(QKeyEvent* e);
-	void focusOutEvent(QFocusEvent* e);
-	bool event(QEvent* e);
+	void resizeEvent(QResizeEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	//void mouseMoveEvent(QMouseEvent* e) override;
+	//void mouseReleaseEvent(QMouseEvent* e) override;
+	void keyPressEvent(QKeyEvent* e) override;
+	void focusOutEvent(QFocusEvent* e) override;
+	bool event(QEvent* e) override;
 
 	// layout
 	int frameL, frameR, frameT, frameB;

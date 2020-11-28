@@ -80,8 +80,8 @@ void CPURegsViewer::paintEvent(QPaintEvent* e)
 
 QSize CPURegsViewer::sizeHint() const
 {
-	return QSize(frameL + 4 + fontMetrics().horizontalAdvance("HLWFFFFWWHLWFFFFW") + 4 + frameR,
-	             frameT + 8 * fontMetrics().height() + frameB );
+	return {frameL + 4 + fontMetrics().horizontalAdvance("HLWFFFFWWHLWFFFFW") + 4 + frameR,
+	        frameT + 8 * fontMetrics().height() + frameB};
 }
 
 void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
@@ -336,8 +336,7 @@ void CPURegsViewer::applyModifications()
 	data[25] = regs[CpuRegs::REG_R];
 
 	// send new data to openmsx
-	WriteDebugBlockCommand* req = new WriteDebugBlockCommand(
-			"{CPU regs}", 0, 26, data);
+	auto* req = new WriteDebugBlockCommand("{CPU regs}", 0, 26, data);
 	CommClient::instance().sendCommand(req);
 	// turn off editing
 	cursorLoc = -1;
@@ -380,7 +379,7 @@ bool CPURegsViewer::event(QEvent* e)
 		return QWidget::event(e);
 	}
 
-	QHelpEvent* helpEvent = static_cast<QHelpEvent*>(e);
+	auto* helpEvent = static_cast<QHelpEvent*>(e);
 	// calc register number
 	int pos = -1;
 	if (helpEvent->x() >= leftValuePos &&

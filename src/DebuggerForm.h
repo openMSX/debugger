@@ -25,14 +25,14 @@ class DebuggerForm : public QMainWindow
 {
 	Q_OBJECT;
 public:
-	DebuggerForm(QWidget* parent = 0);
-	~DebuggerForm();
+	DebuggerForm(QWidget* parent = nullptr);
+	~DebuggerForm() override;
 
 public slots:
 	void showAbout();
 
 private:
-	void closeEvent(QCloseEvent* e);
+	void closeEvent(QCloseEvent* e) override;
 
 	void createActions();
 	void createMenus();
@@ -76,8 +76,8 @@ private:
 	QAction* fileQuitAction;
 
 	enum { MaxRecentFiles = 5 };
-   QAction *recentFileActions[MaxRecentFiles];
-	QAction *recentFileSeparator;
+	QAction* recentFileActions[MaxRecentFiles];
+	QAction* recentFileSeparator;
 
 	QAction* systemConnectAction;
 	QAction* systemDisconnectAction;

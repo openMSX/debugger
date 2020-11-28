@@ -21,7 +21,7 @@ static const DisasmRow DISABLED_ROW = {DisasmRow::INSTRUCTION, 0, 1, 0, "-      
 static const int FIRST_INFO_LINE = 1;
 static const int LAST_INFO_LINE = -65536;
 
-typedef std::vector<DisasmRow> DisasmLines;
+using DisasmLines = std::vector<DisasmRow>;
 
 void dasm(const unsigned char* membuf, unsigned short startAddr,
           unsigned short endAddr, DisasmLines& disasm,

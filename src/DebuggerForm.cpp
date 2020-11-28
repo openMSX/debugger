@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		// old openmsx versions returned 'on','false'
 		// new versions return 'true','false'
@@ -69,7 +69,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		form.finalizeConnection(message.trimmed() == "1");
 		delete this;
@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		if (merge) {
 			QString bps = form.session.breakpoints().mergeBreakpoints(message);
@@ -123,7 +123,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		copyData(message);
 		form.regsView->setData(buf);
@@ -145,7 +145,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		form.setDebuggables(message);
 		delete this;
@@ -165,7 +165,7 @@ public:
 	{
 	}
 
-	virtual void replyOk(const QString& message)
+	void replyOk(const QString& message) override
 	{
 		form.setDebuggableSize(debuggable, message.toInt());
 		delete this;
@@ -182,9 +182,9 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
 	, comm(CommClient::instance())
 {
-	VDPRegView = NULL;
-	VDPStatusRegView = NULL;
-	VDPCommandRegView = NULL;
+	VDPRegView = nullptr;
+	VDPStatusRegView = nullptr;
+	VDPCommandRegView = nullptr;
 
 	createActions();
 	createMenus();
@@ -218,9 +218,9 @@ void DebuggerForm::createActions()
 	fileQuitAction->setShortcut(tr("Ctrl+Q"));
 	fileQuitAction->setStatusTip(tr("Quit the openMSX debugger"));
 
-	for (int i = 0; i < MaxRecentFiles; ++i) {
-		recentFileActions[i] = new QAction(this);
-		connect(recentFileActions[i], SIGNAL(triggered()), this, SLOT(fileRecentOpen()));
+	for (auto& rfa : recentFileActions) {
+		rfa = new QAction(this);
+		connect(rfa, SIGNAL(triggered()), this, SLOT(fileRecentOpen()));
 	}
 
 	systemConnectAction = new QAction(tr("&Connect"), this);
@@ -392,8 +392,8 @@ void DebuggerForm::createMenus()
 	fileMenu->addAction(fileSaveSessionAsAction);
 
 	recentFileSeparator = fileMenu->addSeparator();
-	for (int i = 0; i < MaxRecentFiles; ++i)
-		fileMenu->addAction(recentFileActions[i]);
+	for (auto* rfa : recentFileActions)
+		fileMenu->addAction(rfa);
 
 	fileMenu->addSeparator();
 	fileMenu->addAction(fileQuitAction);
@@ -497,7 +497,7 @@ void DebuggerForm::createForm()
 	setCentralWidget(mainArea);
 
 	// Create main widgets and append them to the list first
-	DockableWidget* dw = new DockableWidget(dockMan);
+	auto* dw = new DockableWidget(dockMan);
 
 	// create the disasm viewer widget
 	disasmView = new DisasmViewer();
@@ -696,18 +696,17 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 	// fill layout list with docked widgets
 	dockMan.getConfig(0, layoutList);
 	// append floating widgets
-	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	     it != dockMan.managedWidgets().end(); ++it) {
-		if ((*it)->isFloating()) {
+	for (auto* widget : dockMan.managedWidgets()) {
+		if (widget->isFloating()) {
 			QString s("%1 F %2 %3 %4 %5 %6");
-			s = s.arg((*it)->id());
-			if ((*it)->isHidden()) {
+			s = s.arg(widget->id());
+			if (widget->isHidden()) {
 				s = s.arg("H");
 			} else {
 				s = s.arg("V");
 			}
-			s = s.arg((*it)->x()).arg((*it)->y())
-			     .arg((*it)->width()).arg((*it)->height());
+			s = s.arg(widget->x()).arg(widget->y())
+			     .arg(widget->width()).arg(widget->height());
 			layoutList.append(s);
 		}
 	}
@@ -730,7 +729,7 @@ void DebuggerForm::updateRecentFiles()
 		} else
 			recentFileActions[i]->setVisible(false);
 	// show separator only when recent files exist
-	recentFileSeparator->setVisible(recentFiles.size());
+	recentFileSeparator->setVisible(!recentFiles.empty());
 }
 
 void DebuggerForm::addRecentFile(const QString& file)
@@ -863,9 +862,8 @@ void DebuggerForm::connectionClosed()
 	breakpointToggleAction->setEnabled(false);
 	breakpointAddAction->setEnabled(false);
 
-	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	     it != dockMan.managedWidgets().end(); ++it) {
-		(*it)->widget()->setEnabled(false);
+	for (auto* w : dockMan.managedWidgets()) {
+		w->widget()->setEnabled(false);
 	}
 }
 
@@ -885,9 +883,8 @@ void DebuggerForm::finalizeConnection(bool halted)
 		updateData();
 	}
 
-	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	     it != dockMan.managedWidgets().end(); ++it) {
-		(*it)->widget()->setEnabled(true);
+	for (auto* w : dockMan.managedWidgets()) {
+		w->widget()->setEnabled(true);
 	}
 }
 
@@ -930,7 +927,7 @@ void DebuggerForm::updateData()
 	// update registers
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
-	CPURegRequest* regs = new CPURegRequest(*this);
+	auto* regs = new CPURegRequest(*this);
 	comm.sendCommand(regs);
 
 	// refresh slot viewer
@@ -1038,9 +1035,9 @@ void DebuggerForm::fileSaveSessionAs()
 
 void DebuggerForm::fileRecentOpen()
 {
-	QAction *action = qobject_cast<QAction *>(sender());
-	if (action)
+	if (auto* action = qobject_cast<QAction *>(sender())) {
 		openSession(action->data().toString());
+	}
 }
 
 void DebuggerForm::systemConnect()
@@ -1119,7 +1116,7 @@ void DebuggerForm::executeStep()
 
 void DebuggerForm::executeStepOver()
 {
-	SimpleCommand *sc = new SimpleCommand("step_over");
+	auto* sc = new SimpleCommand("step_over");
 	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
 	comm.sendCommand(sc);
 	setRunMode();
@@ -1140,7 +1137,7 @@ void DebuggerForm::executeStepOut()
 
 void DebuggerForm::executeStepBack()
 {
-	SimpleCommand *sc = new SimpleCommand("step_back");
+	auto* sc = new SimpleCommand("step_back");
 	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
 	comm.sendCommand(sc);
 	setRunMode();
@@ -1148,7 +1145,7 @@ void DebuggerForm::executeStepBack()
 
 void DebuggerForm::handleCommandReplyStatus(bool status)
 {
-	if(status) {
+	if (status) {
 		finalizeConnection(true);
 	}
 }
@@ -1158,7 +1155,8 @@ void DebuggerForm::breakpointToggle(int addr)
 	// toggle address unspecified, use cursor address
 	if (addr < 0) addr = disasmView->cursorAddress();
 
-	QString cmd, id;
+	QString cmd;
+	QString id;
 	if (session.breakpoints().isBreakpoint(addr, &id)) {
 		cmd = Breakpoints::createRemoveCommand(id);
 	} else {
@@ -1222,8 +1220,8 @@ void DebuggerForm::toggleBitMappedDisplay()
 	// not sure if this a good idea for a docable widget
 
 	// create new debuggable viewer window
-	BitMapViewer* viewer = new BitMapViewer();
-	DockableWidget* dw = new DockableWidget(dockMan);
+	auto* viewer = new BitMapViewer();
+	auto* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Bitmapped VRAM View"));
 	dw->setId("BITMAPVRAMVIEW");
@@ -1249,9 +1247,9 @@ void DebuggerForm::toggleBitMappedDisplay()
 
 void DebuggerForm::toggleVDPCommandRegsDisplay()
 {
-	if (VDPCommandRegView == NULL) {
+	if (VDPCommandRegView == nullptr) {
 		VDPCommandRegView = new VDPCommandRegViewer();
-		DockableWidget* dw = new DockableWidget(dockMan);
+		auto* dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPCommandRegView);
 		dw->setTitle(tr("VDP registers view"));
 		dw->setId("VDPCommandRegView");
@@ -1268,9 +1266,9 @@ void DebuggerForm::toggleVDPCommandRegsDisplay()
 
 void DebuggerForm::toggleVDPRegsDisplay()
 {
-	if (VDPRegView == NULL) {
+	if (VDPRegView == nullptr) {
 		VDPRegView = new VDPRegViewer();
-		DockableWidget *dw = new DockableWidget(dockMan);
+		auto* dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPRegView);
 		dw->setTitle(tr("VDP registers view"));
 		dw->setId("VDPREGVIEW");
@@ -1287,9 +1285,9 @@ void DebuggerForm::toggleVDPRegsDisplay()
 
 void DebuggerForm::toggleVDPStatusRegsDisplay()
 {
-	if (VDPStatusRegView == NULL) {
+	if (VDPStatusRegView == nullptr) {
 		VDPStatusRegView = new VDPStatusRegViewer();
-		DockableWidget* dw = new DockableWidget(dockMan);
+		auto* dw = new DockableWidget(dockMan);
 		dw->setWidget(VDPStatusRegView);
 		dw->setTitle(tr("VDP status registers view"));
 		dw->setId("VDPSTATUSREGVIEW");
@@ -1322,8 +1320,8 @@ void DebuggerForm::toggleView(DockableWidget* widget)
 void DebuggerForm::addDebuggableViewer()
 {
 	// create new debuggable viewer window
-	DebuggableViewer* viewer = new DebuggableViewer();
-	DockableWidget* dw = new DockableWidget(dockMan);
+	auto* viewer = new DebuggableViewer();
+	auto* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Debuggable hex view"));
 	dw->setId("DEBUGVIEW-" + QString::number(++counter));
@@ -1382,15 +1380,12 @@ void DebuggerForm::updateVDPViewMenu()
 void DebuggerForm::updateViewFloatingWidgetsMenu()
 {
 	viewFloatingWidgetsMenu->clear();
-	for (QList<DockableWidget*>::const_iterator it = dockMan.managedWidgets().begin();
-	it != dockMan.managedWidgets().end(); ++it) {
-		if ((*it)->isFloating()) {
+	for (auto* w : dockMan.managedWidgets()) {
+		if (w->isFloating()) {
 			// Build up the window title
-			QString widget_title = (*it)->title();
-			QString widget_id = (*it)->id();
-			QAction* action = new QAction(widget_title);
+			auto* action = new QAction(w->title());
 			// Set the widget_id as a property on the menu item action, so we can read it out later again via sender() on the receiving functor
-			action->setProperty("widget_id", widget_id);
+			action->setProperty("widget_id", w->id());
 			connect(action, SIGNAL(triggered()), this, SLOT(showFloatingWidget()));
 			viewFloatingWidgetsMenu->addAction(action);
 		}

@@ -92,7 +92,7 @@ private:
 
 	QString getWidgetText(QWidget* wdg)
 	{
-		if (wdg == NULL) return QString();
+		if (wdg == nullptr) return QString();
 		if (QLabel* ql = dynamic_cast<QLabel*>(wdg)) {
 			return ql->text();
 		} else {
@@ -113,19 +113,19 @@ private:
 
 	void updaterw()
 	{
-		if (w_rw == NULL) return;
+		if (w_rw == nullptr) return;
 		rw = rl + 256 * rh;
 		updateWidget(w_rw, rw, disp_rw);
 	}
 	void updaterl()
 	{
-		if (w_rl == NULL) return;
+		if (w_rl == nullptr) return;
 		rl = rw & 255;
 		updateWidget(w_rl, rl, disp_rl);
 	}
 	void updaterh()
 	{
-		if (w_rh == NULL) return;
+		if (w_rh == nullptr) return;
 		rh = (rw >> 8) & 255;
 		updateWidget(w_rh, rh, disp_rh);
 	}

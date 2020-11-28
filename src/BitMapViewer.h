@@ -10,7 +10,7 @@ class BitMapViewer : public QDialog, private Ui::BitMapViewer
 {
 	Q_OBJECT
 public:
-	BitMapViewer(QWidget* parent = 0);
+	BitMapViewer(QWidget* parent = nullptr);
 
 private:
 	void decodeVDPregs();

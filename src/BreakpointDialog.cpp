@@ -5,14 +5,14 @@
 #include <QStandardItemModel>
 
 BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession *session, QWidget* parent)
-	: QDialog(parent), memLayout(ml), currentSymbol(0)
+	: QDialog(parent), memLayout(ml), currentSymbol(nullptr)
 {
 	setupUi(this);
 
 	value = valueEnd = -1;
 
 	debugSession = session;
-	if( session ) {
+	if (session) {
 		// create address completer
 		jumpCompleter = new QCompleter(session->symbolTable().labelList(), this);
 		allCompleter = new QCompleter(session->symbolTable().labelList(true), this);
@@ -156,7 +156,7 @@ void BreakpointDialog::addressChanged(const QString& text)
 	}			
 
 	// adjust controls for (in)correct values
-	QStandardItemModel* model = qobject_cast<QStandardItemModel*>(cmbxSlot->model());
+	auto* model = qobject_cast<QStandardItemModel*>(cmbxSlot->model());
 	QPalette pal;
 	if (v == -1) {
 		// set line edit text to red for invalid values TODO: make configurable
@@ -177,25 +177,26 @@ void BreakpointDialog::addressChanged(const QString& text)
 		if(currentSymbol) {
 			// enable allowed slots
 			int s = currentSymbol->validSlots();
-			int num = 0, last = 0;
-			for(int i = 4; i >= 0; i--) {
+			int num = 0;
+			int last = 0;
+			for (int i = 4; i >= 0; i--) {
 				QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
-				if(i) {
-					bool ena = (s & (15<<(4*(i-1)))) != 0;
+				if (i) {
+					bool ena = (s & (15 << (4 * (i - 1)))) != 0;
 					model->itemFromIndex(index)->setEnabled(ena);
 					if(ena) {
 						num++;
 						last = i;
 					}	
 				} else {
-					model->itemFromIndex(index)->setEnabled( num == 4 );
+					model->itemFromIndex(index)->setEnabled(num == 4);
 					if(num == 4) last = 0;
 				}
 			}
 			cmbxSlot->setCurrentIndex(last);
 		} else {
 			// enable everything
-			for(int i = 0; i < 5; i++) {
+			for (int i = 0; i < 5; i++) {
 				QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
 				model->itemFromIndex(index)->setEnabled(true);
 			}
@@ -219,8 +220,8 @@ void BreakpointDialog::typeChanged(int s)
 		case 4:
 			lblAddress->setText(tr("Add watchpoint on IO port or range:"));
 			edtAddressRange->setVisible(true);
-			edtAddress->setCompleter(0);
-			edtAddressRange->setCompleter(0);
+			edtAddress->setCompleter(nullptr);
+			edtAddressRange->setCompleter(nullptr);
 			break;
 		default:
 			lblAddress->setText(tr("Add breakpoint at address:"));
@@ -262,25 +263,26 @@ void BreakpointDialog::typeChanged(int s)
 
 void BreakpointDialog::slotChanged(int s)
 {
-	if(!currentSymbol) idxSlot = s;
+	if (!currentSymbol) idxSlot = s;
 	if (s && memLayout.isSubslotted[s - 1]) {
 		if(currentSymbol) {
 			// enable subslots
 			int v = (currentSymbol->validSlots() >> (4*(s-1))) & 15;
-			int num = 0, last = 0;
-				QStandardItemModel* model = qobject_cast<QStandardItemModel*>(cmbxSubslot->model());
-			for(int i = 4; i >= 0; i--) {
+			int num = 0;
+			int last = 0;
+			auto* model = qobject_cast<QStandardItemModel*>(cmbxSubslot->model());
+			for (int i = 4; i >= 0; i--) {
 				QModelIndex index = model->index(i, 0, cmbxSubslot->rootModelIndex());
 				if(i) {
-					bool ena = (v & (1<<(i-1))) != 0;
+					bool ena = (v & (1 << (i - 1))) != 0;
 					model->itemFromIndex(index)->setEnabled(ena);
-					if(ena) {
+					if (ena) {
 						num++;
 						last = i;
 					}	
 				} else {
-					model->itemFromIndex(index)->setEnabled( num == 4 );
-					if(num == 4) last = 0;
+					model->itemFromIndex(index)->setEnabled(num == 4);
+					if (num == 4) last = 0;
 				}
 			}
 			cmbxSubslot->setCurrentIndex(last);

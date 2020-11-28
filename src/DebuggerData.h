@@ -33,8 +33,8 @@ public:
 	void setBreakpoints(const QString& str);
 	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
-	bool isBreakpoint(quint16 addr, QString *id = 0);
-	bool isWatchpoint(quint16 addr, QString *id = 0);
+	bool isBreakpoint(quint16 addr, QString *id = nullptr);
+	bool isWatchpoint(quint16 addr, QString *id = nullptr);
 
 	/* xml session file functions */
 	void saveBreakpoints(QXmlStreamWriter& xml);
@@ -64,7 +64,7 @@ private:
 		// compare content
 		bool operator==(const Breakpoint &bp) const;
 	};
-	typedef QLinkedList<Breakpoint> BreakpointList;
+	using BreakpointList = QLinkedList<Breakpoint>;
 
 	BreakpointList breakpoints;
 	MemoryLayout* memLayout;

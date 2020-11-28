@@ -1,5 +1,6 @@
 #include "DebuggerData.h"
 #include "Convert.h"
+#include "qglobal.h"
 #include <QStringList>
 #include <QDebug>
 // class MemoryLayout
@@ -52,8 +53,8 @@ bool Breakpoints::Breakpoint::operator==(const Breakpoint &bp) const
 		if (bp.address != address) return false;
 		if (type != BREAKPOINT) {
 			int re1 = -1, re2 = -1;
-			if (bp.regionEnd != -1 && bp.regionEnd != bp.address) re1 = bp.regionEnd;
-			if (   regionEnd != -1 &&    regionEnd !=    address) re2 =    regionEnd; 
+			if (bp.regionEnd != quint16(-1) && bp.regionEnd != bp.address) re1 = bp.regionEnd;
+			if (   regionEnd != quint16(-1) &&    regionEnd !=    address) re2 =    regionEnd;
 			if (re1 != re2) return false;
 		}
 		// compare slot
@@ -65,7 +66,7 @@ bool Breakpoints::Breakpoint::operator==(const Breakpoint &bp) const
 
 
 Breakpoints::Breakpoints()
-	: memLayout(NULL)
+	: memLayout(nullptr)
 {
 }
 
@@ -220,7 +221,6 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 
 	// first split off braces
 	if (bp.condition[0] == '{' && bp.condition.endsWith('}')) {
-		
 		if (bp.type != CONDITION) {
 			// check for slot argument
 			QRegExp rx("^\\{\\s*\\[\\s*(pc|watch)_in_slot\\s([X0123])\\s([X0123])\\s(X|\\d{1,3})\\s*\\]\\s*(&&\\s*\\((.+)\\)\\s*)?\\}$");
@@ -246,7 +246,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 
 bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 {
-	if (memLayout == NULL) return true;
+	if (!memLayout) return true;
 
 	int page = (bp.address & 0xC000) >> 14;
 	if (bp.ps == -1 || bp.ps == memLayout->primarySlot[page]) {
@@ -289,11 +289,10 @@ int Breakpoints::breakpointCount()
 
 bool Breakpoints::isBreakpoint(quint16 addr, QString *id)
 {
-	for (BreakpointList::const_iterator it = breakpoints.constBegin();
-	     it != breakpoints.constEnd(); ++it) {
-		if (it->type == BREAKPOINT && it->address == addr) {
-			if (inCurrentSlot(*it)) {
-				if (id) *id = it->id;
+	for (const auto& bp : breakpoints) {
+		if (bp.type == BREAKPOINT && bp.address == addr) {
+			if (inCurrentSlot(bp)) {
+				if (id) *id = bp.id;
 				return true;
 			}
 		}
@@ -303,17 +302,16 @@ bool Breakpoints::isBreakpoint(quint16 addr, QString *id)
 
 bool Breakpoints::isWatchpoint(quint16 addr, QString *id)
 {
-	for (BreakpointList::const_iterator it = breakpoints.constBegin();
-	     it != breakpoints.constEnd(); ++it) {
-		if (it->type == WATCHPOINT_MEMREAD || it->type == WATCHPOINT_MEMWRITE)
-			if ( (it->address == addr && it->regionEnd < it->address) ||
-			     (addr >= it->address && addr <= it->regionEnd) )
-			{
-				if (inCurrentSlot(*it)) {
-					if (id) *id = it->id;
+	for (const auto& bp : breakpoints) {
+		if (bp.type == WATCHPOINT_MEMREAD || bp.type == WATCHPOINT_MEMWRITE) {
+			if ((bp.address == addr && bp.regionEnd < bp.address) ||
+			    (addr >= bp.address && addr <= bp.regionEnd)) {
+				if (inCurrentSlot(bp)) {
+					if (id) *id = bp.id;
 					return true;
 				}
 			}
+		}
 	}
 	return false;
 }

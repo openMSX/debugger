@@ -28,7 +28,7 @@ signals:
 
 private:
 	CommClient();
-	~CommClient();
+	~CommClient() override;
 
 	OpenMSXConnection* connection;
 };

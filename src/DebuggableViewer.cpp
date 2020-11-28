@@ -14,7 +14,7 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	hexView->setIsInteractive(true);
 	hexView->setIsEditable(true);
 
-	QVBoxLayout* vbox = new QVBoxLayout();
+	auto* vbox = new QVBoxLayout();
 	vbox->setMargin(0);
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
@@ -62,8 +62,7 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 	debuggableList->disconnect(this, SLOT(debuggableSelected(int)));
 
 	debuggableList->clear();
-	for (QMap<QString, int>::const_iterator it = list.begin();
-	     it != list.end(); ++it) {
+	for (auto it = list.begin(); it != list.end(); ++it) {
 		// set name and strip braces if necessary
 		QString name = it.key();
 		if (name.contains(QChar(' '))) {

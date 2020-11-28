@@ -41,7 +41,7 @@ void DockableWidgetLayout::addItem(QLayoutItem* item)
 void DockableWidgetLayout::addItem(
 		QLayoutItem* item, int index, DockSide side, int dist, int w, int h)
 {
-	DockInfo* info = new DockInfo();
+	auto* info = new DockInfo();
 	info->item = item;
 	info->widget = qobject_cast<DockableWidget*>(item->widget());
 	info->dockSide = side;
@@ -76,8 +76,8 @@ void DockableWidgetLayout::addItem(
 		info->useHintHeight = false;
 	}
 
-	for (int i = 0; i < dockedWidgets.size(); ++i) {
-		Q_ASSERT(dockedWidgets.at(i)->widget != item->widget());
+	for (const auto* w : dockedWidgets) {
+		Q_ASSERT(w->widget != item->widget());
 	}
 
 	if (index > -1 && index < dockedWidgets.size()) {
@@ -145,7 +145,7 @@ int DockableWidgetLayout::count() const
 
 QLayoutItem* DockableWidgetLayout::takeAt(int index)
 {
-	if (index < 0 || index >= dockedWidgets.size()) return 0;
+	if (index < 0 || index >= dockedWidgets.size()) return nullptr;
 
 	DockInfo* info = dockedWidgets.takeAt(index);
 	QLayoutItem* item = info->item;
@@ -157,24 +157,24 @@ QLayoutItem* DockableWidgetLayout::takeAt(int index)
 
 QLayoutItem* DockableWidgetLayout::itemAt(int index) const
 {
-	if (index < 0 || index >= dockedWidgets.size()) return 0;
+	if (index < 0 || index >= dockedWidgets.size()) return nullptr;
 
 	return dockedWidgets.at(index)->item;
 }
 
 QSize DockableWidgetLayout::minimumSize() const
 {
-	return QSize(minWidth, minHeight);
+	return {minWidth, minHeight};
 }
 
 QSize DockableWidgetLayout::maximumSize() const
 {
-	return QSize(maxWidth, maxHeight);
+	return {maxWidth, maxHeight};
 }
 
 QSize DockableWidgetLayout::sizeHint() const
 {
-	return QSize(layoutWidth, layoutHeight);
+	return {layoutWidth, layoutHeight};
 }
 
 void DockableWidgetLayout::setGeometry(const QRect& rect)
@@ -195,8 +195,7 @@ void DockableWidgetLayout::setGeometry(const QRect& rect)
 	}
 
 	// resize the widgets
-	for (int i = 0; i < dockedWidgets.size(); ++i) {
-		DockInfo* d = dockedWidgets[i];
+	for (auto* d : dockedWidgets) {
 		if (!d->widget->isHidden()) {
 			d->item->setGeometry(d->bounds());
 		}
@@ -215,8 +214,8 @@ void DockableWidgetLayout::calcSizeLimits()
 	int curWidth = d->width;
 	int curHeight = d->height;
 	QVector<int> distStore;
-	for (int i = 0; i < dockedWidgets.size(); ++i) {
-		distStore.push_back(dockedWidgets.at(i)->dockDistance);
+	for (auto* d : dockedWidgets) {
+		distStore.push_back(d->dockDistance);
 	}
 
 	// first check minimum width (blunt method)
@@ -421,8 +420,7 @@ void DockableWidgetLayout::doLayout(bool check)
 	int& w = check ? checkWidth  : layoutWidth;
 	int& h = check ? checkHeight : layoutHeight;
 	w = h = 0;
-	for (int i = 0; i < dockedWidgets.size(); ++i) {
-		DockInfo* d = dockedWidgets[i];
+	for (auto* d : dockedWidgets) {
 		if (!d->widget->isHidden()) {
 			d->left -= dx;
 			d->top  -= dy;
@@ -789,9 +787,7 @@ bool DockableWidgetLayout::insertLocation(QRect& rect, const QSizePolicy& sizePo
 
 void DockableWidgetLayout::getConfig(QStringList& list)
 {
-	for (int i = 0; i < dockedWidgets.size(); ++i) {
-		DockInfo* d = dockedWidgets.at(i);
-
+	for (auto* d : dockedWidgets) {
 		// string format D [Hidden/Visible] [Side] [Distance] [Width] [Height]
 		QString s("%1 D %2 %3 %4 %5 %6");
 		s = s.arg(d->widget->id());

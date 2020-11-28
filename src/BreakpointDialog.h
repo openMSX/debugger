@@ -14,8 +14,8 @@ class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 {
 	Q_OBJECT
 public:
-	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = 0, QWidget* parent = 0);
-	~BreakpointDialog();
+	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = nullptr, QWidget* parent = nullptr);
+	~BreakpointDialog() override;
 
 	Breakpoints::Type type();
 	int address();

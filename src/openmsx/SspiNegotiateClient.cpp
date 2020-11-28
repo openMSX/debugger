@@ -14,13 +14,13 @@ bool SspiNegotiateClient::Authenticate()
 {
 	TimeStamp tsCredsExpiry;
 	SECURITY_STATUS ss = AcquireCredentialsHandleW(
-		NULL,
+		nullptr,
 		const_cast<SEC_WCHAR*>(NEGOSSP_NAME_W),
 		SECPKG_CRED_OUTBOUND,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
 		&hCreds,
 		&tsCredsExpiry);
 
@@ -35,8 +35,8 @@ bool SspiNegotiateClient::Authenticate()
 	InitTokenContextBuffer(&secServerBufferDesc, &secServerBuffer);
 
 	std::vector<char> buffer;
-	PCtxtHandle phContext = NULL;
-	PSecBufferDesc psecServerBufferDesc = NULL;
+	PCtxtHandle phContext = nullptr;
+	PSecBufferDesc psecServerBufferDesc = nullptr;
 	while (true) {
 
 		ULONG fContextAttr;
@@ -44,7 +44,7 @@ bool SspiNegotiateClient::Authenticate()
 		ss = InitializeSecurityContextA(
 			&hCreds,
 			phContext,
-			NULL,	// To use Kerberos, we'll need an SPN here
+			nullptr,	// To use Kerberos, we'll need an SPN here
 			ISC_REQ_ALLOCATE_MEMORY | ISC_REQ_CONNECTION | ISC_REQ_STREAM,
 			0,
 			SECURITY_NETWORK_DREP,

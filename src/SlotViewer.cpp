@@ -34,7 +34,7 @@ SlotViewer::SlotViewer(QWidget* parent)
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum));
 
-	memLayout = NULL;
+	memLayout = nullptr;
 	for (int p = 0; p < 4; ++p) {
 		slotsChanged[p] = false;
 		segmentsChanged[p] = false;
@@ -110,7 +110,7 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	int y = frameT + headerHeight + dy / 2 + fontMetrics().height() / 2 -
 	        fontMetrics().descent();
 
-	int isOn = isEnabled() && memLayout != NULL;
+	int isOn = isEnabled() && memLayout != nullptr;
 	for (int i = 0; i < 4; ++i) {
 		QString str;
 		p.setPen(palette().color(QPalette::Text));

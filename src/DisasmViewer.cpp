@@ -61,13 +61,13 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	watchMarker = QPixmap(":/icons/watchpoint.png");
 	pcMarker = QPixmap(":/icons/pcarrow.png");
 
-	memory = NULL;
+	memory = nullptr;
 	cursorAddr = 0;
 	cursorLine = 0;
 	visibleLines = 0;
 	programAddr = 0xFFFF;
 	waitingForData = false;
-	nextRequest = NULL;
+	nextRequest = nullptr;
 
 	scrollBar = new QScrollBar(Qt::Vertical, this);
 	scrollBar->setMinimum(0);
@@ -179,7 +179,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 
 	QString hexStr;
 	const DisasmRow* row;
-	bool displayDisasm = memory != NULL && isEnabled();
+	bool displayDisasm = memory != nullptr && isEnabled();
 
 	Settings& s = Settings::get();
 	p.setFont(s.font(Settings::CODE_FONT));
@@ -430,7 +430,7 @@ void DisasmViewer::updateCancelled(CommMemoryRequest* req)
 	delete req;
 	if (nextRequest) {
 		CommClient::instance().sendCommand(nextRequest);
-		nextRequest = NULL;
+		nextRequest = nullptr;
 	} else {
 		waitingForData = false;
 	}

@@ -543,7 +543,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r2->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r2->setText(regtexttext);
-		label_dec_r2->setToolTip(NULL);
+		label_dec_r2->setToolTip(nullptr);
 	}
 
 	// the color table address
@@ -561,7 +561,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r3->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r3->setText(regtexttext);
-		label_dec_r3->setToolTip(NULL);
+		label_dec_r3->setToolTip(nullptr);
 	}
 
 	// the pattern generator address
@@ -575,7 +575,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r4->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r4->setText(regtexttext);
-		label_dec_r4->setToolTip(NULL);
+		label_dec_r4->setToolTip(nullptr);
 	}
 
 	// the sprite attribute tabel address
@@ -591,7 +591,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r5->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r5->setText(regtexttext);
-		label_dec_r5->setToolTip(NULL);
+		label_dec_r5->setToolTip(nullptr);
 	};
 	// special case for sprite mode 2
 	if (must && !( 4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
