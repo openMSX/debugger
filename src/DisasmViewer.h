@@ -58,6 +58,8 @@ private:
 
 	QList<int> jumpStack;
 
+	int wheelRemainder;
+
 	// layout information
 	int frameL, frameR, frameT, frameB;
 	int labelFontHeight, labelFontAscent;

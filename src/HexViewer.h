@@ -57,6 +57,8 @@ private:
 	QAction* setWith16Action;
 	QAction* setWith32Action;
 
+	int wheelRemainder;
+
 	// layout
 	int frameL, frameR, frameT, frameB;
 	int leftCharPos, leftValuePos, rightValuePos, rightCharPos;

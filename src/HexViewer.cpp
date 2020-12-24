@@ -43,6 +43,7 @@ private:
 
 HexViewer::HexViewer(QWidget* parent)
 	: QFrame(parent)
+	, wheelRemainder(0)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
@@ -256,8 +257,13 @@ void HexViewer::resizeEvent(QResizeEvent* e)
 
 void HexViewer::wheelEvent(QWheelEvent* e)
 {
-	int v = vertScrollBar->value() - e->angleDelta().y() / 40;
-	vertScrollBar->setValue(v);
+	wheelRemainder += e->angleDelta().y();
+	const int delta = wheelRemainder / 40;
+	wheelRemainder %= 40;
+	if (delta) {
+		int v = vertScrollBar->value() - delta;
+		vertScrollBar->setValue(v);
+	}
 	e->accept();
 }
 

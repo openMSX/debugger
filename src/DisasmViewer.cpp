@@ -52,6 +52,7 @@ private:
 
 DisasmViewer::DisasmViewer(QWidget* parent)
 	: QFrame(parent)
+	, wheelRemainder(0)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
@@ -662,8 +663,13 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 
 void DisasmViewer::wheelEvent(QWheelEvent* e)
 {
-	int line = std::max(0, disasmTopLine - e->angleDelta().y() / 40);
-	setAddress(disasmLines[line].addr, disasmLines[line].infoLine, TopAlways);
+	wheelRemainder += e->angleDelta().y();
+	const int delta = wheelRemainder / 40;
+	wheelRemainder %= 40;
+	if (delta) {
+		int line = std::max(0, disasmTopLine - delta);
+		setAddress(disasmLines[line].addr, disasmLines[line].infoLine, TopAlways);
+	}
 	e->accept();
 }
 
