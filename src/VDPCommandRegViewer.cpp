@@ -1,11 +1,6 @@
 #include "VDPCommandRegViewer.h"
 #include "CommClient.h"
 
-static QString hex8bit(int val)
-{
-	return QString("0x%1").arg(QString("%1").arg(val, 2, 16, QChar('0')).toUpper());
-}
-
 VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	: QDialog(parent)
 {
@@ -61,9 +56,9 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 		        this, SLOT(R45BitChanged(int)));
 	}
 
-	lineEdit_r44->setText("0x00");
-	lineEdit_r45->setText("0x00");
-	lineEdit_r46->setText("0x00");
+	lineEdit_r44->setText(hexValue(0, 2));
+	lineEdit_r45->setText(hexValue(0, 2));
+	lineEdit_r46->setText(hexValue(0, 2));
 	R46 = 0;
 	comboBox_cmd->setCurrentIndex(0);
 	//decodeR46(R46);
@@ -81,7 +76,7 @@ VDPCommandRegViewer::~VDPCommandRegViewer()
 void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 {
 	//for now simply recheck all the checkBoxes and recreate R45
-	int val = lineEdit_r45->text().toInt(nullptr, 0);
+	int val = stringToValue(lineEdit_r45->text());
 	int r45 = 0;
 	for (auto* item : findChildren<QCheckBox*>()) {
 	        int order = QString(item->objectName().right(1)).toInt();
@@ -92,7 +87,7 @@ void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 			item->setChecked(false);
 		}
 	}
-	lineEdit_r45->setText(hex8bit(r45));
+	lineEdit_r45->setText(hexValue(r45, 2));
 	label_arg->setText(QString("%1").arg(r45, 8, 2, QChar('0')));
 }
 
@@ -109,7 +104,7 @@ void VDPCommandRegViewer::on_comboBox_cmd_currentIndexChanged(int index)
 	}
 	R46 = (15 & R46) + 16 * index;
 	decodeR46(R46);
-	lineEdit_r46->setText(hex8bit(R46));
+	lineEdit_r46->setText(hexValue(R46, 2));
 }
 
 void VDPCommandRegViewer::on_comboBox_operator_currentIndexChanged(int index)
@@ -119,7 +114,7 @@ void VDPCommandRegViewer::on_comboBox_operator_currentIndexChanged(int index)
 
 	R46 = index + (R46 & 0xF0);
 	decodeR46(R46);
-	lineEdit_r46->setText(hex8bit(R46));
+	lineEdit_r46->setText(hexValue(R46, 2));
 }
 
 void VDPCommandRegViewer::decodeR46(int val)
@@ -200,21 +195,21 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 {
 	unsigned char newregs[64];
 	memset(newregs, 0, 64);
-	newregs[32] = lineEdit_r32->text().toInt(nullptr, 0);
-	newregs[33] = lineEdit_r33->text().toInt(nullptr, 0);
-	newregs[34] = lineEdit_r34->text().toInt(nullptr, 0);
-	newregs[35] = lineEdit_r35->text().toInt(nullptr, 0);
-	newregs[36] = lineEdit_r36->text().toInt(nullptr, 0);
-	newregs[37] = lineEdit_r37->text().toInt(nullptr, 0);
-	newregs[38] = lineEdit_r38->text().toInt(nullptr, 0);
-	newregs[39] = lineEdit_r39->text().toInt(nullptr, 0);
-	newregs[40] = lineEdit_r40->text().toInt(nullptr, 0);
-	newregs[41] = lineEdit_r41->text().toInt(nullptr, 0);
-	newregs[42] = lineEdit_r42->text().toInt(nullptr, 0);
-	newregs[43] = lineEdit_r43->text().toInt(nullptr, 0);
-	newregs[44] = lineEdit_r44->text().toInt(nullptr, 0);
-	newregs[45] = lineEdit_r45->text().toInt(nullptr, 0);
-	newregs[46] = lineEdit_r46->text().toInt(nullptr, 0);
+	newregs[32] = stringToValue(lineEdit_r32->text());
+	newregs[33] = stringToValue(lineEdit_r33->text());
+	newregs[34] = stringToValue(lineEdit_r34->text());
+	newregs[35] = stringToValue(lineEdit_r35->text());
+	newregs[36] = stringToValue(lineEdit_r36->text());
+	newregs[37] = stringToValue(lineEdit_r37->text());
+	newregs[38] = stringToValue(lineEdit_r38->text());
+	newregs[39] = stringToValue(lineEdit_r39->text());
+	newregs[40] = stringToValue(lineEdit_r40->text());
+	newregs[41] = stringToValue(lineEdit_r41->text());
+	newregs[42] = stringToValue(lineEdit_r42->text());
+	newregs[43] = stringToValue(lineEdit_r43->text());
+	newregs[44] = stringToValue(lineEdit_r44->text());
+	newregs[45] = stringToValue(lineEdit_r45->text());
+	newregs[46] = stringToValue(lineEdit_r46->text());
 
 	auto* req = new WriteDebugBlockCommand("{VDP regs}", 32, 15, newregs);
 	CommClient::instance().sendCommand(req);
@@ -222,7 +217,7 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 
 void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()
 {
-	int val = lineEdit_r44->text().toInt(nullptr, 0);
+	int val = stringToValue(lineEdit_r44->text());
 	label_color->setText(QString("%1 %2").
 			arg((val >> 4) & 15, 4, 2, QChar('0')).
 			arg((val >> 0) & 15, 4, 2, QChar('0')));
@@ -238,14 +233,14 @@ void VDPCommandRegViewer::R45BitChanged(int /*state*/)
 			r45 = r45 | (1 << order);
 		}
 	}
-	lineEdit_r45->setText(hex8bit(r45));
+	lineEdit_r45->setText(hexValue(r45, 2));
 	label_arg->setText(QString("%1").arg(r45, 8, 2, QChar('0')));
 }
 
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
-	int val = lineEdit_r46->text().toInt(nullptr, 0) & 0xFF;
-	lineEdit_r46->setText(hex8bit(val));
+	int val = stringToValue(lineEdit_r46->text()) & 0xFF;
+	lineEdit_r46->setText(hexValue(val, 2));
 	R46 = val;
 	decodeR46(R46);
 	comboBox_operator->setCurrentIndex(R46 & 15);
@@ -267,43 +262,43 @@ void VDPCommandRegViewer::refresh()
 
 void VDPCommandRegViewer::syncRegToCmd()
 {
-	grp_sx->setRL(hex8bit(regs[32]));
-	grp_sx->setRH(hex8bit(regs[33]));
-	grp_sy->setRL(hex8bit(regs[34]));
-	grp_sy->setRH(hex8bit(regs[35]));
-	grp_dx->setRL(hex8bit(regs[36]));
-	grp_dx->setRH(hex8bit(regs[37]));
-	grp_dy->setRL(hex8bit(regs[38]));
-	grp_dy->setRH(hex8bit(regs[39]));
-	grp_nx->setRL(hex8bit(regs[40]));
-	grp_nx->setRH(hex8bit(regs[41]));
-	grp_ny->setRL(hex8bit(regs[42]));
-	grp_ny->setRH(hex8bit(regs[43]));
+	grp_sx->setRL(hexValue(regs[32], 2));
+	grp_sx->setRH(hexValue(regs[33], 2));
+	grp_sy->setRL(hexValue(regs[34], 2));
+	grp_sy->setRH(hexValue(regs[35], 2));
+	grp_dx->setRL(hexValue(regs[36], 2));
+	grp_dx->setRH(hexValue(regs[37], 2));
+	grp_dy->setRL(hexValue(regs[38], 2));
+	grp_dy->setRH(hexValue(regs[39], 2));
+	grp_nx->setRL(hexValue(regs[40], 2));
+	grp_nx->setRH(hexValue(regs[41], 2));
+	grp_ny->setRL(hexValue(regs[42], 2));
+	grp_ny->setRH(hexValue(regs[43], 2));
 
-	lineEdit_r44->setText(hex8bit(regs[44]));
+	lineEdit_r44->setText(hexValue(regs[44], 2));
 	on_lineEdit_r44_editingFinished();
-	lineEdit_r45->setText(hex8bit(regs[45]));
+	lineEdit_r45->setText(hexValue(regs[45], 2));
 	on_lineEdit_r45_editingFinished();
-	lineEdit_r46->setText(hex8bit(regs[46]));
+	lineEdit_r46->setText(hexValue(regs[46], 2));
 	on_lineEdit_r46_editingFinished();
 }
 
 void VDPCommandRegViewer::DataHexRequestReceived()
 {
-	grp_l_sx->setRL(hex8bit(regs[32]));
-	grp_l_sx->setRH(hex8bit(regs[33]));
-	grp_l_sy->setRL(hex8bit(regs[34]));
-	grp_l_sy->setRH(hex8bit(regs[35]));
-	grp_l_dx->setRL(hex8bit(regs[36]));
-	grp_l_dx->setRH(hex8bit(regs[37]));
-	grp_l_dy->setRL(hex8bit(regs[38]));
-	grp_l_dy->setRH(hex8bit(regs[39]));
-	grp_l_nx->setRL(hex8bit(regs[40]));
-	grp_l_nx->setRH(hex8bit(regs[41]));
-	grp_l_ny->setRL(hex8bit(regs[42]));
-	grp_l_ny->setRH(hex8bit(regs[43]));
-	label_r_44->setText(hex8bit(regs[44]));
-	label_r_45->setText(hex8bit(regs[45]));
-	label_r_46->setText(hex8bit(regs[46]));
+	grp_l_sx->setRL(hexValue(regs[32], 2));
+	grp_l_sx->setRH(hexValue(regs[33], 2));
+	grp_l_sy->setRL(hexValue(regs[34], 2));
+	grp_l_sy->setRH(hexValue(regs[35], 2));
+	grp_l_dx->setRL(hexValue(regs[36], 2));
+	grp_l_dx->setRH(hexValue(regs[37], 2));
+	grp_l_dy->setRL(hexValue(regs[38], 2));
+	grp_l_dy->setRH(hexValue(regs[39], 2));
+	grp_l_nx->setRL(hexValue(regs[40], 2));
+	grp_l_nx->setRH(hexValue(regs[41], 2));
+	grp_l_ny->setRL(hexValue(regs[42], 2));
+	grp_l_ny->setRH(hexValue(regs[43], 2));
+	label_r_44->setText(hexValue(regs[44], 2));
+	label_r_45->setText(hexValue(regs[45], 2));
+	label_r_46->setText(hexValue(regs[46], 2));
 	if (autoSyncRadioButton->isChecked()) syncRegToCmd();
 }

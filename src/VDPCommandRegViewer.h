@@ -3,6 +3,7 @@
 
 #include "SimpleHexRequest.h"
 #include "ui_VDPCommandRegisters.h"
+#include "Convert.h"
 #include <QDialog>
 
 
@@ -39,9 +40,8 @@ public slots:
 
 	void setRH(const QString& newval)
 	{
-		bool ok;
-		int val = newval.toInt(&ok, 0) & 0xFF;
-		if (!ok || (val == rh)) return;
+		int val = stringToValue(newval) & 0xFF;
+		if ((val == -1) || (val == rh)) return;
 
 		rh = val;
 		updaterw();
@@ -49,9 +49,8 @@ public slots:
 	}
 	void setRL(const QString& newval)
 	{
-		bool ok;
-		int val = newval.toInt(&ok, 0) & 0xFF;
-		if (!ok || (val == rl)) return;
+		int val = stringToValue(newval) & 0xFF;
+		if ((val == -1) || (val == rl)) return;
 
 		rl = val;
 		updaterw();
@@ -60,9 +59,8 @@ public slots:
 	void setRW(const QString& newval)
 	{
 		//TODO: build a split-in-two method
-		bool ok;
-		int val = newval.toInt(&ok, 0) & 0xFFFF;
-		if (!ok || (val == rw)) return;
+		int val = stringToValue(newval) & 0xFFFF;
+		if ((val == -1) || (val == rw)) return;
 
 		rw = val;
 		updaterl();
@@ -84,7 +82,7 @@ private:
 	QString convert(int val, int mode)
 	{
 		if (mode & 1) {
-			return QString("0x%1").arg(QString("%1").arg(val, 2, 16, QChar('0')).toUpper());
+			return hexValue(val, 2);
 		} else {
 			return QString("%1").arg(val);
 		}

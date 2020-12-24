@@ -1,6 +1,7 @@
 #include "BitMapViewer.h"
 #include "VramBitMappedView.h"
 #include "VDPDataStore.h"
+#include "Convert.h"
 #include <QMessageBox>
 
 static const unsigned char defaultPalette[32] = {
@@ -146,7 +147,7 @@ void BitMapViewer::decodeVDPregs()
 
 	setPages();
 
-	addressLabel->setText(QString("0x%1").arg(QString("%1").arg(p * q, 5, 16, QChar('0')).toUpper()));
+	addressLabel->setText(hexValue(p * q, 5));
 	if (useVDP) showPage->setCurrentIndex(p);
 }
 
@@ -272,6 +273,6 @@ void BitMapViewer::imagePositionUpdate(
 	labelX->setText(QString("%1").arg(x, 3, 10, QChar('0')));
 	labelY->setText(QString("%1").arg(y, 3, 10, QChar('0')));
 	labelColor->setText(QString("%1").arg(color, 3, 10, QChar('0')));
-	labelByte->setText(QString("0x%1").arg(QString("%1").arg(byteValue, 2, 16, QChar('0')).toUpper()));
-	labelVramAddr->setText(QString("0x%1").arg(QString("%1").arg(addr, 5, 16, QChar('0')).toUpper()));
+	labelByte->setText(hexValue(byteValue, 2));
+	labelVramAddr->setText(hexValue(addr, 5));
 }

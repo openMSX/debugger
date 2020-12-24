@@ -569,8 +569,7 @@ void SymbolManager::updateItemValue(QTreeWidgetItem* item)
 	auto* sym = reinterpret_cast<Symbol*>(item->data(0, Qt::UserRole).value<quintptr>());
 
 	// symbol value in 3rd column
-	// TODO: Custom prefix/postfix
-	item->setText(2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')).toUpper());
+	item->setText(2, hexValue(sym->value(), 4));
 }
 
 void SymbolManager::updateItemSlots(QTreeWidgetItem* item)
