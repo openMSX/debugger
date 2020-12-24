@@ -691,24 +691,22 @@ bool HexViewer::event(QEvent* e)
 		QString text = QString("Address: %1").arg(QString("%1").arg(address, addressLength, 16, QChar('0')).toUpper());
 
 		// print 8 bit values
-		text += "\nBinary: ";
-		text += QString("%1 ").arg(chr >> 4, 4, 2, QChar('0'));
-		text += QString("%1") .arg(chr & 0x000F, 4, 2, QChar('0'));
-		text += "\nDecimal: ";
-		text += QString::number(chr);
+		text += QString("\nBinary: %1 %2")
+			.arg(chr >> 4, 4, 2, QChar('0'))
+			.arg(chr & 0x000F, 4, 2, QChar('0'));
+		text += QString("\nDecimal: %1").arg(chr);
 
 		// print 16 bit values if possible
 		if ((address + 1) < debuggableSize) {
 			unsigned wd = chr;
 			wd += 256 * hexData[address + 1];
 			text += QString("\n\nWord: %1").arg(QString("%1").arg(wd, 4, 16, QChar('0')).toUpper());
-			text += "\nBinary: ";
-			text += QString("%1 ").arg((wd & 0xF000) >> 12, 4, 2, QChar('0'));
-			text += QString("%1 ").arg((wd & 0x0F00) >>  8, 4, 2, QChar('0'));
-			text += QString("%1 ").arg((wd & 0x00F0) >>  4, 4, 2, QChar('0'));
-			text += QString("%1 ").arg((wd & 0x000F) >>  0, 4, 2, QChar('0'));
-			text += "\nDecimal: ";
-			text += QString::number(wd);
+			text += QString("\nBinary: %1 %1 %1 %1")
+				.arg((wd & 0xF000) >> 12, 4, 2, QChar('0'))
+				.arg((wd & 0x0F00) >>  8, 4, 2, QChar('0'))
+				.arg((wd & 0x00F0) >>  4, 4, 2, QChar('0'))
+				.arg((wd & 0x000F) >>  0, 4, 2, QChar('0'));
+			text += QString("\nDecimal: %1").arg(wd);
 		}
 		QToolTip::showText(helpEvent->globalPos(), text);
 	} else {
