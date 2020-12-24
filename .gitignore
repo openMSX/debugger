@@ -1,3 +1,5 @@
 build/*.pyc
 derived/
 build/msvc/.vs/*
+.vscode/
+__pycache__/
