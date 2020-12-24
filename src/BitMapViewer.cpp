@@ -146,7 +146,7 @@ void BitMapViewer::decodeVDPregs()
 
 	setPages();
 
-	addressLabel->setText(QString("0x%1").arg(p * q, 5, 16, QChar('0')));
+	addressLabel->setText(QString("0x%1").arg(QString("%1").arg(p * q, 5, 16, QChar('0')).toUpper()));
 	if (useVDP) showPage->setCurrentIndex(p);
 }
 
@@ -272,6 +272,6 @@ void BitMapViewer::imagePositionUpdate(
 	labelX->setText(QString("%1").arg(x, 3, 10, QChar('0')));
 	labelY->setText(QString("%1").arg(y, 3, 10, QChar('0')));
 	labelColor->setText(QString("%1").arg(color, 3, 10, QChar('0')));
-	labelByte->setText(QString("0x%1").arg(byteValue, 2, 16, QChar('0')));
-	labelVramAddr->setText(QString("0x%1").arg(addr, 5, 16, QChar('0')));
+	labelByte->setText(QString("0x%1").arg(QString("%1").arg(byteValue, 2, 16, QChar('0')).toUpper()));
+	labelVramAddr->setText(QString("0x%1").arg(QString("%1").arg(addr, 5, 16, QChar('0')).toUpper()));
 }

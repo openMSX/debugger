@@ -3,7 +3,7 @@
 
 static QString hex8bit(int val)
 {
-	return QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper();
+	return QString("0x%1").arg(QString("%1").arg(val, 2, 16, QChar('0')).toUpper());
 }
 
 VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
@@ -92,7 +92,7 @@ void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 			item->setChecked(false);
 		}
 	}
-	lineEdit_r45->setText(QString("0x%1").arg(r45, 2, 16, QChar('0')).toUpper());
+	lineEdit_r45->setText(hex8bit(r45));
 	label_arg->setText(QString("%1").arg(r45, 8, 2, QChar('0')));
 }
 
@@ -109,7 +109,7 @@ void VDPCommandRegViewer::on_comboBox_cmd_currentIndexChanged(int index)
 	}
 	R46 = (15 & R46) + 16 * index;
 	decodeR46(R46);
-	lineEdit_r46->setText(QString("0x%1").arg(R46, 2, 16, QChar('0')).toUpper());
+	lineEdit_r46->setText(hex8bit(R46));
 }
 
 void VDPCommandRegViewer::on_comboBox_operator_currentIndexChanged(int index)
@@ -119,7 +119,7 @@ void VDPCommandRegViewer::on_comboBox_operator_currentIndexChanged(int index)
 
 	R46 = index + (R46 & 0xF0);
 	decodeR46(R46);
-	lineEdit_r46->setText(QString("0x%1").arg(R46, 2, 16, QChar('0')).toUpper());
+	lineEdit_r46->setText(hex8bit(R46));
 }
 
 void VDPCommandRegViewer::decodeR46(int val)
@@ -238,14 +238,14 @@ void VDPCommandRegViewer::R45BitChanged(int /*state*/)
 			r45 = r45 | (1 << order);
 		}
 	}
-	lineEdit_r45->setText(QString("0x%1").arg(r45, 2, 16, QChar('0')).toUpper());
+	lineEdit_r45->setText(hex8bit(r45));
 	label_arg->setText(QString("%1").arg(r45, 8, 2, QChar('0')));
 }
 
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
 	int val = lineEdit_r46->text().toInt(nullptr, 0) & 0xFF;
-	lineEdit_r46->setText(QString("0x%1").arg(val, 2, 16, QChar('0')).toUpper());
+	lineEdit_r46->setText(hex8bit(val));
 	R46 = val;
 	decodeR46(R46);
 	comboBox_operator->setCurrentIndex(R46 & 15);

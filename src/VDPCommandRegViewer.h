@@ -84,7 +84,7 @@ private:
 	QString convert(int val, int mode)
 	{
 		if (mode & 1) {
-			return QString("0x%1").arg(val, 2, 16, QChar('0'));
+			return QString("0x%1").arg(QString("%1").arg(val, 2, 16, QChar('0')).toUpper());
 		} else {
 			return QString("%1").arg(val);
 		}

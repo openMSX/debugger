@@ -570,7 +570,7 @@ void SymbolManager::updateItemValue(QTreeWidgetItem* item)
 
 	// symbol value in 3rd column
 	// TODO: Custom prefix/postfix
-	item->setText(2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')));
+	item->setText(2, QString("$%1").arg(sym->value(), 4, 16, QChar('0')).toUpper());
 }
 
 void SymbolManager::updateItemSlots(QTreeWidgetItem* item)

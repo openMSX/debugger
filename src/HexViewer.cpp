@@ -688,7 +688,7 @@ bool HexViewer::event(QEvent* e)
 		// create text with binary and decimal values
 		int address = hexTopAddress + offset;
 		unsigned char chr = hexData[address];
-		QString text = QString("Address: %1").arg(address, addressLength, 16, QChar('0'));
+		QString text = QString("Address: %1").arg(QString("%1").arg(address, addressLength, 16, QChar('0')).toUpper());
 
 		// print 8 bit values
 		text += "\nBinary: ";
@@ -701,7 +701,7 @@ bool HexViewer::event(QEvent* e)
 		if ((address + 1) < debuggableSize) {
 			unsigned wd = chr;
 			wd += 256 * hexData[address + 1];
-			text += QString("\n\nWord: %1").arg(wd, 4, 16, QChar('0'));
+			text += QString("\n\nWord: %1").arg(QString("%1").arg(wd, 4, 16, QChar('0')).toUpper());
 			text += "\nBinary: ";
 			text += QString("%1 ").arg((wd & 0xF000) >> 12, 4, 2, QChar('0'));
 			text += QString("%1 ").arg((wd & 0x0F00) >>  8, 4, 2, QChar('0'));

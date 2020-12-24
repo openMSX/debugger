@@ -57,7 +57,7 @@ QString hexValue(int value, int width)
 {
 	Settings& s = Settings::get();
 	return QString("%1%2%3").arg(s.value("Preferences/HexPrefix", "$").toString())
-	                        .arg(value, width, 16, QChar('0'))
+	                        .arg(QString("%1").arg(value, width, 16, QChar('0')).toUpper())
 	                        .arg(s.value("Preferences/HexPostfix", "").toString());
 	                      
 }

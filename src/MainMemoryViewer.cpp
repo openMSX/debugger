@@ -70,7 +70,7 @@ void MainMemoryViewer::settingsChanged()
 
 void MainMemoryViewer::setLocation(int addr)
 {
-	addressValue->setText(hexValue(addr, 4).toUpper());
+	addressValue->setText(hexValue(addr, 4));
 	hexView->setLocation(addr);
 }
 
@@ -96,7 +96,7 @@ void MainMemoryViewer::refresh()
 
 void MainMemoryViewer::hexViewChanged(int addr)
 {
-	addressValue->setText(hexValue(addr, 4).toUpper());
+	addressValue->setText(hexValue(addr, 4));
 }
 
 void MainMemoryViewer::addressValueChanged()
@@ -120,7 +120,7 @@ void MainMemoryViewer::registerChanged(int id, int value)
 		return;
 	}
 
-	addressValue->setText(hexValue(value, 4).toUpper());
+	addressValue->setText(hexValue(value, 4));
 	hexView->setLocation(value);
 	//hexView->refresh();
 }
