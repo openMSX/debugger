@@ -263,7 +263,7 @@ COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PA
 COMPILE_FLAGS+=-std=c++11
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
-OSX_VER:=10.7
+OSX_VER:=10.13
 COMPILE_FLAGS+=-mmacosx-version-min=$(OSX_VER) -stdlib=libc++
 LINK_FLAGS+=-mmacosx-version-min=$(OSX_VER) -stdlib=libc++
 else
