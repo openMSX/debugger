@@ -1,7 +1,7 @@
 #ifndef DEBUGGERDATA_H
 #define DEBUGGERDATA_H
 
-#include <QLinkedList>
+#include <list>
 #include <QString>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -64,7 +64,7 @@ private:
 		// compare content
 		bool operator==(const Breakpoint &bp) const;
 	};
-	using BreakpointList = QLinkedList<Breakpoint>;
+	using BreakpointList = std::list<Breakpoint>;
 
 	BreakpointList breakpoints;
 	MemoryLayout* memLayout;

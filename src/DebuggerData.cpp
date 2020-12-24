@@ -196,7 +196,7 @@ QString Breakpoints::mergeBreakpoints(const QString& str)
 	// check old list against new one
 	QStringList mergeSet;
 	while (!oldBps.empty()) {
-		Breakpoint& old = oldBps.first();
+		Breakpoint& old = oldBps.front();
 		auto newit = breakpoints.begin();
 		for (/**/; newit != breakpoints.end(); ++newit) {
 			// check for identical data
@@ -208,7 +208,7 @@ QString Breakpoints::mergeBreakpoints(const QString& str)
 			                               old.regionEnd, old.condition);
 			mergeSet << cmd;
 		}
-		oldBps.removeFirst();
+		oldBps.pop_front();
 	}
 	return mergeSet.join(" ; ");
 }
@@ -279,7 +279,7 @@ void Breakpoints::insertBreakpoint(Breakpoint& bp)
 			return;
 		}
 	}
-	breakpoints.append(bp);
+	breakpoints.push_back(bp);
 }
 
 int Breakpoints::breakpointCount()
