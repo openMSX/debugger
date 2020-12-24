@@ -1,6 +1,6 @@
 #include "OpenMSXConnection.h"
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
+#include <QXmlStreamReader>
+#include <cinttypes>
 #include <cassert>
 
 
@@ -87,12 +87,10 @@ void ReadDebugBlockCommand::copyData(const QString& message)
 
 OpenMSXConnection::OpenMSXConnection(QAbstractSocket* socket_)
 	: socket(socket_)
-	, reader(new QXmlSimpleReader())
+	, reader(new QXmlStreamReader())
 	, connected(true)
 {
 	assert(socket->isValid());
-	reader->setContentHandler(this);
-	reader->setErrorHandler(this);
 
 	connect(socket, SIGNAL(readyRead()), this, SLOT(processData()));
 	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
@@ -163,39 +161,37 @@ void OpenMSXConnection::socketError(QAbstractSocket::SocketError /*state*/)
 
 void OpenMSXConnection::processData()
 {
-	if (input) {
-		// continue
-		input->setData(socket->readAll());
-		reader->parseContinue();
-	} else {
-		// first time
-		input.reset(new QXmlInputSource());
-		input->setData(socket->readAll());
-		reader->parse(input.get(), true); // incremental parsing
+	if (!reader->device()) {
+		reader->setDevice(socket);
+	}
+
+	while (!reader->atEnd()) {
+		reader->readNext();
+		if (reader->isStartElement()) {
+			startElement(reader->name(), reader->attributes());
+		} else if (reader->isEndElement()) {
+			endElement(reader->name());
+		} else if (reader->isCharacters()) {
+			characters(reader->text());
+		}
+	}
+
+	if (reader->hasError() && reader->error() != QXmlStreamReader::PrematureEndOfDocumentError) {
+		qWarning("Fatal error on line %" PRIi64 ", column %" PRIi64 ": %s",
+				reader->lineNumber(), reader->columnNumber(),
+				reader->errorString().toLatin1().data());
+		cleanup();
 	}
 }
 
-bool OpenMSXConnection::fatalError(const QXmlParseException& exception)
-{
-	qWarning("Fatal error on line %i, column %i: %s",
-	         exception.lineNumber(), exception.columnNumber(),
-	         exception.message().toLatin1().data());
-	cleanup();
-	return false;
-}
-
-bool OpenMSXConnection::startElement(
-		const QString& /*namespaceURI*/, const QString& /*localName*/,
-		const QString& /*qName*/, const QXmlAttributes& atts)
+bool OpenMSXConnection::startElement(const QStringRef& /*qName*/, const QXmlStreamAttributes& atts)
 {
 	xmlAttrs = atts;
 	xmlData.clear();
 	return true;
 }
 
-bool OpenMSXConnection::endElement(
-		const QString& /*namespaceURI*/, const QString& /*localName*/,
-		const QString& qName)
+bool OpenMSXConnection::endElement(const QStringRef& qName)
 {
 	if (qName == "openmsx-output") {
 		// ignore
@@ -212,16 +208,16 @@ bool OpenMSXConnection::endElement(
 			// the connection, ignore it
 		}
 	} else if (qName == "log") {
-		emit logParsed(xmlAttrs.value("level"), xmlData);
+		emit logParsed(xmlAttrs.value("level").toString(), xmlData);
 	} else if (qName == "update") {
-		emit updateParsed(xmlAttrs.value("type"), xmlAttrs.value("name"), xmlData);
+		emit updateParsed(xmlAttrs.value("type").toString(), xmlAttrs.value("name").toString(), xmlData);
 	} else {
 		qWarning("Unknown XML tag: %s", qName.toLatin1().data());
 	}
 	return true;
 }
 
-bool OpenMSXConnection::characters(const QString& ch)
+bool OpenMSXConnection::characters(const QStringRef& ch)
 {
 	xmlData += ch;
 	return true;

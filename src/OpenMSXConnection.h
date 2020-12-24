@@ -3,12 +3,11 @@
 
 #include <QObject>
 #include <QAbstractSocket>
-#include <QXmlDefaultHandler>
+#include <QXmlStreamAttributes>
 #include <QQueue>
 #include <memory>
 
-class QXmlInputSource;
-class QXmlSimpleReader;
+class QXmlStreamReader;
 
 class Command
 {
@@ -59,7 +58,7 @@ public:
 	                      unsigned char* source);
 };
 
-class OpenMSXConnection : public QObject, private QXmlDefaultHandler
+class OpenMSXConnection : public QObject
 {
 	Q_OBJECT
 public:
@@ -83,21 +82,16 @@ private:
 	void cleanup();
 	void cancelPending();
 
-	// QXmlDefaultHandler
-	bool fatalError(const QXmlParseException& exception) override;
-	bool startElement(const QString& namespaceURI, const QString& localName,
-	                  const QString& qName, const QXmlAttributes& atts) override;
-	bool endElement(const QString& namespaceURI, const QString& localName,
-	                const QString& qName) override;
-	bool characters(const QString& ch) override;
+	bool startElement(const QStringRef& qName, const QXmlStreamAttributes& atts);
+	bool endElement(const QStringRef& qName);
+	bool characters(const QStringRef& ch);
 
 	//std::unique_ptr<QAbstractSocket> socket;
 	QAbstractSocket* socket;
-	std::unique_ptr<QXmlInputSource> input;
-	std::unique_ptr<QXmlSimpleReader> reader;
+	std::unique_ptr<QXmlStreamReader> reader;
 
 	QString xmlData;
-	QXmlAttributes xmlAttrs;
+	QXmlStreamAttributes xmlAttrs;
 	QQueue<Command*> commands;
 	bool connected;
 };
