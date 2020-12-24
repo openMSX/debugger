@@ -256,7 +256,7 @@ void HexViewer::resizeEvent(QResizeEvent* e)
 
 void HexViewer::wheelEvent(QWheelEvent* e)
 {
-	int v = vertScrollBar->value() - e->delta() / 40;
+	int v = vertScrollBar->value() - e->angleDelta().y() / 40;
 	vertScrollBar->setValue(v);
 	e->accept();
 }

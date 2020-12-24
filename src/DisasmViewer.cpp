@@ -662,13 +662,9 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 
 void DisasmViewer::wheelEvent(QWheelEvent* e)
 {
-	int line = std::max(0, disasmTopLine - e->delta() / 40);
-	if (e->orientation() == Qt::Vertical) {
-		setAddress(disasmLines[line].addr,
-		           disasmLines[line].infoLine,
-		           TopAlways);
-		e->accept();
-	}
+	int line = std::max(0, disasmTopLine - e->angleDelta().y() / 40);
+	setAddress(disasmLines[line].addr, disasmLines[line].infoLine, TopAlways);
+	e->accept();
 }
 
 void DisasmViewer::mousePressEvent(QMouseEvent* e)
