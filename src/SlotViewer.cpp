@@ -116,18 +116,17 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 		p.setPen(palette().color(QPalette::Text));
 
 		// print page nr
-		str.asprintf("%i", i);
+		str = QString("$%1").arg(i);
 		p.drawText(mid1 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		// print address
-		str.asprintf("$%04X", i * 0x4000);
+		str = QString("$%1").arg(i * 0x4000, 4, 16, QChar('0')).toUpper();
 		p.drawText(mid2 - fontMetrics().horizontalAdvance(str) / 2, y, str);
 
 		// print slot
 		if (isOn) {
 			if (memLayout->isSubslotted[memLayout->primarySlot[i]]) {
-				str.asprintf("%i-%i", memLayout->primarySlot[i],
-				                      memLayout->secondarySlot[i]);
+				str = QString("%1-%2").arg(memLayout->primarySlot[i]).arg(memLayout->secondarySlot[i]);
 			} else {
 				str = QString::number(memLayout->primarySlot[i]);
 			}
@@ -153,12 +152,12 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 				ms = memLayout->mapperSize[memLayout->primarySlot[i] & 3][0];
 			}
 			if (ms > 0) {
-				str.asprintf("%i", memLayout->mapperSegment[i]);
+				str = QString("%1").arg(memLayout->mapperSegment[i]);
 			} else if (memLayout->romBlock[2*i] >= 0) {
 				if (memLayout->romBlock[2*i] == memLayout->romBlock[2*i+1]) {
-					str.asprintf("R%i", memLayout->romBlock[2*i]);
+					str = QString("R%1").arg(memLayout->romBlock[2*i]);
 				} else {
-					str.asprintf("R%i/%i", memLayout->romBlock[2*i], memLayout->romBlock[2*i+1]);
+					str = QString("R%1/%2").arg(memLayout->romBlock[2*i]).arg(memLayout->romBlock[2*i+1]);
 				}
 			} else {
 				str = "-";

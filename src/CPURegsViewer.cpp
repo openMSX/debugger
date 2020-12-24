@@ -127,11 +127,11 @@ void CPURegsViewer::drawValue(QPainter& p, int id, int x, int y)
 		// create string
 		QString str;
 		if (id < CpuRegs::REG_I) {
-			str.asprintf("%04X", regs[id]);
+			str = QString("%1").arg(regs[id], 4, 16, QChar('0')).toUpper();
 		} else if (id < CpuRegs::REG_IM) {
-			str.asprintf("%02X", regs[id]);
+			str = QString("%1").arg(regs[id], 2, 16, QChar('0')).toUpper();
 		} else {
-			str.asprintf("%01X", regs[id]);
+			str = QString("%1").arg(regs[id], 1, 16, QChar('0')).toUpper();
 		}
 		// draw
 		p.drawText(x, y, str);

@@ -126,9 +126,9 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
 		// print address
 		QString hexStr;
-		hexStr.asprintf("%04X", address);
+		hexStr = QString("%1").arg(address, 4, 16, QChar('0')).toUpper();
 		p.drawText(xAddr,  y - d, hexStr);
-		hexStr.asprintf("%02X%02X", memory[address + 1], memory[address]);
+		hexStr = QString("%1").arg(memory[address + 1] << 8 | memory[address], 4, 16, QChar('0')).toUpper();
 		p.drawText(xStack, y - d, hexStr);
 		y += h;
 		address += 2;

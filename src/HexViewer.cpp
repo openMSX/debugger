@@ -302,7 +302,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		for (int j = 0; j < horBytes; ++j) {
 			// print data
 			if (address + j < debuggableSize) {
-				hexStr.asprintf("%02X", hexData[address + j]);
+				hexStr = QString("%1").arg(hexData[address + j], 2, 16, QChar('0')).toUpper();
 				// draw marker if needed
 				if (useMarker || beingEdited) {
 					QRect b(x, y, dataWidth, lineHeight);
@@ -316,7 +316,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 						if (beingEdited) {
 							p.fillRect(b, Qt::darkGreen);
 							if (cursorPosition) {
-								hexStr.asprintf("%2X", editValue);
+								hexStr = QString("%1").arg(editValue, 2, 16).toUpper();
 							}
 						} else {
 							p.drawRect(b);

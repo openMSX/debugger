@@ -252,12 +252,12 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 			}
 
 			// print the address
-			hexStr.asprintf("%04X", row->addr);
+			hexStr = QString("%1").arg(row->addr, 4, 16, QChar('0')).toUpper();
 			p.drawText(xAddr, y + a, hexStr);
 
 			// print 1 to 4 bytes
 			for (int j = 0; j < row->numBytes; ++j) {
-				hexStr.asprintf("%02X", displayDisasm ? memory[row->addr + j] : 0);
+				hexStr = QString("%1").arg(displayDisasm ? memory[row->addr + j] : 0, 2, 16, QChar('0')).toUpper();
 				p.drawText(xMCode[j], y + a, hexStr);
 			}
 
