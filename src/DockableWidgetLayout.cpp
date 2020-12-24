@@ -3,7 +3,7 @@
 #include <QLayoutItem>
 #include <QtGlobal>
 #include <QSet>
-
+#include <iterator>
 
 static const int SNAP_DISTANCE = 16;
 
@@ -517,7 +517,7 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+					for (auto ita = std::next(sidePoints.begin()); ita != sidePoints.end(); ++ita) {
 						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
@@ -594,7 +594,7 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.horizontalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.left() + rect.width() / 2;
-					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+					for (auto ita = std::next(sidePoints.begin()); ita != sidePoints.end(); ++ita) {
 						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
@@ -672,7 +672,7 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+					for (auto ita = std::next(sidePoints.begin()); ita != sidePoints.end(); ++ita) {
 						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
@@ -748,7 +748,7 @@ bool DockableWidgetLayout::insertLocation(
 				// check for resized placement options
 				if (sizePol.verticalPolicy() != QSizePolicy::Fixed) {
 					int mid = rect.top() + rect.height() / 2;
-					for (auto ita = sidePoints.begin() + 1; ita != sidePoints.end(); ++ita) {
+					for (auto ita = std::next(sidePoints.begin()); ita != sidePoints.end(); ++ita) {
 						for (auto itb = sidePoints.begin(); ita != itb; ++itb) {
 							int sp_mid = (*ita + *itb) / 2;
 							int sp_diff = *ita - *itb;
