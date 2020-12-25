@@ -39,6 +39,7 @@ private:
 
 StackViewer::StackViewer(QWidget* parent)
 	: QFrame(parent)
+	, wheelRemainder(0)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
@@ -79,6 +80,18 @@ void StackViewer::setScrollBarValues()
 	vertScrollBar->setMaximum(stackPointer + 2 * (lines - int(visibleLines)));
 	vertScrollBar->setSingleStep(2);
 	vertScrollBar->setPageStep(2 * int(visibleLines));
+}
+
+void StackViewer::wheelEvent(QWheelEvent* e)
+{
+	wheelRemainder += e->angleDelta().y();
+	const int delta = wheelRemainder / 40;
+	wheelRemainder %= 40;
+	if (delta) {
+		int v = vertScrollBar->value() - delta;
+		vertScrollBar->setValue(v);
+	}
+	e->accept();
 }
 
 void StackViewer::resizeEvent(QResizeEvent* e)

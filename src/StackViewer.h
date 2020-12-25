@@ -21,6 +21,7 @@ public slots:
 	void setStackPointer(quint16 addr);
 
 private:
+	void wheelEvent(QWheelEvent* e) override;
 	void resizeEvent(QResizeEvent* e) override;
 	void paintEvent(QPaintEvent* e) override;
 
@@ -29,6 +30,8 @@ private:
 	void transferCancelled(StackRequest* r);
 
 	QScrollBar* vertScrollBar;
+
+	int wheelRemainder;
 
 	int frameL, frameR, frameT, frameB;
 	double visibleLines;
