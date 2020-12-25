@@ -1,6 +1,5 @@
 #include "OpenMSXConnection.h"
 #include <QXmlStreamReader>
-#include <cinttypes>
 #include <cassert>
 
 
@@ -177,7 +176,7 @@ void OpenMSXConnection::processData()
 	}
 
 	if (reader->hasError() && reader->error() != QXmlStreamReader::PrematureEndOfDocumentError) {
-		qWarning("Fatal error on line %" PRIi64 ", column %" PRIi64 ": %s",
+		qWarning("Fatal error on line %lli, column %lli: %s",
 				reader->lineNumber(), reader->columnNumber(),
 				reader->errorString().toLatin1().data());
 		cleanup();
