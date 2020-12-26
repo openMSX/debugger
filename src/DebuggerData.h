@@ -64,9 +64,8 @@ private:
 		// compare content
 		bool operator==(const Breakpoint &bp) const;
 	};
-	using BreakpointList = std::list<Breakpoint>;
 
-	BreakpointList breakpoints;
+	std::vector<Breakpoint> breakpoints;
 	MemoryLayout* memLayout;
 
 	void parseCondition(Breakpoint& bp);

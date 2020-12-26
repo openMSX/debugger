@@ -190,13 +190,12 @@ void Breakpoints::setBreakpoints(const QString& str)
 QString Breakpoints::mergeBreakpoints(const QString& str)
 {
 	// copy breakpoints
-	BreakpointList oldBps(breakpoints);
+	auto oldBps = breakpoints;
 	// parse new list
 	setBreakpoints(str);
 	// check old list against new one
 	QStringList mergeSet;
-	while (!oldBps.empty()) {
-		Breakpoint& old = oldBps.front();
+	for (const auto& old : oldBps) {
 		auto newit = breakpoints.begin();
 		for (/**/; newit != breakpoints.end(); ++newit) {
 			// check for identical data
@@ -208,7 +207,6 @@ QString Breakpoints::mergeBreakpoints(const QString& str)
 			                               old.regionEnd, old.condition);
 			mergeSet << cmd;
 		}
-		oldBps.pop_front();
 	}
 	return mergeSet.join(" ; ");
 }
