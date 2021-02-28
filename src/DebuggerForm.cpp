@@ -1,5 +1,6 @@
 #include "DebuggerForm.h"
 #include "BitMapViewer.h"
+#include "TileViewer.h"
 #include "DockableWidgetArea.h"
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
@@ -290,7 +291,11 @@ void DebuggerForm::createActions()
 	viewVDPRegsAction->setCheckable(true);
 	viewBitMappedAction = new QAction(tr("Bitmapped VRAM"), this);
 	viewBitMappedAction->setStatusTip(tr("Decode VRAM as screen 5/6/7/8 image"));
-	//viewBitMappedAction->setCheckable(true);
+        //viewBitMappedAction->setCheckable(true);
+        viewCharMappedAction = new QAction(tr("Tiles in VRAM"), this);
+        viewCharMappedAction->setStatusTip(tr("Decode VRAM as MSX1 screen tiles"));
+        viewSpritesAction = new QAction(tr("Sprites in VRAM"), this);
+        viewSpritesAction->setStatusTip(tr("Decode sprites tiles"));
 
 	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
@@ -367,7 +372,9 @@ void DebuggerForm::createActions()
 	connect(viewMemoryAction, SIGNAL(triggered()), this, SLOT(toggleMemoryDisplay()));
 	connect(viewDebuggableViewerAction, SIGNAL(triggered()), this, SLOT(addDebuggableViewer()));
 	connect(viewBitMappedAction, SIGNAL(triggered()), this, SLOT(toggleBitMappedDisplay()));
-	connect(viewVDPRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPRegsDisplay()));
+        connect(viewCharMappedAction, SIGNAL(triggered()), this, SLOT(toggleCharMappedDisplay()));
+        connect(viewSpritesAction, SIGNAL(triggered()), this, SLOT(toggleSpritesDisplay()));
+        connect(viewVDPRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPRegsDisplay()));
 	connect(viewVDPCommandRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPCommandRegsDisplay()));
 	connect(viewVDPStatusRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPStatusRegsDisplay()));
 	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
@@ -433,6 +440,8 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu->addAction(viewVDPCommandRegsAction);
 	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
+    viewVDPDialogsMenu->addAction(viewCharMappedAction);
+    viewVDPDialogsMenu->addAction(viewSpritesAction);
 	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
 
 	// create Debuggable Viewers menu (so the user can focus an existing one)
@@ -1246,6 +1255,46 @@ void DebuggerForm::toggleBitMappedDisplay()
 	viewer->setDebuggables(debuggables);
 	viewer->setEnabled(disasmView->isEnabled());
 	*/
+}
+
+void DebuggerForm::toggleCharMappedDisplay()
+{
+    //toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
+    // not sure if this a good idea for a docable widget
+
+    // create new debuggable viewer window
+    auto* viewer = new TileViewer();
+    auto* dw = new DockableWidget(dockMan);
+    dw->setWidget(viewer);
+    dw->setTitle(tr("Tile VRAM View"));
+    dw->setId("CHARMAPVRAMVIEW");
+    dw->setFloating(true);
+    dw->setDestroyable(true);
+    dw->setMovable(true);
+    dw->setClosable(true);
+
+    // TODO: refresh should be being hanled by VDPDataStore...
+    connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
+}
+
+void DebuggerForm::toggleSpritesDisplay()
+{
+    //toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
+    // not sure if this a good idea for a docable widget
+
+    // create new debuggable viewer window
+    auto* viewer = new TileViewer();
+    auto* dw = new DockableWidget(dockMan);
+    dw->setWidget(viewer);
+    dw->setTitle(tr("Sprites View"));
+    dw->setId("SPRITESVRAMVIEW");
+    dw->setFloating(true);
+    dw->setDestroyable(true);
+    dw->setMovable(true);
+    dw->setClosable(true);
+
+    // TODO: refresh should be being hanled by VDPDataStore...
+    connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
 }
 
 void DebuggerForm::toggleVDPCommandRegsDisplay()

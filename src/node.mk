@@ -10,7 +10,8 @@ MOC_SRC_HDR:= \
 	Settings PreferencesDialog BreakpointDialog DebuggableViewer \
 	DebugSession MainMemoryViewer BitMapViewer VramBitMappedView \
 	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
-	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable
+	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable \
+	TileViewer VramTiledView
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \
@@ -22,6 +23,6 @@ SRC_ONLY:= \
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
 	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters \
-	GotoDialog
+	GotoDialog TileViewer
 
 include build/node-end.mk

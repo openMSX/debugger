@@ -96,7 +96,9 @@ private:
 	QAction* viewDebuggableViewerAction;
 
 	QAction* viewBitMappedAction;
-	QAction* viewVDPStatusRegsAction;
+    QAction* viewCharMappedAction;
+    QAction* viewSpritesAction;
+    QAction* viewVDPStatusRegsAction;
 	QAction* viewVDPRegsAction;
 	QAction* viewVDPCommandRegsAction;
 
@@ -156,6 +158,8 @@ private slots:
 	void toggleSlotsDisplay();
 	void toggleMemoryDisplay();
 	void toggleBitMappedDisplay();
+    void toggleCharMappedDisplay();
+    void toggleSpritesDisplay();
 	void toggleVDPRegsDisplay();
 	void toggleVDPStatusRegsDisplay();
 	void toggleVDPCommandRegsDisplay();

@@ -1,21 +1,22 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>icons/openMSX-debugger-logo-256.png</file>
-    <file>icons/connect.png</file>
-    <file>icons/disconnect.png</file>
-    <file>icons/pause.png</file>
-    <file>icons/break.png</file>
-    <file>icons/run.png</file>
-    <file>icons/stepinto.png</file>
-    <file>icons/stepover.png</file>
-    <file>icons/runto.png</file>
-    <file>icons/stepout.png</file>
-    <file>icons/stepback.png</file>
-    <file>icons/breakpoint.png</file>
-    <file>icons/watchpoint.png</file>
-    <file>icons/pcarrow.png</file>
-    <file>icons/symmanager.png</file>
-    <file>icons/symman.png</file>
-    <file>icons/symfil.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>icons/openMSX-debugger-logo-256.png</file>
+        <file>icons/connect.png</file>
+        <file>icons/disconnect.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/break.png</file>
+        <file>icons/run.png</file>
+        <file>icons/stepinto.png</file>
+        <file>icons/stepover.png</file>
+        <file>icons/runto.png</file>
+        <file>icons/stepout.png</file>
+        <file>icons/stepback.png</file>
+        <file>icons/breakpoint.png</file>
+        <file>icons/watchpoint.png</file>
+        <file>icons/pcarrow.png</file>
+        <file>icons/symmanager.png</file>
+        <file>icons/symman.png</file>
+        <file>icons/symfil.png</file>
+        <file>overlay.png</file>
+    </qresource>
 </RCC>
