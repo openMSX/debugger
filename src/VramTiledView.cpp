@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <algorithm>
 #include <cstdio>
+#include "Convert.h"
 
 /** Clips x to the range [LO,HI].
   * Slightly faster than    std::min(HI, std::max(LO, x))
@@ -53,7 +54,8 @@ void VramTiledView::setZoom(float zoom)
     } else {
         lines=forcedscreenrows?(forcedscreenrows*8):192;
     }
-    setFixedSize(int(512 * zoomFactor), int(lines * 2 * zoomFactor));
+    int imagew=screenMode==0?40*6*2:(screenMode==80?80*6:512);
+    setFixedSize(int(imagew * zoomFactor), int(lines * 2 * zoomFactor));
 	update();
 }
 
@@ -64,7 +66,8 @@ void VramTiledView::decode()
     //also everytime we decode we adjust height of widget to the correct screenheight
     const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
     lines=forcedscreenrows?(forcedscreenrows*8):(regs[9]&128?212:192);
-    setFixedSize(int(512 * zoomFactor), int(lines * 2 * zoomFactor));
+    int imagew=screenMode==0?40*6*2:(screenMode==80?80*6:512);
+    setFixedSize(int(imagew * zoomFactor), int(lines * 2 * zoomFactor));
 
     image.fill(Qt::gray);
 
@@ -197,17 +200,19 @@ void VramTiledView::overLayNameTable()
     //now draw the char numbers from the overlay over all the chars
     QImage overlayimage(":/overlay.png");
     QPainter qp(&image);
+    int pwidth=screenMode!=80?2:1;
+
     for (int chary=0; chary < screenheight ; chary++){
         for (int charx=0; charx < screenwidth ; charx++){
             int ch = vramBase[NameTableAddress+charx+chary*screenwidth];
             int x=((ch>>4)&15)*6;
             int y=(ch == highlightchar?8:0); // white letters or red variant if higlighted
-            qp.drawImage(2*charx*charwidth,chary*16,overlayimage,x,y,5,8);
+            qp.drawImage(pwidth*charx*charwidth,chary*16,overlayimage,x,y,5,8);
             x=(ch&15)*6;
             if (screenMode!=80){
-                qp.drawImage(2*charx*charwidth+6,chary*16,overlayimage,x,y,5,8); //draw to the right
+                qp.drawImage(pwidth*charx*charwidth+6,chary*16,overlayimage,x,y,5,8); //draw to the right
             } else {
-                qp.drawImage(2*charx*charwidth,chary*16+7,overlayimage,x,y,5,8); //draw below
+                qp.drawImage(pwidth*charx*charwidth,chary*16+7,overlayimage,x,y,5,8); //draw below
             };
         }
     }
@@ -239,6 +244,11 @@ QRgb VramTiledView::getColor(int c)
 {
 	// TODO do we need to look at the TP bit???
     return msxpallet[c ? c : (TPbit ? 0 : borderColor)];
+}
+
+int VramTiledView::getScreenMode() const
+{
+    return screenMode;
 }
 
 void VramTiledView::setHighlightchar(int value)
@@ -376,7 +386,7 @@ unsigned char VramTiledView::getCharColorByte(int character, int x, int y, int r
         colorbyte = vramBase[ColorTableAddress+(character>>3)];
         break;
     case 3:
-        decodePatternTableMultiColor();
+//        decodePatternTableMultiColor();
         colorbyte = 0xf0;
     }
     return colorbyte;
@@ -460,13 +470,71 @@ void VramTiledView::refresh()
 	decode();
 }
 
+QString VramTiledView::byteAsPattern(unsigned char byte)
+{
+    QString val;
+    for (int i=7; i>=0 ; i--){
+        val.append(QChar(byte&(1<<i)?'1':'.'));
+    };
+    val.append(QString(" %1").arg(hexValue(byte,2)));
+    return val;
+}
+
+QString VramTiledView::textinfo(int &x,int &y, int &character)
+{
+    QString info("Generator Data         Color data\n");
+
+    //now the initial color data to be displayed
+    const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+    QString colordata=QString("- VDP reg 7 is %1").arg(hexValue(regs[7],2));
+    // if blink bit set then show alternate colors
+    if ( screenMode==80 && useBlink && (tableToShow>0) &&
+         (vramBase[ColorTableAddress+(x>>3)+y*10] & (1<<(7-(7&x))) ))
+    {
+        colordata=QString("- VDP reg 12 is %1").arg(hexValue(regs[12] ,2));
+    }
+    if ( screenMode==1)
+    {
+        colordata=QString("- %1: %2").arg(
+                    hexValue(ColorTableAddress+(character>>3),4) ,
+                    hexValue(vramBase[ColorTableAddress+(character>>3)],2)
+                );
+    };
+    if ( screenMode==3)
+    {
+        colordata=QString("- not used");
+    };
+
+    //now build the text
+    for (int charrow=0 ; charrow<8 ; charrow++){
+        int addr = PatternTableAddress+8*character+charrow;
+        //color data changes per line for scrren 2 and 4
+        if (screenMode==2 || screenMode==4 ){
+            colordata=QString("  %1: %2").arg(
+                        hexValue(ColorTableAddress+character*8+charrow,4) ,
+                        hexValue(vramBase[ColorTableAddress+character*8+charrow],2)
+                    );
+
+        }
+
+        info.append(QString("%1: %2    %3\n").arg(
+                    hexValue(addr,4),
+                    byteAsPattern(vramBase[addr]),
+                    colordata
+                        )
+                    );
+        colordata.clear();
+    };
+    return info;
+}
+
 void VramTiledView::mousePressEvent(QMouseEvent* e)
 {
     int x=0;
     int y=0;
-    unsigned char character=0;
+    int character=0;
     if (infoFromMouseEvent(e,x,y,character)){
-        emit imageClicked(x,y,character);
+        emit imageClicked(x,y,character,textinfo(x,y,character));
     };
 }
 
@@ -475,13 +543,13 @@ void VramTiledView::mouseMoveEvent(QMouseEvent* e)
 {
     int x=0;
     int y=0;
-    unsigned char character=0;
+    int character=0;
     if (infoFromMouseEvent(e,x,y,character)){
         emit imagePosition(x,y,character);
     };
 }
 
-bool VramTiledView::infoFromMouseEvent(QMouseEvent* e,int &x,int &y, unsigned char &character)
+bool VramTiledView::infoFromMouseEvent(QMouseEvent* e,int &x,int &y, int &character)
 
 {
 
@@ -491,11 +559,7 @@ bool VramTiledView::infoFromMouseEvent(QMouseEvent* e,int &x,int &y, unsigned ch
 	// I see negative y-coords sometimes, so for safety clip the coords
 	x = std::max(0, std::min(511, x));
 	y = std::max(0, std::min(255, y));
-/*
-	if (screenMode != 80 ) {
-		x /= 2;
-	}
-*/
+
     if (x>=horistep*screenwidth || y>=8*screenheight || vramBase==nullptr){
         return false;
 	}
@@ -506,10 +570,16 @@ bool VramTiledView::infoFromMouseEvent(QMouseEvent* e,int &x,int &y, unsigned ch
     switch (tableToShow) {
         case 0:
             character=x+y*screenwidth;
+            if (!(screenMode==2||screenMode==4)){
+                character=255&character;
+            }
             break;
         case 1:
         case 2:
             character=vramBase[NameTableAddress+x+y*screenwidth];
+            if (screenMode==2||screenMode==4){
+                character+=256*int(y/8);
+            }
             break;
     };
     return true;

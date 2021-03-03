@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>866</width>
+    <width>911</width>
     <height>756</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -22,7 +28,7 @@
      <property name="handleWidth">
       <number>4</number>
      </property>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget1">
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="60,1">
@@ -32,7 +38,7 @@
             <widget class="QScrollArea" name="scrollArea">
              <property name="minimumSize">
               <size>
-               <width>0</width>
+               <width>512</width>
                <height>256</height>
               </size>
              </property>
@@ -44,7 +50,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>553</width>
+                <width>598</width>
                 <height>376</height>
                </rect>
               </property>
@@ -182,7 +188,8 @@
                <item row="1" column="1">
                 <widget class="QLabel" name="label_charadr">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string>PGT: $0348, CT: $200D
+NT: $196E (base+$16E)</string>
                  </property>
                 </widget>
                </item>
@@ -241,6 +248,12 @@
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
               <widget class="QPushButton" name="refreshButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Take VRAM snapshot</string>
                </property>
@@ -571,10 +584,22 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget2">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="Line" name="line">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>880</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -590,9 +615,21 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_13">
+          <widget class="QLabel" name="label_clickedcharimage">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
            <property name="text">
-            <string>Pattern</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -612,7 +649,11 @@
         </layout>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit"/>
+        <widget class="QPlainTextEdit" name="plainTextEdit">
+         <property name="plainText">
+          <string>Click on the tilemap to show character info</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

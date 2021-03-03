@@ -33,6 +33,7 @@ public:
     unsigned getNameTableAddress() const;
     unsigned getPatternTableAddress() const;
     unsigned getColorTableAddress() const;
+    int getScreenMode() const;
 
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent (QMouseEvent* e) override;
@@ -41,15 +42,15 @@ public:
 
     //used to draw a character on the external image used when clicked on the VramTiledView widget
     void drawCharAtImage(int character,int x, int y, QImage &image); //draw 8x8 character on reference image at topleft
+    QString textinfo(int &x, int &y, int &character);
 
 
 public slots:
     void refresh();
 
 signals:
-//	void imageChanged();
-    void imagePosition(int screenx, int screeny, unsigned char character);
-    void imageClicked(int screenx, int screeny, unsigned char character);
+    void imagePosition(int screenx, int screeny, int character);
+    void imageClicked(int screenx, int screeny, int character, QString textinfo);
     void highlightCount(unsigned char character, int count);
 
 private:
@@ -72,9 +73,9 @@ private:
 	float zoomFactor;
     bool drawgrid;
 
-    unsigned PatternTableAddress;
-    unsigned NameTableAddress;
-    unsigned ColorTableAddress;
+    int PatternTableAddress;
+    int NameTableAddress;
+    int ColorTableAddress;
 
     int screenwidth=32;
     int screenheight=24;
@@ -96,8 +97,9 @@ private:
     void decodeNameTableMultiColor();
     unsigned char getCharColorByte(int character, int x, int y, int row);
     void drawCharAt(int character,int x, int y); //draw 8x8 character on given location in image
-    bool infoFromMouseEvent(QMouseEvent *e, int &x, int &y, unsigned char &character);
+    bool infoFromMouseEvent(QMouseEvent *e, int &x, int &y, int &character);
 
+    QString byteAsPattern(unsigned char byte);
 };
 
 #endif // VRAMBITMAPPEDVIEW

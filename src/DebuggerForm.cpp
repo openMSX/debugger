@@ -1264,6 +1264,7 @@ void DebuggerForm::toggleCharMappedDisplay()
 
     // create new debuggable viewer window
     auto* viewer = new TileViewer();
+//    viewer->adjustSize();
     auto* dw = new DockableWidget(dockMan);
     dw->setWidget(viewer);
     dw->setTitle(tr("Tile VRAM View"));
@@ -1272,6 +1273,7 @@ void DebuggerForm::toggleCharMappedDisplay()
     dw->setDestroyable(true);
     dw->setMovable(true);
     dw->setClosable(true);
+//    dw->adjustSize();
 
     // TODO: refresh should be being hanled by VDPDataStore...
     connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));

@@ -15,17 +15,15 @@ public:
     ~TileViewer();
 
 private:
-//    VramCharView* imageWidget;
     void decodeVDPregs();
 
     VramTiledView* imageWidget;
     QImage image4label;
-    int screenmode;
 
 private slots:
     void refresh();
 
-    void characterSelected2ImageAndText(int screenx, int screeny, unsigned char character);
+    void characterSelected2Text(int screenx, int screeny, int character, QString textinfo);
 
     void on_cb_tilemapsource_currentIndexChanged(int index);
     void on_cb_screen_currentIndexChanged(int index);
@@ -48,10 +46,11 @@ private slots:
 
     void VDPDataStoreDataRefreshed();
     void highlightInfo(unsigned char character, int count);
-    void imageMouseOver(int screenx, int screeny, unsigned char character);
+    void imageMouseOver(int screenx, int screeny, int character);
 
     void on_cb_blinkcolors_stateChanged(int arg1);
     void on_cb_screenrows_currentIndexChanged(int index);
+
 };
 
 #endif // TILEVIEWER_H
