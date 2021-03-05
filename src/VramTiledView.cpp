@@ -246,6 +246,11 @@ QRgb VramTiledView::getColor(int c)
     return msxpallet[c ? c : (TPbit ? 0 : borderColor)];
 }
 
+const unsigned char *VramTiledView::getPaletteSource() const
+{
+    return pallet;
+}
+
 int VramTiledView::getScreenMode() const
 {
     return screenMode;

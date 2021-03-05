@@ -44,6 +44,7 @@ private slots:
 
 
 
+    void paletteChanged();
     void VDPDataStoreDataRefreshed();
     void highlightInfo(unsigned char character, int count);
     void imageMouseOver(int screenx, int screeny, int character);

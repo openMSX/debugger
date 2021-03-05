@@ -2,11 +2,12 @@
 #include "ui_TileViewer.h"
 #include "VramTiledView.h"
 #include "VDPDataStore.h"
+#include "PaletteDialog.h"
 #include "Convert.h"
 #include <QMessageBox>
 
 
-static const unsigned char defaultPalette[32] = {
+static /*const*/ unsigned char defaultPalette[32] = { //temp not static to test PaletteDialog
 //        RB  G
     0x00, 0,
     0x00, 0,
@@ -214,11 +215,10 @@ void TileViewer::decodeVDPregs()
         le_nametable->setText(hexValue(nametable,4));
         le_patterntable->setText(hexValue(patterntable,4));
         le_colortable->setText(hexValue(colortable,4));
-        cb_blinkcolors->setEnabled(usesblink);
         cb_blinkcolors->setChecked(usesblink ? regs[13]&0xf0 : false);
         cb_screenrows->setCurrentIndex((regs[9]&128)? 1 : 0 );
-	sp_bordercolor->setValue(regs[7]&15);
-	cb_color0->setChecked(regs[8]&32);
+        sp_bordercolor->setValue(regs[7]&15);
+        cb_color0->setChecked(regs[8]&32);
     }
 
 
@@ -265,6 +265,8 @@ void TileViewer::on_cb_screen_currentIndexChanged(int index)
 
     }
     imageWidget->setScreenMode(i);
+    //blink checkbox depends on scrrenmode and manuel usage
+    cb_blinkcolors->setEnabled(i==80 && !useVDPRegisters->isChecked());
 }
 
 void TileViewer::on_le_nametable_textChanged(const QString &text)
@@ -336,24 +338,32 @@ void TileViewer::on_useVDPRegisters_stateChanged(int state)
 
 void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
-    useVDPPalette->setChecked(false);
-    QMessageBox::information(
-        this,
-        "Not yet implemented",
-        "Sorry, the palette editor is not yet implemented, "
-        "only disabling 'Use VDP palette registers' for now");
+    PaletteDialog* p=new PaletteDialog();
+    p->setPalette(defaultPalette);
+    p->setAutoSync(true);
+    connect(p,SIGNAL(paletteSynced()),
+            this,SLOT(paletteChanged()));
+    p->show();
+//    useVDPPalette->setChecked(false);
+//    QMessageBox::information(
+//        this,
+//        "Not yet implemented",
+//        "Sorry, the palette editor is not yet implemented, "
+//        "only disabling 'Use VDP palette registers' for now");
 
 }
 
 void TileViewer::on_useVDPPalette_stateChanged(int state)
 {
+    const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
     if (state) {
-        const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
         imageWidget->setPaletteSource(palette);
     } else {
+        if (palette!=nullptr) memcpy(defaultPalette,palette,32);
         imageWidget->setPaletteSource(defaultPalette);
     }
     imageWidget->refresh();
+    editPaletteButton->setEnabled(!state);
 }
 
 void TileViewer::on_zoomLevel_valueChanged(double d)
@@ -385,6 +395,11 @@ void TileViewer::on_sp_highlight_valueChanged(int i)
 void TileViewer::on_sp_bordercolor_valueChanged(int i)
 {
     imageWidget->setBorderColor(i);
+}
+
+void TileViewer::paletteChanged()
+{
+    imageWidget->refresh();
 }
 
 

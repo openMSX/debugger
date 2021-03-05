@@ -21,7 +21,7 @@ public:
     void setNameTableAddress(int adr);
     void setPatternTableAddress(int adr);
     void setColorTableAddress(int adr);
-	void setPaletteSource(const unsigned char* adr);
+    void setPaletteSource(const unsigned char *adr);
 	void setBorderColor(int value);
     void setDrawgrid(bool value);
     void setTPbit(bool value);
@@ -44,6 +44,7 @@ public:
     void drawCharAtImage(int character,int x, int y, QImage &image); //draw 8x8 character on reference image at topleft
     QString textinfo(int &x, int &y, int &character);
 
+    const unsigned char *getPaletteSource() const;
 
 public slots:
     void refresh();
@@ -68,7 +69,7 @@ private:
 	QRgb msxpallet[16];
 	QImage image;
 	QPixmap piximage;
-	const unsigned char* pallet;
+    const unsigned char* pallet;
 	const unsigned char* vramBase;
 	float zoomFactor;
     bool drawgrid;
