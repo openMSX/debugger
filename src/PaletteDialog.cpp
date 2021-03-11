@@ -4,7 +4,7 @@
 #include <QPainter>
 #include "PaletteDialog.h"
 #include "ui_PaletteDialog.h"
-
+#include "Convert.h"
 
 
 PalettePatch::PalettePatch(QWidget *parent, int palnr) : QPushButton(parent),mycolor(Qt::green),isSelected(false)
@@ -41,6 +41,7 @@ void PalettePatch::setHighlightTest(int colornr)
     update();
 }
 
+
 void PalettePatch::paintEvent(QPaintEvent */*event*/)
 {
     QPainter painter(this);
@@ -56,6 +57,9 @@ PaletteDialog::PaletteDialog(QWidget *parent) :
     ui(new Ui::PaletteDialog),sourcepal(nullptr),currentcolor(0),autoSync(false)
 {
     ui->setupUi(this);
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    ui->plainTextEdit->setFont(fixedFont);
+
     setWindowTitle("Palette editor");
     memset(mypal,0,32);
     memset(myoriginalpal,0,32);
@@ -82,6 +86,24 @@ PaletteDialog::PaletteDialog(QWidget *parent) :
                 this, SLOT(colorSelected(int)));
 
         ui->colorsframe->setLayout(gridLayout);
+        connect(this,SIGNAL(paletteChanged(unsigned char*)),
+                this,SLOT(updateText()));
+}
+
+void PaletteDialog::updateText()
+{
+    ui->plainTextEdit->clear();
+    for (int i=0; i<4 ;i++){
+        QString txt(" db ");
+        for (int j=0; j<4 ;j++){
+            txt.append(QString("%1,%2 ")
+                        .arg(hexValue(mypal[2*(j+4*i)],2))
+                        .arg(hexValue(mypal[2*(j+4*i)+1],2))
+                    );
+            if (j<3){txt.append(',');};
+        }
+        ui->plainTextEdit->appendPlainText(txt);
+    };
 }
 
 void PaletteDialog::restoreOpeningsPalette()

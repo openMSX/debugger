@@ -60,6 +60,9 @@ private slots:
 
     void on_cb_autosync_stateChanged(int arg1);
 
+    void updateText();
+
+
 private:
     Ui::PaletteDialog *ui;
     QSignalMapper *signalMapper;
