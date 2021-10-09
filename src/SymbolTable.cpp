@@ -197,7 +197,7 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = TNIASM0_FILE;
 				} else if (line.contains(": %equ ")) {
 					type = TNIASM1_FILE;
-				} else if (line.contains(": equ ")) {
+				} else if (line.contains(": equ ", Qt::CaseInsensitive)) {
 					type = SJASM_FILE;
 				} else {
 					// this is a blunt conclusion but I
@@ -281,7 +281,7 @@ bool SymbolTable::readSymbolFile(
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
-		QStringList l = line.split(equ);
+		QStringList l = line.split(equ, Qt::KeepEmptyParts, Qt::CaseInsensitive);
 		if (l.size() != 2) continue;
 		int value;
 		if (!parseValue(l.at(1), value)) continue;
