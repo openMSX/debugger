@@ -395,7 +395,7 @@ bool SymbolTable::readHTCFile(const QString& filename)
 bool SymbolTable::readLinkMapFile(const QString& filename)
 {
 	const QString magic("Machine type");
-	const QString tableStart("*\tSymbol Table");
+	const QString tableStart("Symbol Table");
 
 	QRegExp rx(" [0-9A-Fa-f]{4}  (?![ 0-9])");
 	QRegExp rp("^([^ ]+) +[^ ]* +([0-9A-Fa-f]{4})  $");
@@ -408,10 +408,13 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 
 	QTextStream in(&file);
 	if (in.atEnd()) return false;
-	if (!in.readLine().startsWith(magic)) return false;
 	while (true) {
 		if (in.atEnd()) return false;
-		if (in.readLine().startsWith(tableStart)) break;
+		if (in.readLine().startsWith(magic)) break;
+	}
+	while (true) {
+		if (in.atEnd()) return false;
+		if (in.readLine().contains(tableStart)) break;
 	}
 
 	while (!in.atEnd()) {
