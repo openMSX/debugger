@@ -621,7 +621,7 @@ void DebuggerForm::createForm()
 
 	// add widgets
 	for (int i = 0; i < list.size(); ++i) {
-		QStringList s = list.at(i).split(" ", Qt::SkipEmptyParts);
+		QStringList s = list.at(i).split(" ", QString::SplitBehavior::SkipEmptyParts);
 		// get widget
 		if ((dw = dockMan.findDockableWidget(s.at(0)))) {
 			if (s.at(1) == "D") {
@@ -1451,7 +1451,7 @@ void DebuggerForm::setDebuggables(const QString& list)
 	debuggables.clear();
 
 	// process result string
-	QStringList l = list.split(" ", Qt::SkipEmptyParts);
+	QStringList l = list.split(" ", QString::SplitBehavior::SkipEmptyParts);
 	for (int i = 0; i < l.size(); ++i) {
 		QString d = l[i];
 		// combine multiple words
