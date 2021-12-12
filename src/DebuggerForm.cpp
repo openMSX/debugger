@@ -441,7 +441,7 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
 	viewVDPDialogsMenu->addAction(viewCharMappedAction);
-	viewVDPDialogsMenu->addAction(viewSpritesAction);
+//	viewVDPDialogsMenu->addAction(viewSpritesAction); NOT IMPLEMENTED YET
 	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
 
 	// create Debuggable Viewers menu (so the user can focus an existing one)
