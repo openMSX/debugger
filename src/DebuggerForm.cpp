@@ -1,6 +1,7 @@
 #include "DebuggerForm.h"
 #include "BitMapViewer.h"
 #include "TileViewer.h"
+#include "SpriteViewer.h"
 #include "DockableWidgetArea.h"
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
@@ -1285,7 +1286,7 @@ void DebuggerForm::toggleSpritesDisplay()
     // not sure if this a good idea for a docable widget
 
     // create new debuggable viewer window
-    auto* viewer = new TileViewer();
+    auto* viewer = new SpriteViewer();
     auto* dw = new DockableWidget(dockMan);
     dw->setWidget(viewer);
     dw->setTitle(tr("Sprites View"));
