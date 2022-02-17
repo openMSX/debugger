@@ -96,9 +96,9 @@ private:
 	QAction* viewDebuggableViewerAction;
 
 	QAction* viewBitMappedAction;
-    QAction* viewCharMappedAction;
-    QAction* viewSpritesAction;
-    QAction* viewVDPStatusRegsAction;
+	QAction* viewCharMappedAction;
+	QAction* viewSpritesAction;
+	QAction* viewVDPStatusRegsAction;
 	QAction* viewVDPRegsAction;
 	QAction* viewVDPCommandRegsAction;
 
@@ -158,8 +158,8 @@ private slots:
 	void toggleSlotsDisplay();
 	void toggleMemoryDisplay();
 	void toggleBitMappedDisplay();
-    void toggleCharMappedDisplay();
-    void toggleSpritesDisplay();
+	void toggleCharMappedDisplay();
+	void toggleSpritesDisplay();
 	void toggleVDPRegsDisplay();
 	void toggleVDPStatusRegsDisplay();
 	void toggleVDPCommandRegsDisplay();
@@ -175,7 +175,7 @@ private slots:
 	void breakpointAdd();
 
 	void handleCommandReplyStatus(bool status);
-	
+
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
@@ -202,7 +202,7 @@ signals:
 	void settingsChanged();
 	void symbolsChanged();
 	void debuggablesChanged(const QMap<QString, int>& list);
-	void emulationChanged();
+	void breakStateEntered();
 };
 
 #endif // DEBUGGERFORM_H

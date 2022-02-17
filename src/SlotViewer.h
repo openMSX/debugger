@@ -12,11 +12,13 @@ class SlotViewer : public QFrame
 public:
 	SlotViewer(QWidget* parent = nullptr);
 
-	void refresh();
 	void setMemoryLayout(MemoryLayout* ml);
 	void slotsUpdated(const QString& message);
 
 	QSize sizeHint() const override;
+
+public slots:
+	void refresh();
 
 private:
 	void resizeEvent(QResizeEvent* e) override;

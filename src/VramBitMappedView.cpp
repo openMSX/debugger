@@ -47,7 +47,7 @@ void VramBitMappedView::decode()
 
 	printf("\n"
 	       "screenMode: %i\n"
-	       "vram to start decoding: %i\n",
+	       "vram address to start decoding: %i\n",
 	       screenMode, vramAddress);
 	switch (screenMode) {
 	case 12:
@@ -70,7 +70,7 @@ void VramBitMappedView::decode()
 		decodeSCR5();
 		break;
 	}
-	piximage = piximage.fromImage(image);
+	piximage = QPixmap::fromImage(image);
 	update();
 }
 

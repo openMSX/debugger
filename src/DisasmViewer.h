@@ -36,8 +36,8 @@ public slots:
 	void setProgramCounter(quint16 pc);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
-	void settingsChanged();
-	void symbolsChanged();
+	void updateLayout();
+	void refresh();
 
 private:
 	void resizeEvent(QResizeEvent* e) override;

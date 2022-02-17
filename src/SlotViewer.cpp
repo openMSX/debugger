@@ -191,6 +191,7 @@ void SlotViewer::refresh()
 void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 {
 	memLayout = ml;
+	update();
 }
 
 void SlotViewer::slotsUpdated(const QString& message)
