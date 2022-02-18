@@ -281,7 +281,7 @@ bool SymbolTable::readSymbolFile(
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
-		QStringList l = line.split(equ, QString::SplitBehavior::KeepEmptyParts, Qt::CaseInsensitive);
+		QStringList l = line.split(equ, Qt::SplitBehaviorFlags::KeepEmptyParts, Qt::CaseInsensitive);
 		if (l.size() != 2) continue;
 		int value;
 		if (!parseValue(l.at(1), value)) continue;
