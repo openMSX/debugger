@@ -271,13 +271,12 @@ bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 
 void Breakpoints::insertBreakpoint(Breakpoint& bp)
 {
-	for (auto it = breakpoints.begin(); it != breakpoints.end(); ++it) {
-		if (it->address > bp.address) {
-			breakpoints.insert(it, bp);
-			return;
-		}
-	}
-	breakpoints.push_back(bp);
+	auto it = std::upper_bound(breakpoints.begin(), breakpoints.end(), bp,
+	           [](const Breakpoint& bp1, const Breakpoint& bp2) {
+				   return bp1.address < bp2.address;
+			   }
+   			);
+	breakpoints.insert(it, bp);
 }
 
 int Breakpoints::breakpointCount()
@@ -316,9 +315,15 @@ bool Breakpoints::isWatchpoint(quint16 addr, QString *id)
 
 int Breakpoints::findBreakpoint(quint16 addr)
 {
-	// stub
-	// will implement findfirst/findnext scheme for speed
-	return addr;
+    auto i = std::lower_bound(breakpoints.begin(), breakpoints.end(), addr,
+	           [](const Breakpoint& bp, const quint16 addr) {
+				   return bp.address < addr;
+			   }
+   			);
+	if (i != breakpoints.end() && i->address == addr) {
+		return i - breakpoints.begin();
+	}
+	return -1;
 }
 
 int Breakpoints::findNextBreakpoint()
