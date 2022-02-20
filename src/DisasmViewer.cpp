@@ -296,6 +296,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 			dt = db = 10;
 			break;
 		case TopAlways:
+		case OnDemand:
 			dt = 10;
 			db = visibleLines + 10;
 			break;
@@ -315,16 +316,23 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 		    (line < int(disasmLines.size()) - db ||
 		     disasmLines.back().addr+disasmLines.back().numBytes > 0xFFFF)) {
 			// line is within existing disasm'd data. Find where to put it.
-			if (method == Top || method == TopAlways ||
-			    (method == Closest && line < disasmTopLine)) {
+			bool lineIsBeforeDisasm = line < disasmTopLine;
+			bool lineIsAfterDisasm = line >= disasmTopLine + visibleLines;
+			bool lineIsOutOfDisasm = lineIsBeforeDisasm || lineIsAfterDisasm;
+
+			if (method == Top ||
+			    method == TopAlways ||
+			   (method == Closest && lineIsBeforeDisasm) ||
+			   (method == OnDemand && lineIsOutOfDisasm)) {
 				// Move line to top
 				disasmTopLine = line;
-			} else if (method == Bottom || method == BottomAlways ||
-			           (method == Closest && line >= disasmTopLine + visibleLines)) {
+			} else if (method == Bottom ||
+				   method == BottomAlways ||
+				  (method == Closest && lineIsAfterDisasm)) {
 				// Move line to bottom
 				disasmTopLine = line - visibleLines + 1;
 			} else if (method == MiddleAlways ||
-			           (method == Middle && (line < disasmTopLine || line >= disasmTopLine + visibleLines))) {
+			          (method == Middle && lineIsOutOfDisasm)) {
 				// Move line to middle
 				disasmTopLine = line - visibleLines / 2;
 			}
@@ -362,6 +370,12 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	case BottomAlways:
 		disasmStart = addr - 2 * extra;
 		disasmEnd   = addr +     extra;
+		break;
+	case OnDemand:
+		if (addr < disasmStart || addr > disasmEnd) {
+			disasmStart = addr;
+			disasmEnd   = addr + 3 * extra;
+		}
 		break;
 	default:
 		disasmStart = addr -     extra;
@@ -451,7 +465,7 @@ void DisasmViewer::setProgramCounter(quint16 pc)
 {
 	cursorAddr = pc;
 	programAddr = pc;
-	setAddress(pc, 0, MiddleAlways);
+	setAddress(pc, 0, OnDemand);
 }
 
 int DisasmViewer::findDisasmLine(quint16 lineAddr, int infoLine)
