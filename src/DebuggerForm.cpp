@@ -519,6 +519,8 @@ void DebuggerForm::createForm()
 	dw->setClosable(false);
 	connect(this, SIGNAL(settingsChanged()),
 	        disasmView, SLOT(updateLayout()));
+	connect(this, SIGNAL(breakStateEntered()),
+	        disasmView, SLOT(refresh()));
 	connect(this, SIGNAL(symbolsChanged()),
 	        disasmView, SLOT(refresh()));
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
