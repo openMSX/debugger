@@ -252,6 +252,8 @@ void VramBitMappedView::refresh()
 
 void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 {
+	if (!vramBase) return;
+
 	static const unsigned bytes_per_line[] = {
 		0,	//screen 0
 		1,	//screen 1
