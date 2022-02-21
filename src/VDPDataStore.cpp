@@ -80,9 +80,12 @@ VDPDataStore& VDPDataStore::instance()
 
 void VDPDataStore::refresh()
 {
-	if (!got_version) return;
-
-	refresh1();
+	if (!got_version) {
+		// No data? Send request again.
+		CommClient::instance().sendCommand(new VDPDataStoreVersionCheck(*this));
+	} else {
+		refresh1();
+	}
 }
 
 void VDPDataStore::refresh1()
@@ -99,6 +102,7 @@ void VDPDataStore::refresh2()
 			"[ debug read_block {VDP status regs} 0 16 ]"
 			"[ debug read_block {VDP regs} 0 64 ]"
 			"[ debug read_block {VRAM pointer} 0 2 ]");
+	// receive contents of VRAM
 	new SimpleHexRequest(req, MAX_TOTAL_SIZE - MAX_VRAM_SIZE + vramSize, vram, *this);
 }
 
@@ -106,7 +110,6 @@ void VDPDataStore::DataHexRequestReceived()
 {
 	emit dataRefreshed();
 }
-
 
 const unsigned char* VDPDataStore::getVramPointer() const
 {
