@@ -76,7 +76,7 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	scrollBar->setSingleStep(0);
 	scrollBar->setPageStep(0);
 
-	settingsChanged();
+	updateLayout();
 
 	// manual scrollbar handling routines (real size of the data is not known)
 	connect(scrollBar, SIGNAL(actionTriggered(int)),
@@ -104,7 +104,7 @@ void DisasmViewer::resizeEvent(QResizeEvent* e)
 	}
 }
 
-void DisasmViewer::settingsChanged()
+void DisasmViewer::updateLayout()
 {
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + scrollBar->sizeHint().width();
@@ -135,7 +135,7 @@ void DisasmViewer::settingsChanged()
 	update();
 }
 
-void DisasmViewer::symbolsChanged()
+void DisasmViewer::refresh()
 {
 	int disasmStart = disasmLines.front().addr;
 	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
