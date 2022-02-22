@@ -70,7 +70,7 @@ void VramBitMappedView::decode()
 		decodeSCR5();
 		break;
 	}
-	piximage = piximage.fromImage(image);
+	piximage = QPixmap::fromImage(image);
 	update();
 }
 

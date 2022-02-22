@@ -97,7 +97,7 @@ void VramTiledView::decode()
 		}
 	};
 
-	piximage = piximage.fromImage(image);
+	piximage = QPixmap::fromImage(image);
 	update();
 }
 
