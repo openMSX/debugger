@@ -45,7 +45,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 	scrollArea->setWidget(imageWidget);
 
-	useVDP = true;
+	useVDP = useVDPRegisters->isChecked();
 
 	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
 	const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
