@@ -80,9 +80,14 @@ VDPDataStore& VDPDataStore::instance()
 
 void VDPDataStore::refresh()
 {
-	if (!got_version) return;
-
-	refresh1();
+	if (!got_version) {
+		// this can happen when the data store was used before
+		// connecting to openMSX
+		CommClient::instance().sendCommand(new
+				VDPDataStoreVersionCheck(*this));
+	} else {
+		refresh1();
+	}
 }
 
 void VDPDataStore::refresh1()
