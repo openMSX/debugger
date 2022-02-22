@@ -96,9 +96,9 @@ private:
 	QAction* viewDebuggableViewerAction;
 
 	QAction* viewBitMappedAction;
-    QAction* viewCharMappedAction;
-    QAction* viewSpritesAction;
-    QAction* viewVDPStatusRegsAction;
+	QAction* viewCharMappedAction;
+	QAction* viewSpritesAction;
+	QAction* viewVDPStatusRegsAction;
 	QAction* viewVDPRegsAction;
 	QAction* viewVDPCommandRegsAction;
 
@@ -158,8 +158,8 @@ private slots:
 	void toggleSlotsDisplay();
 	void toggleMemoryDisplay();
 	void toggleBitMappedDisplay();
-    void toggleCharMappedDisplay();
-    void toggleSpritesDisplay();
+	void toggleCharMappedDisplay();
+	void toggleSpritesDisplay();
 	void toggleVDPRegsDisplay();
 	void toggleVDPStatusRegsDisplay();
 	void toggleVDPCommandRegsDisplay();
@@ -199,10 +199,11 @@ private slots:
 	friend class DebuggableSizeHandler;
 
 signals:
+	void connected();
 	void settingsChanged();
 	void symbolsChanged();
+	void breakStateEntered();
 	void debuggablesChanged(const QMap<QString, int>& list);
-	void emulationChanged();
 };
 
 #endif // DEBUGGERFORM_H

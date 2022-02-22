@@ -518,9 +518,11 @@ void DebuggerForm::createForm()
 	dw->setMovable(false);
 	dw->setClosable(false);
 	connect(this, SIGNAL(settingsChanged()),
-	        disasmView, SLOT(settingsChanged()));
+	        disasmView, SLOT(updateLayout()));
+	connect(this, SIGNAL(breakStateEntered()),
+	        disasmView, SLOT(refresh()));
 	connect(this, SIGNAL(symbolsChanged()),
-	        disasmView, SLOT(symbolsChanged()));
+	        disasmView, SLOT(refresh()));
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 
@@ -536,6 +538,10 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(this, SIGNAL(connected()),
+	        mainMemoryView, SLOT(refresh()));
+	connect(this, SIGNAL(breakStateEntered()),
+	        mainMemoryView, SLOT(refresh()));
 	mainMemoryView->setSymbolTable(&session.symbolTable());
 
 	// create register viewer
@@ -595,6 +601,10 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(this, SIGNAL(connected()),
+	        slotView, SLOT(refresh()));
+	connect(this, SIGNAL(breakStateEntered()),
+	        slotView, SLOT(refresh()));
 
 	// restore layout
 	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
@@ -621,7 +631,7 @@ void DebuggerForm::createForm()
 
 	// add widgets
 	for (int i = 0; i < list.size(); ++i) {
-		QStringList s = list.at(i).split(" ", QString::SplitBehavior::SkipEmptyParts);
+		QStringList s = list.at(i).split(" ", Qt::SplitBehaviorFlags::SkipEmptyParts);
 		// get widget
 		if ((dw = dockMan.findDockableWidget(s.at(0)))) {
 			if (s.at(1) == "D") {
@@ -886,12 +896,13 @@ void DebuggerForm::finalizeConnection(bool halted)
 	// merge breakpoints on connect
 	mergeBreakpoints = true;
 	if (halted) {
-		setBreakMode();
 		breakOccured();
 	} else {
 		setRunMode();
 		updateData();
 	}
+
+	emit connected();
 
 	for (auto* w : dockMan.managedWidgets()) {
 		w->widget()->setEnabled(true);
@@ -923,6 +934,7 @@ void DebuggerForm::breakOccured()
 {
 	setBreakMode();
 	updateData();
+	emit breakStateEntered();
 }
 
 void DebuggerForm::updateData()
@@ -931,19 +943,11 @@ void DebuggerForm::updateData()
 	// only merge the first time after connect
 	mergeBreakpoints = false;
 
-	// refresh memory viewer
-	mainMemoryView->refresh();
-
 	// update registers
 	// note that a register update is processed, a signal is sent to other
 	// widgets as well. Any dependent updates shoud be called before this one.
 	auto* regs = new CPURegRequest(*this);
 	comm.sendCommand(regs);
-
-	// refresh slot viewer
-	slotView->refresh();
-
-	emit emulationChanged();
 }
 
 void DebuggerForm::setBreakMode()
@@ -1249,7 +1253,7 @@ void DebuggerForm::toggleBitMappedDisplay()
 	*/
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
+	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
 
 	/*
 	viewer->setDebuggables(debuggables);
@@ -1276,7 +1280,7 @@ void DebuggerForm::toggleCharMappedDisplay()
 	//    dw->adjustSize();
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
+	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
 }
 
 void DebuggerForm::toggleSpritesDisplay()
@@ -1296,7 +1300,7 @@ void DebuggerForm::toggleSpritesDisplay()
 	dw->setClosable(true);
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(emulationChanged()), viewer, SLOT(refresh()));
+	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
 }
 
 void DebuggerForm::toggleVDPCommandRegsDisplay()
@@ -1311,7 +1315,7 @@ void DebuggerForm::toggleVDPCommandRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(emulationChanged()),
+		connect(this, SIGNAL(breakStateEntered()),
 		        VDPCommandRegView, SLOT(refresh()));
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
@@ -1330,7 +1334,7 @@ void DebuggerForm::toggleVDPRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(emulationChanged()),
+		connect(this, SIGNAL(breakStateEntered()),
 		        VDPRegView, SLOT(refresh()));
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
@@ -1349,7 +1353,7 @@ void DebuggerForm::toggleVDPStatusRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(emulationChanged()),
+		connect(this, SIGNAL(breakStateEntered()),
 		        VDPStatusRegView, SLOT(refresh()));
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
@@ -1387,7 +1391,7 @@ void DebuggerForm::addDebuggableViewer()
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
 	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
-	connect(this, SIGNAL(emulationChanged()),
+	connect(this, SIGNAL(breakStateEntered()),
 	        viewer, SLOT(refresh()));
 	viewer->setDebuggables(debuggables);
 	viewer->setEnabled(disasmView->isEnabled());
@@ -1451,7 +1455,7 @@ void DebuggerForm::setDebuggables(const QString& list)
 	debuggables.clear();
 
 	// process result string
-	QStringList l = list.split(" ", QString::SplitBehavior::SkipEmptyParts);
+	QStringList l = list.split(" ", Qt::SplitBehaviorFlags::SkipEmptyParts);
 	for (int i = 0; i < l.size(); ++i) {
 		QString d = l[i];
 		// combine multiple words
