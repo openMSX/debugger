@@ -10,6 +10,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QRubberBand;
 class DockManager;
+class QStatusBar;
 
 class DockableWidget : public QWidget
 {
@@ -56,6 +57,7 @@ private:
 	QWidget* headerWidget;
 	QLabel* titleLabel;
 	QToolButton* closeButton;
+	QStatusBar* statusBar;
 
 signals:
 	void visibilityChanged(DockableWidget* w);

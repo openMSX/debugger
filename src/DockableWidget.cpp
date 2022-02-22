@@ -9,6 +9,7 @@
 #include <QStyleOptionDockWidget>
 #include <QRubberBand>
 #include <QMouseEvent>
+#include <QStatusBar>
 #include <algorithm>
 
 
@@ -68,6 +69,7 @@ void DockableWidget::setWidget(QWidget* widget)
 {
 	if (mainWidget) {
 		widgetLayout->removeWidget(mainWidget);
+		delete statusBar;
 	}
 	mainWidget = widget;
 
@@ -86,6 +88,12 @@ void DockableWidget::setWidget(QWidget* widget)
 		setMinimumSize(minW, minH);
 		setMaximumSize(maxW, maxH);
 		setSizePolicy(widget->sizePolicy());
+
+		statusBar = new QStatusBar(nullptr);
+		statusBar->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+		statusBar->setVisible(false);
+		statusBar->setSizeGripEnabled(false);
+		widgetLayout->addWidget(statusBar, 2);
 	}
 }
 
@@ -120,7 +128,14 @@ void DockableWidget::setFloating(bool enable, bool showNow)
 	if (floating == enable) return;
 
 	floating = enable;
-	setWindowFlags(floating ? Qt::Tool : Qt::Widget);
+	setWindowFlags(floating ? Qt::FramelessWindowHint | Qt::Tool : Qt::Widget);
+
+	if (mainWidget->sizePolicy().horizontalPolicy() != QSizePolicy::Fixed &&
+			mainWidget->sizePolicy().verticalPolicy() != QSizePolicy::Fixed) {
+		statusBar->setVisible(floating);
+		statusBar->setSizeGripEnabled(floating);
+	}
+
 	if (floating && showNow) {
 		show();
 	}
