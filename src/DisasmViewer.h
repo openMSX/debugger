@@ -28,7 +28,7 @@ public:
 
 	QSize sizeHint() const override;
 
-	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
+	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways, OnDemand};
 
 public slots:
 	void setAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
