@@ -73,14 +73,14 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
     imageWidget->setDrawgrid(cb_drawgrid->isChecked());
 
-    connect(imageWidget,SIGNAL(highlightCount(unsigned char, int )),
-            this,SLOT(highlightInfo(unsigned char , int)));
+    connect(imageWidget, SIGNAL(highlightCount(unsigned char, int)),
+            this, SLOT(highlightInfo(unsigned char, int)));
 
-    connect(imageWidget,SIGNAL(imagePosition(int , int , int )),
-            this,SLOT( imageMouseOver(int , int , int ) )  );
+    connect(imageWidget, SIGNAL(imageHovered(int, int, int)),
+            this, SLOT(imageMouseOver(int, int, int)));
 
-    connect(imageWidget,SIGNAL(imageClicked(int , int , int ,QString)),
-            this,SLOT( characterSelected2Text(int , int , int ,QString) )  );
+    connect(imageWidget, SIGNAL(imageClicked(int, int, int, QString)),
+            this, SLOT(displayCharInfo(int, int, int, QString)));
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -232,7 +232,7 @@ void TileViewer::refresh()
     VDPDataStore::instance().refresh();
 }
 
-void TileViewer::characterSelected2Text(int screenx, int screeny, int character,QString textinfo)
+void TileViewer::displayCharInfo(int screenx, int screeny, int character,QString textinfo)
 {
     label_charpat->setText(QString::number(character));
     plainTextEdit->setPlainText(QString("info for character %1 (%2)\n%3")
@@ -341,8 +341,7 @@ void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
     PaletteDialog* p=new PaletteDialog();
     p->setPalette(defaultPalette);
     p->setAutoSync(true);
-    connect(p,SIGNAL(paletteSynced()),
-            this,SLOT(paletteChanged()));
+    connect(p, SIGNAL(paletteSynced()), this, SLOT(refresh()));
     p->show();
 //    useVDPPalette->setChecked(false);
 //    QMessageBox::information(
@@ -396,12 +395,6 @@ void TileViewer::on_sp_bordercolor_valueChanged(int i)
 {
     imageWidget->setBorderColor(i);
 }
-
-void TileViewer::paletteChanged()
-{
-    imageWidget->refresh();
-}
-
 
 void TileViewer::on_cb_blinkcolors_stateChanged(int arg1)
 {

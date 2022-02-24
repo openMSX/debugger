@@ -19,13 +19,13 @@ void buttonHighlightDispatcher::receiveState(bool state)
 {
 	if (state) {
 		if (counter == 0) {
-			emit dispatchState(true);
+			emit stateDispatched(true);
 		}
 		++counter;
 	} else {
 		--counter;
 		if (counter == 0) {
-			emit dispatchState(false);
+			emit stateDispatched(false);
 		}
 	}
 }
@@ -680,7 +680,7 @@ void VDPRegViewer::doConnect(InteractiveButton* but, buttonHighlightDispatcher* 
 {
 	connect(but, SIGNAL(mouseOver(bool)),
 	        dis, SLOT(receiveState(bool)));
-	connect(dis, SIGNAL(dispatchState(bool)),
+	connect(dis, SIGNAL(stateDispatched(bool)),
 	        but, SLOT(highlight(bool)));
 }
 
@@ -712,7 +712,7 @@ buttonHighlightDispatcher* VDPRegViewer::makeGroup(
 	auto* dispat = new buttonHighlightDispatcher();
 	connect(explained, SIGNAL(mouseOver(bool)),
 	        dispat, SLOT(receiveState(bool)));
-	connect(dispat, SIGNAL(dispatchState(bool)),
+	connect(dispat, SIGNAL(stateDispatched(bool)),
 	        explained, SLOT(highlight(bool)));
 	for (auto* item : list) {
 		doConnect(item, dispat);

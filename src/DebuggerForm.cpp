@@ -667,7 +667,7 @@ void DebuggerForm::createForm()
 	        flagsView,  SLOT(setFlags(quint8)));
 	connect(regsView,   SIGNAL(spChanged(quint16)),
 	        stackView,  SLOT(setStackPointer(quint16)));
-	connect(disasmView, SIGNAL(toggleBreakpoint(int)),
+	connect(disasmView, SIGNAL(breakpointToggled(int)),
 	                    SLOT(breakpointToggle(int)));
 
 	connect(&comm, SIGNAL(connectionReady()),
@@ -1166,7 +1166,7 @@ void DebuggerForm::handleCommandReplyStatus(bool status)
 	}
 }
 
-void DebuggerForm::breakpointToggle(int addr)
+void DebuggerForm::toggleBreakpoint(int addr)
 {
 	// toggle address unspecified, use cursor address
 	if (addr < 0) addr = disasmView->cursorAddress();
@@ -1186,7 +1186,7 @@ void DebuggerForm::breakpointToggle(int addr)
 	comm.sendCommand(new ListBreakPointsHandler(*this));
 }
 
-void DebuggerForm::breakpointAdd()
+void DebuggerForm::addBreakpoint()
 {
 	BreakpointDialog bpd(memLayout, &session, this);
 	int addr = disasmView->cursorAddress();

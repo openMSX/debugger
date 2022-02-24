@@ -550,7 +550,7 @@ void VramTiledView::mouseMoveEvent(QMouseEvent* e)
 	int y = 0;
 	int character = 0;
 	if (infoFromMouseEvent(e, x, y, character)) {
-		emit imagePosition(x, y, character);
+		emit imageHovered(x, y, character);
 	};
 }
 

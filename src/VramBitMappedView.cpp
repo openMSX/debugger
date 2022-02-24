@@ -314,7 +314,7 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		default:
 			color = 0; // avoid warning
 	}
-	emit imagePosition(x, y, color, addr, val);
+	emit imageHovered(x, y, color, addr, val);
 }
 
 void VramBitMappedView::mousePressEvent(QMouseEvent* e)

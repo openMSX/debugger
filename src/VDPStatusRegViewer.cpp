@@ -15,13 +15,13 @@ void highlightDispatcher::receiveState(bool state)
 {
 	if (state) {
 		if (counter == 0) {
-			emit dispatchState(true);
+			emit stateDispatched(true);
 		}
 		++counter;
 	} else {
 		--counter;
 		if (counter == 0) {
-			emit dispatchState(false);
+			emit stateDispatched(false);
 		}
 	}
 }
@@ -110,7 +110,7 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 void VDPStatusRegViewer::doConnect(InteractiveLabel* lab, highlightDispatcher* dis)
 {
 	connect(lab, SIGNAL(mouseOver(bool)),     dis, SLOT(receiveState(bool)));
-	connect(dis, SIGNAL(dispatchState(bool)), lab, SLOT(highlight(bool)));
+	connect(dis, SIGNAL(stateDispatched(bool)), lab, SLOT(highlight(bool)));
 }
 
 void VDPStatusRegViewer::makeGroup(QList<InteractiveLabel*> list, InteractiveLabel* explained)
