@@ -50,7 +50,7 @@ public slots:
     void refresh();
 
 signals:
-    void imagePosition(int screenx, int screeny, int character);
+    void imageHovered(int screenx, int screeny, int character);
     void imageClicked(int screenx, int screeny, int character, QString textinfo);
     void highlightCount(unsigned char character, int count);
 

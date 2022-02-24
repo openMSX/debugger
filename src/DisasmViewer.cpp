@@ -716,7 +716,7 @@ void DisasmViewer::mousePressEvent(QMouseEvent* e)
 		} else if (e->x() < frameL + 16) {
 			// clicked on the breakpoint area
 			if (line + disasmTopLine < int(disasmLines.size())) {
-				emit toggleBreakpoint(disasmLines[line + disasmTopLine].addr);
+				emit breakpointToggled(disasmLines[line + disasmTopLine].addr);
 			}
 		}
 	}

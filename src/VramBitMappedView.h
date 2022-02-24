@@ -31,10 +31,10 @@ public slots:
 
 signals:
 	void imageChanged();
-	void imagePosition(int xcoormsx, int ycoormsx, int color,
-	                   unsigned addr, int byte);
-	void imageClicked (int xcoormsx, int ycoormsx, int color,
-	                   unsigned addr, int byte);
+	void imageHovered(int xcoormsx, int ycoormsx, int color,
+	                  unsigned addr, int byte);
+	void imageClicked(int xcoormsx, int ycoormsx, int color,
+	                  unsigned addr, int byte);
 
 private:
 	void paintEvent(QPaintEvent* e) override;

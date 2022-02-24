@@ -29,7 +29,7 @@ public slots:
 	void receiveState(bool state);
 
 signals:
-	void dispatchState(bool state);
+	void stateDispatched(bool state);
 
 private:
 	int counter;

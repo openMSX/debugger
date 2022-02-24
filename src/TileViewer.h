@@ -4,7 +4,7 @@
 #include "ui_TileViewer.h"
 #include <QDialog>
 
-class VramTiledView; 
+class VramTiledView;
 
 class TileViewer : public QDialog,private Ui::TileViewer
 {
@@ -23,7 +23,7 @@ private:
 private slots:
     void refresh();
 
-    void characterSelected2Text(int screenx, int screeny, int character, QString textinfo);
+    void displayCharInfo(int screenx, int screeny, int character, QString textinfo);
 
     void on_cb_tilemapsource_currentIndexChanged(int index);
     void on_cb_screen_currentIndexChanged(int index);
@@ -44,7 +44,6 @@ private slots:
 
 
 
-    void paletteChanged();
     void VDPDataStoreDataRefreshed();
     void highlightInfo(unsigned char character, int count);
     void imageMouseOver(int screenx, int screeny, int character);

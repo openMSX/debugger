@@ -171,11 +171,11 @@ private slots:
 	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
-	void breakpointToggle(int addr = -1);
-	void breakpointAdd();
+	void toggleBreakpoint(int addr = -1);
+	void addBreakpoint();
 
 	void handleCommandReplyStatus(bool status);
-	
+
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,

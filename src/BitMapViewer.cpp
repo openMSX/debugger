@@ -61,10 +61,10 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	connect(refreshButton, SIGNAL(clicked(bool)),
 	        &VDPDataStore::instance(), SLOT(refresh()));
 
-	connect(imageWidget, SIGNAL(imagePosition(int,int,int,unsigned,int)),
-	        this, SLOT(imagePositionUpdate(int,int,int,unsigned,int)));
-	connect(imageWidget, SIGNAL(imageClicked (int,int,int,unsigned,int)),
-	        this, SLOT(imagePositionUpdate(int,int,int,unsigned,int)));
+	connect(imageWidget, SIGNAL(imageHovered(int, int, int, unsigned, int)),
+	        this, SLOT(updateImagePosition(int, int, int, unsigned, int)));
+	connect(imageWidget, SIGNAL(imageClicked(int, int, int, unsigned, int)),
+	        this, SLOT(updateImagePosition(int, int, int, unsigned, int)));
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -267,7 +267,7 @@ void BitMapViewer::VDPDataStoreDataRefreshed()
 	decodeVDPregs();
 }
 
-void BitMapViewer::imagePositionUpdate(
+void BitMapViewer::updateImagePosition(
 	int x, int y, int color, unsigned addr, int byteValue)
 {
 	labelX->setText(QString("%1").arg(x, 3, 10, QChar('0')));
