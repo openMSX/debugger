@@ -4,7 +4,7 @@
 #include <QObject>
 
 class OpenMSXConnection;
-class Command;
+class CommandBase;
 class QString;
 
 class CommClient : public QObject
@@ -13,7 +13,7 @@ class CommClient : public QObject
 public:
 	static CommClient& instance();
 
-	void sendCommand(Command* command);
+	void sendCommand(CommandBase* command);
 
 public slots:
 	void connectToOpenMSX(OpenMSXConnection* conn);

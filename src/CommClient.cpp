@@ -41,7 +41,7 @@ void CommClient::closeConnection()
 	}
 }
 
-void CommClient::sendCommand(Command* command)
+void CommClient::sendCommand(CommandBase* command)
 {
 	if (connection) {
 		connection->sendCommand(command);

@@ -43,7 +43,7 @@ private:
 
 // Command handler to get initial info from new openmsx connections
 
-class ConnectionInfoRequest : public QObject, Command
+class ConnectionInfoRequest : public QObject, CommandBase
 {
 	Q_OBJECT
 public:
