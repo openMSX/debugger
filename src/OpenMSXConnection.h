@@ -6,13 +6,14 @@
 #include <QXmlStreamAttributes>
 #include <QQueue>
 #include <memory>
+#include <functional>
 
 class QXmlStreamReader;
 
-class Command
+class CommandBase
 {
 public:
-	virtual ~Command() = default;
+	virtual ~CommandBase() = default;
 
 	virtual QString getCommand() const = 0;
 	virtual void replyOk (const QString& message) = 0;
@@ -20,7 +21,7 @@ public:
 	virtual void cancel() = 0;
 };
 
-class SimpleCommand : public QObject, public Command
+class SimpleCommand : public QObject, public CommandBase
 {
 	Q_OBJECT
 public:
@@ -35,6 +36,25 @@ signals:
 
 private:
 	QString command;
+};
+
+class Command : public CommandBase
+{
+public:
+	Command(const QString& command,
+		std::function <void (const QString&)> okCallback,
+		std::function <void (const QString&)> errorCallback = nullptr);
+
+	QString getCommand() const override;
+
+	void replyOk (const QString& message) override;
+	void replyNok(const QString& message) override;
+	void cancel() override;
+
+private:
+	QString command;
+	std::function <void (const QString&)> okCallback;
+	std::function <void (const QString&)> errorCallback;
 };
 
 class ReadDebugBlockCommand : public SimpleCommand
@@ -66,7 +86,7 @@ public:
 	OpenMSXConnection(QAbstractSocket* socket);
 	~OpenMSXConnection() override;
 
-	void sendCommand(Command* command);
+	void sendCommand(CommandBase* command);
 
 signals:
 	void disconnected();
@@ -92,7 +112,7 @@ private:
 
 	QString xmlData;
 	QXmlStreamAttributes xmlAttrs;
-	QQueue<Command*> commands;
+	QQueue<CommandBase*> commands;
 	bool connected;
 };
 
