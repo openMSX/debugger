@@ -79,42 +79,6 @@ private:
 	DebuggerForm& form;
 };
 
-
-class ListBreakPointsHandler : public SimpleCommand
-{
-public:
-	ListBreakPointsHandler(DebuggerForm& form_, bool merge_ = false)
-		: SimpleCommand("debug_list_all_breaks")
-		, form(form_), merge(merge_)
-	{
-	}
-
-	void replyOk(const QString& message) override
-	{
-		if (merge) {
-			QString bps = form.session.breakpoints().mergeBreakpoints(message);
-			if (!bps.isEmpty()) {
-				form.comm.sendCommand(new SimpleCommand(bps));
-				form.comm.sendCommand(new ListBreakPointsHandler(form, false));
-			} else {
-				form.disasmView->update();
-				form.session.sessionModified();
-				form.updateWindowTitle();
-			}
-		} else {
-			form.session.breakpoints().setBreakpoints(message);
-			form.disasmView->update();
-			form.session.sessionModified();
-			form.updateWindowTitle();
-		}
-		delete this;
-	}
-private:
-	DebuggerForm& form;
-	bool merge;
-};
-
-
 class CPURegRequest : public ReadDebugBlockCommand
 {
 public:
@@ -384,8 +348,8 @@ void DebuggerForm::createActions()
 	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
 	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
 	connect(executeStepBackAction, SIGNAL(triggered()), this, SLOT(executeStepBack()));
-	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(breakpointToggle()));
-	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(breakpointAdd()));
+	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
+	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(addBreakpoint()));
 	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 }
 
@@ -668,7 +632,7 @@ void DebuggerForm::createForm()
 	connect(regsView,   SIGNAL(spChanged(quint16)),
 	        stackView,  SLOT(setStackPointer(quint16)));
 	connect(disasmView, SIGNAL(breakpointToggled(int)),
-	                    SLOT(breakpointToggle(int)));
+	                    SLOT(toggleBreakpoint(int)));
 
 	connect(&comm, SIGNAL(connectionReady()),
 	        SLOT(initConnection()));
@@ -939,7 +903,7 @@ void DebuggerForm::breakOccured()
 
 void DebuggerForm::updateData()
 {
-	comm.sendCommand(new ListBreakPointsHandler(*this, mergeBreakpoints));
+	reloadBreakpoints(mergeBreakpoints);
 	// only merge the first time after connect
 	mergeBreakpoints = false;
 
@@ -1009,7 +973,7 @@ void DebuggerForm::openSession(const QString& file)
 	session.open(file);
 	if (systemDisconnectAction->isEnabled()) {
 		// active connection, merge loaded breakpoints
-		comm.sendCommand(new ListBreakPointsHandler(*this, true));
+		reloadBreakpoints(true);
 	}
 	// update recent
 	if (session.existsAsFile()) {
@@ -1183,7 +1147,8 @@ void DebuggerForm::toggleBreakpoint(int addr)
 		cmd = Breakpoints::createSetCommand(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
-	comm.sendCommand(new ListBreakPointsHandler(*this));
+	// Get results from command above
+	reloadBreakpoints();
 }
 
 void DebuggerForm::addBreakpoint()
@@ -1199,7 +1164,8 @@ void DebuggerForm::addBreakpoint()
 				bpd.type(), bpd.address(), bpd.slot(), bpd.subslot(), bpd.segment(),
 				bpd.addressEndRange(), bpd.condition());
 			comm.sendCommand(new SimpleCommand(cmd));
-			comm.sendCommand(new ListBreakPointsHandler(*this));
+			// Get results of command above
+			reloadBreakpoints();
 		}
 	}
 }
@@ -1512,4 +1478,29 @@ void DebuggerForm::addressSlot(int addr, int& ps, int& ss, int& segment)
 		if (memLayout.romBlock[q] >= 0)
 			segment = memLayout.romBlock[q];
 	}
+}
+
+void DebuggerForm::reloadBreakpoints(bool merge)
+{
+	auto command = new Command("debug_list_all_breaks",
+		[this, merge](const QString& message){
+			if (merge) {
+				QString bps = session.breakpoints().mergeBreakpoints(message);
+				if (!bps.isEmpty()) {
+					comm.sendCommand(new SimpleCommand(bps));
+					reloadBreakpoints(false);
+				} else {
+					disasmView->update();
+					session.sessionModified();
+					updateWindowTitle();
+				}
+			} else {
+				session.breakpoints().setBreakpoints(message); /* here */
+				disasmView->update();
+				session.sessionModified();
+				updateWindowTitle();
+			}
+		}
+	);
+	comm.sendCommand(command);
 }

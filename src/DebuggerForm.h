@@ -3,6 +3,7 @@
 
 #include "DockManager.h"
 #include "DebugSession.h"
+#include "OpenMSXConnection.h"
 #include <QMainWindow>
 #include <QMap>
 
@@ -23,13 +24,14 @@ class VDPCommandRegViewer;
 
 class DebuggerForm : public QMainWindow
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DebuggerForm(QWidget* parent = nullptr);
 	~DebuggerForm() override;
 
 public slots:
 	void showAbout();
+	void reloadBreakpoints(bool merge = false);
 
 private:
 	void closeEvent(QCloseEvent* e) override;
