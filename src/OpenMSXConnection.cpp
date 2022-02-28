@@ -15,13 +15,11 @@ QString SimpleCommand::getCommand() const
 
 void SimpleCommand::replyOk (const QString& /*message*/)
 {
-	emit replyStatusOk(true);
 	delete this;
 }
 
 void SimpleCommand::replyNok(const QString& /*message*/)
 {
-	emit replyStatusOk(false);
 	cancel();
 }
 
@@ -30,6 +28,38 @@ void SimpleCommand::cancel()
 	delete this;
 }
 
+
+Command::Command(const QString& command,
+		std::function <void (const QString&)> okCallback,
+		std::function <void (const QString&)> errorCallback)
+		: command(command)
+		, okCallback(okCallback)
+		, errorCallback(errorCallback)
+{
+}
+
+void Command::replyOk(const QString& message)
+{
+	okCallback(message);
+	delete this;
+}
+
+void Command::replyNok(const QString& message)
+{
+	if (errorCallback != nullptr)
+		errorCallback(message);
+	cancel();
+}
+
+QString Command::getCommand() const
+{
+	return command;
+}
+
+void Command::cancel()
+{
+	delete this;
+}
 
 static QString createDebugCommand(const QString& debuggable,
 		unsigned offset, unsigned size)
@@ -108,7 +138,7 @@ OpenMSXConnection::~OpenMSXConnection()
 	socket->deleteLater();
 }
 
-void OpenMSXConnection::sendCommand(Command* command)
+void OpenMSXConnection::sendCommand(CommandBase* command)
 {
 	assert(command);
 	if (connected && socket->isValid()) {
@@ -140,7 +170,7 @@ void OpenMSXConnection::cancelPending()
 {
 	assert(!connected);
 	while (!commands.empty()) {
-		Command* command = commands.dequeue();
+		CommandBase* command = commands.dequeue();
 		command->cancel();
 	}
 }
@@ -196,7 +226,7 @@ bool OpenMSXConnection::endElement(const QStringRef& qName)
 		// ignore
 	} else if (qName == "reply") {
 		if (connected) {
-			Command* command = commands.dequeue();
+			CommandBase* command = commands.dequeue();
 			if (xmlAttrs.value("result") == "ok") {
 				command->replyOk (xmlData);
 			} else {

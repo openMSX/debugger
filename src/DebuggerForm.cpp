@@ -1132,8 +1132,8 @@ void DebuggerForm::executeStep()
 
 void DebuggerForm::executeStepOver()
 {
-	auto* sc = new SimpleCommand("step_over");
-	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
+	auto* sc = new Command("step_over",
+		[this](const QString&){ finalizeConnection(true); });
 	comm.sendCommand(sc);
 	setRunMode();
 }
@@ -1153,17 +1153,10 @@ void DebuggerForm::executeStepOut()
 
 void DebuggerForm::executeStepBack()
 {
-	auto* sc = new SimpleCommand("step_back");
-	connect(sc, SIGNAL(replyStatusOk(bool)), this, SLOT(handleCommandReplyStatus(bool)));
+	auto* sc = new Command("step_back",
+		[this](const QString&){ finalizeConnection(true); });
 	comm.sendCommand(sc);
 	setRunMode();
-}
-
-void DebuggerForm::handleCommandReplyStatus(bool status)
-{
-	if (status) {
-		finalizeConnection(true);
-	}
 }
 
 void DebuggerForm::toggleBreakpoint(int addr)
