@@ -384,8 +384,8 @@ void DebuggerForm::createActions()
 	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
 	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
 	connect(executeStepBackAction, SIGNAL(triggered()), this, SLOT(executeStepBack()));
-	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(breakpointToggle()));
-	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(breakpointAdd()));
+	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
+	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(addBreakpoint()));
 	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 }
 
@@ -668,7 +668,7 @@ void DebuggerForm::createForm()
 	connect(regsView,   SIGNAL(spChanged(quint16)),
 	        stackView,  SLOT(setStackPointer(quint16)));
 	connect(disasmView, SIGNAL(breakpointToggled(int)),
-	                    SLOT(breakpointToggle(int)));
+	                    SLOT(toggleBreakpoint(int)));
 
 	connect(&comm, SIGNAL(connectionReady()),
 	        SLOT(initConnection()));
