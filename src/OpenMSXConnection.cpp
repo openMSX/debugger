@@ -15,13 +15,11 @@ QString SimpleCommand::getCommand() const
 
 void SimpleCommand::replyOk (const QString& /*message*/)
 {
-	emit replyStatusOk(true);
 	delete this;
 }
 
 void SimpleCommand::replyNok(const QString& /*message*/)
 {
-	emit replyStatusOk(false);
 	cancel();
 }
 
