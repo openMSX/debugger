@@ -176,8 +176,6 @@ private slots:
 	void toggleBreakpoint(int addr = -1);
 	void addBreakpoint();
 
-	void handleCommandReplyStatus(bool status);
-
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,

@@ -31,9 +31,6 @@ public:
 	void replyNok(const QString& message) override;
 	void cancel() override;
 
-signals:
-	void replyStatusOk(bool status);
-
 private:
 	QString command;
 };
