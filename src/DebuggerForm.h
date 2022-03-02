@@ -193,7 +193,6 @@ private slots:
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
-	friend class ListBreakPointsHandler;
 	friend class CPURegRequest;
 	friend class ListDebuggablesHandler;
 	friend class DebuggableSizeHandler;
