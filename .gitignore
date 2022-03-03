@@ -3,3 +3,4 @@ derived/
 build/msvc/.vs/*
 .vscode/
 __pycache__/
+.*.swp

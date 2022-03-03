@@ -106,7 +106,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 
 		QAbstractSocketStreamWrapper stream(socket);
 		SspiNegotiateClient client(stream);
-
+		
 		if (!socket->waitForConnected(1000) ||
 			!client.Authenticate()) {
 			delete socket;
