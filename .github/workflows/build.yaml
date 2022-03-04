@@ -96,6 +96,8 @@ jobs:
           find /usr/x86_64-w64-mingw32 -name 'Qt5Network.dll' -exec cp {} . \;
           find /usr/x86_64-w64-mingw32 -name 'Qt5Widgets.dll' -exec cp {} . \;
           find /usr/x86_64-w64-mingw32 -name 'zlib1.dll' -exec cp {} . \;
+          mkdir platforms
+          cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/platforms/qwindows.dll platforms/
         fi
     - name: Upload redistributable package for ${{ matrix.name }}
       uses: actions/upload-artifact@v3
