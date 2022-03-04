@@ -74,14 +74,32 @@ jobs:
       run: |
         cd derived/bin
         if [ "${{ matrix.os }}" = "mingw" ]; then
-          cp -rp /usr/x86_64-w64-mingw32/bin .
-          cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/imageformats .
-          cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/iconengines .
-          cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/platforms .
+          /usr/bin/x86_64-w64-mingw32-strip openmsx-debugger.exe
+          find /usr/x86_64-w64-mingw32 -name 'libbrotlicommon.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libbrotlidec.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libbz2-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libfreetype-6.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libgcc_s_seh-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libglib-2.0-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libgraphite2.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libharfbuzz-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libiconv-2.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libintl-8.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpcre-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpcre2-16-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpng16-16.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libssp-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libstdc++-6.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libwinpthread-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Core.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Gui.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Network.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Widgets.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'zlib1.dll' -exec cp {} . \;
         fi
     - name: Upload redistributable package for ${{ matrix.name }}
       uses: actions/upload-artifact@v3
       with:
-        #name: debugger-${{ steps.get_version.outputs.OPENMSX_VERSION }}-${{ env.target_cpu }}-${{ env.target_os }}-${{ env.package_origin }}.zip
-        name: ${{ steps.get_version.outputs.target_file }}.zip
+        #name: debugger-${{ steps.get_version.outputs.OPENMSX_VERSION }}-${{ env.target_cpu }}-${{ env.target_os }}-${{ env.package_origin }}
+        name: ${{ steps.get_version.outputs.target_file }}
         path: derived/bin
