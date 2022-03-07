@@ -30,6 +30,7 @@ public:
 
 public slots:
 	void showAbout();
+	void reloadBreakpoints(bool merge = false);
 
 private:
 	void closeEvent(QCloseEvent* e) override;
@@ -188,6 +189,7 @@ private slots:
 	void updateWindowTitle();
 	void symbolFileChanged();
 	void showFloatingWidget();
+	void processBreakpoints(const QString& message, bool merge = false);
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
