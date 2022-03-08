@@ -1,7 +1,6 @@
 #ifdef _WIN32
 
 #include "SspiUtils.h"
-#include "MSXException.h"
 #include <sddl.h>
 #include <cassert>
 
@@ -20,7 +19,8 @@ SspiPackageBase::SspiPackageBase(StreamWrapper& userStream, const SEC_WCHAR* sec
 	memset(&hContext, 0, sizeof(hContext));
 
 	if (!cbMaxTokenSize) {
-		throw MSXException("GetPackageMaxTokenSize failed");
+		// GetPackageMaxTokenSize failed
+		assert(false);
 	}
 }
 
