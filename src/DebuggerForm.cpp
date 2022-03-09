@@ -1,6 +1,7 @@
 #include "DebuggerForm.h"
 #include "BitMapViewer.h"
 #include "TileViewer.h"
+#include "SpriteViewer.h"
 #include "DockableWidgetArea.h"
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
