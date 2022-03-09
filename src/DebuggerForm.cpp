@@ -1170,7 +1170,8 @@ void DebuggerForm::toggleBreakpoint(int addr)
 		cmd = Breakpoints::createRemoveCommand(id);
 	} else {
 		// get slot
-		int ps, ss, seg;
+		qint8 ps, ss;
+		qint16 seg;
 		addressSlot(addr, ps, ss, seg);
 		// create command
 		cmd = Breakpoints::createSetCommand(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
@@ -1183,7 +1184,8 @@ void DebuggerForm::addBreakpoint()
 {
 	BreakpointDialog bpd(memLayout, &session, this);
 	int addr = disasmView->cursorAddress();
-	int ps, ss, seg;
+	qint8 ps, ss;
+	qint16 seg;
 	addressSlot(addr, ps, ss, seg);
 	bpd.setData(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
@@ -1490,12 +1492,11 @@ void DebuggerForm::symbolFileChanged()
 		session.symbolTable().reloadFiles();
 }
 
-void DebuggerForm::addressSlot(int addr, int& ps, int& ss, int& segment)
+void DebuggerForm::addressSlot(int addr, qint8& ps, qint8& ss, qint16& segment)
 {
 	int p = (addr & 0xC000) >> 14;
 	ps = memLayout.primarySlot[p];
-	// figure out secondary slot
-	ss = memLayout.isSubslotted[ps] ? memLayout.secondarySlot[p] : -1;
+	ss = memLayout.secondarySlot[p];
 	// figure out (rom) mapper segment
 	segment = -1;
 	if (memLayout.mapperSize[ps][ss==-1 ? 0 : ss] > 0)

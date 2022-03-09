@@ -79,8 +79,8 @@ QString BreakpointDialog::condition()
 	return (cbCondition->checkState() == Qt::Checked) ? txtCondition->toPlainText() : "";
 }
 
-void BreakpointDialog::setData(Breakpoints::Type type, int address, int ps, int ss, int segment,
-                               int addressEnd, QString condition)
+void BreakpointDialog::setData(Breakpoints::Type type, int address, qint8 ps, qint8 ss,
+                               qint16 segment, int addressEnd, QString condition)
 {
 	// set type
 	cmbxType->setCurrentIndex(int(type));
@@ -94,19 +94,19 @@ void BreakpointDialog::setData(Breakpoints::Type type, int address, int ps, int 
 
 	// primary slot
 	if (cmbxSlot->isEnabled() && ps >= 0) {
-		cmbxSlot->setCurrentIndex(ps+1);
+		cmbxSlot->setCurrentIndex(ps + 1);
 		slotChanged(cmbxSlot->currentIndex());
 	}
 
 	// secondary slot
 	if (cmbxSubslot->isEnabled() && ss >= 0) {
-		cmbxSubslot->setCurrentIndex(ss+1);
+		cmbxSubslot->setCurrentIndex(ss + 1);
 		subslotChanged(cmbxSubslot->currentIndex());
 	}
 
 	// segment
 	if (cmbxSegment->isEnabled() && segment >= 0) {
-		cmbxSegment->setCurrentIndex(segment+1);
+		cmbxSegment->setCurrentIndex(segment + 1);
 	}
 
 	// end address
