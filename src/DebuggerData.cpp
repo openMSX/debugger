@@ -8,8 +8,8 @@
 MemoryLayout::MemoryLayout()
 {
 	for (int p = 0; p < 4; ++p) {
-		primarySlot[p] = '0';
-		secondarySlot[p] = 'X';
+		primarySlot[p] = 0;
+		secondarySlot[p] = -1;
 		mapperSegment[p] = 0;
 		isSubslotted[p] = false;
 		for (int q = 0; q < 4; ++q) {
@@ -80,7 +80,7 @@ void Breakpoints::setMemoryLayout(MemoryLayout* ml)
 	memLayout = ml;
 }
 
-QString Breakpoints::createSetCommand(Type type, int address, char ps, char ss, int segment,
+QString Breakpoints::createSetCommand(Type type, int address, qint8 ps, qint8 ss, qint16 segment,
                                       int endRange, QString condition)
 {
 	QString cmd("debug %1 %2 %3");
@@ -99,9 +99,9 @@ QString Breakpoints::createSetCommand(Type type, int address, char ps, char ss, 
 		condition = condition.simplified();
 		cond = QString("{ [ %1_in_slot %2 %3 %4 ] %5}")
 		       .arg(type == WATCHPOINT_MEMREAD || type == WATCHPOINT_MEMWRITE ? "watch" : "pc")
-		       .arg(ps==-1 ? 'X' : char('0'+ps))
-		       .arg(ss==-1 ? 'X' : char('0'+ss))
-		       .arg(segment==-1 ? QString('X') : QString::number(segment))
+		       .arg(ps == -1 ? 'X' : char('0' + ps))
+		       .arg(ss == -1 ? 'X' : char('0' + ss))
+		       .arg(segment == -1 ? QString('X') : QString::number(segment))
 		       .arg(condition.isEmpty() ? QString() : QString("&& ( %1 ) ").arg(condition));
 	}
 

@@ -202,7 +202,8 @@ void SlotViewer::slotsUpdated(const QString& message)
 		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toLatin1()-'0') ||
 		                  (memLayout->secondarySlot[p] != lines[p * 2][1].toLatin1()-'0' && memLayout->isSubslotted[p]);
 		memLayout->primarySlot  [p] = lines[p * 2][0].toLatin1()-'0';
-		memLayout->secondarySlot[p] = lines[p * 2][1].toLatin1()-'0';
+		memLayout->secondarySlot[p] = (lines[p * 2][1]) == 'X'
+			? -1 : lines[p * 2][1].toLatin1() - '0';
 		segmentsChanged[p] = memLayout->mapperSegment[p] !=
 		                     lines[p * 2 + 1].toInt();
 		memLayout->mapperSegment[p] = lines[p * 2 + 1].toInt();

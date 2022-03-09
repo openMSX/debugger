@@ -701,7 +701,7 @@ bool HexViewer::event(QEvent* e)
 			unsigned wd = chr;
 			wd += 256 * hexData[address + 1];
 			text += QString("\n\nWord: %1").arg(QString("%1").arg(wd, 4, 16, QChar('0')).toUpper());
-			text += QString("\nBinary: %1 %1 %1 %1")
+			text += QString("\nBinary: %1 %2 %3 %4")
 				.arg((wd & 0xF000) >> 12, 4, 2, QChar('0'))
 				.arg((wd & 0x0F00) >>  8, 4, 2, QChar('0'))
 				.arg((wd & 0x00F0) >>  4, 4, 2, QChar('0'))

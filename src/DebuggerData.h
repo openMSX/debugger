@@ -44,7 +44,7 @@ public:
 	int findNextBreakpoint();
 
 	static QString createSetCommand(Type type, int address,
-	                                char ps = -1, char ss = -1, int segment = -1,
+	                                qint8 ps = -1, qint8 ss = -1, qint16 segment = -1,
 	                                int endRange = -1, QString condition = QString());
 	static QString createRemoveCommand(const QString& id);
 
@@ -56,8 +56,8 @@ private:
 		// end for watchpoint region
 		quint16 regionEnd;
 		// gui specific condition variables
-		char ps;
-		char ss;
+		qint8 ps;
+		qint8 ss;
 		qint16 segment;
 		// general condition
 		QString condition;
