@@ -17,7 +17,7 @@ public:
 	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = nullptr, QWidget* parent = nullptr);
 	~BreakpointDialog() override;
 
-	Breakpoints::Type type();
+	Breakpoint::Type type();
 	int address();
 	int addressEndRange();
 	int slot();
@@ -25,7 +25,7 @@ public:
 	int segment();
 	QString condition();
 
-	void setData(Breakpoints::Type type, int address = -1,
+	void setData(Breakpoint::Type type, int address = -1,
 	             qint8 ps = -1, qint8 ss = -1, qint16 segment = -1,
 	             int addressEnd = -1, QString condition = QString());
 

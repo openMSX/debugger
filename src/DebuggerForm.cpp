@@ -1141,7 +1141,7 @@ void DebuggerForm::toggleBreakpoint(int addr)
 		qint16 seg;
 		addressSlot(addr, ps, ss, seg);
 		// create command
-		cmd = Breakpoints::createSetCommand(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
+		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
 	// Get results from command above
@@ -1155,7 +1155,7 @@ void DebuggerForm::addBreakpoint()
 	qint8 ps, ss;
 	qint16 seg;
 	addressSlot(addr, ps, ss, seg);
-	bpd.setData(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
+	bpd.setData(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
 		if (bpd.address() >= 0) {
 			QString cmd = Breakpoints::createSetCommand(

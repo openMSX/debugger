@@ -41,9 +41,9 @@ BreakpointDialog::~BreakpointDialog()
 	delete allCompleter;
 }
 
-Breakpoints::Type BreakpointDialog::type()
+Breakpoint::Type BreakpointDialog::type()
 {
-	return Breakpoints::Type(cmbxType->currentIndex());
+	return Breakpoint::Type(cmbxType->currentIndex());
 }
 
 int BreakpointDialog::address()
@@ -79,7 +79,7 @@ QString BreakpointDialog::condition()
 	return (cbCondition->checkState() == Qt::Checked) ? txtCondition->toPlainText() : "";
 }
 
-void BreakpointDialog::setData(Breakpoints::Type type, int address, qint8 ps, qint8 ss,
+void BreakpointDialog::setData(Breakpoint::Type type, int address, qint8 ps, qint8 ss,
                                qint16 segment, int addressEnd, QString condition)
 {
 	// set type
