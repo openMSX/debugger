@@ -569,8 +569,7 @@ void DebuggerForm::createForm()
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
 	connect(this, SIGNAL(connected()),
 	        slotView, SLOT(refresh()));
-	connect(this, SIGNAL(breakStateEntered()),
-	        slotView, SLOT(refresh()));
+	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
 
 	// restore layout
 	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
@@ -918,6 +917,7 @@ void DebuggerForm::updateData()
 
 void DebuggerForm::setBreakMode()
 {
+	emit breakStateEntered();
 	executeBreakAction->setEnabled(false);
 	executeRunAction->setEnabled(true);
 	executeStepAction->setEnabled(true);
@@ -929,6 +929,7 @@ void DebuggerForm::setBreakMode()
 
 void DebuggerForm::setRunMode()
 {
+	emit runStateEntered();
 	executeBreakAction->setEnabled(true);
 	executeRunAction->setEnabled(false);
 	executeStepAction->setEnabled(false);
@@ -1494,9 +1495,11 @@ void DebuggerForm::processBreakpoints(const QString& message, bool merge)
 			disasmView->update();
 			session.sessionModified();
 			updateWindowTitle();
+			emit breakpointsUpdated();
 		}
 	} else {
 		session.breakpoints().setBreakpoints(message);
+		emit breakpointsUpdated();
 		disasmView->update();
 		session.sessionModified();
 		updateWindowTitle();

@@ -23,6 +23,7 @@ DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	destroyable = true;
 	dragging = false;
 	setAttribute(Qt::WA_DeleteOnClose, true);
+	setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
 	titleLabel = new QLabel();
 	closeButton = new QToolButton();
@@ -128,7 +129,6 @@ void DockableWidget::setFloating(bool enable, bool showNow)
 	if (floating == enable) return;
 
 	floating = enable;
-	setWindowFlags(floating ? Qt::FramelessWindowHint | Qt::Tool : Qt::Widget);
 
 	if (mainWidget->sizePolicy().horizontalPolicy() != QSizePolicy::Fixed &&
 			mainWidget->sizePolicy().verticalPolicy() != QSizePolicy::Fixed) {

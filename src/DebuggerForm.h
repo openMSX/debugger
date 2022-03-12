@@ -202,7 +202,9 @@ signals:
 	void connected();
 	void settingsChanged();
 	void symbolsChanged();
+	void runStateEntered();
 	void breakStateEntered();
+	void breakpointsUpdated();
 	void debuggablesChanged(const QMap<QString, int>& list);
 };
 
