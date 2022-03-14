@@ -9,3 +9,4 @@ moc_*.cpp
 moc_predefs.h
 qrc_resources.cpp
 Makefile
+.*.swp

@@ -112,7 +112,8 @@ void SymbolManager::initFileList()
 	for (int i = 0; i < symTable.symbolFilesSize(); ++i) {
 		auto* item = new QTreeWidgetItem(treeFiles);
 		item->setText(0, symTable.symbolFile(i));
-		item->setText(1, symTable.symbolFileRefresh(i).toString(Qt::LocaleDate));
+		auto fmt = QLocale().dateTimeFormat(QLocale::ShortFormat);
+		item->setText(1, symTable.symbolFileRefresh(i).toString(fmt));
 	}
 }
 

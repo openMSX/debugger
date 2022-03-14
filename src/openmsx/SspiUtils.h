@@ -3,6 +3,7 @@
 
 #ifdef _WIN32
 
+#include <cstdint>
 #include <winsock2.h>
 #ifdef __GNUC__
 // MinGW32 requires that subauth.h be included before security.h, in order to define several things

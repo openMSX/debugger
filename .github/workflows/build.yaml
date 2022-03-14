@@ -1,0 +1,105 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+      - github-workflow
+  pull_request:
+    branches:
+      - master
+
+env:
+  package_origin: gh
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+      options: --user=0:0
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: docker://pvmm/mingw-arch:latest
+            name: Windows
+            cpu: x86_64
+            os: mingw
+          - image: debian:unstable
+            name: GNU/Linux
+            cpu: x86_64
+            os: debian
+    steps:
+    - name: configure base system
+      run: |
+        if [ "${{ matrix.os }}" = "debian" ]; then
+          export DEBIAN_FRONTEND=noninteractive
+          export DEBCONF_NONINTERACTIVE_SEEN=true
+          apt-get -y update
+          apt-get -y install tzdata
+          echo "America/Sao_Paulo" > /etc/timezone
+          cp /etc/timezone /tz
+          cp /etc/localtime /tz
+          apt-get -y install git build-essential python3 qtbase5-dev qt5-qmake
+        fi
+        git config --global init.defaultBranch master
+    - name: checkout repository code
+      uses: actions/checkout@v3
+    - name: compile repository code
+      run: |
+        if [ "${{ matrix.os }}" = "mingw" ]; then
+          # Setting QT_INSTALL_BINS differently won't work since it's overwritten.
+          #export QT_INSTALL_BINS=/usr/x86_64-w64-mingw32/lib/qt/bin/
+          export OPENMSX_TARGET_OS=mingw32
+          export CXX=/usr/bin/x86_64-w64-mingw32-g++
+          export WINDRES=/usr/bin/x86_64-w64-mingw32-windres
+          ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/uic /usr/x86_64-w64-mingw32/bin/uic
+          ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/moc /usr/x86_64-w64-mingw32/bin/moc
+          ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/rcc /usr/x86_64-w64-mingw32/bin/rcc
+          QMAKE=/usr/x86_64-w64-mingw32/lib/qt/bin/qmake make
+        else
+          make
+        fi
+    - name: Determine version and file name
+      id: get_version
+      run: |
+        #DEBUGGER_VERSION=`python3 build/version.py`
+        #echo ::set-output name=DEBUGGER_VERSION::$DEBUGGER_VERSION
+        #echo "::set-output name=target_file::debugger-$DEBUGGER_VERSION-${{ matrix.cpu }}-${{ matrix.os }}-${{ env.package_origin }}"
+        echo "::set-output name=target_file::debugger-${{ matrix.cpu }}-${{ matrix.os }}-${{ env.package_origin }}"
+    - name: Prepare redistributable directory
+      run: |
+        cd derived/bin
+        if [ "${{ matrix.os }}" = "mingw" ]; then
+          /usr/bin/x86_64-w64-mingw32-strip openmsx-debugger.exe
+          find /usr/x86_64-w64-mingw32 -name 'libbrotlicommon.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libbrotlidec.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libbz2-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libfreetype-6.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libgcc_s_seh-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libglib-2.0-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libgraphite2.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libharfbuzz-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libiconv-2.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libintl-8.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpcre-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpcre2-16-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libpng16-16.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libssp-0.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libstdc++-6.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'libwinpthread-1.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Core.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Gui.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Network.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'Qt5Widgets.dll' -exec cp {} . \;
+          find /usr/x86_64-w64-mingw32 -name 'zlib1.dll' -exec cp {} . \;
+          mkdir platforms
+          cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/platforms/qwindows.dll platforms/
+        fi
+    - name: Upload redistributable package for ${{ matrix.name }}
+      uses: actions/upload-artifact@v3
+      with:
+        #name: debugger-${{ steps.get_version.outputs.OPENMSX_VERSION }}-${{ env.target_cpu }}-${{ env.target_os }}-${{ env.package_origin }}
+        name: ${{ steps.get_version.outputs.target_file }}
+        path: derived/bin
