@@ -104,6 +104,7 @@ void VramTiledView::decode()
 void VramTiledView::decodePallet()
 {
 	if (!pallet) return;
+    //printf("VramTiledView::decodePallet  palletpointer %p \n",pallet);
 
 	for (int i = 0; i < 16; ++i) {
 		int r = (pallet[2 * i + 0] & 0xf0) >> 4;
@@ -115,6 +116,7 @@ void VramTiledView::decodePallet()
 		g = (g >> 1) | (g << 2) | (g << 5);
 
 		msxpallet[i] = qRgb(r, g, b);
+        //printf("VramTiledView::decodePallet  color %d => r %d  g %d  b %d \n",i,r,g,b);
 	}
 }
 

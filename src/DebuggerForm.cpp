@@ -442,7 +442,7 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
 	viewVDPDialogsMenu->addAction(viewCharMappedAction);
-//	viewVDPDialogsMenu->addAction(viewSpritesAction); NOT IMPLEMENTED YET
+	viewVDPDialogsMenu->addAction(viewSpritesAction);
 	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
 
 	// create Debuggable Viewers menu (so the user can focus an existing one)
@@ -1283,7 +1283,7 @@ void DebuggerForm::toggleSpritesDisplay()
 	// not sure if this a good idea for a docable widget
 
 	// create new debuggable viewer window
-	auto* viewer = new TileViewer();
+    auto* viewer = new SpriteViewer();
 	auto* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Sprites View"));
