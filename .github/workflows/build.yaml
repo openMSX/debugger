@@ -6,8 +6,6 @@ on:
       - master
       - github-workflow
   pull_request:
-    types:
-      - opened
     branches:
       - master
 
