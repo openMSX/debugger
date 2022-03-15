@@ -1513,28 +1513,31 @@ void DebuggerForm::addressSlot(int addr, qint8& ps, qint8& ss, qint16& segment)
 void DebuggerForm::reloadBreakpoints(bool merge)
 {
 	auto command = new Command("debug_list_all_breaks",
-	                           [this, merge](const QString& message){ processBreakpoints(message, merge); });
+	                           [this, merge](const QString& message) {
+	                                if (merge) {
+	                                        processMerge(message);
+	                                } else {
+	                                        processBreakpoints(message);
+	                                } });
 	comm.sendCommand(command);
 }
 
-void DebuggerForm::processBreakpoints(const QString& message, bool merge)
+void DebuggerForm::processBreakpoints(const QString& message)
 {
-	if (merge) {
-		QString bps = session.breakpoints().mergeBreakpoints(message);
-		if (!bps.isEmpty()) {
-			comm.sendCommand(new SimpleCommand(bps));
-			reloadBreakpoints(false);
-		} else {
-			disasmView->update();
-			session.sessionModified();
-			updateWindowTitle();
-			emit breakpointsUpdated();
-		}
+	session.breakpoints().setBreakpoints(message);
+	disasmView->update();
+	session.sessionModified();
+	updateWindowTitle();
+	emit breakpointsUpdated();
+}
+
+void DebuggerForm::processMerge(const QString& message)
+{
+	QString bps = session.breakpoints().mergeBreakpoints(message);
+	if (!bps.isEmpty()) {
+		comm.sendCommand(new SimpleCommand(bps));
+		reloadBreakpoints(false);
 	} else {
-		session.breakpoints().setBreakpoints(message);
-		emit breakpointsUpdated();
-		disasmView->update();
-		session.sessionModified();
-		updateWindowTitle();
+		processBreakpoints(message);
 	}
 }

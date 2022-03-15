@@ -193,7 +193,8 @@ private slots:
 	void updateWindowTitle();
 	void symbolFileChanged();
 	void showFloatingWidget();
-	void processBreakpoints(const QString& message, bool merge = false);
+	void processBreakpoints(const QString& message);
+	void processMerge(const QString& message);
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
