@@ -96,7 +96,7 @@ QString Breakpoints::createSetCommand(Type type, int address, qint8 ps, qint8 ss
 	if (type == CONDITION) {
 		cond = QString("{%1}").arg(condition);
 	} else {
-		condition = condition.simplified();
+		condition = condition.trimmed();
 		cond = QString("{ [ %1_in_slot %2 %3 %4 ] %5}")
 		       .arg(type == WATCHPOINT_MEMREAD || type == WATCHPOINT_MEMWRITE ? "watch" : "pc")
 		       .arg(ps == -1 ? 'X' : char('0' + ps))
@@ -180,8 +180,7 @@ void Breakpoints::setBreakpoints(const QString& str)
 		int q = bp.lastIndexOf('{');
 		if (bp.mid(q).simplified() != "{debug break}") continue;
 
-		newBp.condition = bp.mid(p, q - p).simplified();
-		unescapeXML(newBp.condition);
+		newBp.condition = unescapeXML(bp.mid(p, q - p).trimmed());
 		parseCondition(newBp);
 		insertBreakpoint(newBp);
 	}
@@ -437,7 +436,7 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				// read symbol name
 				bp.regionEnd = xml.readElementText().toInt();
 			} else if (xml.name() == "condition") {
-				bp.condition = xml.readElementText().simplified();
+				bp.condition = xml.readElementText().trimmed();
 			}
 		}
 	}
