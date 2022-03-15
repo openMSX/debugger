@@ -7,7 +7,7 @@ class QPaintEvent;
 
 class CPURegsViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	CPURegsViewer(QWidget* parent = nullptr);
 

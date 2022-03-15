@@ -13,7 +13,7 @@ struct MemoryLayout;
 
 class DisasmViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DisasmViewer(QWidget* parent = nullptr);
 

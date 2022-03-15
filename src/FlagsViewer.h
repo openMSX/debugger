@@ -10,7 +10,7 @@ class QString;
 
 class FlagsViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	FlagsViewer(QWidget* parent = nullptr);
 

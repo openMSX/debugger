@@ -23,7 +23,7 @@ class VDPCommandRegViewer;
 
 class DebuggerForm : public QMainWindow
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DebuggerForm(QWidget* parent = nullptr);
 	~DebuggerForm() override;

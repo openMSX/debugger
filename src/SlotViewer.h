@@ -8,7 +8,7 @@ class QString;
 
 class SlotViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	SlotViewer(QWidget* parent = nullptr);
 
