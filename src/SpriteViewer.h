@@ -39,6 +39,12 @@ private slots:
 
     void on_le_colortable_textChanged(const QString &arg1);
 
+    void on_sp_zoom_valueChanged(int arg1);
+
+    void on_cb_ecinfluence_toggled(bool checked);
+
+    void on_cb_mag_currentIndexChanged(int index);
+
 private:
     void decodeVDPregs();
 

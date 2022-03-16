@@ -21,11 +21,11 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
             this, SLOT(VDPDataStoreDataRefreshed()));
 
     imageWidget = new VramSpriteView();
-    QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    sizePolicy1.setHorizontalStretch(0);
-    sizePolicy1.setVerticalStretch(0);
-    sizePolicy1.setHeightForWidth(imageWidget->sizePolicy().hasHeightForWidth());
-    imageWidget->setSizePolicy(sizePolicy1);
+    //QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //sizePolicy1.setHorizontalStretch(0);
+    //sizePolicy1.setVerticalStretch(0);
+    //sizePolicy1.setHeightForWidth(imageWidget->sizePolicy().hasHeightForWidth());
+    //imageWidget->setSizePolicy(sizePolicy1);
     imageWidget->setMinimumSize(QSize(256, 212));
     connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
             imageWidget, SLOT(refresh()));
@@ -34,7 +34,7 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     imageWidget->setVramSource(VDPDataStore::instance().getVramPointer());
     imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 
-    imageWidgetSingle = new VramSpriteView(nullptr,true,true);
+    imageWidgetSingle = new VramSpriteView(nullptr,VramSpriteView::PatternMode,true);
     QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sizePolicy3.setHorizontalStretch(0);
     sizePolicy3.setVerticalStretch(0);
@@ -52,12 +52,12 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
 
 
 
-    imageWidgetSpat = new VramSpriteView(nullptr,false);
-    QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(imageWidgetSpat->sizePolicy().hasHeightForWidth());
-    imageWidgetSpat->setSizePolicy(sizePolicy2);
+    imageWidgetSpat = new VramSpriteView(nullptr,VramSpriteView::SpriteAttributeMode);
+//    QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+//    sizePolicy2.setHorizontalStretch(0);
+//    sizePolicy2.setVerticalStretch(0);
+//    sizePolicy2.setHeightForWidth(imageWidgetSpat->sizePolicy().hasHeightForWidth());
+//    imageWidgetSpat->setSizePolicy(sizePolicy2);
     imageWidgetSpat->setMinimumSize(QSize(256, 212));
     connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
             imageWidgetSpat, SLOT(refresh()));
@@ -123,6 +123,12 @@ void SpriteViewer::pgtwidget_mouseMoveEvent(int x, int y, int character)
 void SpriteViewer::pgtwidget_mouseClickedEvent(int x, int y, int character, QString text)
 {
     pgtwidget_mouseMoveEvent(x,y,character);
+
+    ui->plainTextEdit->setPlainText(QString("info for pattern %1 (%2)\n%3")
+                                    .arg(character)
+                                    .arg(hexValue(character,2))
+                                    .arg(text)
+                );
 }
 
 void SpriteViewer::spatwidget_mouseMoveEvent(int x, int y, int character)
@@ -327,5 +333,27 @@ void SpriteViewer::on_le_colortable_textChanged(const QString &arg1)
         font.setItalic(true);
         ui->le_patterntable->setFont(font);
     }
+}
+
+
+void SpriteViewer::on_sp_zoom_valueChanged(int arg1)
+{
+    int zoom=arg1*2;
+    imageWidget->setZoom(zoom);
+    imageWidgetSpat->setZoom(zoom);
+}
+
+
+void SpriteViewer::on_cb_ecinfluence_toggled(bool checked)
+{
+    imageWidget->setECinfluence(checked);
+    imageWidgetSpat->setECinfluence(checked);
+}
+
+
+void SpriteViewer::on_cb_mag_currentIndexChanged(int index)
+{
+    imageWidget->setUseMagnification(index==1);
+    imageWidgetSpat->setUseMagnification(index==1);
 }
 
