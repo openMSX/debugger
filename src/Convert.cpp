@@ -62,12 +62,12 @@ QString hexValue(int value, int width)
 	                      
 }
 
-QString& escapeXML(QString& str)
+QString escapeXML(QString str)
 {
 	return str.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
 }
 
-QString& unescapeXML(QString& str)
+QString unescapeXML(QString str)
 {
 	return str.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">");
 }
