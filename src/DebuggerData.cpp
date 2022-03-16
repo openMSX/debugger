@@ -3,7 +3,11 @@
 #include "qglobal.h"
 #include <QStringList>
 #include <QDebug>
+#include <algorithm>
 // class MemoryLayout
+
+static const char* const TypeNames[] = { "breakpoint", "memread", "memwrite", "ioread", "iowrite",
+                                         "condition" };
 
 MemoryLayout::MemoryLayout()
 {
@@ -314,13 +318,13 @@ bool Breakpoints::isWatchpoint(quint16 addr, QString *id)
 
 int Breakpoints::findBreakpoint(quint16 addr)
 {
-    auto i = std::lower_bound(breakpoints.begin(), breakpoints.end(), addr,
+	auto i = std::lower_bound(breakpoints.begin(), breakpoints.end(), addr,
 	           [](const Breakpoint& bp, const quint16 addr) {
 				   return bp.address < addr;
 			   }
    			);
 	if (i != breakpoints.end() && i->address == addr) {
-		return i - breakpoints.begin();
+		return std::distance(breakpoints.begin(), i);
 	}
 	return -1;
 }
@@ -340,26 +344,7 @@ void Breakpoints::saveBreakpoints(QXmlStreamWriter& xml)
 		xml.writeStartElement("Breakpoint");
 
 		// type
-		switch (bp.type) {
-		case BREAKPOINT:
-			xml.writeAttribute("type", "breakpoint");
-			break;
-		case WATCHPOINT_IOREAD:
-			xml.writeAttribute("type", "ioread");
-			break;
-		case WATCHPOINT_IOWRITE:
-			xml.writeAttribute("type", "iowrite");
-			break;
-		case WATCHPOINT_MEMREAD:
-			xml.writeAttribute("type", "memread");
-			break;
-		case WATCHPOINT_MEMWRITE:
-			xml.writeAttribute("type", "memwrite");
-			break;
-		case CONDITION:
-			xml.writeAttribute("type", "condition");
-			break;
-		}
+		xml.writeAttribute("type", TypeNames[bp.type]);
 
 		// id
 		xml.writeAttribute("id", bp.id);
@@ -402,19 +387,13 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 		if (xml.isStartElement()) {
 			if (xml.name() == "Breakpoint") {
 				// set type
-				QString type = xml.attributes().value("type").toString().toLower();
-				if (type == "ioread") {
-					bp.type = WATCHPOINT_IOREAD;
-				} else if (type == "iowrite") {
-					bp.type = WATCHPOINT_IOWRITE;
-				} else if (type == "memread") {
-					bp.type = WATCHPOINT_MEMREAD;
-				} else if (type == "memwrite") {
-					bp.type = WATCHPOINT_MEMWRITE;
-				} else if (type == "condition") {
-					bp.type = CONDITION;
-				} else {
+				QString label = xml.attributes().value("type").toString().toLower();
+				auto iter = std::find(std::begin(TypeNames), std::end(TypeNames), label);
+				if (iter == std::end(TypeNames)) {
+					qWarning() << "Unknown type" << label << "in XML";
 					bp.type = BREAKPOINT;
+				} else {
+					bp.type = static_cast<Type>(std::distance(TypeNames, iter));
 				}
 
 				// id
