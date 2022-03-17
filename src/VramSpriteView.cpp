@@ -270,7 +270,6 @@ void VramSpriteView::decodePallet()
 
 void VramSpriteView::decodepgt()
 {
-    printf("void VramSpriteView::decodepgt()\n");
     image.fill(QColor(Qt::lightGray));
     //scope for painter of drawSpriteAt calling setSpritePixel will fail
     //QPainter::begin: A paint device can only be painted by one painter at a time.

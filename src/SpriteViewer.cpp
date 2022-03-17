@@ -258,7 +258,6 @@ void SpriteViewer::setCorrectEnabled(bool checked)
 
     ui->le_patterntable->setEnabled(!checked);
     ui->le_attributentable->setEnabled(!checked);
-    ui->le_spat_colortable->setEnabled(!checked&&spritemode==2);
     ui->le_colortable->setEnabled(!checked&&spritemode==2);
 
 
