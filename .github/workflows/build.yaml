@@ -10,7 +10,7 @@ on:
       - master
 
 env:
-  package_origin: gh
+  package_origin: -github
 
 jobs:
   build:
@@ -62,12 +62,32 @@ jobs:
           make
         fi
     - name: Determine version and file name
-      id: get_version
+      id: get-version
       run: |
-        #DEBUGGER_VERSION=`python3 build/version.py`
-        #echo ::set-output name=DEBUGGER_VERSION::$DEBUGGER_VERSION
-        #echo "::set-output name=target_file::debugger-$DEBUGGER_VERSION-${{ matrix.cpu }}-${{ matrix.os }}-${{ env.package_origin }}"
-        echo "::set-output name=target_file::debugger-${{ matrix.cpu }}-${{ matrix.os }}-${{ env.package_origin }}"
+        #VERSION=`python3 build/version.py`
+        if [ '${{ github.event_name }}' == 'pull request' ]; then
+          tag_name=pr${{ github.run_attempt }}
+          draft=true
+          prerelease=false
+        else
+          if [ "${{ github.ref_name }}" =~ rc[0-9]?$ ]; then
+            draft=true
+            prerelease=true
+          else
+            if [ "${{ github.ref_name }}" =~ ^v[0-9] ]; then
+              draft=false
+              prerelease=false
+            fi
+          fi
+          tag_name=${{ github.ref_name }}
+        fi
+        echo "::set-output name=draft::$draft"
+        echo "::set-output name=prerelease::$prerelease"
+        echo "::set-output name=tag_name::$tag_name"
+        PACKAGE_NAME="debugger-${{ matrix.cpu }}-${{ matrix.os }}${{ env.package_origin }}"
+        echo "::set-output name=target_file::${PACKAGE_NAME}"
+        echo "Package name set to '${PACKAGE_NAME}'"
+        # Check if body file exists?
     - name: Prepare redistributable directory
       run: |
         cd derived/bin
@@ -100,6 +120,82 @@ jobs:
     - name: Upload redistributable package for ${{ matrix.name }}
       uses: actions/upload-artifact@v3
       with:
-        #name: debugger-${{ steps.get_version.outputs.OPENMSX_VERSION }}-${{ env.target_cpu }}-${{ env.target_os }}-${{ env.package_origin }}
-        name: ${{ steps.get_version.outputs.target_file }}
-        path: derived/bin
+        name: ${{ steps.get-version.outputs.target_file }}
+        path: |
+          derived/bin
+
+  release:
+    name: Release project packages
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ steps.get-version.outputs.target_file }}
+      - name: View content
+        id: get-dir
+        run: |
+          target_debian=$(find . -maxdepth 1 -type d -name "*-debian-*" -printf %f)
+          target_mingw=$(find . -maxdepth 1 -type d -name "*-mingw-*" -printf %f)
+          echo "::set-output name=target_debian::$target_debian"
+          echo "::set-output name=target_mingw::$target_mingw"
+
+      - name: Creating Debian package
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "${{ steps.get-dir.outputs.target_debian }}"
+          filename: "${{ steps.get-dir.outputs.target_debian }}.zip"
+
+      - name: Creating MinGW package
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "${{ steps.get-dir.outputs.target_mingw }}"
+          filename: "${{ steps.get-dir.outputs.target_mingw }}.zip"
+
+      - name: Create GitHub release
+        id: create-new-release-debian
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_name: "Debian build number ${{ github.ref_name }}-${{ github.run_number }}"
+          tag_name: ${{ github.run_number }}
+          draft: ${{ steps.check-body.outputs.HAS_BODY_FILE }}
+          body: ${{ github.event.head_commit.message }}
+
+      - name: Create GitHub release
+        id: create-new-release-mingw
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_name: "Windows (MinGW) build number ${{ github.ref_name }}s-${{ github.run_number }}"
+          tag_name: ${{ github.run_number }}
+          draft: ${{ steps.check-body.outputs.HAS_BODY_FILE }}
+          body: ${{ github.event.head_commit.message }}
+
+      - name: Upload Debian release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-new-release-debian.outputs.upload_url }}
+          asset_path: ${{ steps.get-dir.outputs.target_debian }}/${{ steps.get-dir.outputs.target_debian }}.zip
+          asset_name: ${{ steps.get-dir.outputs.target_debian }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload MinGW release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-new-release-mingw.outputs.upload_url }}
+          asset_path: ${{ steps.get-dir.outputs.target_mingw }}/${{ steps.get-dir.outputs.target_mingw }}.zip
+          asset_name: ${{ steps.get-dir.outputs.target_mingw }}.zip
+          asset_content_type: application/zip
+
