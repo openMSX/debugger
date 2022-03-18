@@ -59,10 +59,16 @@ public slots:
     void setECinfluence(bool value);
 
     void setCharToDisplay(int character);
+    void setSpriteboxClicked(int spbox); //for drawMode != PatternMode
+    void setCharacterClicked(int charbox); //when drawMode == PatternMode
 
 signals:
     void imagePosition(int screenx, int screeny, int spritenr);
     void imageClicked(int screenx, int screeny, int spritenr, QString textinfo);
+
+    //when clicked and selection made signals
+    void spriteboxClicked(int spbox); //for drawMode != PatternMode
+    void characterClicked(int charbox); //when drawMode == PatternMode
 
 protected:
     virtual void resizeEvent(QResizeEvent *event);
@@ -75,6 +81,7 @@ private:
 
     void decodepgt();
     void decodespat();
+    void decodecol();
 
     void setSpritePixel(int x, int y, QRgb c);
     QRgb getColor(int c);
@@ -106,10 +113,12 @@ private:
     bool useECbit;
     bool useMagnification; //only used when useECbit is true! if not this simply acts as zoomfactor...
     int charToDisplay;
+    int currentSpriteboxSelected;
 
     void drawMonochromeSpriteAt(int character, int spritebox, int xoffset, int yoffset, QRgb fg, QRgb bg, bool ec=false);
     void drawLineColoredSpriteAt(int character, int spritebox, int xoffset, int yoffset, int rowoffset, QRgb bg);
     void drawGrid();
+    void drawColSprite(int entry, QColor &bgcolor);
     void drawSpatSprite(int entry, QColor &bgcolor);
 
     bool infoFromMouseEvent(QMouseEvent* e, int &spritebox, int &character);

@@ -21,6 +21,7 @@ VramSpriteView::VramSpriteView(QWidget *parent, mode drawer, bool singlesprite)
     size16x16=true;
     useECbit=false;
     useMagnification=false;
+    currentSpriteboxSelected=-1;
     // sprite size=8x8,16x16,32x32 or 40x8,48x16,64x32 if EC bit respected
     calculate_size_of_sprites();
 
@@ -104,18 +105,23 @@ void VramSpriteView::mousePressEvent(QMouseEvent *e)
     int character=0;
     int spritebox=0;
 
-    printf("mousePressEvent\n");
     if (infoFromMouseEvent(e,spritebox,character)){
         QString text;
         switch (drawMode) {
             case PatternMode:
                 text=patterninfo(character);
+                currentSpriteboxSelected=spritebox;
+                emit characterClicked(character);
+                refresh(); //to do the drawgrid with selection
             break;
         case SpriteAttributeMode:
         case ColorMode:
             if (character<32) {
                 int pat=vramBase[attributeTableAddress+4*character+2];
                 text=patterninfo(pat,spritebox);
+                currentSpriteboxSelected=spritebox;
+                emit spriteboxClicked(spritebox);
+                refresh(); //to do the drawgrid with selection
             };
             break;
         }
@@ -216,6 +222,7 @@ void VramSpriteView::decode()
                 decodespat();
                 break;
             case ColorMode:
+                decodecol();
                 break;
             }
         //and now draw grid if any
@@ -248,6 +255,26 @@ void VramSpriteView::drawGrid()
         qp.drawLine(xx,0,xx,gridheight);
     }
 
+    if (currentSpriteboxSelected>=0 && currentSpriteboxSelected<nr_of_sprites_to_show){
+        int x=size_of_sprites_horizontal*zoomFactor*(currentSpriteboxSelected%nr_of_sprites_horizontal);
+        int y=size_of_sprites_vertical*zoomFactor*int(currentSpriteboxSelected/nr_of_sprites_horizontal);
+        int w=size_of_sprites_horizontal*zoomFactor;
+        int h=size_of_sprites_vertical*zoomFactor;
+        if (x==0){
+            w--;
+        } else {
+            x--;
+        };
+        if (y==0){
+            h--;
+        } else {
+            y--;
+        };
+        qp.setPen(QColor(255,0,0,192));
+        qp.setBrush(Qt::NoBrush);
+        qp.drawRect(x,y,w,h);
+
+    }
 }
 
 
@@ -316,6 +343,56 @@ void VramSpriteView::decodespat()
     for(int i=0;i<32;i++){
         drawSpatSprite(i,bgcolor);
     }
+}
+
+void VramSpriteView::decodecol()
+{
+    if (spritemode==0){
+        return;
+    }
+
+    QColor bgcolor=QColor(Qt::lightGray);
+    for(int i=0;i<32;i++){
+        drawColSprite(i,bgcolor);
+    }
+}
+
+void VramSpriteView::drawColSprite(int entry,QColor &bgcolor)
+{
+    int color=vramBase[attributeTableAddress+4*entry+3];
+    int x=(entry%nr_of_sprites_horizontal) * size_of_sprites_horizontal*zoomFactor;
+    int y=int(entry/nr_of_sprites_horizontal) * size_of_sprites_vertical*zoomFactor;
+    QPainter qp(&image);
+    //mode 0 already tested, we will not end up here with spritemode==0
+    if (spritemode==1){
+        bool ec = color&128 ;
+        QRgb fgcolor = msxpallet[color&15]; //drop EC and unused bits
+        qp.fillRect(x,y,size_of_sprites_horizontal*zoomFactor,size_of_sprites_vertical*zoomFactor,fgcolor);
+        qp.fillRect(x,y,zoomFactor,size_of_sprites_vertical*zoomFactor,
+                    ec?QRgb(Qt::white):QRgb(Qt::black)
+                    );
+    } else if (spritemode==2){
+        for (int charrow=0 ; charrow<(size16x16?16:8) ; charrow++){
+            unsigned char colorbyte = vramBase[colorTableAddress+16*entry+charrow];
+            bool ec=128&colorbyte;
+            bool cc=64&colorbyte;
+            bool ic=32&colorbyte;
+            QRgb fgcolor=msxpallet[colorbyte&15]; //drop EC,CC and IC bits
+            qp.fillRect(             x,   y+charrow*zoomFactor,   size_of_sprites_horizontal*zoomFactor,  zoomFactor, fgcolor); // line with color
+            qp.fillRect(             x,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (ec?QColor(Qt::white):QColor(Qt::black)) ); // ec bit set -> white
+            qp.fillRect(  x+zoomFactor,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (cc?QColor(Qt::green):QColor(Qt::black)) ); // cc bit set -> green
+            qp.fillRect(x+2*zoomFactor,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (ic?QColor(Qt::red):QColor(Qt::black)) ); // ic bit set -> blue
+
+            if (zoomFactor>2){ // nice seperation black line if possible
+                qp.fillRect(  x+zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
+                qp.fillRect(x+2*zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
+                qp.fillRect(x+3*zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
+            }
+        };
+    }else {
+        image.fill(QColor(Qt::darkCyan));
+    }
+
 }
 
 void VramSpriteView::drawSpatSprite(int entry,QColor &bgcolor)
@@ -525,6 +602,21 @@ void VramSpriteView::setCharToDisplay(int character)
         charToDisplay = character;
         refresh();
     };
+}
+
+void VramSpriteView::setSpriteboxClicked(int spbox)
+{
+    if (currentSpriteboxSelected==spbox){
+        return;
+    };
+
+    currentSpriteboxSelected=spbox;
+    refresh();
+}
+
+void VramSpriteView::setCharacterClicked(int charbox)
+{
+    setSpriteboxClicked(charbox);
 }
 
 void VramSpriteView::recalcSpriteLayout(int width)

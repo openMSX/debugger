@@ -52,6 +52,7 @@ private:
     VramSpriteView* imageWidget;
     VramSpriteView* imageWidgetSingle;
     VramSpriteView* imageWidgetSpat;
+    VramSpriteView* imageWidgetColor;
 
     int spritemode;
     bool size16x16;

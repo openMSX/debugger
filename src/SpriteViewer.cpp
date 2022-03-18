@@ -8,6 +8,16 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SpriteViewer)
 {
+    //initialize internal variables
+    spritemode=0;
+    size16x16=false;
+    magnified=false;
+    spritesenabled=false;
+    spataddr=0;
+    pgtaddr=0;
+    spcoladdr=0;
+
+
     ui->setupUi(this);
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->plainTextEdit->setFont(fixedFont);
@@ -53,11 +63,6 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
 
 
     imageWidgetSpat = new VramSpriteView(nullptr,VramSpriteView::SpriteAttributeMode);
-//    QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//    sizePolicy2.setHorizontalStretch(0);
-//    sizePolicy2.setVerticalStretch(0);
-//    sizePolicy2.setHeightForWidth(imageWidgetSpat->sizePolicy().hasHeightForWidth());
-//    imageWidgetSpat->setSizePolicy(sizePolicy2);
     imageWidgetSpat->setMinimumSize(QSize(256, 212));
     connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
             imageWidgetSpat, SLOT(refresh()));
@@ -65,6 +70,19 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
 
     imageWidgetSpat->setVramSource(VDPDataStore::instance().getVramPointer());
     imageWidgetSpat->setPaletteSource(VDPDataStore::instance().getPalettePointer());
+
+
+
+    imageWidgetColor = new VramSpriteView(nullptr,VramSpriteView::ColorMode);
+    imageWidgetColor->setMinimumSize(QSize(256, 212));
+    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
+            imageWidgetColor, SLOT(refresh()));
+    ui->spriteColorTable_widget->parentWidget()->layout()->replaceWidget(ui->spriteColorTable_widget,imageWidgetColor);
+
+    imageWidgetColor->setVramSource(VDPDataStore::instance().getVramPointer());
+    imageWidgetColor->setPaletteSource(VDPDataStore::instance().getPalettePointer());
+
+
 
 
 
@@ -81,6 +99,22 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
             this,SLOT(spatwidget_mouseClickedEvent(int , int , int , QString)));
     connect(imageWidgetSpat,SIGNAL(imagePosition(int , int , int )),
             this,SLOT(spatwidget_mouseMoveEvent(int , int , int )));
+
+
+    //since imageWidgetColor and imageWidgetSpat are the same structure we reuse
+    //spatwidget_mouseClickedEvent
+    connect(imageWidgetColor,SIGNAL(imageClicked(int , int , int , QString )),
+            this,SLOT(spatwidget_mouseClickedEvent(int , int , int , QString)));
+
+
+    //have spat and color the same spriteselection box synced
+    connect(imageWidgetSpat,SIGNAL( spriteboxClicked(int)),
+            imageWidgetColor,SLOT(setSpriteboxClicked(int)));
+
+    connect(imageWidgetColor,SIGNAL( spriteboxClicked(int)),
+            imageWidgetSpat,SLOT(setSpriteboxClicked(int)));
+
+
 
 
 
@@ -164,6 +198,7 @@ void SpriteViewer::setDrawGrid(int state)
     imageWidget->setDrawgrid(state==Qt::Checked);
     imageWidgetSingle->setDrawgrid(state==Qt::Checked);
     imageWidgetSpat->setDrawgrid(state==Qt::Checked);
+    imageWidgetColor->setDrawgrid(state==Qt::Checked);
 }
 
 void SpriteViewer::decodeVDPregs()
@@ -212,6 +247,7 @@ void SpriteViewer::on_le_patterntable_textChanged(const QString &arg1)
         imageWidget->setPatternTableAddress(i);
         imageWidgetSingle->setPatternTableAddress(i);
         imageWidgetSpat->setPatternTableAddress(i);
+        imageWidgetColor->setPatternTableAddress(i);
         auto font = ui->le_patterntable->font();
         font.setItalic(false);
         ui->le_patterntable->setFont(font);
@@ -229,6 +265,7 @@ void SpriteViewer::on_le_attributentable_textChanged(const QString &arg1)
         imageWidget->setAttributeTableAddress(i);
         imageWidgetSingle->setAttributeTableAddress(i);
         imageWidgetSpat->setAttributeTableAddress(i);
+        imageWidgetColor->setAttributeTableAddress(i);
         auto font = ui->le_attributentable->font();
         font.setItalic(false);
         ui->le_attributentable->setFont(font);
@@ -281,6 +318,9 @@ void SpriteViewer::setCorrectVDPData()
     imageWidgetSpat->setSize16x16(size16x16);
     imageWidgetSpat->setSpritemode(spritemode);
 
+    imageWidgetColor->setSize16x16(size16x16);
+    imageWidgetColor->setSpritemode(spritemode);
+
 
 
     ui->cb_spritemode->setCurrentIndex(spritemode);
@@ -303,6 +343,7 @@ void SpriteViewer::on_cb_size_currentIndexChanged(int index)
     imageWidget->setSize16x16(size16x16);
     imageWidgetSingle->setSize16x16(size16x16);
     imageWidgetSpat->setSize16x16(size16x16);
+    imageWidgetColor->setSize16x16(size16x16);
 }
 
 void SpriteViewer::on_cb_spritemode_currentIndexChanged(int index)
@@ -311,6 +352,7 @@ void SpriteViewer::on_cb_spritemode_currentIndexChanged(int index)
     imageWidget->setSpritemode(index);
     imageWidgetSingle->setSpritemode(index);
     imageWidgetSpat->setSpritemode(index);
+    imageWidgetColor->setSpritemode(index);
 
 }
 
@@ -318,12 +360,12 @@ void SpriteViewer::on_cb_spritemode_currentIndexChanged(int index)
 void SpriteViewer::on_le_colortable_textChanged(const QString &arg1)
 {
     int i = stringToValue(arg1);
-    printf(" new   on_le_colortable_textChanged  %05x \n",i);
     if (i != -1){
         spcoladdr=i;
         imageWidget->setColorTableAddress(i);
         imageWidgetSingle->setColorTableAddress(i);
         imageWidgetSpat->setColorTableAddress(i);
+        imageWidgetColor->setColorTableAddress(i);
         auto font = ui->le_patterntable->font();
         font.setItalic(false);
         ui->le_patterntable->setFont(font);
@@ -340,6 +382,7 @@ void SpriteViewer::on_sp_zoom_valueChanged(int arg1)
     int zoom=arg1*2;
     imageWidget->setZoom(zoom);
     imageWidgetSpat->setZoom(zoom);
+    imageWidgetColor->setZoom(zoom);
 }
 
 
@@ -347,6 +390,7 @@ void SpriteViewer::on_cb_ecinfluence_toggled(bool checked)
 {
     imageWidget->setECinfluence(checked);
     imageWidgetSpat->setECinfluence(checked);
+    imageWidgetColor->setECinfluence(checked);
 }
 
 
@@ -354,5 +398,6 @@ void SpriteViewer::on_cb_mag_currentIndexChanged(int index)
 {
     imageWidget->setUseMagnification(index==1);
     imageWidgetSpat->setUseMagnification(index==1);
+    imageWidgetColor->setUseMagnification(index==1);
 }
 
