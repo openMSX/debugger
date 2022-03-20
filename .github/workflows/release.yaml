@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    if: ${{ github.ref == 'refs/heads/master' }}
     uses: ./.github/workflows/workflow-build.yaml
   release:
     name: Release project packages
