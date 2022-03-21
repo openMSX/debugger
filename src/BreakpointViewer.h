@@ -16,11 +16,11 @@ public:
 	BreakpointViewer(QWidget* parent = nullptr);
 	void setBreakpoints(Breakpoints* bps);
 
-	enum Type { BREAKPOINT, WATCHPOINT };
+	enum Type { BREAKPOINT, WATCHPOINT, CONDITION };
 
 private:
 	Ui::BreakpointViewer* ui;
-	QTableWidget* selector[2];
+	QTableWidget* selector[3];
 
 	// layout
 	int frameL, frameR, frameT, frameB;
@@ -32,15 +32,8 @@ private:
 	bool conditionsMsg = false;
 	Breakpoints* breakpoints;
 
-	struct ItemPos {
-		BreakpointViewer::Type type;
-		int row;
-		bool operator==(const ItemPos& ip) const;
-	};
-	QList<ItemPos> items;
-
 	bool processLocationField(int index, BreakpointViewer::Type type, const QString& field,
-		int& begin, int& end);
+		int& begin, int& end, const QString combo = QString());
 	bool processSlotField(int index, const QString& field, qint8& ps, qint8& ss);
 	bool processSegmentField(int index, const QString& field, qint16& segment);
 	void changeTableItem(Type type, QTableWidgetItem* item);
@@ -48,6 +41,9 @@ private:
 	int createTableRow(Type type);
 
 	void createBreakpoint(Type type, int row);
+	void _createBreakpoint(Type type, int row);
+	void _createCondition(int row);
+
 	void replaceBreakpoint(Type type, int row);
 	void removeBreakpoint(Type type, int row);
 	void setBreakpointStatus(Type type, int row, int status);
@@ -57,12 +53,16 @@ private slots:
 	void changeCurrentWpType(int row, int index);
 	void changeBpTableItem(QTableWidgetItem* item);
 	void changeWpTableItem(QTableWidgetItem* item);
+	void changeCnTableItem(QTableWidgetItem* item);
 
 public slots:
 	void on_btnAddBp_clicked();
 	void on_btnRemoveBp_clicked();
 	void on_btnAddWp_clicked();
 	void on_btnRemoveWp_clicked();
+	void on_btnAddCn_clicked();
+	void on_btnRemoveCn_clicked();
+
 	void setRunState();
 	void setBreakState();
 	void sync();
