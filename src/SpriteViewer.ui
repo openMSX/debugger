@@ -18,6 +18,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QCheckBox" name="useVDPPalette">
+       <property name="toolTip">
+        <string>, otherwise use the palette from the editor</string>
+       </property>
        <property name="text">
         <string>Use VDP  palette registers</string>
        </property>
@@ -60,6 +63,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="cb_alwaysShowColorTable">
+       <property name="toolTip">
+        <string>Alsways show the Sprite Color Table even if not in sprite mode 2</string>
+       </property>
+       <property name="text">
+        <string>Always show color table</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="refreshButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -95,6 +111,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="cb_displaygrid">
+       <property name="toolTip">
+        <string>display gridlines and checkered background</string>
+       </property>
        <property name="text">
         <string>display grid</string>
        </property>
@@ -163,6 +182,11 @@
           </item>
           <item>
            <widget class="QComboBox" name="cb_spritemode">
+            <property name="toolTip">
+             <string>VDP text modes do not have sprites.
+Mode 1 and 2 mainly differ in the amount of sprites per line and how the color of the spritelines are determined.
+Sprite mode depends on current display mode.</string>
+            </property>
             <item>
              <property name="text">
               <string>Unavailable</string>
@@ -215,6 +239,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="cb_size">
+            <property name="toolTip">
+             <string>in 16x16 the VDP will group 4 8x8 sprites together and handle them as being 1 sprite</string>
+            </property>
             <item>
              <property name="text">
               <string>8x8</string>
@@ -262,6 +289,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="cb_mag">
+            <property name="toolTip">
+             <string>Efefct only visible if &quot;display EC influence&quot; is checked.</string>
+            </property>
             <item>
              <property name="text">
               <string>Normal</string>
@@ -291,6 +321,10 @@
            <widget class="QLabel" name="label_spritesenabled">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Displays is VDP will display sprites,
+Has no effect on this widget.</string>
             </property>
             <property name="text">
              <string>Sprites enabled</string>
@@ -360,7 +394,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>420</width>
+                 <width>430</width>
                  <height>129</height>
                 </rect>
                </property>

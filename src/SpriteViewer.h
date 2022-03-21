@@ -45,6 +45,8 @@ private slots:
 
     void on_cb_mag_currentIndexChanged(int index);
 
+    void on_cb_alwaysShowColorTable_toggled(bool checked);
+
 private:
     void decodeVDPregs();
 

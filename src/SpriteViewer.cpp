@@ -114,6 +114,19 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     connect(imageWidgetColor,SIGNAL( spriteboxClicked(int)),
             imageWidgetSpat,SLOT(setSpriteboxClicked(int)));
 
+    //clear pattern selection if spat or color selected
+    connect(imageWidgetSpat,SIGNAL( spriteboxClicked(int)),
+            imageWidget,SLOT(setCharacterClicked()));
+
+    connect(imageWidgetColor,SIGNAL( spriteboxClicked(int)),
+            imageWidget,SLOT(setCharacterClicked()));
+
+    //clear spat and color selection if imagewidget clicked
+    connect(imageWidget,SIGNAL( characterClicked(int)),
+            imageWidgetSpat,SLOT(setSpriteboxClicked()));
+
+    connect(imageWidget,SIGNAL( characterClicked(int)),
+            imageWidgetColor,SLOT(setSpriteboxClicked()));
 
 
 
@@ -302,7 +315,7 @@ void SpriteViewer::setCorrectEnabled(bool checked)
     ui->label_mag->setEnabled(spritemode!=0);
     ui->label_spritesenabled->setEnabled(spritesenabled);
 
-    ui->gb_colpat->setVisible(spritemode==2);
+    ui->gb_colpat->setVisible(spritemode==2 || ui->cb_alwaysShowColorTable->isChecked());
 
 }
 
@@ -348,7 +361,8 @@ void SpriteViewer::on_cb_size_currentIndexChanged(int index)
 
 void SpriteViewer::on_cb_spritemode_currentIndexChanged(int index)
 {
-    ui->gb_colpat->setVisible(index==2);
+    ui->gb_colpat->setVisible(index==2 || ui->cb_alwaysShowColorTable->isChecked());
+    spritemode=index;
     imageWidget->setSpritemode(index);
     imageWidgetSingle->setSpritemode(index);
     imageWidgetSpat->setSpritemode(index);
@@ -399,5 +413,11 @@ void SpriteViewer::on_cb_mag_currentIndexChanged(int index)
     imageWidget->setUseMagnification(index==1);
     imageWidgetSpat->setUseMagnification(index==1);
     imageWidgetColor->setUseMagnification(index==1);
+}
+
+
+void SpriteViewer::on_cb_alwaysShowColorTable_toggled(bool checked)
+{
+    ui->gb_colpat->setVisible(spritemode==2 || ui->cb_alwaysShowColorTable->isChecked());
 }
 

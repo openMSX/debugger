@@ -364,11 +364,12 @@ void VramSpriteView::drawColSprite(int entry,QColor &bgcolor)
     int y=int(entry/nr_of_sprites_horizontal) * size_of_sprites_vertical*zoomFactor;
     QPainter qp(&image);
     //mode 0 already tested, we will not end up here with spritemode==0
+    int z=zoomFactor*((useMagnification && useECbit)?2:1);
     if (spritemode==1){
         bool ec = color&128 ;
         QRgb fgcolor = msxpallet[color&15]; //drop EC and unused bits
-        qp.fillRect(x,y,size_of_sprites_horizontal*zoomFactor,size_of_sprites_vertical*zoomFactor,fgcolor);
-        qp.fillRect(x,y,zoomFactor,size_of_sprites_vertical*zoomFactor,
+        qp.fillRect(x,y,size_of_sprites_horizontal*z,size_of_sprites_vertical*z,fgcolor);
+        qp.fillRect(x,y,z,size_of_sprites_vertical*z,
                     ec?QRgb(Qt::white):QRgb(Qt::black)
                     );
     } else if (spritemode==2){
@@ -378,15 +379,15 @@ void VramSpriteView::drawColSprite(int entry,QColor &bgcolor)
             bool cc=64&colorbyte;
             bool ic=32&colorbyte;
             QRgb fgcolor=msxpallet[colorbyte&15]; //drop EC,CC and IC bits
-            qp.fillRect(             x,   y+charrow*zoomFactor,   size_of_sprites_horizontal*zoomFactor,  zoomFactor, fgcolor); // line with color
-            qp.fillRect(             x,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (ec?QColor(Qt::white):QColor(Qt::black)) ); // ec bit set -> white
-            qp.fillRect(  x+zoomFactor,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (cc?QColor(Qt::green):QColor(Qt::black)) ); // cc bit set -> green
-            qp.fillRect(x+2*zoomFactor,   y+charrow*zoomFactor,                              zoomFactor,  zoomFactor, (ic?QColor(Qt::red):QColor(Qt::black)) ); // ic bit set -> blue
+            qp.fillRect(             x,   y+charrow*z,   size_of_sprites_horizontal*z,  z, fgcolor); // line with color
+            qp.fillRect(             x,   y+charrow*z,                              z,  z, (ec?QColor(Qt::white):QColor(Qt::black)) ); // ec bit set -> white
+            qp.fillRect(  x+z,   y+charrow*z,                              z,  z, (cc?QColor(Qt::green):QColor(Qt::black)) ); // cc bit set -> green
+            qp.fillRect(x+2*z,   y+charrow*z,                              z,  z, (ic?QColor(Qt::red):QColor(Qt::black)) ); // ic bit set -> blue
 
-            if (zoomFactor>2){ // nice seperation black line if possible
-                qp.fillRect(  x+zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
-                qp.fillRect(x+2*zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
-                qp.fillRect(x+3*zoomFactor-1,   y+charrow*zoomFactor,   1,  zoomFactor, QColor(Qt::black));
+            if (z>2){ // nice seperation black line if possible
+                qp.fillRect(  x+z-1,   y+charrow*z,   1,  z, QColor(Qt::black));
+                qp.fillRect(x+2*z-1,   y+charrow*z,   1,  z, QColor(Qt::black));
+                qp.fillRect(x+3*z-1,   y+charrow*z,   1,  z, QColor(Qt::black));
             }
         };
     }else {
@@ -715,14 +716,22 @@ void VramSpriteView::drawMonochromeSpriteAt(int character, int spritebox, int xo
     int ec_offset=useECbit && !ec? 32 : 0; //draw more to the right if no ec but spritebox is extra wide to display ec effect
 
     QRgb backg =bg ;
+    bool dogrid = gridenabled && 4<(zoomFactor*((useMagnification && useECbit)?2:1)) ;
     for (int charrow=0 ; charrow<8 ; charrow++){
         unsigned char patternbyte = vramBase[patternTableAddress+8*character+charrow];
         for (int charcol=0 ; charcol<8 ; charcol++){
             unsigned char mask=1<<(7-charcol);
-            if (gridenabled && zoomFactor>4){
+            if (dogrid){
                 backg = 1&(charrow+charcol)?bg:QColor(bg).darker(110).rgb();
             };
-            setSpritePixel(x+xoffset*8+charcol+ec_offset, y+yoffset*8+charrow, (patternbyte&mask ? fg : backg ) );
+            if (useMagnification && useECbit){
+                setSpritePixel(x+ec_offset+2*(xoffset*8+charcol), y+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
+                setSpritePixel(x+ec_offset+1+2*(xoffset*8+charcol), y+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
+                setSpritePixel(x+ec_offset+2*(xoffset*8+charcol), y+1+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
+                setSpritePixel(x+ec_offset+1+2*(xoffset*8+charcol), y+1+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
+            } else {
+                setSpritePixel(x+xoffset*8+charcol+ec_offset, y+yoffset*8+charrow, (patternbyte&mask ? fg : backg ) );
+            }
         }
     }
 
@@ -747,13 +756,13 @@ void VramSpriteView::drawLineColoredSpriteAt(int character,  int spritebox, int 
             if (gridenabled && zoomFactor>4){
                 backg = 1&(charrow+charcol)?bg:QColor(bg).darker(110).rgb();
             };
-            if (!useMagnification){
-                setSpritePixel(x+xoffset*8+charcol+ec_offset, y+yoffset*8+charrow, (patternbyte&mask ? fg : backg ) );
-            } else {
+            if (useMagnification && useECbit){
                 setSpritePixel(x+ec_offset+2*(xoffset*8+charcol), y+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
                 setSpritePixel(x+ec_offset+1+2*(xoffset*8+charcol), y+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
                 setSpritePixel(x+ec_offset+2*(xoffset*8+charcol), y+1+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
                 setSpritePixel(x+ec_offset+1+2*(xoffset*8+charcol), y+1+2*(yoffset*8+charrow), (patternbyte&mask ? fg : backg ) );
+            } else {
+                setSpritePixel(x+xoffset*8+charcol+ec_offset, y+yoffset*8+charrow, (patternbyte&mask ? fg : backg ) );
             }
         }
     }

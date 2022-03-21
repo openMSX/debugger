@@ -59,8 +59,8 @@ public slots:
     void setECinfluence(bool value);
 
     void setCharToDisplay(int character);
-    void setSpriteboxClicked(int spbox); //for drawMode != PatternMode
-    void setCharacterClicked(int charbox); //when drawMode == PatternMode
+    void setSpriteboxClicked(int spbox=-1); //for drawMode != PatternMode
+    void setCharacterClicked(int charbox=-1); //when drawMode == PatternMode
 
 signals:
     void imagePosition(int screenx, int screeny, int spritenr);
