@@ -595,8 +595,7 @@ bool VramTiledView::infoFromMouseEvent(QMouseEvent* e, int &x, int &y, int &char
 void VramTiledView::setBorderColor(int value)
 {
 	borderColor = clip<0, 15>(value);
-	decodePallet();
-	decode();
+    refresh();
 }
 
 void VramTiledView::setScreenMode(int mode)
@@ -608,8 +607,7 @@ void VramTiledView::setScreenMode(int mode)
 void VramTiledView::setVramSource(const unsigned char* adr)
 {
 	vramBase = adr;
-	decodePallet();
-	decode();
+    refresh();
 }
 
 void VramTiledView::setNameTableAddress(int adr)
@@ -634,6 +632,5 @@ void VramTiledView::setPaletteSource(const unsigned char* adr)
 {
 	if (pallet == adr) return ;
 	pallet = adr;
-	decodePallet();
-	decode();
+    refresh();
 }

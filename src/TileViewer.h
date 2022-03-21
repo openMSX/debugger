@@ -14,11 +14,18 @@ public:
     explicit TileViewer(QWidget *parent = nullptr);
     ~TileViewer();
 
+
 private:
     void decodeVDPregs();
 
     VramTiledView* imageWidget;
     QImage image4label;
+
+    int mouseover_x;
+    int mouseover_y;
+    int mouseover_char;
+
+    static unsigned char defaultPalette[32];
 
 private slots:
     void refresh();
@@ -46,6 +53,7 @@ private slots:
 
     void VDPDataStoreDataRefreshed();
     void highlightInfo(unsigned char character, int count);
+    void update_label_characterimage();
     void imageMouseOver(int screenx, int screeny, int character);
 
     void on_cb_blinkcolors_stateChanged(int arg1);

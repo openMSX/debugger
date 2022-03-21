@@ -7,7 +7,7 @@
 #include <QMessageBox>
 
 
-static /*const*/ unsigned char defaultPalette[32] = { //temp not static to test PaletteDialog
+unsigned char TileViewer::defaultPalette[32] = { //static to feed to PaletteDialog and be used when not VDP colors aren't selected
 //        RB  G
     0x00, 0,
     0x00, 0,
@@ -35,6 +35,11 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
 //    nametable=0;
 //    patterntable=0;
 //    colortable=0;
+
+    mouseover_x=0;
+    mouseover_y=0;
+    mouseover_char=0;
+
 
     setupUi(this);
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -96,7 +101,9 @@ TileViewer::~TileViewer()
 
 void TileViewer::VDPDataStoreDataRefreshed()
 {
-    imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
+    if (useVDPPalette->isChecked()){
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
+    };
     decodeVDPregs();
 }
 
@@ -109,8 +116,20 @@ void TileViewer::highlightInfo(unsigned char character, int count)
     }
 }
 
+void TileViewer::update_label_characterimage()
+{
+    imageWidget->drawCharAtImage(mouseover_char,mouseover_x,mouseover_y,image4label);
+    label_characterimage->setPixmap(QPixmap::fromImage(image4label));
+}
+
+
 void TileViewer::imageMouseOver(int screenx, int screeny, int character)
 {
+    mouseover_x=screenx;
+    mouseover_y=screeny;
+    mouseover_char=character;
+    update_label_characterimage();
+
     label_mouseover->setText(QString("col %1  row %2").arg(screenx).arg(screeny));
     int screenmode=imageWidget->getScreenMode();
 
@@ -341,7 +360,8 @@ void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
     PaletteDialog* p=new PaletteDialog();
     p->setPalette(defaultPalette);
     p->setAutoSync(true);
-    connect(p, SIGNAL(paletteSynced()), this, SLOT(refresh()));
+    connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
+    connect(p, SIGNAL(paletteSynced()), this, SLOT(update_label_characterimage()));
     p->show();
 //    useVDPPalette->setChecked(false);
 //    QMessageBox::information(
