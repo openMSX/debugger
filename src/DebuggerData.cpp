@@ -89,18 +89,20 @@ QString Breakpoints::createSetCommand(Type type, int address, qint8 ps, qint8 ss
 {
 	QString cmd("debug %1 %2 %3");
 	QString addr, cond;
+	condition = condition.trimmed();
 
-	// address or range
-	if (type > BREAKPOINT && type < CONDITION && endRange > address)
-		addr = QString("{%1 %2}").arg(address).arg(endRange);
-	else
-		addr = QString::number(address);
-
-	// condition
 	if (type == CONDITION) {
+		// conditions don't have an address
 		cond = QString("{%1}").arg(condition);
 	} else {
-		condition = condition.trimmed();
+		if ((type == BREAKPOINT) || (endRange < address)) {
+			// breakpoint (these never have a range) or watchpoint without range
+			addr = QString::number(address);
+		} else {
+			// some type of watchpoint (with a valid range)
+			addr = QString("{%1 %2}").arg(address).arg(endRange);
+		}
+
 		cond = QString("{ [ %1_in_slot %2 %3 %4 ] %5}")
 		       .arg(type == WATCHPOINT_MEMREAD || type == WATCHPOINT_MEMWRITE ? "watch" : "pc")
 		       .arg(ps == -1 ? 'X' : char('0' + ps))
