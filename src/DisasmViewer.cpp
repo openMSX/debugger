@@ -420,19 +420,20 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 		break;
 	case OnDemand:
 		// Only change the topline if we're out of bounds
-		if (cursorAddr < disasmLines[disasmTopLine].addr ||
-            cursorAddr > disasmLines[disasmTopLine + visibleLines].addr) {
+		if (cursorAddr < disasmLines[disasmTopLine].addr
+		    || cursorAddr > disasmLines[disasmTopLine + visibleLines].addr) {
 			disasmTopLine = findDisasmLine(cursorAddr);
 		}
 		break;
-    default:
-        disasmTopLine = reqDisasmTopLine;
+	default:
+		disasmTopLine = reqDisasmTopLine;
 	}
 
 	disasmTopLine = std::max(disasmTopLine, 0);
 	disasmTopLine = std::min(disasmTopLine,
 	                         int(disasmLines.size()) - visibleLines);
 
+	int method = req->method;
 	updateCancelled(req);
 
 	// sync the scrollbar with the actual address reached
@@ -445,7 +446,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 		           this, SLOT(scrollBarChanged(int)));
 		// set the line
 		setAddress(disasmLines[disasmTopLine].addr,
-		           disasmLines[disasmTopLine].infoLine, req->method);
+		           disasmLines[disasmTopLine].infoLine, method);
 		update();
 	}
 }
