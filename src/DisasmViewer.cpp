@@ -144,7 +144,7 @@ void DisasmViewer::refresh()
 		disasmStart, disasmEnd - disasmStart, &memory[disasmStart], *this);
 	req->address = disasmLines[disasmTopLine].addr;
 	req->line = disasmLines[disasmTopLine].infoLine;
-	req->method = OnDemand;
+	req->method = TopAlways;
 
 	if (waitingForData) {
 		delete nextRequest;
@@ -357,9 +357,8 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	// openMSX and disassembled.
 
 	// determine disasm bounds
-	int disasmStart = disasmLines.front().addr;
-	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
-
+	int disasmStart;
+	int disasmEnd;
 	int extra = 4 * (visibleLines > 9 ? visibleLines+partialBottomLine : 10);
 	switch (method) {
 	case Middle:
@@ -407,26 +406,17 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	     memLayout, symTable, programAddr);
 
 	// locate the requested line
-	int reqDisasmTopLine = findDisasmLine(req->address, req->line);
+	disasmTopLine = findDisasmLine(req->address, req->line);
 
 	switch (req->method) {
 	case Middle:
 	case MiddleAlways:
-		disasmTopLine = reqDisasmTopLine - visibleLines / 2;
+		disasmTopLine -= visibleLines / 2;
 		break;
 	case Bottom:
 	case BottomAlways:
-		disasmTopLine = reqDisasmTopLine - (visibleLines - 1);
+		disasmTopLine -= visibleLines - 1;
 		break;
-	case OnDemand:
-		// Only change the topline if we're out of bounds
-		if (cursorAddr < disasmLines[disasmTopLine].addr ||
-            cursorAddr > disasmLines[disasmTopLine + visibleLines].addr) {
-			disasmTopLine = findDisasmLine(cursorAddr);
-		}
-		break;
-    default:
-        disasmTopLine = reqDisasmTopLine;
 	}
 
 	disasmTopLine = std::max(disasmTopLine, 0);
@@ -445,7 +435,7 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 		           this, SLOT(scrollBarChanged(int)));
 		// set the line
 		setAddress(disasmLines[disasmTopLine].addr,
-		           disasmLines[disasmTopLine].infoLine, req->method);
+		           disasmLines[disasmTopLine].infoLine);
 		update();
 	}
 }
