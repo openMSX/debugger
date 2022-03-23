@@ -8,12 +8,12 @@ class QString;
 
 class SlotViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	SlotViewer(QWidget* parent = nullptr);
 
 	void setMemoryLayout(MemoryLayout* ml);
-	void slotsUpdated(const QString& message);
+	void updateSlots(const QString& message);
 
 	QSize sizeHint() const override;
 
@@ -32,6 +32,9 @@ private:
 
 	bool slotsChanged[4];
 	bool segmentsChanged[4];
+
+signals:
+	void slotsUpdated();
 };
 
 #endif // SLOTVIEWER_H

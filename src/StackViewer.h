@@ -9,7 +9,7 @@ class QPaintEvent;
 
 class StackViewer : public QFrame
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	StackViewer(QWidget* parent = nullptr);
 

@@ -9,7 +9,7 @@ class QPaintEvent;
 
 class DockableWidgetArea : public QWidget
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DockableWidgetArea(QWidget* parent = nullptr);
 

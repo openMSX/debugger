@@ -259,8 +259,8 @@ CXXFLAGS:= -g -fPIC
 INCLUDE_INTERNAL:=$(sort $(foreach header,$(HEADERS_FULL),$(patsubst %/,%,$(dir $(header)))))
 INCLUDE_INTERNAL+=$(BUILD_PATH)/config
 COMPILE_FLAGS:=$(addprefix -I,$(QT_HEADER_DIRS) $(INCLUDE_INTERNAL) $(GEN_SRC_PATH))
-# Enable C++11
-COMPILE_FLAGS+=-std=c++11
+# Enable C++17
+COMPILE_FLAGS+=-std=c++17
 ifeq ($(OPENMSX_TARGET_OS),darwin)
 LINK_FLAGS:=-F$(QT_INSTALL_LIBS) $(addprefix -framework Qt,$(QT_COMPONENTS))
 OSX_VER:=10.13
@@ -283,7 +283,7 @@ DEPEND_FLAGS:=
 # Generic compilation flags.
 CXXFLAGS+=-pipe
 # Stricter warning and error reporting.
-CXXFLAGS+=-Wall
+CXXFLAGS+=-Wall -pedantic
 # Empty definition of used headers, so header removal doesn't break things.
 DEPEND_FLAGS+=-MP
 
