@@ -10,6 +10,7 @@
 #include "FlagsViewer.h"
 #include "StackViewer.h"
 #include "SlotViewer.h"
+#include "BreakpointViewer.h"
 #include "CommClient.h"
 #include "ConnectDialog.h"
 #include "SymbolManager.h"
@@ -78,41 +79,6 @@ public:
 	}
 private:
 	DebuggerForm& form;
-};
-
-
-class ListBreakPointsHandler : public SimpleCommand
-{
-public:
-	ListBreakPointsHandler(DebuggerForm& form_, bool merge_ = false)
-		: SimpleCommand("debug_list_all_breaks")
-		, form(form_), merge(merge_)
-	{
-	}
-
-	void replyOk(const QString& message) override
-	{
-		if (merge) {
-			QString bps = form.session.breakpoints().mergeBreakpoints(message);
-			if (!bps.isEmpty()) {
-				form.comm.sendCommand(new SimpleCommand(bps));
-				form.comm.sendCommand(new ListBreakPointsHandler(form, false));
-			} else {
-				form.disasmView->update();
-				form.session.sessionModified();
-				form.updateWindowTitle();
-			}
-		} else {
-			form.session.breakpoints().setBreakpoints(message);
-			form.disasmView->update();
-			form.session.sessionModified();
-			form.updateWindowTitle();
-		}
-		delete this;
-	}
-private:
-	DebuggerForm& form;
-	bool merge;
 };
 
 
@@ -262,6 +228,10 @@ void DebuggerForm::createActions()
 	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
 	viewRegistersAction->setCheckable(true);
 
+	viewBreakpointsAction = new QAction(tr("Debug &List"), this);
+	viewBreakpointsAction->setStatusTip(tr("Toggle the breakpoints/watchpoints display"));
+	viewBreakpointsAction->setCheckable(true);
+
 	viewFlagsAction = new QAction(tr("CPU &Flags"), this);
 	viewFlagsAction->setStatusTip(tr("Toggle the cpu flags display"));
 	viewFlagsAction->setCheckable(true);
@@ -367,6 +337,7 @@ void DebuggerForm::createActions()
 	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
 	connect(searchGotoAction, SIGNAL(triggered()), this, SLOT(searchGoto()));
 	connect(viewRegistersAction, SIGNAL(triggered()), this, SLOT(toggleRegisterDisplay()));
+	connect(viewBreakpointsAction, SIGNAL(triggered()), this, SLOT(toggleBreakpointsDisplay()));
 	connect(viewFlagsAction, SIGNAL(triggered()), this, SLOT(toggleFlagsDisplay()));
 	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
 	connect(viewSlotsAction, SIGNAL(triggered()), this, SLOT(toggleSlotsDisplay()));
@@ -430,6 +401,7 @@ void DebuggerForm::createMenus()
 	viewMenu->addAction(viewStackAction);
 	viewMenu->addAction(viewSlotsAction);
 	viewMenu->addAction(viewMemoryAction);
+	viewMenu->addAction(viewBreakpointsAction);
 	viewVDPDialogsMenu = viewMenu->addMenu("VDP");
 	viewMenu->addSeparator();
 	viewFloatingWidgetsMenu = viewMenu->addMenu("Floating widgets:");
@@ -563,7 +535,6 @@ void DebuggerForm::createForm()
 	        mainMemoryView, SLOT(registerChanged(int,int)));
 	mainMemoryView->setRegsView(regsView);
 
-
 	// create flags viewer
 	flagsView = new FlagsViewer();
 	dw = new DockableWidget(dockMan);
@@ -602,10 +573,27 @@ void DebuggerForm::createForm()
 	dw->setClosable(true);
 	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
 	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(connected()),
-	        slotView, SLOT(refresh()));
-	connect(this, SIGNAL(breakStateEntered()),
-	        slotView, SLOT(refresh()));
+	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
+	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
+
+	// create breakpoints viewer
+	bpView = new BreakpointViewer(this);
+	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
+	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
+	dw = new DockableWidget(dockMan);
+	dw->setWidget(bpView);
+	dw->setTitle(tr("Debug list"));
+	dw->setId("DEBUG");
+	dw->setFloating(false);
+	dw->setDestroyable(false);
+	dw->setMovable(true);
+	dw->setClosable(true);
+	connect(dw, &DockableWidget::visibilityChanged, this,
+		&DebuggerForm::dockWidgetVisibilityChanged);
+	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
+	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
+	// TODO replace sync by new function that only repaint bp/wp row
+	connect(slotView, &SlotViewer::slotsUpdated, bpView, &BreakpointViewer::sync);
 
 	// restore layout
 	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
@@ -619,15 +607,18 @@ void DebuggerForm::createForm()
 		list.append("FLAGS D V R 0 -1 -1");
 		int regW  = dockMan.findDockableWidget("REGISTERS")->sizeHint().width();
 		int regH  = dockMan.findDockableWidget("REGISTERS")->sizeHint().height();
+		list.append(QString("SLOTS D V R 0 -1 %1").arg(regH));
 		int codeW = dockMan.findDockableWidget("CODEVIEW")->sizeHint().width();
 		int codeH = dockMan.findDockableWidget("CODEVIEW")->sizeHint().height();
 		int flagW = dockMan.findDockableWidget("FLAGS")->sizeHint().width();
 		int slotW = dockMan.findDockableWidget("SLOTS")->sizeHint().width();
-		list.append(QString("SLOTS D V R 0 -1 %1").arg(regH));
 		list.append(QString("STACK D V R 0 -1 %1").arg(codeH));
 		list.append(QString("MEMORY D V B %1 %2 %3").arg(codeW)
 		                                             .arg(regW + flagW + slotW)
 		                                             .arg(codeH - regH));
+		int stackW = dockMan.findDockableWidget("STACK")->sizeHint().width();
+		list.append(QString("DEBUG D V B %1 %2 -1").arg(codeW)
+		                                             .arg(regW + flagW + slotW + stackW));
 	}
 
 	// add widgets
@@ -670,7 +661,6 @@ void DebuggerForm::createForm()
 	        stackView,  SLOT(setStackPointer(quint16)));
 	connect(disasmView, SIGNAL(breakpointToggled(int)),
 	                    SLOT(toggleBreakpoint(int)));
-
 	connect(&comm, SIGNAL(connectionReady()),
 	        SLOT(initConnection()));
 	connect(&comm, SIGNAL(updateParsed(const QString&, const QString&, const QString&)),
@@ -684,6 +674,7 @@ void DebuggerForm::createForm()
 	session.breakpoints().setMemoryLayout(&memLayout);
 	mainMemory = new unsigned char[65536 + 4];
 	memset(mainMemory, 0, 65536 + 4);
+	bpView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
@@ -940,7 +931,7 @@ void DebuggerForm::breakOccured()
 
 void DebuggerForm::updateData()
 {
-	comm.sendCommand(new ListBreakPointsHandler(*this, mergeBreakpoints));
+	reloadBreakpoints(mergeBreakpoints);
 	// only merge the first time after connect
 	mergeBreakpoints = false;
 
@@ -953,6 +944,7 @@ void DebuggerForm::updateData()
 
 void DebuggerForm::setBreakMode()
 {
+	emit breakStateEntered();
 	executeBreakAction->setEnabled(false);
 	executeRunAction->setEnabled(true);
 	executeStepAction->setEnabled(true);
@@ -964,6 +956,7 @@ void DebuggerForm::setBreakMode()
 
 void DebuggerForm::setRunMode()
 {
+	emit runStateEntered();
 	executeBreakAction->setEnabled(true);
 	executeRunAction->setEnabled(false);
 	executeStepAction->setEnabled(false);
@@ -1010,7 +1003,7 @@ void DebuggerForm::openSession(const QString& file)
 	session.open(file);
 	if (systemDisconnectAction->isEnabled()) {
 		// active connection, merge loaded breakpoints
-		comm.sendCommand(new ListBreakPointsHandler(*this, true));
+		reloadBreakpoints(true);
 	}
 	// update recent
 	if (session.existsAsFile()) {
@@ -1175,10 +1168,11 @@ void DebuggerForm::toggleBreakpoint(int addr)
 		qint16 seg;
 		addressSlot(addr, ps, ss, seg);
 		// create command
-		cmd = Breakpoints::createSetCommand(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
+		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
-	comm.sendCommand(new ListBreakPointsHandler(*this));
+	// Get results from command above
+	reloadBreakpoints();
 }
 
 void DebuggerForm::addBreakpoint()
@@ -1188,14 +1182,15 @@ void DebuggerForm::addBreakpoint()
 	qint8 ps, ss;
 	qint16 seg;
 	addressSlot(addr, ps, ss, seg);
-	bpd.setData(Breakpoints::BREAKPOINT, addr, ps, ss, seg);
+	bpd.setData(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
 		if (bpd.address() >= 0) {
 			QString cmd = Breakpoints::createSetCommand(
 				bpd.type(), bpd.address(), bpd.slot(), bpd.subslot(), bpd.segment(),
 				bpd.addressEndRange(), bpd.condition());
 			comm.sendCommand(new SimpleCommand(cmd));
-			comm.sendCommand(new ListBreakPointsHandler(*this));
+			// Get results of command above
+			reloadBreakpoints();
 		}
 	}
 }
@@ -1204,6 +1199,11 @@ void DebuggerForm::showAbout()
 {
 	QMessageBox::about(
 		this, "openMSX Debugger", QString(Version::full().c_str()));
+}
+
+void DebuggerForm::toggleBreakpointsDisplay()
+{
+	toggleView(qobject_cast<DockableWidget*>(bpView->parentWidget()));
 }
 
 void DebuggerForm::toggleRegisterDisplay()
@@ -1416,6 +1416,7 @@ void DebuggerForm::updateViewMenu()
 	viewStackAction->setChecked(stackView->isVisible());
 	viewSlotsAction->setChecked(slotView->isVisible());
 	viewMemoryAction->setChecked(mainMemoryView->isVisible());
+	viewBreakpointsAction->setChecked(bpView->isVisible());
 }
 
 void DebuggerForm::updateVDPViewMenu()
@@ -1506,5 +1507,37 @@ void DebuggerForm::addressSlot(int addr, qint8& ps, qint8& ss, qint16& segment)
 		int q = 2*p + ((addr & 0x2000) >> 13);
 		if (memLayout.romBlock[q] >= 0)
 			segment = memLayout.romBlock[q];
+	}
+}
+
+void DebuggerForm::reloadBreakpoints(bool merge)
+{
+	auto command = new Command("debug_list_all_breaks",
+	                           [this, merge](const QString& message) {
+	                                if (merge) {
+	                                        processMerge(message);
+	                                } else {
+	                                        processBreakpoints(message);
+	                                } });
+	comm.sendCommand(command);
+}
+
+void DebuggerForm::processBreakpoints(const QString& message)
+{
+	session.breakpoints().setBreakpoints(message);
+	disasmView->update();
+	session.sessionModified();
+	updateWindowTitle();
+	emit breakpointsUpdated();
+}
+
+void DebuggerForm::processMerge(const QString& message)
+{
+	QString bps = session.breakpoints().mergeBreakpoints(message);
+	if (!bps.isEmpty()) {
+		comm.sendCommand(new SimpleCommand(bps));
+		reloadBreakpoints(false);
+	} else {
+		processBreakpoints(message);
 	}
 }

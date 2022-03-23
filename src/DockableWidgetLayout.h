@@ -10,7 +10,7 @@ class QStringList;
 
 class DockableWidgetLayout : public QLayout
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	enum DockSide { TOP, LEFT, RIGHT, BOTTOM };
 

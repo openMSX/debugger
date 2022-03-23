@@ -14,7 +14,7 @@ class QStatusBar;
 
 class DockableWidget : public QWidget
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DockableWidget(DockManager& manager, QWidget* parent = nullptr);
 	~DockableWidget() override;

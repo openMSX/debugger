@@ -20,16 +20,18 @@ class QToolBar;
 class VDPStatusRegViewer;
 class VDPRegViewer;
 class VDPCommandRegViewer;
+class BreakpointViewer;
 
 class DebuggerForm : public QMainWindow
 {
-	Q_OBJECT;
+	Q_OBJECT
 public:
 	DebuggerForm(QWidget* parent = nullptr);
 	~DebuggerForm() override;
 
 public slots:
 	void showAbout();
+	void reloadBreakpoints(bool merge = false);
 
 private:
 	void closeEvent(QCloseEvent* e) override;
@@ -93,6 +95,7 @@ private:
 	QAction* viewStackAction;
 	QAction* viewSlotsAction;
 	QAction* viewMemoryAction;
+	QAction* viewBreakpointsAction;
 	QAction* viewDebuggableViewerAction;
 
 	QAction* viewBitMappedAction;
@@ -128,6 +131,7 @@ private:
 	VDPStatusRegViewer* VDPStatusRegView;
 	VDPRegViewer* VDPRegView;
 	VDPCommandRegViewer* VDPCommandRegView;
+	BreakpointViewer* bpView;
 
 	CommClient& comm;
 	DebugSession session;
@@ -152,6 +156,7 @@ private slots:
 	void systemSymbolManager();
 	void systemPreferences();
 	void searchGoto();
+	void toggleBreakpointsDisplay();
 	void toggleRegisterDisplay();
 	void toggleFlagsDisplay();
 	void toggleStackDisplay();
@@ -188,6 +193,8 @@ private slots:
 	void updateWindowTitle();
 	void symbolFileChanged();
 	void showFloatingWidget();
+	void processBreakpoints(const QString& message);
+	void processMerge(const QString& message);
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
@@ -200,7 +207,9 @@ signals:
 	void connected();
 	void settingsChanged();
 	void symbolsChanged();
+	void runStateEntered();
 	void breakStateEntered();
+	void breakpointsUpdated();
 	void debuggablesChanged(const QMap<QString, int>& list);
 };
 

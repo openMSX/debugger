@@ -18,7 +18,7 @@ public:
 
 	void replyOk(const QString& message) override
 	{
-		viewer.slotsUpdated(message);
+		viewer.updateSlots(message);
 		delete this;
 	}
 private:
@@ -193,7 +193,7 @@ void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 	memLayout = ml;
 }
 
-void SlotViewer::slotsUpdated(const QString& message)
+void SlotViewer::updateSlots(const QString& message)
 {
 	QStringList lines = message.split('\n');
 
@@ -228,4 +228,5 @@ void SlotViewer::slotsUpdated(const QString& message)
 			memLayout->romBlock[i] = lines[l].toInt();
 	}
 	update();
+	emit slotsUpdated();
 }
