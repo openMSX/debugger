@@ -2,7 +2,28 @@
 #include "ui_SpriteViewer.h"
 #include "VDPDataStore.h"
 #include "VramSpriteView.h"
+#include "PaletteDialog.h"
 #include "Convert.h"
+
+unsigned char SpriteViewer::defaultPalette[32] = { //static to feed to PaletteDialog and be used when not VDP colors aren't selected
+//        RB  G
+    0x00, 0,
+    0x00, 0,
+    0x11, 6,
+    0x33, 7,
+    0x17, 1,
+    0x27, 3,
+    0x51, 1,
+    0x27, 6,
+    0x71, 1,
+    0x73, 3,
+    0x61, 6,
+    0x64, 6,
+    0x11, 4,
+    0x65, 2,
+    0x55, 5,
+    0x77, 7,
+};
 
 SpriteViewer::SpriteViewer(QWidget *parent) :
     QDialog(parent),
@@ -42,7 +63,6 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     ui->spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(ui->spritePatternGenerator_widget,imageWidget);
 
     imageWidget->setVramSource(VDPDataStore::instance().getVramPointer());
-    imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 
     imageWidgetSingle = new VramSpriteView(nullptr,VramSpriteView::PatternMode,true);
     QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -56,7 +76,6 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     ui->single_spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(ui->single_spritePatternGenerator_widget,imageWidgetSingle);
 
     imageWidgetSingle->setVramSource(VDPDataStore::instance().getVramPointer());
-    imageWidgetSingle->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 
 
 
@@ -69,7 +88,6 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     ui->spriteAttributeTable_widget->parentWidget()->layout()->replaceWidget(ui->spriteAttributeTable_widget,imageWidgetSpat);
 
     imageWidgetSpat->setVramSource(VDPDataStore::instance().getVramPointer());
-    imageWidgetSpat->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 
 
 
@@ -80,11 +98,9 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
     ui->spriteColorTable_widget->parentWidget()->layout()->replaceWidget(ui->spriteColorTable_widget,imageWidgetColor);
 
     imageWidgetColor->setVramSource(VDPDataStore::instance().getVramPointer());
-    imageWidgetColor->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 
 
-
-
+    setPaletteSource(VDPDataStore::instance().getPalettePointer(),true);
 
     setCorrectVDPData();
     setCorrectEnabled(ui->useVDPRegisters->isChecked());
@@ -142,6 +158,13 @@ SpriteViewer::SpriteViewer(QWidget *parent) :
 SpriteViewer::~SpriteViewer()
 {
     delete ui;
+}
+void SpriteViewer::setPaletteSource(const unsigned char *palsource, bool useVDP)
+{
+    imageWidget->setPaletteSource(palsource,useVDP);
+    imageWidgetSingle->setPaletteSource(palsource,useVDP);
+    imageWidgetSpat->setPaletteSource(palsource,useVDP);
+    imageWidgetColor->setPaletteSource(palsource,useVDP);
 }
 
 void SpriteViewer::refresh()
@@ -419,5 +442,37 @@ void SpriteViewer::on_cb_mag_currentIndexChanged(int index)
 void SpriteViewer::on_cb_alwaysShowColorTable_toggled(bool checked)
 {
     ui->gb_colpat->setVisible(spritemode==2 || ui->cb_alwaysShowColorTable->isChecked());
+}
+
+
+
+
+void SpriteViewer::on_useVDPPalette_stateChanged(int state)
+{
+    const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
+    if (state == Qt::Checked) {
+        setPaletteSource(palette,true);
+    } else {
+        if (palette!=nullptr) memcpy(defaultPalette,palette,32);
+        setPaletteSource(defaultPalette,false);
+    }
+    imageWidget->refresh();
+    imageWidgetSingle->refresh();
+    imageWidgetSpat->refresh();
+    imageWidgetColor->refresh();
+    ui->editPaletteButton->setEnabled(!(state==Qt::Checked));
+}
+
+
+void SpriteViewer::on_editPaletteButton_clicked(bool checked)
+{
+    PaletteDialog* p=new PaletteDialog();
+    p->setPalette(defaultPalette);
+    p->setAutoSync(true);
+    connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
+    connect(p, SIGNAL(paletteSynced()), imageWidgetSingle, SLOT(refresh()));
+    connect(p, SIGNAL(paletteSynced()), imageWidgetSpat, SLOT(refresh()));
+    connect(p, SIGNAL(paletteSynced()), imageWidgetColor, SLOT(refresh()));
+    p->show();
 }
 

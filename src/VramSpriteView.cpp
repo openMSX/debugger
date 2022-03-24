@@ -20,6 +20,7 @@ VramSpriteView::VramSpriteView(QWidget *parent, mode drawer, bool singlesprite)
 
     size16x16=true;
     useECbit=false;
+    useVDPpalette=true;
     useMagnification=false;
     currentSpriteboxSelected=-1;
     // sprite size=8x8,16x16,32x32 or 40x8,48x16,64x32 if EC bit respected
@@ -85,13 +86,15 @@ void VramSpriteView::calculateImageSize()
 
 void VramSpriteView::setVramSource(const unsigned char *adr)
 {
+    if (vramBase == adr) return;
     vramBase = adr;
     decodePallet();
     decode();
 }
 
-void VramSpriteView::setPaletteSource(const unsigned char *adr)
+void VramSpriteView::setPaletteSource(const unsigned char *adr, bool useVDP)
 {
+    useVDPpalette=useVDP;
     if (pallet == adr) return ;
     pallet = adr;
     decodePallet();
@@ -639,7 +642,9 @@ void VramSpriteView::refresh()
 {
     //reget pointers in case during boot these pointers weren't correctly set due to openMSx not having send over vram size...
     setVramSource(VDPDataStore::instance().getVramPointer());
-    setPaletteSource(VDPDataStore::instance().getPalettePointer());
+    if (useVDPpalette){
+        setPaletteSource(VDPDataStore::instance().getPalettePointer(),true);
+    };
     decodePallet();
     decode();
 }

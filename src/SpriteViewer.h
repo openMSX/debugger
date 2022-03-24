@@ -17,6 +17,7 @@ public:
     explicit SpriteViewer(QWidget *parent = nullptr);
     ~SpriteViewer();
 
+
 private slots:
     void refresh();
     void VDPDataStoreDataRefreshed();
@@ -47,7 +48,14 @@ private slots:
 
     void on_cb_alwaysShowColorTable_toggled(bool checked);
 
+    void on_useVDPPalette_stateChanged(int state);
+
+    void on_editPaletteButton_clicked(bool checked);
+
 private:
+    static unsigned char defaultPalette[32];
+    void setPaletteSource(const unsigned char *palsource, bool useVDP);
+
     void decodeVDPregs();
 
     Ui::SpriteViewer *ui;

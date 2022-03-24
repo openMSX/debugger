@@ -26,7 +26,7 @@ public:
     virtual QSize sizeHint() const;
 
     void setVramSource(const unsigned char* adr);
-    void setPaletteSource(const unsigned char *adr);
+    void setPaletteSource(const unsigned char *adr, bool useVDP);
 
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent (QMouseEvent* e) override;
@@ -111,6 +111,7 @@ private:
 
     bool isSingleSpriteDrawer;
     bool useECbit;
+    bool useVDPpalette;
     bool useMagnification; //only used when useECbit is true! if not this simply acts as zoomfactor...
     int charToDisplay;
     int currentSpriteboxSelected;
