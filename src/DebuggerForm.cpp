@@ -720,6 +720,7 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 			     .arg(widget->width()).arg(widget->height());
 			layoutList.append(s);
 		}
+		widget->hide();
 	}
 	Settings::get().setValue("Layout/WidgetLayout", layoutList);
 
