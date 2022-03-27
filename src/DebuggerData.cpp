@@ -127,6 +127,7 @@ QString Breakpoints::createRemoveCommand(const QString& id)
 void Breakpoints::setBreakpoints(const QString& str)
 {
 	breakpoints.clear();
+
 	QStringList bps = str.split('\n');
 	for (auto& bp : bps) {
 		if (bp.trimmed().isEmpty()) continue;
@@ -269,9 +270,9 @@ bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 void Breakpoints::insertBreakpoint(Breakpoint& bp)
 {
 	auto it = std::upper_bound(breakpoints.begin(), breakpoints.end(), bp,
-	           [](const Breakpoint& bp1, const Breakpoint& bp2) {
-	               return bp1.address < bp2.address;
-			   }
+	    [](const Breakpoint& bp1, const Breakpoint& bp2) {
+	        return bp1.address < bp2.address;
+	    }
 	);
 	breakpoints.insert(it, bp);
 }

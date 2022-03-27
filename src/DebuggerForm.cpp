@@ -580,6 +580,7 @@ void DebuggerForm::createForm()
 	bpView = new BreakpointViewer(this);
 	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
 	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
+
 	dw = new DockableWidget(dockMan);
 	dw->setWidget(bpView);
 	dw->setTitle(tr("Debug list"));
@@ -592,8 +593,6 @@ void DebuggerForm::createForm()
 		&DebuggerForm::dockWidgetVisibilityChanged);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
-	// TODO replace sync by new function that only repaint bp/wp row
-	connect(slotView, &SlotViewer::slotsUpdated, bpView, &BreakpointViewer::sync);
 
 	// restore layout
 	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
@@ -674,7 +673,6 @@ void DebuggerForm::createForm()
 	session.breakpoints().setMemoryLayout(&memLayout);
 	mainMemory = new unsigned char[65536 + 4];
 	memset(mainMemory, 0, 65536 + 4);
-	bpView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
@@ -682,6 +680,7 @@ void DebuggerForm::createForm()
 	mainMemoryView->setDebuggable("memory", 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);
+	bpView->setBreakpoints(&session.breakpoints());
 }
 
 DebuggerForm::~DebuggerForm()
