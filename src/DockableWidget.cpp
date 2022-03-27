@@ -137,6 +137,8 @@ void DockableWidget::setFloating(bool enable, bool showNow)
 	}
 
 	if (floating && showNow) {
+		// force widget to never get behind main window
+		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 		show();
 	}
 }
