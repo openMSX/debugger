@@ -405,9 +405,9 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 		break;
 	}
 
-	disasmTopLine = std::max(disasmTopLine, 0);
 	disasmTopLine = std::min(disasmTopLine,
 	                         int(disasmLines.size()) - visibleLines);
+	disasmTopLine = std::max(disasmTopLine, 0);
 
 	updateCancelled(req);
 
