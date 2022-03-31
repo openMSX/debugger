@@ -196,14 +196,17 @@ void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 void SlotViewer::updateSlots(const QString& message)
 {
 	QStringList lines = message.split('\n');
+	bool changed = false;
 
 	// parse page slots and segments
 	for (int p = 0; p < 4; ++p) {
+		bool subSlotted = (lines[p * 2][1] != 'X');
 		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toLatin1()-'0') ||
-		                  (memLayout->secondarySlot[p] != lines[p * 2][1].toLatin1()-'0' && memLayout->isSubslotted[p]);
+		                  (memLayout->secondarySlot[p] != (subSlotted ? lines[p * 2][1].toLatin1() - '0' : -1));
+		changed |= slotsChanged[p];
 		memLayout->primarySlot  [p] = lines[p * 2][0].toLatin1()-'0';
-		memLayout->secondarySlot[p] = (lines[p * 2][1]) == 'X'
-			? -1 : lines[p * 2][1].toLatin1() - '0';
+		memLayout->secondarySlot[p] = subSlotted
+			? lines[p * 2][1].toLatin1() - '0' : -1;
 		segmentsChanged[p] = memLayout->mapperSegment[p] !=
 		                     lines[p * 2 + 1].toInt();
 		memLayout->mapperSegment[p] = lines[p * 2 + 1].toInt();
@@ -228,5 +231,5 @@ void SlotViewer::updateSlots(const QString& message)
 			memLayout->romBlock[i] = lines[l].toInt();
 	}
 	update();
-	emit slotsUpdated();
+	if (changed) emit slotsUpdated();
 }
