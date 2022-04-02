@@ -5,6 +5,8 @@
 #include "DebuggerData.h"
 #include <QList>
 #include <QTabWidget>
+#include <optional>
+#include <tuple>
 
 class QPaintEvent;
 class Breakpoints;
@@ -37,10 +39,10 @@ private:
 	Breakpoints* breakpoints;
 
 	void setTextField(BreakpointData::Type type, int row, int column, const QString& value);
-	bool parseLocationField(int index, BreakpointData::Type type, const QString& field,
-		int& begin, int& end, const QString& combo = {});
-	bool parseSlotField(int index, const QString& field, qint8& ps, qint8& ss);
-	bool parseSegmentField(int index, const QString& field, qint16& segment);
+	std::optional<std::tuple<int, int>> parseLocationField(int index, BreakpointData::Type type, const QString& field,
+		                                               const QString& combo = {});
+	std::optional<std::tuple<qint8, qint8>> parseSlotField(int index, const QString& field);
+	std::optional<qint16> parseSegmentField(int index, const QString& field);
 	void changeTableItem(BreakpointData::Type type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);

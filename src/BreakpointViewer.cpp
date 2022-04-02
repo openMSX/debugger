@@ -106,32 +106,27 @@ void BreakpointViewer::_handleKeyNotFound()
 void BreakpointViewer::_createBreakpoint(BreakpointData::Type type, int row)
 {
 	assert(type != BreakpointData::CONDITION);
-	auto* table            = tables[type];
-	auto* model            = table->model();
-	auto* combo            = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
+	auto* table = tables[type];
+	auto* model = table->model();
+	auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
 	Breakpoint::Type wtype = type == BreakpointData::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
 
-	int address, endRange;
 	QString location = table->item(row, LOCATION)->text();
-	bool ok1 = parseLocationField(-1, type, location, address, endRange, combo ? combo->currentText() : "");
-	if (!ok1) {
-		setBreakpointChecked(type, row, Qt::Unchecked);
-		return;
-	} else {
-		setBreakpointChecked(type, row, Qt::Checked);
-	}
+	auto loc = parseLocationField(-1, type, location, combo ? combo->currentText() : "");
+	setBreakpointChecked(type, row, loc ? Qt::Checked : Qt::Unchecked);
+	if (!loc) return;
+	auto [address, endRange] = *loc;
 
 	QString condition = table->item(row, T_CONDITION)->text();
 
-	qint8 ps, ss;
-	bool ok2 = parseSlotField(-1, table->item(row, SLOT)->text(), ps, ss);
-	assert(ok2);
+	auto ps_ss = parseSlotField(-1, table->item(row, SLOT)->text());
+	assert(ps_ss);
+	auto [ps, ss] = *ps_ss;
 
-	qint16 segment;
-	bool ok3 = parseSegmentField(-1, table->item(row, SEGMENT)->text(), segment);
-	assert(ok3);
+	auto segment = parseSegmentField(-1, table->item(row, SEGMENT)->text());
+	assert(segment);
 
-	const QString cmdStr = Breakpoints::createSetCommand(wtype, address, ps, ss, segment, endRange, condition);
+	const QString cmdStr = Breakpoints::createSetCommand(wtype, address, ps, ss, *segment, endRange, condition);
 
 	auto* command = new Command(cmdStr,
 		[this, type, row] (const QString& id) {
@@ -266,101 +261,97 @@ void BreakpointViewer::setTextField(BreakpointData::Type type, int row, int colu
 	table->setSortingEnabled(oldValue);
 }
 
-bool BreakpointViewer::parseSlotField(int index, const QString& field, qint8& ps, qint8& ss)
+std::optional<std::tuple<qint8, qint8>> BreakpointViewer::parseSlotField(int index, const QString& field)
 {
 	QStringList s = field.simplified().split("/", Qt::SplitBehaviorFlags::SkipEmptyParts);
 
+	qint8 ps;
 	if (s[0].compare("X", Qt::CaseInsensitive)) {
 		bool ok;
 		int value = s[0].toInt(&ok);
-		if (!ok || (value < 0 && value > 3)) {
+		if (!ok || !(0 <= value && value <= 3)) {
 			// restore value
 			if (index != -1) {
 				ps = breakpoints->getBreakpoint(index).ps;
 			} else {
-				return false;
+				return {};
 			}
 		} else {
-			ps = value;
+			ps = qint8(value);
 		}
 	} else {
 		ps = -1;
 	}
+
+	qint8 ss;
 	if (s.size() == 2 && s[1].compare("X", Qt::CaseInsensitive)) {
 		bool ok;
 		int value = s[1].toInt(&ok);
-		if (!ok || (value < 0 && value > 3)) {
+		if (!ok || !(0 <= value && value <= 3)) {
 			if (index != -1) {
 				ss = breakpoints->getBreakpoint(index).ss;
 			} else {
-				return false;
+				return {};
 			}
 		} else {
-			ss = value;
+			ss = qint8(value);
 		}
 	} else {
 		ss = -1;
 	}
-	return true;
+	return std::tuple{ps, ss};
 }
 
-bool BreakpointViewer::parseSegmentField(int index, const QString& field, qint16& segment)
+std::optional<qint16> BreakpointViewer::parseSegmentField(int index, const QString& field)
 {
 	QString s = field.simplified();
 
 	if (s.compare("X", Qt::CaseInsensitive)) {
 		bool ok;
 		int value = field.toInt(&ok);
-		if (!ok || (value < 0 && value > 255)) {
+		if (!ok || !(0 <= value && value <= 255)) {
 			if (index != -1) {
-				segment = breakpoints->getBreakpoint(index).segment;
+				return breakpoints->getBreakpoint(index).segment;
 			} else {
-				return false;
+				return {};
 			}
 		} else {
-			segment = value;
+			return value;
 		}
 	} else {
-		segment = -1;
+		return -1;
 	}
-	return true;
 }
 
 static const char* ComboTypeNames[] = { "read_mem", "write_mem", "read_io", "write_io" };
 
-bool BreakpointViewer::parseLocationField(int index, BreakpointData::Type type,
-		const QString& field, int& begin, int& end, const QString& comboTxt)
+std::optional<std::tuple<int, int>> BreakpointViewer::parseLocationField(
+	int index, BreakpointData::Type type, const QString& field, const QString& comboTxt)
 {
 	if (type == BreakpointData::BREAKPOINT) {
 		if (int value = stringToValue(field.simplified()); value > -1 && value < 0x10000) {
-			begin = value;
-			end = -1;
-			return true;
+			return std::tuple{value, -1};
 		} else if (index != -1) {
-			begin = breakpoints->getBreakpoint(index).address;
-			end = -1;
-			return true;
+			return std::tuple{breakpoints->getBreakpoint(index).address, -1};
 		}
-		return false;
+		return {};
 	}
 
 	QStringList s = field.simplified().split(":", Qt::SplitBehaviorFlags::SkipEmptyParts);
-	begin = (s.size() >= 1) ? stringToValue(s[0]) : -1;
-	end   = (s.size() == 2) ? stringToValue(s[1]) : (s.size() == 1 ? begin : -1);
+	int begin = (s.size() >= 1) ? stringToValue(s[0]) : -1;
+	int end   = (s.size() == 2) ? stringToValue(s[1]) : (s.size() == 1 ? begin : -1);
 
 	auto iter  = std::find(std::begin(ComboTypeNames), std::end(ComboTypeNames), comboTxt);
 	auto wtype = static_cast<Breakpoint::Type>(std::distance(ComboTypeNames, iter) + 1);
 	if ((wtype == Breakpoint::WATCHPOINT_IOREAD || wtype == Breakpoint::WATCHPOINT_IOWRITE)
 	     && (begin > 0xFF || end > 0xFF)) {
-		return false;
+		return {};
 	}
-	if (begin != -1 && end != -1 && end >= begin) return true;
+	if (begin != -1 && end != -1 && end >= begin) return std::tuple{begin, end};
 
-	if (index == -1) return false;
+	if (index == -1) return {};
 	const auto& bp = breakpoints->getBreakpoint(index);
-	begin    = bp.address;
-	end      = bp.regionEnd;
-	return true;
+	return std::tuple{bp.address, bp.regionEnd};
 }
 
 void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetItem* item)
@@ -401,8 +392,8 @@ void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetIt
 				adrLen = 4;
 			}
 
-			int begin, end;
-			if (parseLocationField(index, type, item->text(), begin, end, combo ? combo->currentText() : "")) {
+			if (auto loc = parseLocationField(index, type, item->text(), combo ? combo->currentText() : "")) {
+				auto [begin, end] = *loc;
 				setTextField(type, row, LOCATION, QString("%1%2%3").arg(hexValue(begin, adrLen))
 					.arg(end == begin || end == -1 ? "" : ":")
 					.arg(end == begin || end == -1 ? "" : hexValue(end, adrLen)));
@@ -415,8 +406,8 @@ void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetIt
 			break;
 		}
 		case SLOT: {
-			qint8 ps, ss;
-			if (parseSlotField(index, item->text(), ps, ss)) {
+			if (auto ps_ss = parseSlotField(index, item->text())) {
+				auto [ps, ss] = *ps_ss;
 				setTextField(type, row, SLOT, QString("%1/%2")
 					.arg(ps == -1 ? QChar('X') : QChar('0' + ps))
 					.arg(ss == -1 ? QChar('X') : QChar('0' + ss)));
@@ -427,9 +418,8 @@ void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetIt
 			break;
 		}
 		case SEGMENT: {
-			qint16 segment;
-			if (parseSegmentField(index, item->text(), segment)) {
-				setTextField(type, row, SEGMENT, QString("%1").arg(segment == -1 ? "X" : QString::number(segment)));
+			if (auto segment = parseSegmentField(index, item->text())) {
+				setTextField(type, row, SEGMENT, QString("%1").arg(*segment == -1 ? "X" : QString::number(*segment)));
 			} else {
 				setTextField(type, row, SEGMENT, "X");
 			}
