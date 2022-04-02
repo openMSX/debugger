@@ -12,8 +12,6 @@ class TileViewer : public QDialog,private Ui::TileViewer
 
 public:
     explicit TileViewer(QWidget *parent = nullptr);
-    ~TileViewer();
-
 
 private:
     void decodeVDPregs();

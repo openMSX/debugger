@@ -1,7 +1,7 @@
 #include "Settings.h"
 #include <QApplication>
 
-static const char *DebuggerFontNames[Settings::FONT_END] = {
+static const char* DebuggerFontNames[Settings::FONT_END] = {
 	"Application Font", "Default Fixed Font", "Code Font",
 	"Label Font", "Hex viewer font"
 };
@@ -75,7 +75,7 @@ void Settings::getFontsFromSettings()
 
 QString Settings::fontName(DebuggerFont f) const
 {
-	return QString(DebuggerFontNames[f]);
+	return DebuggerFontNames[f];
 }
 
 const QFont& Settings::font(DebuggerFont f) const

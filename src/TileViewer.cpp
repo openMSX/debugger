@@ -94,11 +94,6 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
 //    colortable=0;
 }
 
-TileViewer::~TileViewer()
-{
-
-}
-
 void TileViewer::VDPDataStoreDataRefreshed()
 {
     if (useVDPPalette->isChecked()){

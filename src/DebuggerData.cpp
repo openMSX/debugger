@@ -217,7 +217,7 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 	if (bp.condition[0] == '{' && bp.condition.endsWith('}')) {
 		if (bp.type != Breakpoint::CONDITION) {
 			// check for slot argument
-			QRegExp rx("^\\{\\s*\\[\\s*(pc|watch)_in_slot\\s([X0123])\\s([X0123])\\s(X|\\d{1,3})\\s*\\]\\s*(&&\\s*\\((.+)\\)\\s*)?\\}$");
+			QRegExp rx(R"(^\{\s*\[\s*(pc|watch)_in_slot\s([X0123])\s([X0123])\s(X|\d{1,3})\s*\]\s*(&&\s*\((.+)\)\s*)?\}$)");
 			if (rx.indexIn(bp.condition) == 0) {
 				bool ok;
 				bp.ps = rx.cap(2).toInt(&ok);
