@@ -1052,8 +1052,8 @@ void DebuggerForm::fileRecentOpen()
 
 void DebuggerForm::systemConnect()
 {
-	if (OpenMSXConnection* connection = ConnectDialog::getConnection(this)) {
-		comm.connectToOpenMSX(connection);
+	if (auto connection = ConnectDialog::getConnection(this)) {
+		comm.connectToOpenMSX(std::move(connection));
 	}
 }
 

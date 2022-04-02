@@ -1,9 +1,10 @@
 #ifndef COMMCLIENT_H
 #define COMMCLIENT_H
 
+#include "OpenMSXConnection.h"
 #include <QObject>
+#include <memory>
 
-class OpenMSXConnection;
 class CommandBase;
 class QString;
 
@@ -14,9 +15,9 @@ public:
 	static CommClient& instance();
 
 	void sendCommand(CommandBase* command);
+	void connectToOpenMSX(std::unique_ptr<OpenMSXConnection> conn);
 
 public slots:
-	void connectToOpenMSX(OpenMSXConnection* conn);
 	void closeConnection();
 
 signals:
@@ -27,10 +28,10 @@ signals:
 	void updateParsed(const QString& type, const QString& name, const QString& message);
 
 private:
-	CommClient();
+	CommClient() = default;
 	~CommClient() override;
 
-	OpenMSXConnection* connection;
+	std::unique_ptr<OpenMSXConnection> connection;
 };
 
 #endif // COMMCLIENT_H

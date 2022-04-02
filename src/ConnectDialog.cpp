@@ -86,7 +86,7 @@ static void deleteSocket(const QFileInfo& info)
 	dir.rmdir(info.absolutePath()); // ignore errors
 }
 
-static OpenMSXConnection* createConnection(const QDir& dir, const QString& socketName)
+static std::unique_ptr<OpenMSXConnection> createConnection(const QDir& dir, const QString& socketName)
 {
 	QFileInfo info(dir, socketName);
 	if (!checkSocket(info)) {
@@ -135,15 +135,15 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 
 #endif
 	if (socket) {
-		return new OpenMSXConnection(socket);
+		return std::make_unique<OpenMSXConnection>(socket);
 	} else {
 		// cannot connect, must be a stale socket, try to clean it up
 		deleteSocket(socketName);
-		return nullptr;
+		return {};
 	}
 }
 
-static void collectServers(QList<OpenMSXConnection*>& servers)
+static std::vector<std::unique_ptr<OpenMSXConnection>> collectServers()
 {
 #ifdef _WIN32
 	DWORD len = GetTempPathW(0, nullptr);
@@ -161,7 +161,7 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 	dir.cd("openmsx-" + getUserName());
 	if (!checkSocketDir(dir)) {
 		// no correct socket directory
-		return;
+		return {};
 	}
 	QDir::Filters filters =
 #ifdef _WIN32
@@ -169,11 +169,13 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 #else
 		QDir::System; // sockets for *nix
 #endif
+	std::vector<std::unique_ptr<OpenMSXConnection>> servers;
 	for (const auto& name : dir.entryList(filters)) {
-		if (auto* connection = createConnection(dir, name)) {
-			servers.push_back(connection);
+		if (auto connection = createConnection(dir, name)) {
+			servers.push_back(std::move(connection));
 		}
 	}
+	return servers;
 }
 
 
@@ -240,7 +242,7 @@ void ConnectionInfoRequest::terminate()
 
 // class ConnectDialog
 
-OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
+std::unique_ptr<OpenMSXConnection> ConnectDialog::getConnection(QWidget* parent)
 {
 	ConnectDialog dialog(parent);
 
@@ -258,7 +260,7 @@ OpenMSXConnection* ConnectDialog::getConnection(QWidget* parent)
 	} else {
 		dialog.exec();
 	}
-	return dialog.result;
+	return std::move(dialog.result);
 }
 
 ConnectDialog::ConnectDialog(QWidget* parent)
@@ -287,19 +289,17 @@ void ConnectDialog::clear()
 	// First kill the infos. That will remove the disconnect signals.
 	qDeleteAll(connectionInfos);
 	connectionInfos.clear();
-	qDeleteAll(pendingConnections);
 	pendingConnections.clear();
-	qDeleteAll(confirmedConnections);
 	confirmedConnections.clear();
 }
 
 void ConnectDialog::on_connectButton_clicked()
 {
-	int row = ui.listConnections->currentRow();
-	if (row != -1) {
-		assert((0 <= row) && (row < confirmedConnections.size()));
-		result = confirmedConnections[row];
-		confirmedConnections.removeAt(row);
+	if (int row = ui.listConnections->currentRow();
+	    row != -1) {
+		assert((0 <= row) && (row < int(confirmedConnections.size())));
+		result = std::move(confirmedConnections[row]);
+		confirmedConnections.erase(confirmedConnections.begin() + row);
 	}
 	accept();
 }
@@ -307,8 +307,8 @@ void ConnectDialog::on_connectButton_clicked()
 void ConnectDialog::on_rescanButton_clicked()
 {
 	clear();
-	collectServers(pendingConnections);
-	for (OpenMSXConnection* connection : pendingConnections) {
+	pendingConnections = collectServers();
+	for (auto& connection : pendingConnections) {
 		connectionInfos.append(new ConnectionInfoRequest(*this, *connection));
 	}
 }
@@ -316,13 +316,14 @@ void ConnectDialog::on_rescanButton_clicked()
 void ConnectDialog::connectionOk(OpenMSXConnection& connection,
                                  const QString& title)
 {
-	auto it = std::find(pendingConnections.begin(), pendingConnections.end(), &connection);
+	auto it = std::find_if(pendingConnections.begin(), pendingConnections.end(),
+	                       [&](auto& e) { return e.get() == &connection; });
 	if (it == pendingConnections.end()) {
 		// connection is already being destoyed
 		return;
 	}
+	confirmedConnections.push_back(std::move(*it));
 	pendingConnections.erase(it);
-	confirmedConnections.push_back(&connection);
 
 	new QListWidgetItem(title, ui.listConnections);
 
@@ -334,18 +335,21 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 
 void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 {
-	auto it = std::find(pendingConnections.begin(), pendingConnections.end(), &connection);
-	if (it == pendingConnections.end()) {
-		// was this connection established but terminated?
-		int id = confirmedConnections.indexOf(&connection);
-		if (id >= 0) {
-			OpenMSXConnection* conn = confirmedConnections.takeAt(id);
-			QListWidgetItem* item = ui.listConnections->takeItem(id);
-			delete item;
-			conn->deleteLater();
-                }
-		return;
+	auto find = [](auto& coll, auto& conn) {
+		return std::find_if(coll.begin(), coll.end(),
+			[&](auto& e) { return e.get() == &conn; });
+	};
+
+	if (auto it = find(pendingConnections, connection);
+	    it != pendingConnections.end()) {
+		pendingConnections.erase(it);
+	} else if (auto it2 = find(confirmedConnections, connection);
+		   it2 != confirmedConnections.end()) {
+		// Was this connection established but terminated?
+		int id = std::distance(confirmedConnections.begin(), it2);
+		QListWidgetItem* item = ui.listConnections->takeItem(id);
+		delete item;
+
+		confirmedConnections.erase(it2);
 	}
-	pendingConnections.erase(it);
-	connection.deleteLater();
 }

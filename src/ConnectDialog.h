@@ -5,6 +5,8 @@
 #include "ui_ConnectDialog.h"
 #include <QDialog>
 #include <QList>
+#include <memory>
+#include <vector>
 
 class QString;
 class ConnectionInfoRequest;
@@ -13,7 +15,7 @@ class ConnectDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	static OpenMSXConnection* getConnection(QWidget* parent = nullptr);
+	static std::unique_ptr<OpenMSXConnection> getConnection(QWidget* parent = nullptr);
 
 private slots:
 	void on_connectButton_clicked();
@@ -32,16 +34,16 @@ private:
 
 	int delay;
 	Ui::ConnectDialog ui;
-	using OpenMSXConnections = QList<OpenMSXConnection*>;
+	using OpenMSXConnections = std::vector<std::unique_ptr<OpenMSXConnection>>;
 	OpenMSXConnections pendingConnections;
 	OpenMSXConnections confirmedConnections;
-	OpenMSXConnection* result;
+	std::unique_ptr<OpenMSXConnection> result;
 	QList<ConnectionInfoRequest*> connectionInfos;
 
 	friend class ConnectionInfoRequest;
 };
 
-// Command handler to get initial info from new openmsx connections
+// Command handler to get initial info from new openMSX connections
 
 class ConnectionInfoRequest : public QObject, CommandBase
 {
