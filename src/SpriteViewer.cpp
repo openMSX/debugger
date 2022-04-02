@@ -97,13 +97,13 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     setCorrectEnabled(ui->useVDPRegisters->isChecked());
 
     connect(imageWidget, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(pgtwidget_mouseClickedEvent(int, int, int, QString)));
+            this, SLOT(pgtwidget_mouseClickedEvent(int, int, int, const QString&)));
     connect(imageWidget, SIGNAL(imagePosition(int, int, int)),
             this, SLOT(pgtwidget_mouseMoveEvent(int, int, int)));
 
 
     connect(imageWidgetSpat, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, QString)));
+            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, const QString&)));
     connect(imageWidgetSpat, SIGNAL(imagePosition(int, int, int)),
             this, SLOT(spatwidget_mouseMoveEvent(int, int, int)));
 
@@ -111,7 +111,7 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     // Since imageWidgetColor and imageWidgetSpat are the same structure we reuse
     // spatwidget_mouseClickedEvent
     connect(imageWidgetColor, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, QString)));
+            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, const QString&)));
 
 
     // Have spat and color the same spriteselection box synced
@@ -178,7 +178,7 @@ void SpriteViewer::pgtwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character)
     imageWidgetSingle->setCharToDisplay(character);
 }
 
-void SpriteViewer::pgtwidget_mouseClickedEvent(int x, int y, int character, QString text)
+void SpriteViewer::pgtwidget_mouseClickedEvent(int x, int y, int character, const QString& text)
 {
     pgtwidget_mouseMoveEvent(x, y, character);
 
@@ -207,7 +207,7 @@ void SpriteViewer::spatwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character
     }
 }
 
-void SpriteViewer::spatwidget_mouseClickedEvent(int x, int y, int character, QString text)
+void SpriteViewer::spatwidget_mouseClickedEvent(int x, int y, int character, const QString& text)
 {
     spatwidget_mouseMoveEvent(x, y, character);
     ui->plainTextEdit->setPlainText(QString("info for sprite %1 (%2)\n%3")

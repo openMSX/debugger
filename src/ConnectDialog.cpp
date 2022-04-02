@@ -106,7 +106,7 @@ static OpenMSXConnection* createConnection(const QDir& dir, const QString& socke
 
 		QAbstractSocketStreamWrapper stream(socket);
 		SspiNegotiateClient client(stream);
-		
+
 		if (!socket->waitForConnected(1000) ||
 			!client.Authenticate()) {
 			delete socket;
@@ -169,8 +169,8 @@ static void collectServers(QList<OpenMSXConnection*>& servers)
 #else
 		QDir::System; // sockets for *nix
 #endif
-	for (QString name : dir.entryList(filters)) {
-		if (OpenMSXConnection* connection = createConnection(dir, name)) {
+	for (const auto& name : dir.entryList(filters)) {
+		if (auto* connection = createConnection(dir, name)) {
 			servers.push_back(connection);
 		}
 	}

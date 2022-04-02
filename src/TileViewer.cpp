@@ -85,7 +85,7 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
             this, SLOT(imageMouseOver(int, int, int)));
 
     connect(imageWidget, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(displayCharInfo(int, int, int, QString)));
+            this, SLOT(displayCharInfo(int, int, int, const QString&)));
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -246,7 +246,7 @@ void TileViewer::refresh()
     VDPDataStore::instance().refresh();
 }
 
-void TileViewer::displayCharInfo(int screenx, int screeny, int character,QString textinfo)
+void TileViewer::displayCharInfo(int screenx, int screeny, int character, const QString& textinfo)
 {
     label_charpat->setText(QString::number(character));
     plainTextEdit->setPlainText(QString("info for character %1 (%2)\n%3")

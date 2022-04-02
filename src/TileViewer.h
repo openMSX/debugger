@@ -28,13 +28,13 @@ private:
 private slots:
     void refresh();
 
-    void displayCharInfo(int screenx, int screeny, int character, QString textinfo);
+    void displayCharInfo(int screenx, int screeny, int character, const QString& textinfo);
 
     void on_cb_tilemapsource_currentIndexChanged(int index);
     void on_cb_screen_currentIndexChanged(int index);
-    void on_le_nametable_textChanged(const QString &text);
-    void on_le_colortable_textChanged(const QString &text);
-    void on_le_patterntable_textChanged(const QString &text);
+    void on_le_nametable_textChanged(const QString& text);
+    void on_le_colortable_textChanged(const QString& text);
+    void on_le_patterntable_textChanged(const QString& text);
     void on_cb_color0_stateChanged(int state);
     void on_useVDPRegisters_stateChanged(int state);
 
