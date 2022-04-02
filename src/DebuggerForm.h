@@ -56,7 +56,12 @@ private:
 
 	void refreshBreakpoints();
 
-	void addressSlot(int addr, qint8& ps, qint8& ss, qint16& segment);
+	struct AddressSlotResult {
+		qint8 ps;
+		qint8 ss;
+		int segment;
+	};
+	AddressSlotResult addressSlot(int addr) const;
 
 	QMenu* fileMenu;
 	QMenu* systemMenu;

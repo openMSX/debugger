@@ -1164,9 +1164,7 @@ void DebuggerForm::toggleBreakpoint(int addr)
 		cmd = Breakpoints::createRemoveCommand(id);
 	} else {
 		// get slot
-		qint8 ps, ss;
-		qint16 seg;
-		addressSlot(addr, ps, ss, seg);
+		auto [ps, ss, seg] = addressSlot(addr);
 		// create command
 		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	}
@@ -1179,9 +1177,7 @@ void DebuggerForm::addBreakpoint()
 {
 	BreakpointDialog bpd(memLayout, &session, this);
 	int addr = disasmView->cursorAddress();
-	qint8 ps, ss;
-	qint16 seg;
-	addressSlot(addr, ps, ss, seg);
+	auto [ps, ss, seg] = addressSlot(addr);
 	bpd.setData(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
 		if (bpd.address() >= 0) {
@@ -1494,31 +1490,33 @@ void DebuggerForm::symbolFileChanged()
 		session.symbolTable().reloadFiles();
 }
 
-void DebuggerForm::addressSlot(int addr, qint8& ps, qint8& ss, qint16& segment)
+DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
 {
 	int p = (addr & 0xC000) >> 14;
-	ps = memLayout.primarySlot[p];
-	ss = memLayout.secondarySlot[p];
-	// figure out (rom) mapper segment
-	segment = -1;
-	if (memLayout.mapperSize[ps][ss==-1 ? 0 : ss] > 0)
-		segment = memLayout.mapperSegment[p];
-	else {
-		int q = 2*p + ((addr & 0x2000) >> 13);
-		if (memLayout.romBlock[q] >= 0)
-			segment = memLayout.romBlock[q];
-	}
+	auto ps = qint8(memLayout.primarySlot[p]);
+	auto ss = qint8(memLayout.secondarySlot[p]);
+	int segment = [&] { // figure out (rom) mapper segment
+		if (memLayout.mapperSize[ps][ss == -1 ? 0 : ss] > 0) {
+			return memLayout.mapperSegment[p];
+		} else {
+			int q = 2 * p + ((addr & 0x2000) >> 13);
+			int b = memLayout.romBlock[q];
+			return (b >= 0) ? b : -1;
+		}
+	}();
+	return {ps, ss, segment};
 }
 
 void DebuggerForm::reloadBreakpoints(bool merge)
 {
-	auto command = new Command("debug_list_all_breaks",
-	                           [this, merge](const QString& message) {
-	                                if (merge) {
-	                                        processMerge(message);
-	                                } else {
-	                                        processBreakpoints(message);
-	                                } });
+	auto* command = new Command("debug_list_all_breaks",
+	                            [this, merge](const QString& message) {
+	                                    if (merge) {
+	                                            processMerge(message);
+	                                    } else {
+	                                            processBreakpoints(message);
+	                                    }
+	                            });
 	comm.sendCommand(command);
 }
 
