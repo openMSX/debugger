@@ -3,7 +3,9 @@
 
 #include "ui_BreakpointDialog.h"
 #include "DebuggerData.h"
+#include <QCompleter>
 #include <QDialog>
+#include <memory>
 
 struct MemoryLayout;
 
@@ -15,7 +17,6 @@ class BreakpointDialog : public QDialog, private Ui::BreakpointDialog
 	Q_OBJECT
 public:
 	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = nullptr, QWidget* parent = nullptr);
-	~BreakpointDialog() override;
 
 	Breakpoint::Type type() const;
 	int address() const;
@@ -37,7 +38,8 @@ private:
 	int idxSlot, idxSubSlot;
 	int value, valueEnd;
 	int conditionHeight;
-	QCompleter *jumpCompleter, *allCompleter;
+	std::unique_ptr<QCompleter> jumpCompleter;
+	std::unique_ptr<QCompleter> allCompleter;
 
 private slots:
 	void addressChanged(const QString& text);

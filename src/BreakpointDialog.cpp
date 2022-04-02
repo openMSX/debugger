@@ -1,10 +1,10 @@
 #include "BreakpointDialog.h"
 #include "DebugSession.h"
 #include "Convert.h"
-#include <QCompleter>
 #include <QStandardItemModel>
+#include <memory>
 
-BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession *session, QWidget* parent)
+BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession* session, QWidget* parent)
 	: QDialog(parent), memLayout(ml), currentSymbol(nullptr)
 {
 	setupUi(this);
@@ -14,12 +14,12 @@ BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession *session
 	debugSession = session;
 	if (session) {
 		// create address completer
-		jumpCompleter = new QCompleter(session->symbolTable().labelList(), this);
-		allCompleter = new QCompleter(session->symbolTable().labelList(true), this);
+		jumpCompleter = std::make_unique<QCompleter>(session->symbolTable().labelList(), this);
+		allCompleter = std::make_unique<QCompleter>(session->symbolTable().labelList(true), this);
 		jumpCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 		allCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-		connect(jumpCompleter, SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
-		connect(allCompleter,  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
+		connect(jumpCompleter.get(), SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
+		connect(allCompleter.get(),  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
 	}
 
 	connect(edtAddress,      SIGNAL(textEdited(const QString&)), this, SLOT(addressChanged(const QString&)));
@@ -33,12 +33,6 @@ BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession *session
 	slotChanged(0);
 	idxSlot = idxSubSlot = 0;
 	hasCondition(0);
-}
-
-BreakpointDialog::~BreakpointDialog()
-{
-	delete jumpCompleter;
-	delete allCompleter;
 }
 
 Breakpoint::Type BreakpointDialog::type() const
@@ -207,8 +201,8 @@ void BreakpointDialog::typeChanged(int s)
 		case 2:
 			lblAddress->setText(tr("Add watchpoint at memory address or range:"));
 			edtAddressRange->setVisible(true);
-			edtAddress->setCompleter(allCompleter);
-			edtAddressRange->setCompleter(allCompleter);
+			edtAddress->setCompleter(allCompleter.get());
+			edtAddressRange->setCompleter(allCompleter.get());
 			break;
 		case 3:
 		case 4:
@@ -220,7 +214,7 @@ void BreakpointDialog::typeChanged(int s)
 		default:
 			lblAddress->setText(tr("Add breakpoint at address:"));
 			edtAddressRange->setVisible(false);
-			edtAddress->setCompleter(jumpCompleter);
+			edtAddress->setCompleter(jumpCompleter.get());
 	}
 
 	switch(s) {
