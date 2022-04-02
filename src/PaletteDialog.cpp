@@ -66,10 +66,10 @@ PaletteDialog::PaletteDialog(QWidget *parent) :
     //add colors to colorframe
 
     signalMapper = new QSignalMapper(this);
-    QGridLayout *gridLayout = new QGridLayout;
+    auto* gridLayout = new QGridLayout;
     gridLayout->setSpacing(0);
     for (int i = 0; i < 16; ++i) {
-            PalettePatch *button = new PalettePatch(nullptr,i);
+            auto* button = new PalettePatch(nullptr,i);
             connect(button, SIGNAL(clicked(bool)), signalMapper,SLOT(map()));
             signalMapper->setMapping(button, i);
             gridLayout->addWidget(button, i/8, i%8);

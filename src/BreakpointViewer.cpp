@@ -393,16 +393,15 @@ void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetIt
 
 			if (type == BreakpointData::CONDITION) {
 				return;
-			}
-			else if (type == BreakpointData::WATCHPOINT) {
-				Breakpoint::Type wtype = static_cast<Breakpoint::Type>(combo->currentIndex() + 1);
-				adrLen = (wtype == Breakpoint::WATCHPOINT_IOREAD || wtype == Breakpoint::WATCHPOINT_IOWRITE)
+			} else if (type == BreakpointData::WATCHPOINT) {
+				auto wType = static_cast<Breakpoint::Type>(combo->currentIndex() + 1);
+				adrLen = (wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
 					? 2 : 4;
 			} else {
 				adrLen = 4;
 			}
-			int begin, end;
 
+			int begin, end;
 			if (parseLocationField(index, type, item->text(), begin, end, combo ? combo->currentText() : "")) {
 				setTextField(type, row, LOCATION, QString("%1%2%3").arg(hexValue(begin, adrLen))
 					.arg(end == begin || end == -1 ? "" : ":")
@@ -618,7 +617,7 @@ void BreakpointViewer::populate()
 
 	// reuse current table rows
 	for (int index = 0; index < BreakpointData::ALL; ++index) {
-		BreakpointData::Type type = static_cast<BreakpointData::Type>(index);
+		auto type = static_cast<BreakpointData::Type>(index);
 		auto* table = tables[index];
 
 		for (int row = 0; row < table->rowCount(); ++row) {

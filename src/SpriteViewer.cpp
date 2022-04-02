@@ -430,7 +430,7 @@ void SpriteViewer::on_useVDPPalette_stateChanged(int state)
 
 void SpriteViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
-    PaletteDialog* p = new PaletteDialog();
+    auto* p = new PaletteDialog();
     p->setPalette(defaultPalette);
     p->setAutoSync(true);
     connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
