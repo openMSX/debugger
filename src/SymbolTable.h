@@ -16,7 +16,7 @@ class SymbolTable;
 class Symbol
 {
 public:
-	Symbol(const QString& str, int addr, int val = 0xFFFF);
+	Symbol(QString str, int addr, int val = 0xFFFF);
 	Symbol(const Symbol& symbol);
 	Symbol& operator=(const Symbol&) = default;
 

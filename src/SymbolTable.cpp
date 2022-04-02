@@ -710,8 +710,8 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 
 // class Symbol
 
-Symbol::Symbol(const QString& str, int addr, int val)
-	: symText(str), symValue(addr), symSlots(val)
+Symbol::Symbol(QString str, int addr, int val)
+	: symText(std::move(str)), symValue(addr), symSlots(val)
 {
 	symStatus = ACTIVE;
 	symType = JUMPLABEL;

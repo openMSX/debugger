@@ -25,8 +25,9 @@ class SimpleCommand : public QObject, public CommandBase
 {
 	Q_OBJECT
 public:
-	SimpleCommand(const QString& command);
-	QString getCommand() const override;
+	SimpleCommand(QString command_)
+		: command(std::move(command_)) {}
+	QString getCommand() const override { return command; }
 	void replyOk (const QString& message) override;
 	void replyNok(const QString& message) override;
 	void cancel() override;
@@ -38,9 +39,9 @@ private:
 class Command : public CommandBase
 {
 public:
-	Command(const QString& command,
-		std::function <void (const QString&)> okCallback,
-		std::function <void (const QString&)> errorCallback = nullptr);
+	Command(QString command,
+		std::function<void(const QString&)> okCallback,
+		std::function<void(const QString&)> errorCallback = {});
 
 	QString getCommand() const override;
 

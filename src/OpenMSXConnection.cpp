@@ -3,16 +3,6 @@
 #include <cassert>
 
 
-SimpleCommand::SimpleCommand(const QString& command_)
-	: command(command_)
-{
-}
-
-QString SimpleCommand::getCommand() const
-{
-	return command;
-}
-
 void SimpleCommand::replyOk (const QString& /*message*/)
 {
 	delete this;
@@ -29,12 +19,12 @@ void SimpleCommand::cancel()
 }
 
 
-Command::Command(const QString& command,
-		std::function <void (const QString&)> okCallback,
-		std::function <void (const QString&)> errorCallback)
-		: command(command)
-		, okCallback(okCallback)
-		, errorCallback(errorCallback)
+Command::Command(QString command_,
+                 std::function<void(const QString&)> okCallback_,
+                 std::function<void(const QString&)> errorCallback_)
+	: command(std::move(command_))
+	, okCallback(std::move(okCallback_))
+	, errorCallback(std::move(errorCallback_))
 {
 }
 
