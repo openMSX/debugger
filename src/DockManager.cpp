@@ -15,7 +15,7 @@ int DockManager::dockAreaIndex(DockableWidgetArea* area) const
 	return areas.indexOf(area);
 }
 
-void DockManager::dockWidget(DockableWidget* widget, const QPoint& p, const QRect& r)
+void DockManager::dockWidget(DockableWidget* widget, const QPoint& /*p*/, const QRect& r)
 {
 	auto it = areaMap.begin(); // TODO
 	if (it != areaMap.end()) {

@@ -162,7 +162,7 @@ void BreakpointViewer::replaceBreakpoint(BreakpointData::Type type, int row)
 
 	const QString cmdStr = breakpoints->createRemoveCommand(id);
 	auto* command = new Command(cmdStr,
-		[this, type, row] (const QString& result) {
+		[this, type, row] (const QString& /*result*/) {
 			createBreakpoint(type, row);
 		},
 		[this](const QString& error) { _handleSyncError(error); }
@@ -183,7 +183,7 @@ void BreakpointViewer::removeBreakpoint(BreakpointData::Type type, int row, bool
 	const QString cmdStr = Breakpoints::createRemoveCommand(id);
 
 	auto* command = new Command(cmdStr,
-		[this, type, row, id, logical] (const QString& result) {
+		[this, type, row, id, logical] (const QString& /*result*/) {
 			size_t erased = maps[type].erase(id);
 
 			if (erased != 1) {
@@ -436,7 +436,7 @@ void BreakpointViewer::changeTableItem(BreakpointData::Type type, QTableWidgetIt
 			}
 			if (!enabled) return;
 			break;
-		} 
+		}
 		case T_CONDITION: {
 			setTextField(type, row, T_CONDITION, item->text().simplified());
 
@@ -658,7 +658,7 @@ BreakpointViewer::findBreakpointData(BreakpointData::Type type, const QString& i
 	return maps[type].find(id);
 }
 
-void BreakpointViewer::changeCurrentWpType(int row, int selected)
+void BreakpointViewer::changeCurrentWpType(int row, int /*selected*/)
 {
 	if (!userMode) return;
 	auto* item = wpTableWidget->item(row, WP_TYPE);
@@ -867,12 +867,12 @@ void BreakpointViewer::on_btnRemoveCn_clicked()
 	onRemoveBtnClicked(BreakpointData::CONDITION);
 }
 
-void BreakpointViewer::on_itemPressed(QTableWidgetItem* item)
+void BreakpointViewer::on_itemPressed(QTableWidgetItem* /*item*/)
 {
 	bpTableWidget->setSortingEnabled(false);
 }
 
-void BreakpointViewer::on_headerClicked(int index)
+void BreakpointViewer::on_headerClicked(int /*index*/)
 {
 	bpTableWidget->setSortingEnabled(true);
 }

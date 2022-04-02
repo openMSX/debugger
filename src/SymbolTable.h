@@ -18,6 +18,7 @@ class Symbol
 public:
 	Symbol(const QString& str, int addr, int val = 0xFFFF);
 	Symbol(const Symbol& symbol);
+	Symbol& operator=(const Symbol&) = default;
 
 	// ACTIVE status is for regular symbols. HIDDEN is for symbols
 	// that are in the list but not shown anywhere. LOST is a special

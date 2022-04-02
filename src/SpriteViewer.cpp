@@ -169,7 +169,7 @@ void SpriteViewer::VDPDataStoreDataRefreshed()
     }
 }
 
-void SpriteViewer::pgtwidget_mouseMoveEvent(int x, int y, int character)
+void SpriteViewer::pgtwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character)
 {
     ui->label_spgt_pat->setText(QString::number(character));
     ui->label_spg_adr->setText(hexValue(pgtAddr + character * 8, 4));
@@ -188,7 +188,7 @@ void SpriteViewer::pgtwidget_mouseClickedEvent(int x, int y, int character, QStr
                                     .arg(text));
 }
 
-void SpriteViewer::spatwidget_mouseMoveEvent(int x, int y, int character)
+void SpriteViewer::spatwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character)
 {
     ui->label_spat_sprite->setText(QString::number(character));
     ui->label_spat_adr->setText(hexValue(spAtAddr + 4 * character, 4));
@@ -407,7 +407,7 @@ void SpriteViewer::on_cb_mag_currentIndexChanged(int index)
     imageWidgetColor->setUseMagnification(index == 1);
 }
 
-void SpriteViewer::on_cb_alwaysShowColorTable_toggled(bool checked)
+void SpriteViewer::on_cb_alwaysShowColorTable_toggled(bool /*checked*/)
 {
     ui->gb_colpat->setVisible(spriteMode == 2 || ui->cb_alwaysShowColorTable->isChecked());
 }
@@ -428,7 +428,7 @@ void SpriteViewer::on_useVDPPalette_stateChanged(int state)
     ui->editPaletteButton->setEnabled(state != Qt::Checked);
 }
 
-void SpriteViewer::on_editPaletteButton_clicked(bool checked)
+void SpriteViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
     PaletteDialog* p = new PaletteDialog();
     p->setPalette(defaultPalette);

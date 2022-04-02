@@ -283,7 +283,7 @@ DEPEND_FLAGS:=
 # Generic compilation flags.
 CXXFLAGS+=-pipe
 # Stricter warning and error reporting.
-CXXFLAGS+=-Wall -pedantic
+CXXFLAGS+=-Wall -Wextra -pedantic
 # Empty definition of used headers, so header removal doesn't break things.
 DEPEND_FLAGS+=-MP
 

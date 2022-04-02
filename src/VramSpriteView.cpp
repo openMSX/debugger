@@ -176,17 +176,15 @@ void VramSpriteView::warningImage()
     QPainter qp(&image);
     qp.setPen(Qt::black);
     qp.drawText(16,16,QString("No sprites in this screenmode!"));
-
 }
 
 void VramSpriteView::setZoom(float zoom)
 {
     zoomFactor = std::max(1, int(zoom));
     calculateImageSize();
-
 }
 
-void VramSpriteView::paintEvent(QPaintEvent *e)
+void VramSpriteView::paintEvent(QPaintEvent* /*e*/)
 {
     QRect srcRect(0, 0, imagewidth, imageheight);
     QRect dstRect(0, 0, imagewidth, imageheight);
@@ -360,7 +358,7 @@ void VramSpriteView::decodecol()
     }
 }
 
-void VramSpriteView::drawColSprite(int entry,QColor &bgcolor)
+void VramSpriteView::drawColSprite(int entry,QColor& /*bgcolor*/)
 {
     int color=vramBase[attributeTableAddress+4*entry+3];
     int x=(entry%nr_of_sprites_horizontal) * size_of_sprites_horizontal*zoomFactor;

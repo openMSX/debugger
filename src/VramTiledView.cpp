@@ -137,6 +137,7 @@ void VramTiledView::decodePatternTable()
 	case 2:
 	case 4:
 		screenheight = 24;
+		[[fallthrough]];
 	case 1:
 		decodePatternTableRegularChars();
 		break;

@@ -43,7 +43,7 @@ private slots:
 
 private:
     static uint8_t defaultPalette[32];
-    void setPaletteSource(const uint8_t* palsource, bool useVDP);
+    void setPaletteSource(const uint8_t* palSource, bool useVDP);
 
     void decodeVDPregs();
 

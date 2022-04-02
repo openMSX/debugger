@@ -135,13 +135,16 @@ void dasm(const unsigned char* membuf, unsigned short startAddr,
 			case '!':
 				dest.instr = "db     #ED,#" + toHex(membuf[pc + 1], 2);
 				dest.numBytes = 2;
+				break;
 			case '@':
 				dest.instr = "db     #" + toHex(membuf[pc], 2);
 				dest.numBytes = 1;
+				break;
 			case '#':
 				dest.instr = "db     #" + toHex(membuf[pc + 0], 2) +
 				                "#CB,#" + toHex(membuf[pc + 2], 2);
 				dest.numBytes = 2;
+				break;
 			case ' ': {
 				dest.instr.resize(7, ' ');
 				break;

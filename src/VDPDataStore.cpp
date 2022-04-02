@@ -10,14 +10,14 @@ public:
 	{
 	}
 
-	void replyOk(const QString& message) override
+	void replyOk(const QString& /*message*/) override
 	{
 		dataStore.debuggableNameVRAM = "physical VRAM";
 		dataStore.got_version = true;
 		dataStore.refresh();
 		delete this;
 	}
-	void replyNok(const QString& message) override
+	void replyNok(const QString& /*message*/) override
 	{
 		dataStore.debuggableNameVRAM = "VRAM";
 		dataStore.got_version = true;
@@ -46,7 +46,7 @@ public:
 		dataStore.refresh2();
 		delete this;
 	}
-	void replyNok(const QString& message) override
+	void replyNok(const QString& /*message*/) override
 	{
 		delete this;
 	}
