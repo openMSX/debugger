@@ -13,7 +13,6 @@ class VramSpriteView : public QWidget
 {
     Q_OBJECT
 public:
-
     enum mode
     {
         PatternMode,
@@ -21,36 +20,30 @@ public:
         ColorMode
     };
 
-    explicit VramSpriteView(QWidget* parent = nullptr, mode drawer = PatternMode, bool singlesprite = false);
+    explicit VramSpriteView(QWidget* parent = nullptr, mode drawer = PatternMode, bool singleSprite = false);
 
-    virtual int heightForWidth( int width ) const;
-    virtual QSize sizeHint() const;
+    [[nodiscard]] int heightForWidth(int width) const override;
+    [[nodiscard]] QSize sizeHint() const override;
 
-    void setVramSource(const unsigned char* adr);
-    void setPaletteSource(const unsigned char *adr, bool useVDP);
+    void setVramSource(const uint8_t* adr);
+    void setPaletteSource(const uint8_t* adr, bool useVDP);
 
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent (QMouseEvent* e) override;
 
     void warningImage();
 
-
     void setSpritemode(int value);
-
-
     void setPatternTableAddress(int value);
-
     void setAttributeTableAddress(int value);
-
     void setColorTableAddress(int value);
 
-    QString patterninfo(int character, int spritenr = -1);
-
-    QString byteAsPattern(unsigned char byte);
+    QString patternInfo(int character, int spriteNr = -1);
+    QString byteAsPattern(uint8_t byte);
 
     void calculateImageSize();
-
     void recalcSpriteLayout(int width);
+
 public slots:
     void refresh();
     void setZoom(float zoom);
@@ -60,72 +53,71 @@ public slots:
     void setECinfluence(bool value);
 
     void setCharToDisplay(int character);
-    void setSpriteboxClicked(int spbox=-1); //for drawMode != PatternMode
-    void setCharacterClicked(int charbox=-1); //when drawMode == PatternMode
+    void setSpriteboxClicked(int spBox = -1); // for drawMode != PatternMode
+    void setCharacterClicked(int charBox = -1); // when drawMode == PatternMode
 
 signals:
-    void imagePosition(int screenx, int screeny, int spritenr);
-    void imageClicked(int screenx, int screeny, int spritenr, QString textinfo);
+    void imagePosition(int screenX, int screenY, int spriteNr);
+    void imageClicked(int screenX, int screenY, int spriteNr, QString textInfo);
 
-    //when clicked and selection made signals
-    void spriteboxClicked(int spbox); //for drawMode != PatternMode
-    void characterClicked(int charbox); //when drawMode == PatternMode
+    // when clicked and selection made signals
+    void spriteboxClicked(int spBox); // for drawMode != PatternMode
+    void characterClicked(int charBox); // when drawMode == PatternMode
 
 protected:
-    virtual void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     void paintEvent(QPaintEvent* e) override;
 
     void decode();
-    void decodePallet();
-
-    void decodepgt();
-    void decodespat();
-    void decodecol();
+    void decodePalette();
+    void decodePgt();
+    void decodeSpat();
+    void decodeCol();
 
     void setSpritePixel(int x, int y, QRgb c);
     QRgb getColor(int c);
 
-    QRgb msxpallet[16];
+    QRgb msxPalette[16];
     QImage image;
-    QPixmap piximage;
-    const unsigned char* pallet;
-    const unsigned char* vramBase;
-    int patternTableAddress;
-    int attributeTableAddress;
-    int colorTableAddress;
+    QPixmap pixImage;
+    const uint8_t* palette = nullptr;
+    const uint8_t* vramBase = nullptr;
+    int patternTableAddress = 0;
+    int attributeTableAddress = 0;
+    int colorTableAddress = 0;
 
     int zoomFactor;
-    bool gridenabled;
+    bool gridEnabled = true;
 
-    int spritemode;
-    int imagewidth;
-    int imageheight;
-    bool size16x16;
+    int spriteMode = 1; // 0 is no sprites, 1 = sprite mode 1 (msx1), 2 = sprite mode 2 (msx2)
+    int imageWidth;
+    int imageHeight;
+    bool size16x16 = true;
     mode drawMode;
-    int nr_of_sprites_to_show;
-    int nr_of_sprites_horizontal;
-    int nr_of_sprites_vertical;
-    int size_of_sprites_horizontal;
-    int size_of_sprites_vertical;
+    int nrOfSpritesToShow;
+    int nrOfSpritesHorizontal;
+    int nrOfSpritesVertical;
+    int sizeOfSpritesHorizontal;
+    int sizeOfSpritesVertical;
 
     bool isSingleSpriteDrawer;
-    bool useECbit;
-    bool useVDPpalette;
-    bool useMagnification; //only used when useECbit is true! if not this simply acts as zoomfactor...
-    int charToDisplay;
-    int currentSpriteboxSelected;
+    bool useECbit = false;
+    bool useVDPpalette = true;
+    bool useMagnification = false; // only used when useECbit is true! if not this simply acts as zoomfactor...
+    int charToDisplay = 0;
+    int currentSpriteboxSelected = -1;
 
-    void drawMonochromeSpriteAt(int character, int spritebox, int xoffset, int yoffset, QRgb fg, QRgb bg, bool ec=false);
-    void drawLineColoredSpriteAt(int character, int spritebox, int xoffset, int yoffset, int rowoffset, QRgb bg);
+    void drawMonochromeSpriteAt(int character, int spriteBox, int xOffset, int yOffset, QRgb fg, QRgb bg, bool ec = false);
+    void drawLineColoredSpriteAt(int character, int spriteBox, int xOffset, int yOffset, int rowOffset, QRgb bg);
     void drawGrid();
-    void drawColSprite(int entry, QColor &bgcolor);
-    void drawSpatSprite(int entry, QColor &bgcolor);
+    void drawColSprite(int entry, QColor& bgColor);
+    void drawSpatSprite(int entry, QColor& bgColor);
 
-    bool infoFromMouseEvent(QMouseEvent* e, int &spritebox, int &character);
-    void calculate_size_of_sprites();
-    QString colorinfo(uint8_t color) const;
+    bool infoFromMouseEvent(QMouseEvent* e, int& spriteBox, int& character);
+    void calculateSizeOfSprites();
+    [[nodiscard]] QString colorInfo(uint8_t color) const;
 };
 
 #endif // VRAMSPRITEVIEW_H
