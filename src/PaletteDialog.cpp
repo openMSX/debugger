@@ -18,7 +18,7 @@ PalettePatch::PalettePatch(QWidget *parent, int palnr) : QPushButton(parent),myc
 //    update();
 //}
 
-void PalettePatch::updatePaletteChanged(unsigned char *pal)
+void PalettePatch::updatePaletteChanged(const uint8_t* pal)
 {
     int r = (pal[2 * msxpalnr + 0] & 0xf0) >> 4;
     int b = (pal[2 * msxpalnr + 0] & 0x0f);

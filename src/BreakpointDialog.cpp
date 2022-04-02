@@ -41,40 +41,37 @@ BreakpointDialog::~BreakpointDialog()
 	delete allCompleter;
 }
 
-Breakpoint::Type BreakpointDialog::type()
+Breakpoint::Type BreakpointDialog::type() const
 {
 	return Breakpoint::Type(cmbxType->currentIndex());
 }
 
-int BreakpointDialog::address()
+int BreakpointDialog::address() const
 {
 	return value;
 }
 
-int BreakpointDialog::addressEndRange()
+int BreakpointDialog::addressEndRange() const
 {
-	if (valueEnd < value)
-		return value;
-	else
-		return valueEnd;
+	return (valueEnd < value) ? value : valueEnd;
 }
 
-int BreakpointDialog::slot()
+int BreakpointDialog::slot() const
 {
 	return cmbxSlot->currentIndex() - 1;
 }
 
-int BreakpointDialog::subslot()
+int BreakpointDialog::subslot() const
 {
 	return cmbxSubslot->currentIndex() - 1;
 }
 
-int BreakpointDialog::segment()
+int BreakpointDialog::segment() const
 {
 	return cmbxSegment->currentIndex() - 1;
 }
 
-QString BreakpointDialog::condition()
+QString BreakpointDialog::condition() const
 {
 	return (cbCondition->checkState() == Qt::Checked) ? txtCondition->toPlainText() : "";
 }

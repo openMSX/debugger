@@ -653,7 +653,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 	}
 }
 
-int HexViewer::coorToOffset(int x, int y)
+int HexViewer::coorToOffset(int x, int y) const
 {
 	int offset = -1;
 	if (x >= xData && x < rightValuePos) {

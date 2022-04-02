@@ -48,7 +48,7 @@ private:
 	void setSizes();
 	void hexdataTransfered(HexRequest* r);
 	void transferCancelled(HexRequest* r);
-	int coorToOffset(int x, int y);
+	int coorToOffset(int x, int y) const;
 
 	QScrollBar* vertScrollBar;
 	QAction* fillWidthAction;

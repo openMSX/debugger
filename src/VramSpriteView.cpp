@@ -470,28 +470,29 @@ void VramSpriteView::setColorTableAddress(int value)
     decode();
 }
 
-QString VramSpriteView::colorinfo(unsigned char color)
+QString VramSpriteView::colorinfo(uint8_t color) const
 {
-    bool ec=(color&128);
-    int c=color&15;
+    bool ec = color & 128;
+    int c = color & 15;
 
-    QString colortext=QString("%1 (%2)").arg(int(color),2)
-                                        .arg(hexValue(color,2));
+    QString colortext = QString("%1 (%2)").arg(int(color), 2)
+                                          .arg(hexValue(color, 2));
 
-    if (spritemode==1){
-        if (color>15){
-            colortext.append(QString(" -> %1 %2").arg(ec?"EC,":"").arg(c,2));
+    if (spritemode == 1) {
+        if (color > 15) {
+            colortext.append(QString(" -> %1 %2").arg(ec ? "EC," : "")
+                                                 .arg(c, 2));
         }
     } else {
-        if (color>15){
-            bool cc=color&64;
-            bool ic=color&32;
+        if (color > 15) {
+            bool cc = color & 64;
+            bool ic = color & 32;
             colortext.append(
-                        QString(" -> %1%2%3 %4").arg(ec?"EC,":"")
-                                                .arg(cc?"CC,":"")
-                                                .arg(ic?"IC,":"")
-                                                .arg(c,2)
-                        );
+                QString(" -> %1%2%3 %4").arg(ec ? "EC," : "")
+                                        .arg(cc ? "CC," : "")
+                                        .arg(ic ? "IC," : "")
+                                        .arg(c, 2)
+                );
         }
     }
     return colortext;

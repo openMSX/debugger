@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSignalMapper>
 #include <QPushButton>
+#include <cstdint>
 
 
 namespace Ui {
@@ -18,7 +19,7 @@ public:
 //    ~PalettePatch();
 //    void setColor(QRgb c);
 public slots:
-    void updatePaletteChanged(unsigned char* pal);
+    void updatePaletteChanged(const uint8_t* pal);
     void setHighlightTest(int colornr);
 
 protected:

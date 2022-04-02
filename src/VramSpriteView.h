@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QColor>
+#include <cstdint>
 
 class VramSpriteView : public QWidget
 {
@@ -124,7 +125,7 @@ private:
 
     bool infoFromMouseEvent(QMouseEvent* e, int &spritebox, int &character);
     void calculate_size_of_sprites();
-    QString colorinfo(unsigned char color);
+    QString colorinfo(uint8_t color) const;
 };
 
 #endif // VRAMSPRITEVIEW_H
