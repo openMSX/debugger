@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QXmlStreamWriter>
 #include <QMap>
+#include <optional>
 
 // class SymbolTable
 
@@ -255,18 +256,20 @@ void SymbolTable::appendFile(const QString& file, FileType type)
 //  - 0123                 (oct)
 // The string may (optionally) end with a '; comment' part (with or without
 // whitespace around the ';' character).
-static bool parseValue(const QString& str, int& result)
+static std::optional<int> parseValue(const QString& str)
 {
 	QStringList l = str.split(";"); // ignore stuff after ';'
 	QString s = l.at(0).trimmed();
 	bool success;
+	int result;
 	if (s.endsWith('h', Qt::CaseInsensitive)) {
 		s.chop(1);
 		result = s.toInt(&success, 16);
 	} else {
 		result = s.toInt(&success, 0); // any base (e.g. 0x..)
 	}
-	return success;
+	if (success) return result;
+	return {};
 }
 
 bool SymbolTable::readSymbolFile(
@@ -283,11 +286,11 @@ bool SymbolTable::readSymbolFile(
 		QString line = in.readLine();
 		QStringList l = line.split(equ, Qt::SplitBehaviorFlags::KeepEmptyParts, Qt::CaseInsensitive);
 		if (l.size() != 2) continue;
-		int value;
-		if (!parseValue(l.at(1), value)) continue;
-		auto* sym = new Symbol(l.at(0), value);
-		sym->setSource(&symbolFiles.back().fileName);
-		add(sym);
+		if (auto value = parseValue(l.at(1))) {
+			auto* sym = new Symbol(l.at(0), *value);
+			sym->setSource(&symbolFiles.back().fileName);
+			add(sym);
+		}
 	}
 	return true;
 }
@@ -383,11 +386,11 @@ bool SymbolTable::readHTCFile(const QString& filename)
 		QString line = in.readLine();
 		QStringList l = line.split(' ');
 		if (l.size() != 3) continue;
-		int value;
-		if (!parseValue("0x" + l.at(1), value)) continue;
-		auto* sym = new Symbol(l.at(0), value);
-		sym->setSource(&symbolFiles.back().fileName);
-		add(sym);
+		if (auto value = parseValue("0x" + l.at(1))) {
+			auto* sym = new Symbol(l.at(0), *value);
+			sym->setSource(&symbolFiles.back().fileName);
+			add(sym);
+		}
 	}
 	return true;
 }
