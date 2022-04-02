@@ -376,7 +376,7 @@ void CPURegsViewer::cancelModifications()
 bool CPURegsViewer::event(QEvent* e)
 {
 	if (e->type() != QEvent::ToolTip) {
-		return QWidget::event(e);
+		return QFrame::event(e);
 	}
 
 	auto* helpEvent = static_cast<QHelpEvent*>(e);
@@ -425,5 +425,5 @@ bool CPURegsViewer::event(QEvent* e)
 	} else {
 		QToolTip::hideText();
 	}
-	return QWidget::event(e);
+	return QFrame::event(e);
 }

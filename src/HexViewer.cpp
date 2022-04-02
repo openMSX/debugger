@@ -678,7 +678,7 @@ int HexViewer::coorToOffset(int x, int y) const
 bool HexViewer::event(QEvent* e)
 {
 	if (e->type() != QEvent::ToolTip) {
-		return QWidget::event(e);
+		return QFrame::event(e);
 	}
 
 	// calculate address for tooltip
@@ -712,7 +712,7 @@ bool HexViewer::event(QEvent* e)
 	} else {
 		QToolTip::hideText();
 	}
-	return QWidget::event(e);
+	return QFrame::event(e);
 }
 
 void HexViewer::mousePressEvent(QMouseEvent* e)
