@@ -239,40 +239,38 @@ void SpriteViewer::setDrawGrid(int state)
 
 void SpriteViewer::decodeVDPregs()
 {
-    const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
-    //first determine sprite mode from screenmode
-    int v = ((regs[0] & 0x0E) << 1)  | ((regs[1] & 0x18) >> 3);
-    unsigned char patadrmask=255;
+    const uint8_t* regs = VDPDataStore::instance().getRegsPointer();
+    // first determine sprite mode from screenmode
+    int v = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3);
+    uint8_t patadrmask = 255;
     switch (v) {
-    case 2: //Text1
-    case 10: //Text2
-        spritemode=0; //no sprites here!
-        size16x16=false;
-        magnified=false;
-        spritesenabled=false;
+    case 2: // Text1
+    case 10: // Text2
+        spritemode = 0; // no sprites here!
+        size16x16 = false;
+        magnified = false;
+        spritesenabled = false;
         break;
-    case 0: //Graphic1
-    case 1: //MultiColor
-    case 4: //Graphic2
-        spritemode=1;
-        spritesenabled=regs[8]&2?false:true;
-        size16x16=regs[1]&2;
-        magnified=regs[1]&1;
+    case 0: // Graphic1
+    case 1: // MultiColor
+    case 4: // Graphic2
+        spritemode = 1;
+        spritesenabled = (regs[8] & 2) == 0;
+        size16x16 = regs[1] & 2;
+        magnified = regs[1] & 1;
         break;
     default:
-        spritemode=2;
-    	patadrmask=0xfc;
-        spritesenabled=regs[8]&2?false:true;
-        size16x16=regs[1]&2;
-        magnified=regs[1]&1;
+        spritemode = 2;
+        patadrmask = 0xfc;
+        spritesenabled = (regs[8] & 2) == 0;
+        size16x16 = regs[1] & 2;
+        magnified = regs[1] & 1;
     };
 
-//    ui-> ->setEnabled(spritemode!=0);
-    spataddr=(regs[11]<<15)+((regs[5]&patadrmask)<<7);
-    pgtaddr=regs[6]<<11;
-    spcoladdr=spataddr& 0xFFFFFDFF; //only used in spritemode2
-
-
+    // ui-> ->setEnabled(spritemode != 0);
+    spataddr = (regs[11] << 15) + ((regs[5] & patadrmask) << 7);
+    pgtaddr = regs[6] << 11;
+    spcoladdr = spataddr & 0xFFFFFDFF; // only used in spritemode2
 }
 
 void SpriteViewer::on_le_patterntable_textChanged(const QString &arg1)
@@ -374,8 +372,8 @@ void SpriteViewer::setCorrectVDPData()
 
 void SpriteViewer::on_cb_size_currentIndexChanged(int index)
 {
-    size16x16=(index==0?false:true);
-    ui->label_spgt_size->setText(size16x16?QString("(16x16)"):QString("(8x8)"));
+    size16x16 = index != 0;
+    ui->label_spgt_size->setText(size16x16 ? "(16x16)" : "(8x8)");
     imageWidget->setSize16x16(size16x16);
     imageWidgetSingle->setSize16x16(size16x16);
     imageWidgetSpat->setSize16x16(size16x16);
@@ -475,4 +473,3 @@ void SpriteViewer::on_editPaletteButton_clicked(bool checked)
     connect(p, SIGNAL(paletteSynced()), imageWidgetColor, SLOT(refresh()));
     p->show();
 }
-
