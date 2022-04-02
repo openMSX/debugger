@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QColor>
 #include <cstdint>
+#include <optional>
 
 class VramSpriteView : public QWidget
 {
@@ -115,7 +116,11 @@ private:
     void drawColSprite(int entry, QColor& bgColor);
     void drawSpatSprite(int entry, QColor& bgColor);
 
-    bool infoFromMouseEvent(QMouseEvent* e, int& spriteBox, int& character);
+    struct MouseEventInfo {
+        int spriteBox;
+        int character;
+    };
+    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
     void calculateSizeOfSprites();
     [[nodiscard]] QString colorInfo(uint8_t color) const;
 };

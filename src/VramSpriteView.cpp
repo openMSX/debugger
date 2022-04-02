@@ -84,49 +84,46 @@ void VramSpriteView::setPaletteSource(const uint8_t* adr, bool useVDP)
 
 void VramSpriteView::mousePressEvent(QMouseEvent* e)
 {
-    int x = 0;
+    int x = 0; // TODO is this correct? 'x' and 'y' always remain '0'.
     int y = 0;
-    int character = 0;
-    int spriteBox = 0;
 
-    if (infoFromMouseEvent(e, spriteBox, character)) {
+    if (auto info = infoFromMouseEvent(e)) {
         QString text;
         switch (drawMode) {
             case PatternMode:
-                text = patternInfo(character);
-                currentSpriteboxSelected = spriteBox;
-                emit characterClicked(character);
+                text = patternInfo(info->character);
+                currentSpriteboxSelected = info->spriteBox;
+                emit characterClicked(info->character);
                 refresh(); // to do the drawgrid with selection
                 break;
             case SpriteAttributeMode:
             case ColorMode:
-                if (character < 32) {
-                    int pat = vramBase[attributeTableAddress + 4 * character + 2];
-                    text = patternInfo(pat, spriteBox);
-                    currentSpriteboxSelected = spriteBox;
-                    emit spriteboxClicked(spriteBox);
+                if (info->character < 32) {
+                    int pat = vramBase[attributeTableAddress + 4 * info->character + 2];
+                    text = patternInfo(pat, info->spriteBox);
+                    currentSpriteboxSelected = info->spriteBox;
+                    emit spriteboxClicked(info->spriteBox);
                     refresh(); // to do the drawgrid with selection
                 }
                 break;
         }
-        emit imageClicked(x, y, character, text);
+        emit imageClicked(x, y, info->character, text);
     }
 }
 
 void VramSpriteView::mouseMoveEvent(QMouseEvent* e)
 {
-    int x = 0;
+    int x = 0; // TODO is this correct? 'x' and 'y' always remain '0'.
     int y = 0;
-    int character = 0;
-    int spriteBox = 0;
-    if (infoFromMouseEvent(e, spriteBox, character)) {
-        emit imagePosition(x, y, character);
+    if (auto info = infoFromMouseEvent(e)) {
+        emit imagePosition(x, y, info->character);
     }
 }
 
-bool VramSpriteView::infoFromMouseEvent(QMouseEvent* e, int& spriteBox, int& character)
+std::optional<VramSpriteView::MouseEventInfo> VramSpriteView::infoFromMouseEvent(QMouseEvent* e)
 {
-//    printf(" VramSpriteView::infoFromMouseEvent(%i, %i)  \n", e->x(), e->y());
+    //printf(" VramSpriteView::infoFromMouseEvent(%i, %i)  \n", e->x(), e->y());
+    if (!vramBase) return {};
 
     // I see negative y-coords sometimes, so for safety clip the coords to zero as lowest value
     int x = std::max(0, e->x());
@@ -134,22 +131,15 @@ bool VramSpriteView::infoFromMouseEvent(QMouseEvent* e, int& spriteBox, int& cha
     // maybe clip to maximum to furthest spritepixel drawn?
     //x = std::max(0, std::min(e->x(), nrOfSpritesHorizontal * sizeOfSpritesHorizontal * zoomFactor - 1));
     //y = std::max(0, std::min(e->y(), nrOfSpritesVertical   * sizeOfSpritesVertical   * zoomFactor - 1));
+    if (x >= imageWidth) return {};
+    if (y >= imageHeight) return {};
 
-    if (x >= imageWidth || y >= imageHeight || vramBase == nullptr) {
-        return false;
-    }
+    int spriteBox = nrOfSpritesHorizontal * int(y / (sizeOfSpritesVertical * zoomFactor)) + int(x / (sizeOfSpritesHorizontal * zoomFactor));
+    if (spriteBox >= nrOfSpritesToShow) return {};
 
-    spriteBox = character =
-        nrOfSpritesHorizontal * int(y / (sizeOfSpritesVertical * zoomFactor)) + int(x / (sizeOfSpritesHorizontal * zoomFactor));
+    int character = (size16x16 && drawMode == PatternMode) ? 4 * spriteBox : spriteBox;
 
-    if (character >= nrOfSpritesToShow) {
-        return false;
-    }
-    if (size16x16 && drawMode == PatternMode) {
-        character *= 4;
-    }
-
-    return true;
+    return MouseEventInfo{spriteBox, character};
 }
 
 void VramSpriteView::warningImage()
