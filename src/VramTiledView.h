@@ -7,6 +7,8 @@
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QColor>
+#include <cstdint>
+#include <optional>
 
 class VramTiledView : public QWidget
 {
@@ -17,48 +19,48 @@ public:
 	void setZoom(float zoom);
 	void setScreenMode(int mode);
 	void setLines(int nrLines);
-	void setVramSource(const unsigned char* adr);
+	void setVramSource(const uint8_t* adr);
     void setNameTableAddress(int adr);
     void setPatternTableAddress(int adr);
     void setColorTableAddress(int adr);
-    void setPaletteSource(const unsigned char *adr);
+    void setPaletteSource(const uint8_t *adr);
 	void setBorderColor(int value);
-    void setDrawgrid(bool value);
-    void setTPbit(bool value);
+    void setDrawGrid(bool value);
+    void setTpBit(bool value);
     void setTabletoShow(int value);
     void setUseBlink(bool value);
-    void setForcedscreenrows(float value);
-    void setHighlightchar(int value);
+    void setForcedScreenRows(float value);
+    void setHighlightChar(int value);
 
-    unsigned getNameTableAddress() const;
-    unsigned getPatternTableAddress() const;
-    unsigned getColorTableAddress() const;
-    int getScreenMode() const;
+    [[nodiscard]] unsigned getNameTableAddress() const;
+    [[nodiscard]] unsigned getPatternTableAddress() const;
+    [[nodiscard]] unsigned getColorTableAddress() const;
+    [[nodiscard]] int getScreenMode() const;
 
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent (QMouseEvent* e) override;
 
     void warningImage();
 
-    //used to draw a character on the external image used when clicked on the VramTiledView widget
-    void drawCharAtImage(int character,int x, int y, QImage &image); //draw 8x8 character on reference image at topleft
-    QString textinfo(int &x, int &y, int &character);
+    // Used to draw a character on the external image used when clicked on the VramTiledView widget
+    void drawCharAtImage(int character, int x, int y, QImage& image); // Draw 8x8 character on reference image at topleft
+    QString textInfo(int x, int y, int character);
 
-    const unsigned char *getPaletteSource() const;
+    [[nodiscard]] const uint8_t* getPaletteSource() const;
 
 public slots:
     void refresh();
 
 signals:
-    void imageHovered(int screenx, int screeny, int character);
-    void imageClicked(int screenx, int screeny, int character, QString textinfo);
-    void highlightCount(unsigned char character, int count);
+    void imageHovered(int screenX, int screenY, int character);
+    void imageClicked(int screenX, int screenY, int character, QString textinfo);
+    void highlightCount(uint8_t character, int count);
 
 private:
 	void paintEvent(QPaintEvent* e) override;
 
 	void decode();
-	void decodePallet();
+	void decodePalette();
     void decodePatternTable();
     void decodeNameTable();
     void overLayNameTable();
@@ -66,41 +68,46 @@ private:
     void setPixel2x2(int x, int y, QRgb c);
 	QRgb getColor(int c);
 
-	QRgb msxpallet[16];
+	QRgb msxPalette[16];
 	QImage image;
-	QPixmap piximage;
-    const unsigned char* pallet;
-	const unsigned char* vramBase;
+	QPixmap pixImage;
+    const uint8_t* palette = nullptr;
+	const uint8_t* vramBase = nullptr;
 	float zoomFactor;
-    bool drawgrid;
+    bool drawGrid = true;
 
-    int PatternTableAddress;
-    int NameTableAddress;
-    int ColorTableAddress;
+    int patternTableAddress = 0;
+    int nameTableAddress = 0;
+    int colorTableAddress = 0;
 
-    int screenwidth=32;
-    int screenheight=24;
-    int charwidth=8;
-	int horistep=16;
+    int screenWidth = 32;
+    int screenHeight = 24;
+    int charWidth = 8;
+	int horiStep = 16;
 
-	int lines;
-	int screenMode;
-    int tableToShow;
-	int borderColor;
-    float forcedscreenrows;
-    int highlightchar;
-    bool useBlink;
-    bool TPbit;
+	int lines = 212;
+	int screenMode = 0;
+    int tableToShow = 0;
+	int borderColor = 0;
+    float forcedScreenRows = 0;
+    int highlightChar = -1; // anything outside 0-255 will do
+    bool useBlink = false;
+    bool tpBit = false;
 
     void decodePatternTableRegularChars();
     void decodePatternTableMultiColor();
     void decodeNameTableRegularChars();
     void decodeNameTableMultiColor();
-    unsigned char getCharColorByte(int character, int x, int y, int row);
-    void drawCharAt(int character,int x, int y); //draw 8x8 character on given location in image
-    bool infoFromMouseEvent(QMouseEvent *e, int &x, int &y, int &character);
+    uint8_t getCharColorByte(int character, int x, int y, int row);
+    void drawCharAt(int character, int x, int y); // Draw 8x8 character on given location in image
 
-    QString byteAsPattern(unsigned char byte);
+    struct MouseEventInfo {
+        int x, y;
+        int character;
+    };
+    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
+
+    QString byteAsPattern(uint8_t byte);
 };
 
 #endif // VRAMBITMAPPEDVIEW

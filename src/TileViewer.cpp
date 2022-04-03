@@ -66,7 +66,7 @@ TileViewer::TileViewer(QWidget* parent)
 	imageWidget->setPaletteSource(palette);
     imageWidget->setVramSource(vram);
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
-    imageWidget->setDrawgrid(cb_drawgrid->isChecked());
+    imageWidget->setDrawGrid(cb_drawgrid->isChecked());
 
     connect(imageWidget, SIGNAL(highlightCount(uint8_t, int)),
             this, SLOT(highlightInfo(uint8_t, int)));
@@ -294,7 +294,7 @@ void TileViewer::on_le_patterntable_textChanged(const QString& text)
 
 void TileViewer::on_cb_color0_stateChanged(int state)
 {
-	imageWidget->setTPbit(state != Qt::Unchecked);
+	imageWidget->setTpBit(state != Qt::Unchecked);
 }
 
 void TileViewer::on_useVDPRegisters_stateChanged(int state)
@@ -350,18 +350,18 @@ void TileViewer::on_zoomLevel_valueChanged(double d)
 
 void TileViewer::on_cb_drawgrid_stateChanged(int state)
 {
-    imageWidget->setDrawgrid(state == Qt::Checked);
+    imageWidget->setDrawGrid(state == Qt::Checked);
 }
 
 void TileViewer::on_cb_highlight_stateChanged(int state)
 {
-    imageWidget->setHighlightchar(state == Qt::Unchecked ? -1 : sp_highlight->value());
+    imageWidget->setHighlightChar(state == Qt::Unchecked ? -1 : sp_highlight->value());
 }
 
 void TileViewer::on_sp_highlight_valueChanged(int i)
 {
     if (cb_highlight->isChecked()) {
-        imageWidget->setHighlightchar(i);
+        imageWidget->setHighlightChar(i);
     }
 }
 
@@ -381,5 +381,5 @@ void TileViewer::on_cb_screenrows_currentIndexChanged(int index)
                                               index == 1 ? 26.5f
                                                          : 32.0f)
                                            : 0.0f;
-    imageWidget->setForcedscreenrows(rows);
+    imageWidget->setForcedScreenRows(rows);
 }
