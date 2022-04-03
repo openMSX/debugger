@@ -3,6 +3,7 @@
 
 #include "ui_TileViewer.h"
 #include <QDialog>
+#include <cstdint>
 
 class VramTiledView;
 
@@ -11,7 +12,7 @@ class TileViewer : public QDialog,private Ui::TileViewer
     Q_OBJECT
 
 public:
-    explicit TileViewer(QWidget *parent = nullptr);
+    explicit TileViewer(QWidget* parent = nullptr);
 
 private:
     void decodeVDPregs();
@@ -19,16 +20,16 @@ private:
     VramTiledView* imageWidget;
     QImage image4label;
 
-    int mouseover_x;
-    int mouseover_y;
-    int mouseover_char;
+    int mouseOverX = 0;
+    int mouseOverY = 0;
+    int mouseOverChar = 0;
 
-    static unsigned char defaultPalette[32];
+    static uint8_t defaultPalette[32];
 
 private slots:
     void refresh();
 
-    void displayCharInfo(int screenx, int screeny, int character, const QString& textinfo);
+    void displayCharInfo(int screenX, int screenY, int character, const QString& textInfo);
 
     void on_cb_tilemapsource_currentIndexChanged(int index);
     void on_cb_screen_currentIndexChanged(int index);
@@ -47,16 +48,13 @@ private slots:
     void on_sp_highlight_valueChanged(int i);
     void on_sp_bordercolor_valueChanged(int i);
 
-
-
     void VDPDataStoreDataRefreshed();
-    void highlightInfo(unsigned char character, int count);
+    void highlightInfo(uint8_t character, int count);
     void update_label_characterimage();
-    void imageMouseOver(int screenx, int screeny, int character);
+    void imageMouseOver(int screenX, int screenY, int character);
 
     void on_cb_blinkcolors_stateChanged(int arg1);
     void on_cb_screenrows_currentIndexChanged(int index);
-
 };
 
 #endif // TILEVIEWER_H

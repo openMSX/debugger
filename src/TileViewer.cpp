@@ -7,8 +7,9 @@
 #include <QMessageBox>
 
 
-unsigned char TileViewer::defaultPalette[32] = { //static to feed to PaletteDialog and be used when not VDP colors aren't selected
-//        RB  G
+// static to feed to PaletteDialog and be used when VDP colors aren't selected
+uint8_t TileViewer::defaultPalette[32] = {
+//    RB  G
     0x00, 0,
     0x00, 0,
     0x11, 6,
@@ -28,33 +29,22 @@ unsigned char TileViewer::defaultPalette[32] = { //static to feed to PaletteDial
 };
 
 
-
-TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, QImage::Format_RGB32)
+TileViewer::TileViewer(QWidget* parent)
+    : QDialog(parent), image4label(32, 32, QImage::Format_RGB32)
 {
-//    screenmode=0;
-//    nametable=0;
-//    patterntable=0;
-//    colortable=0;
-
-    mouseover_x=0;
-    mouseover_y=0;
-    mouseover_char=0;
-
-
     setupUi(this);
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     plainTextEdit->setFont(fixedFont);
     label_charpat->setFont(fixedFont);
     label_charadr->setFont(fixedFont);
 
-    //now hook up some signals and slots
-    //this way we have created the VDPDataStore::instance before our imagewidget
-    //this alows the VDPDatastore to start asking for data as quickly as possible
+    // Now hook up some signals and slots.
+    // This way we have created the VDPDataStore::instance before our imagewidget.
+    // This allows the VDPDatastore to start asking for data as quickly as possible.
     connect(refreshButton, SIGNAL(clicked(bool)),
             &VDPDataStore::instance(), SLOT(refresh()));
     connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
             this, SLOT(VDPDataStoreDataRefreshed()));
-
 
     imageWidget = new VramTiledView();
     QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -68,18 +58,18 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
 
     scrollArea->setWidget(imageWidget);
 
-	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
-	const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
-//    imageWidget->setNameTableAddress(0);
-//    imageWidget->setPatternTableAddress(0);
-//    imageWidget->setColorTableAddress(0);
+	const auto* vram    = VDPDataStore::instance().getVramPointer();
+	const auto* palette = VDPDataStore::instance().getPalettePointer();
+    //imageWidget->setNameTableAddress(0);
+    //imageWidget->setPatternTableAddress(0);
+    //imageWidget->setColorTableAddress(0);
 	imageWidget->setPaletteSource(palette);
     imageWidget->setVramSource(vram);
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
     imageWidget->setDrawgrid(cb_drawgrid->isChecked());
 
-    connect(imageWidget, SIGNAL(highlightCount(unsigned char, int)),
-            this, SLOT(highlightInfo(unsigned char, int)));
+    connect(imageWidget, SIGNAL(highlightCount(uint8_t, int)),
+            this, SLOT(highlightInfo(uint8_t, int)));
 
     connect(imageWidget, SIGNAL(imageHovered(int, int, int)),
             this, SLOT(imageMouseOver(int, int, int)));
@@ -89,95 +79,88 @@ TileViewer::TileViewer(QWidget *parent) : QDialog(parent), image4label(32, 32, Q
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
-//    nametable=0;
-//    patterntable=0;
-//    colortable=0;
 }
 
 void TileViewer::VDPDataStoreDataRefreshed()
 {
-    if (useVDPPalette->isChecked()){
+    if (useVDPPalette->isChecked()) {
         imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
-    };
+    }
     decodeVDPregs();
 }
 
-void TileViewer::highlightInfo(unsigned char character, int count)
+void TileViewer::highlightInfo(uint8_t character, int count)
 {
-    if (count == 0){
-        label_highligtinfo->setText(QString("%1 (not in nametabel)").arg(hexValue(character,2)));
-    } else {
-        label_highligtinfo->setText(QString("%1 (%2 in nametabel)").arg(hexValue(character,2)).arg(count));
-    }
+    label_highligtinfo->setText(
+        (count == 0) ? QString("%1 (not in nametabel)").arg(hexValue(character, 2))
+                     : QString("%1 (%2 in nametabel)").arg(hexValue(character, 2)).arg(count));
 }
 
 void TileViewer::update_label_characterimage()
 {
-    imageWidget->drawCharAtImage(mouseover_char,mouseover_x,mouseover_y,image4label);
+    imageWidget->drawCharAtImage(mouseOverChar, mouseOverX, mouseOverY, image4label);
     label_characterimage->setPixmap(QPixmap::fromImage(image4label));
 }
 
-
-void TileViewer::imageMouseOver(int screenx, int screeny, int character)
+void TileViewer::imageMouseOver(int screenX, int screenY, int character)
 {
-    mouseover_x=screenx;
-    mouseover_y=screeny;
-    mouseover_char=character;
+    mouseOverX = screenX;
+    mouseOverY = screenY;
+    mouseOverChar = character;
     update_label_characterimage();
 
-    label_mouseover->setText(QString("col %1  row %2").arg(screenx).arg(screeny));
-    int screenmode=imageWidget->getScreenMode();
+    label_mouseover->setText(QString("col %1  row %2").arg(screenX).arg(screenY));
+    int screenMode = imageWidget->getScreenMode();
 
-    //screen 2 and 4 have 3 pattern/colortables so add 256/512 to get to 2nd and 3th bank depending on y
-//    printf("screenmode %i screen y %i character %i \n",screenmode, screeny, character);
-    if ( screenmode==2 || screenmode==4){
-        label_charpat->setText(QString("%1/%2 (%3/%4)").arg(hexValue(character&255,2)).arg(character>>8).arg(character&255).arg(character>>8));
-    } else {
-        label_charpat->setText(QString("%1 (%2)").arg(hexValue(character,2)).arg(character));
-    }
-    imageWidget->drawCharAtImage(character,screenx,screeny,image4label);
+    // Screen 2 and 4 have 3 pattern/colortables so add 256/512 to get to 2nd and 3th bank depending on y
+    //printf("screenmode %i screen y %i character %i \n", screenMode, screenY, character);
+    label_charpat->setText(
+        (screenMode == 2 || screenMode == 4)
+        ? QString("%1/%2 (%3/%4)").arg(hexValue(character & 255, 2)).arg(character >> 8).arg(character & 255).arg(character >> 8)
+        : QString("%1 (%2)").arg(hexValue(character, 2)).arg(character));
+    imageWidget->drawCharAtImage(character, screenX, screenY, image4label);
     label_characterimage->setPixmap(QPixmap::fromImage(image4label));
 
-    int nametable=imageWidget->getNameTableAddress();
-    int patterntable=imageWidget->getPatternTableAddress();
-    int colortable=imageWidget->getColorTableAddress();
+    auto nametable = imageWidget->getNameTableAddress();
+    auto patterntable = imageWidget->getPatternTableAddress();
+    auto colortable = imageWidget->getColorTableAddress();
 
-
-
-    QString pgt=QString("%1").arg(hexValue(patterntable+(8*character),4));
+    QString pgt = hexValue(patterntable + 8 * character, 4);
     QString ct("-");
-//    printf("Tileviewer screenmode %i",screenmode);
-    switch (screenmode) {
+    //printf("Tileviewer screenmode %i", screenMode);
+    switch (screenMode) {
     case 0:
     case 3:
         //no colortable used in these modes
         break;
     case 1:
-        ct=QString("%1").arg( hexValue(colortable+(character>>3) ,4) );
+        ct = hexValue(colortable + (character >> 3), 4);
         break;
     case 2:
     case 4:
         //regular 8 bytes per char colortable, show adr of row 0
-        ct=QString("%1").arg( hexValue((colortable+8*character), 4) );
+        ct = hexValue(colortable + 8 * character, 4);
         break;
     case 80:
         //show the coloraddres for the blink info
-        ct=QString("%1").arg( hexValue((colortable+(screenx>>3)+screeny*10),4) );
+        ct = hexValue(colortable + (screenX >> 3) + 10 * screenY, 4);
         break;
     }
     QString nt("");
-    if (cb_tilemapsource->currentIndex() >0 ){
-        int scrwidth=screenmode==80?80:(screenmode==0?40:32);
-        nt=QString("\nNT: %1 (base+%2) )")
-                .arg(hexValue(nametable+scrwidth*screeny+screenx,4))
-                .arg(hexValue(scrwidth*screeny+screenx,3));
+    if (cb_tilemapsource->currentIndex() > 0) {
+        int scrWidth = screenMode == 80 ? 80
+                     : screenMode ==  0 ? 40
+                                        : 32;
+        nt = QString("\nNT: %1 (base+%2) )")
+                .arg(hexValue(nametable + scrWidth * screenY + screenX, 4))
+                .arg(hexValue(scrWidth * screenY + screenX, 3));
     }
     label_charadr->setText(QString("PGT: %1, CT: %2%3").arg(pgt).arg(ct).arg(nt));
 }
 
 void TileViewer::decodeVDPregs()
 {
-	const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+	const uint8_t* regs = VDPDataStore::instance().getRegsPointer();
 
 //	// Get current screenmode
 //	static const int bits_modetxt[32] = {
@@ -187,57 +170,49 @@ void TileViewer::decodeVDPregs()
 //		255, 255, 255, 255,  8, 255, 255, 255,
 //	};
 
-	//int v = ((regs[0] & 0x0E) << 1)  | ((regs[1] & 0x10) >> 4) | ((regs[1] & 0x08) >> 2);
-	int v = ((regs[0] & 0x0E) << 1)  | ((regs[1] & 0x18) >> 3);
-//	screenmode = bits_modetxt[v];
+	//int v = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x10) >> 4) | ((regs[1] & 0x08) >> 2);
+	int v = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3);
 
-    label_M1->setEnabled( v & 0x02);
-    label_M2->setEnabled( v & 0x01);
-    label_M3->setEnabled( v & 0x04);
-    label_M4->setEnabled( v & 0x08);
-    label_M5->setEnabled( v & 0x10);
+    label_M1->setEnabled(v & 0x02);
+    label_M2->setEnabled(v & 0x01);
+    label_M3->setEnabled(v & 0x04);
+    label_M4->setEnabled(v & 0x08);
+    label_M5->setEnabled(v & 0x10);
 
-    QString modetext;
-    int cbindex=6; // "not tile based"
-    int reg2mask=255; // mask for nametable (aka pattern layout table)
-    int reg3mask=255; // mask for colortable
-    int reg4mask=255; // mask for patterntable
-    bool usesblink=false;
+    QString modeText;
+    int cbIndex = 6; // "not tile based"
+    int reg2mask = 255; // mask for nametable (aka pattern layout table)
+    int reg3mask = 255; // mask for colortable
+    int reg4mask = 255; // mask for patterntable
+    bool usesBlink = false;
     switch (v) {
-        case 0: modetext = QString("Graphic1"); cbindex=2; break;
-        case 1: modetext = QString("MultiColor"); cbindex=4; break;
-        case 2: modetext = QString("Text1"); cbindex=0;reg3mask=128; break;
-        case 4: modetext = QString("Graphic2"); cbindex=3;reg3mask=128;reg4mask=0x3c; break;
-        case 8: modetext = QString("Graphic3"); cbindex=5;reg3mask=128; reg4mask=0x3c; break;
-        case 10: modetext = QString("Text2"); cbindex=1;
-                reg2mask=0xfc; reg3mask=0xf8;
-                usesblink=true; break;
-        case 12: modetext = QString("Graphic4"); break;
-        case 16: modetext = QString("Graphic5"); break;
-        case 20: modetext = QString("Graphic6"); break;
-        case 28: modetext = QString("Graphic7"); break;
-    default: modetext = QString("unknown"); break;
+        case  0: modeText = "Graphic1";   cbIndex = 2; break;
+        case  1: modeText = "MultiColor"; cbIndex = 4; break;
+        case  2: modeText = "Text1";      cbIndex = 0; reg3mask = 0x80; break;
+        case  4: modeText = "Graphic2";   cbIndex = 3; reg3mask = 0x80; reg4mask = 0x3c; break;
+        case  8: modeText = "Graphic3";   cbIndex = 5; reg3mask = 0x80; reg4mask = 0x3c; break;
+        case 10: modeText = "Text2";      cbIndex = 1; reg3mask = 0xf8; reg2mask = 0xfc; usesBlink = true; break;
+        case 12: modeText = "Graphic4"; break;
+        case 16: modeText = "Graphic5"; break;
+        case 20: modeText = "Graphic6"; break;
+        case 28: modeText = "Graphic7"; break;
+        default: modeText = "unknown";  break;
     }
-    label_screenmode->setText(modetext);
+    label_screenmode->setText(modeText);
 
-
-    if (useVDPRegisters->isChecked()){
-        cb_screen->setCurrentIndex(cbindex);
-        int nametable=(regs[2]&reg2mask)<<10;
-        int patterntable=(regs[4]&reg4mask)<<11;
-        int  colortable=((regs[3]&reg3mask)<<6)|(regs[10]<<14);
-        le_nametable->setText(hexValue(nametable,4));
-        le_patterntable->setText(hexValue(patterntable,4));
-        le_colortable->setText(hexValue(colortable,4));
-        cb_blinkcolors->setChecked(usesblink ? regs[13]&0xf0 : false);
-        cb_screenrows->setCurrentIndex((regs[9]&128)? 1 : 0 );
-        sp_bordercolor->setValue(regs[7]&15);
-        cb_color0->setChecked(regs[8]&32);
+    if (useVDPRegisters->isChecked()) {
+        cb_screen->setCurrentIndex(cbIndex);
+        int nameTable = (regs[2] & reg2mask) << 10;
+        int patternTable = (regs[4] & reg4mask) << 11;
+        int colorTable = ((regs[3] & reg3mask) << 6) | (regs[10] << 14);
+        le_nametable->setText(hexValue(nameTable, 4));
+        le_patterntable->setText(hexValue(patternTable, 4));
+        le_colortable->setText(hexValue(colorTable, 4));
+        cb_blinkcolors->setChecked(usesBlink ? regs[13] & 0xf0 : false);
+        cb_screenrows->setCurrentIndex((regs[9] & 128) ? 1 : 0 );
+        sp_bordercolor->setValue(regs[7] & 15);
+        cb_color0->setChecked(regs[8] & 32);
     }
-
-
-
-
 }
 
 void TileViewer::refresh()
@@ -246,19 +221,16 @@ void TileViewer::refresh()
     VDPDataStore::instance().refresh();
 }
 
-void TileViewer::displayCharInfo(int screenx, int screeny, int character, const QString& textinfo)
+void TileViewer::displayCharInfo(int screenX, int screenY, int character, const QString& textInfo)
 {
     label_charpat->setText(QString::number(character));
     plainTextEdit->setPlainText(QString("info for character %1 (%2)\n%3")
                                 .arg(character)
-                                .arg(hexValue(character,2))
-                                .arg(textinfo)
-                                );
-    imageWidget->drawCharAtImage(character,screenx,screeny,image4label);
+                                .arg(hexValue(character, 2))
+                                .arg(textInfo));
+    imageWidget->drawCharAtImage(character, screenX, screenY, image4label);
     label_clickedcharimage->setPixmap(QPixmap::fromImage(image4label));
-
 }
-
 
 void TileViewer::on_cb_tilemapsource_currentIndexChanged(int index)
 {
@@ -267,86 +239,78 @@ void TileViewer::on_cb_tilemapsource_currentIndexChanged(int index)
 
 void TileViewer::on_cb_screen_currentIndexChanged(int index)
 {
-    int i=0;
-    switch (index) {
-            case 0: i=0 ; break;
-            case 1: i=80; break;
-            case 2: i=1 ; break;
-            case 3: i=2 ; break;
-            case 4: i=3 ; break;
-            case 5: i=4 ; break;
-            case 6: i=255 ; break;
-
-    }
-    imageWidget->setScreenMode(i);
-    //blink checkbox depends on scrrenmode and manuel usage
-    cb_blinkcolors->setEnabled(i==80 && !useVDPRegisters->isChecked());
+	int i = [&] {
+		switch (index) {
+            case 0:  return   0;
+            case 1:  return  80;
+            case 2:  return   1;
+            case 3:  return   2;
+            case 4:  return   3;
+            case 5:  return   4;
+            case 6:  return 255;
+            default: return   0;
+        }
+	}();
+	imageWidget->setScreenMode(i);
+	// blink checkbox depends on screenMode and manuel usage
+	cb_blinkcolors->setEnabled(i == 80 && !useVDPRegisters->isChecked());
 }
 
-void TileViewer::on_le_nametable_textChanged(const QString &text)
+void TileViewer::on_le_nametable_textChanged(const QString& text)
 {
-    int i = stringToValue(text);
-    if (i != -1){
+    auto font = le_nametable->font();
+    if (int i = stringToValue(text); i != -1) {
         imageWidget->setNameTableAddress(i);
-        auto font = le_nametable->font();
         font.setItalic(false);
-        le_nametable->setFont(font);
     } else {
-        auto font = le_nametable->font();
         font.setItalic(true);
-        le_nametable->setFont(font);
     }
+    le_nametable->setFont(font);
 }
 
-void TileViewer::on_le_colortable_textChanged(const QString &text)
+void TileViewer::on_le_colortable_textChanged(const QString& text)
 {
-    int i = stringToValue(text);
-    if (i != -1){
+    auto font = le_colortable->font();
+    if (int i = stringToValue(text); i != -1) {
         imageWidget->setColorTableAddress(i);
-        auto font = le_colortable->font();
         font.setItalic(false);
-        le_colortable->setFont(font);
     } else {
-        auto font = le_colortable->font();
         font.setItalic(true);
-        le_colortable->setFont(font);
     }
+    le_colortable->setFont(font);
 }
 
-void TileViewer::on_le_patterntable_textChanged(const QString &text)
+void TileViewer::on_le_patterntable_textChanged(const QString& text)
 {
-    int i = stringToValue(text);
-    if (i != -1){
+    auto font = le_patterntable->font();
+    if (int i = stringToValue(text); i != -1) {
         imageWidget->setPatternTableAddress(i);
-        auto font = le_patterntable->font();
         font.setItalic(false);
-        le_patterntable->setFont(font);
     } else {
-        auto font = le_patterntable->font();
         font.setItalic(true);
-        le_patterntable->setFont(font);
     }
+    le_patterntable->setFont(font);
 }
 
 void TileViewer::on_cb_color0_stateChanged(int state)
 {
-	imageWidget->setTPbit(state!=Qt::Unchecked);
+	imageWidget->setTPbit(state != Qt::Unchecked);
 }
 
 void TileViewer::on_useVDPRegisters_stateChanged(int state)
 {
     bool useManual = state == Qt::Unchecked;
-    const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+    const uint8_t* regs = VDPDataStore::instance().getRegsPointer();
     decodeVDPregs();
     cb_screen->setEnabled(useManual);
     le_colortable->setEnabled(useManual);
     le_nametable->setEnabled(useManual);
     le_patterntable->setEnabled(useManual);
     cb_screenrows->setEnabled(useManual);
-    cb_screenrows->setCurrentIndex(regs[9]&128 ? 1:0);
+    cb_screenrows->setCurrentIndex(regs[9] & 128 ? 1 : 0);
     sp_bordercolor->setEnabled(useManual);
-    int v = ((regs[0] & 0x0E) << 1)  | ((regs[1] & 0x18) >> 3);
-    cb_blinkcolors->setEnabled(useManual && v==10 );  //screenmode==80
+    int v = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3);
+    cb_blinkcolors->setEnabled(useManual && v == 10);  // screenMode == 80
     cb_color0->setEnabled(useManual);
 }
 
@@ -358,22 +322,21 @@ void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
     connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
     connect(p, SIGNAL(paletteSynced()), this, SLOT(update_label_characterimage()));
     p->show();
-//    useVDPPalette->setChecked(false);
-//    QMessageBox::information(
-//        this,
-//        "Not yet implemented",
-//        "Sorry, the palette editor is not yet implemented, "
-//        "only disabling 'Use VDP palette registers' for now");
-
+    //useVDPPalette->setChecked(false);
+    //QMessageBox::information(
+    //    this,
+    //    "Not yet implemented",
+    //    "Sorry, the palette editor is not yet implemented, "
+    //    "only disabling 'Use VDP palette registers' for now");
 }
 
 void TileViewer::on_useVDPPalette_stateChanged(int state)
 {
-    const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
+    const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
     if (state) {
         imageWidget->setPaletteSource(palette);
     } else {
-        if (palette!=nullptr) memcpy(defaultPalette,palette,32);
+        if (palette) memcpy(defaultPalette, palette, 32);
         imageWidget->setPaletteSource(defaultPalette);
     }
     imageWidget->refresh();
@@ -392,16 +355,12 @@ void TileViewer::on_cb_drawgrid_stateChanged(int state)
 
 void TileViewer::on_cb_highlight_stateChanged(int state)
 {
-    if (state == Qt::Unchecked){
-        imageWidget->setHighlightchar(-1);
-    } else {
-        imageWidget->setHighlightchar(sp_highlight->value());
-    }
+    imageWidget->setHighlightchar(state == Qt::Unchecked ? -1 : sp_highlight->value());
 }
 
 void TileViewer::on_sp_highlight_valueChanged(int i)
 {
-    if ( cb_highlight->isChecked()){
+    if (cb_highlight->isChecked()) {
         imageWidget->setHighlightchar(i);
     }
 }
@@ -413,10 +372,14 @@ void TileViewer::on_sp_bordercolor_valueChanged(int i)
 
 void TileViewer::on_cb_blinkcolors_stateChanged(int arg1)
 {
-    imageWidget->setUseBlink(arg1==Qt::Checked);
+    imageWidget->setUseBlink(arg1 == Qt::Checked);
 }
 
 void TileViewer::on_cb_screenrows_currentIndexChanged(int index)
 {
-    imageWidget->setForcedscreenrows(cb_screenrows->isEnabled()?(index?(index==1?26.5:32.0):24.0):0.0);
+    auto rows = cb_screenrows->isEnabled() ? (index == 0 ? 24.0f :
+                                              index == 1 ? 26.5f
+                                                         : 32.0f)
+                                           : 0.0f;
+    imageWidget->setForcedscreenrows(rows);
 }
