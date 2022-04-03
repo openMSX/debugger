@@ -3,7 +3,10 @@
 
 #include "SimpleHexRequest.h"
 #include <QObject>
+#include <cstdint>
+#include <optional>
 #include <string>
+#include <vector>
 
 class VDPDataStore : public QObject, public SimpleHexRequestUser
 {
@@ -11,28 +14,27 @@ class VDPDataStore : public QObject, public SimpleHexRequestUser
 public:
 	static VDPDataStore& instance();
 
-	const unsigned char* getVramPointer() const;
-	const unsigned char* getPalettePointer() const;
-	const unsigned char* getRegsPointer() const;
-	const unsigned char* getStatusRegsPointer() const;
-	const unsigned char* getVdpVramPointer() const;
+	const uint8_t* getVramPointer() const;
+	const uint8_t* getPalettePointer() const;
+	const uint8_t* getRegsPointer() const;
+	const uint8_t* getStatusRegsPointer() const;
+	const uint8_t* getVdpVramPointer() const;
 
 	size_t getVRAMSize() const;
 
 private:
 	VDPDataStore();
-	~VDPDataStore() override;
 
 	void DataHexRequestReceived() override;
 
 	void refresh1();
 	void refresh2();
 
-	unsigned char* vram;
+	std::vector<uint8_t> vram;
 	size_t vramSize;
 
-	std::string debuggableNameVRAM; // VRAM debuggable name
-	bool got_version; // is the above boolean already filled in?
+	std::optional<std::string> debuggableNameVRAM; // VRAM debuggable name
+
 	friend class VDPDataStoreVersionCheck;
 	friend class VDPDataStoreVRAMSizeCheck;
 
@@ -52,4 +54,4 @@ signals:
 	*/
 };
 
-#endif /* VDPDATASTORE_H */
+#endif // VDPDATASTORE_H
