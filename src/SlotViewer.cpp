@@ -21,6 +21,7 @@ public:
 		viewer.updateSlots(message);
 		delete this;
 	}
+
 private:
 	SlotViewer& viewer;
 };
@@ -231,5 +232,5 @@ void SlotViewer::updateSlots(const QString& message)
 			memLayout->romBlock[i] = lines[l].toInt();
 	}
 	update();
-	if (changed) emit slotsUpdated();
+	emit slotsUpdated(changed);
 }

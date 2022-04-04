@@ -626,22 +626,30 @@ void DebuggerForm::createForm()
 	connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpoint);
 	connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
 	connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
+
 	// Main memory viewer
 	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
 	connect(this, &DebuggerForm::breakStateEntered, mainMemoryView, &MainMemoryViewer::refresh);
+
 	// Slot viewer
 	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
 	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
+	// Received status update back from widget after breakStateEntered/connected
+	connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
+
 	// Breakpoint viewer
 	connect(this, &DebuggerForm::connected, bpView, &BreakpointViewer::sync);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
 	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
+
+	// CPU regs viewer
 	// Hook up the register viewer with the main memory viewer
 	connect(regsView, &CPURegsViewer::registerChanged, mainMemoryView, &MainMemoryViewer::registerChanged);
-
 	connect(regsView, &CPURegsViewer::flagsChanged, flagsView, &FlagsViewer::setFlags);
 	connect(regsView, &CPURegsViewer::spChanged, stackView, &StackViewer::setStackPointer);
+	// Received status update back from widgets after update
+	connect(regsView, &CPURegsViewer::pcChanged, this, &DebuggerForm::onPCChanged);
 
 	connect(&comm, &CommClient::connectionReady, this, &DebuggerForm::initConnection);
 	connect(&comm, &CommClient::updateParsed, this, &DebuggerForm::handleUpdate);
@@ -1519,5 +1527,27 @@ void DebuggerForm::processMerge(const QString& message)
 		reloadBreakpoints(false);
 	} else {
 		processBreakpoints(message);
+	}
+}
+
+void DebuggerForm::onSlotsUpdated(bool slotsChanged)
+{
+	if (disasmStatus == PC_CHANGED) {
+		disasmView->setProgramCounter(disasmAddress, slotsChanged);
+		disasmStatus = RESET;
+	} else {
+		disasmStatus = slotsChanged ? SLOTS_CHANGED : SLOTS_CHECKED;
+	}
+}
+
+void DebuggerForm::onPCChanged(uint16_t address)
+{
+	// PC shouldn't update twice.
+	assert(disasmStatus != PC_CHANGED);
+	if (disasmStatus != RESET) {
+		disasmView->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
+	} else {
+		disasmStatus = PC_CHANGED;
+		disasmAddress = address;
 	}
 }

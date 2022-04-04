@@ -44,7 +44,7 @@ private:
 
 signals:
 	void registerChanged(int id, int value);
-	void pcChanged(quint16);
+	void pcChanged(uint16_t);
 	void flagsChanged(quint8);
 	void spChanged(quint16);
 };
