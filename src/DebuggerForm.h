@@ -51,7 +51,6 @@ private:
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
 	void breakOccured();
-	void setBreakMode();
 	void setRunMode();
 	void updateData();
 

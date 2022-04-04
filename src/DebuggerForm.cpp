@@ -273,42 +273,56 @@ void DebuggerForm::createActions()
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
 	executeBreakAction->setIcon(QIcon(":/icons/break.png"));
 	executeBreakAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeBreakAction->setEnabled(true); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeBreakAction->setEnabled(false); });
 
 	executeRunAction = new QAction(tr("Run"), this);
 	executeRunAction->setShortcut(tr("F9"));
 	executeRunAction->setStatusTip(tr("Leave debug mode and resume execution"));
 	executeRunAction->setIcon(QIcon(":/icons/run.png"));
 	executeRunAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeRunAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeRunAction->setEnabled(true); });
 
 	executeStepAction = new QAction(tr("Step into"), this);
 	executeStepAction->setShortcut(tr("F7"));
 	executeStepAction->setStatusTip(tr("Execute a single instruction"));
 	executeStepAction->setIcon(QIcon(":/icons/stepinto.png"));
 	executeStepAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeStepAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepAction->setEnabled(true); });
 
 	executeStepOverAction = new QAction(tr("Step over"), this);
 	executeStepOverAction->setShortcut(tr("F8"));
 	executeStepOverAction->setStatusTip(tr("Execute the next instruction including any called subroutines"));
 	executeStepOverAction->setIcon(QIcon(":/icons/stepover.png"));
 	executeStepOverAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeStepOverAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepOverAction->setEnabled(true); });
 
 	executeStepOutAction = new QAction(tr("Step out"), this);
 	executeStepOutAction->setShortcut(tr("F11"));
 	executeStepOutAction->setStatusTip(tr("Resume execution until the current routine has finished"));
 	executeStepOutAction->setIcon(QIcon(":/icons/stepout.png"));
 	executeStepOutAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeStepOutAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepOutAction->setEnabled(true); });
 
 	executeStepBackAction = new QAction(tr("Step back"), this);
 	executeStepBackAction->setShortcut(tr("F12"));
 	executeStepBackAction->setStatusTip(tr("Reverse the last instruction"));
 	executeStepBackAction->setIcon(QIcon(":/icons/stepback.png"));
 	executeStepBackAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeStepBackAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepBackAction->setEnabled(true); });
 
 	executeRunToAction = new QAction(tr("Run to"), this);
 	executeRunToAction->setShortcut(tr("F4"));
 	executeRunToAction->setStatusTip(tr("Resume execution until the selected line is reached"));
 	executeRunToAction->setIcon(QIcon(":/icons/runto.png"));
 	executeRunToAction->setEnabled(false);
+	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeRunToAction->setEnabled(false); });
+	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeRunToAction->setEnabled(true); });
 
 	breakpointToggleAction = new QAction(tr("Toggle"), this);
 	breakpointToggleAction->setShortcut(tr("F5"));
@@ -896,10 +910,9 @@ void DebuggerForm::handleUpdate(const QString& type, const QString& name,
 {
 	if (type == "status") {
 		if (name == "cpu") {
+			// running state by default.
 			if (message == "suspended") {
 				breakOccured();
-			} else {
-				setRunMode();
 			}
 		} else if (name == "paused") {
 			pauseStatusChanged(message == "true");
@@ -914,9 +927,8 @@ void DebuggerForm::pauseStatusChanged(bool isPaused)
 
 void DebuggerForm::breakOccured()
 {
-	setBreakMode();
-	updateData();
 	emit breakStateEntered();
+	updateData();
 }
 
 void DebuggerForm::updateData()
@@ -932,28 +944,9 @@ void DebuggerForm::updateData()
 	comm.sendCommand(regs);
 }
 
-void DebuggerForm::setBreakMode()
-{
-	emit breakStateEntered();
-	executeBreakAction->setEnabled(false);
-	executeRunAction->setEnabled(true);
-	executeStepAction->setEnabled(true);
-	executeStepOverAction->setEnabled(true);
-	executeStepOutAction->setEnabled(true);
-	executeStepBackAction->setEnabled(true);
-	executeRunToAction->setEnabled(true);
-}
-
 void DebuggerForm::setRunMode()
 {
 	emit runStateEntered();
-	executeBreakAction->setEnabled(true);
-	executeRunAction->setEnabled(false);
-	executeStepAction->setEnabled(false);
-	executeStepOverAction->setEnabled(false);
-	executeStepOutAction->setEnabled(false);
-	executeStepBackAction->setEnabled(false);
-	executeRunToAction->setEnabled(false);
 }
 
 void DebuggerForm::fileNewSession()
@@ -1271,7 +1264,7 @@ void DebuggerForm::toggleSpritesDisplay()
 	// not sure if this a good idea for a docable widget
 
 	// create new debuggable viewer window
-    auto* viewer = new SpriteViewer();
+	auto* viewer = new SpriteViewer();
 	auto* dw = new DockableWidget(dockMan);
 	dw->setWidget(viewer);
 	dw->setTitle(tr("Sprites View"));
