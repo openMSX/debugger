@@ -1,15 +1,15 @@
-name: Build and release
+name: Nightly
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - master
 
 jobs:
   build:
     uses: ./.github/workflows/workflow-build.yaml
-  release:
-    name: Release project packages
+  nightly:
+    name: Release nightly packages
     runs-on: ubuntu-latest
     needs: build
     env:
@@ -47,9 +47,17 @@ jobs:
           cd ..
           mv ${{ steps.get-targets.outputs.debian_target }}/${{ steps.get-targets.outputs.debian_target }}.zip .
           mv ${{ steps.get-targets.outputs.mingw_target }}/${{ steps.get-targets.outputs.mingw_target }}.zip .
-      - name: Publish binaries as artifacts
-        uses: ncipollo/release-action@v1
+
+      - name: Create info file
+        run: |
+           echo "ref: ${GITHUB_REF}" > info.txt
+           echo "commit: ${GITHUB_SHA}" >> info.txt
+           echo "build: $(date +"%Y-%m-%dT%H:%M:%SZ")" >> info.txt
+
+      - name: Update nightly release
+        uses: eine/tip@master
         with:
-          artifacts: "*.zip"
-          body: "Build number ${{ github.run_number }}\n${{ github.event.head_commit.message }}"
+          tag: nightly
+          rm: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          files: info.txt *.zip
