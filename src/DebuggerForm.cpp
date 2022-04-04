@@ -163,7 +163,7 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
 
-	connect(&session.symbolTable(), SIGNAL(symbolFileChanged()), this, SLOT(symbolFileChanged()));
+	connect(&session.symbolTable(), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
 }
 
 void DebuggerForm::createActions()
@@ -188,7 +188,7 @@ void DebuggerForm::createActions()
 
 	for (auto& rfa : recentFileActions) {
 		rfa = new QAction(this);
-		connect(rfa, SIGNAL(triggered()), this, SLOT(fileRecentOpen()));
+		connect(rfa, &QAction::triggered, this, &DebuggerForm::fileRecentOpen);
 	}
 
 	systemConnectAction = new QAction(tr("&Connect"), this);
@@ -324,41 +324,41 @@ void DebuggerForm::createActions()
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the application information"));
 
-	connect(fileNewSessionAction, SIGNAL(triggered()), this, SLOT(fileNewSession()));
-	connect(fileOpenSessionAction, SIGNAL(triggered()), this, SLOT(fileOpenSession()));
-	connect(fileSaveSessionAction, SIGNAL(triggered()), this, SLOT(fileSaveSession()));
-	connect(fileSaveSessionAsAction, SIGNAL(triggered()), this, SLOT(fileSaveSessionAs()));
-	connect(fileQuitAction, SIGNAL(triggered()), this, SLOT(close()));
-	connect(systemConnectAction, SIGNAL(triggered()), this, SLOT(systemConnect()));
-	connect(systemDisconnectAction, SIGNAL(triggered()), this, SLOT(systemDisconnect()));
-	connect(systemPauseAction, SIGNAL(triggered()), this, SLOT(systemPause()));
-	connect(systemRebootAction, SIGNAL(triggered()), this, SLOT(systemReboot()));
-	connect(systemSymbolManagerAction, SIGNAL(triggered()), this, SLOT(systemSymbolManager()));
-	connect(systemPreferencesAction, SIGNAL(triggered()), this, SLOT(systemPreferences()));
-	connect(searchGotoAction, SIGNAL(triggered()), this, SLOT(searchGoto()));
-	connect(viewRegistersAction, SIGNAL(triggered()), this, SLOT(toggleRegisterDisplay()));
-	connect(viewBreakpointsAction, SIGNAL(triggered()), this, SLOT(toggleBreakpointsDisplay()));
-	connect(viewFlagsAction, SIGNAL(triggered()), this, SLOT(toggleFlagsDisplay()));
-	connect(viewStackAction, SIGNAL(triggered()), this, SLOT(toggleStackDisplay()));
-	connect(viewSlotsAction, SIGNAL(triggered()), this, SLOT(toggleSlotsDisplay()));
-	connect(viewMemoryAction, SIGNAL(triggered()), this, SLOT(toggleMemoryDisplay()));
-	connect(viewDebuggableViewerAction, SIGNAL(triggered()), this, SLOT(addDebuggableViewer()));
-	connect(viewBitMappedAction, SIGNAL(triggered()), this, SLOT(toggleBitMappedDisplay()));
-	connect(viewCharMappedAction, SIGNAL(triggered()), this, SLOT(toggleCharMappedDisplay()));
-	connect(viewSpritesAction, SIGNAL(triggered()), this, SLOT(toggleSpritesDisplay()));
-	connect(viewVDPRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPRegsDisplay()));
-	connect(viewVDPCommandRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPCommandRegsDisplay()));
-	connect(viewVDPStatusRegsAction, SIGNAL(triggered()), this, SLOT(toggleVDPStatusRegsDisplay()));
-	connect(executeBreakAction, SIGNAL(triggered()), this, SLOT(executeBreak()));
-	connect(executeRunAction, SIGNAL(triggered()), this, SLOT(executeRun()));
-	connect(executeStepAction, SIGNAL(triggered()), this, SLOT(executeStep()));
-	connect(executeStepOverAction, SIGNAL(triggered()), this, SLOT(executeStepOver()));
-	connect(executeRunToAction, SIGNAL(triggered()), this, SLOT(executeRunTo()));
-	connect(executeStepOutAction, SIGNAL(triggered()), this, SLOT(executeStepOut()));
-	connect(executeStepBackAction, SIGNAL(triggered()), this, SLOT(executeStepBack()));
-	connect(breakpointToggleAction, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
-	connect(breakpointAddAction, SIGNAL(triggered()), this, SLOT(addBreakpoint()));
-	connect(helpAboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
+	connect(fileNewSessionAction, &QAction::triggered, this, &DebuggerForm::fileNewSession);
+	connect(fileOpenSessionAction, &QAction::triggered, this, &DebuggerForm::fileOpenSession);
+	connect(fileSaveSessionAction, &QAction::triggered, this, &DebuggerForm::fileSaveSession);
+	connect(fileSaveSessionAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveSessionAs);
+	connect(fileQuitAction, &QAction::triggered, this, &DebuggerForm::close);
+	connect(systemConnectAction, &QAction::triggered, this, &DebuggerForm::systemConnect);
+	connect(systemDisconnectAction, &QAction::triggered, this, &DebuggerForm::systemDisconnect);
+	connect(systemPauseAction, &QAction::triggered, this, &DebuggerForm::systemPause);
+	connect(systemRebootAction, &QAction::triggered, this, &DebuggerForm::systemReboot);
+	connect(systemSymbolManagerAction, &QAction::triggered, this, &DebuggerForm::systemSymbolManager);
+	connect(systemPreferencesAction, &QAction::triggered, this, &DebuggerForm::systemPreferences);
+	connect(searchGotoAction, &QAction::triggered, this, &DebuggerForm::searchGoto);
+	connect(viewRegistersAction, &QAction::triggered, this, &DebuggerForm::toggleRegisterDisplay);
+	connect(viewBreakpointsAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpointsDisplay);
+	connect(viewFlagsAction, &QAction::triggered, this, &DebuggerForm::toggleFlagsDisplay);
+	connect(viewStackAction, &QAction::triggered, this, &DebuggerForm::toggleStackDisplay);
+	connect(viewSlotsAction, &QAction::triggered, this, &DebuggerForm::toggleSlotsDisplay);
+	connect(viewMemoryAction, &QAction::triggered, this, &DebuggerForm::toggleMemoryDisplay);
+	connect(viewDebuggableViewerAction, &QAction::triggered, this, &DebuggerForm::addDebuggableViewer);
+	connect(viewBitMappedAction, &QAction::triggered, this, &DebuggerForm::toggleBitMappedDisplay);
+	connect(viewCharMappedAction, &QAction::triggered, this, &DebuggerForm::toggleCharMappedDisplay);
+	connect(viewSpritesAction, &QAction::triggered, this, &DebuggerForm::toggleSpritesDisplay);
+	connect(viewVDPRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPRegsDisplay);
+	connect(viewVDPCommandRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPCommandRegsDisplay);
+	connect(viewVDPStatusRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPStatusRegsDisplay);
+	connect(executeBreakAction, &QAction::triggered, this, &DebuggerForm::executeBreak);
+	connect(executeRunAction, &QAction::triggered, this, &DebuggerForm::executeRun);
+	connect(executeStepAction, &QAction::triggered, this, &DebuggerForm::executeStep);
+	connect(executeStepOverAction, &QAction::triggered, this, &DebuggerForm::executeStepOver);
+	connect(executeRunToAction, &QAction::triggered, this, &DebuggerForm::executeRunTo);
+	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
+	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
+	connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
+	connect(breakpointAddAction, &QAction::triggered, this, &DebuggerForm::addBreakpoint);
+	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
 }
 
 void DebuggerForm::createMenus()
@@ -406,7 +406,7 @@ void DebuggerForm::createMenus()
 	viewMenu->addSeparator();
 	viewFloatingWidgetsMenu = viewMenu->addMenu("Floating widgets:");
 	viewMenu->addAction(viewDebuggableViewerAction);
-	connect(viewMenu, SIGNAL(aboutToShow()), this, SLOT(updateViewMenu()));
+	connect(viewMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateViewMenu);
 
 	// create VDP dialogs menu
 	viewVDPDialogsMenu->addAction(viewVDPRegsAction);
@@ -415,10 +415,10 @@ void DebuggerForm::createMenus()
 	viewVDPDialogsMenu->addAction(viewBitMappedAction);
 	viewVDPDialogsMenu->addAction(viewCharMappedAction);
 	viewVDPDialogsMenu->addAction(viewSpritesAction);
-	connect(viewVDPDialogsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVDPViewMenu()));
+	connect(viewVDPDialogsMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateVDPViewMenu);
 
 	// create Debuggable Viewers menu (so the user can focus an existing one)
-	connect(viewFloatingWidgetsMenu, SIGNAL(aboutToShow()), this, SLOT(updateViewFloatingWidgetsMenu()));
+	connect(viewFloatingWidgetsMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateViewFloatingWidgetsMenu);
 
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
@@ -490,14 +490,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(false);
 	dw->setClosable(false);
-	connect(this, SIGNAL(settingsChanged()),
-	        disasmView, SLOT(updateLayout()));
-	connect(this, SIGNAL(breakStateEntered()),
-	        disasmView, SLOT(refresh()));
-	connect(this, SIGNAL(symbolsChanged()),
-	        disasmView, SLOT(refresh()));
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create the memory view widget
 	mainMemoryView = new MainMemoryViewer();
@@ -509,13 +502,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(connected()),
-	        mainMemoryView, SLOT(refresh()));
-	connect(this, SIGNAL(breakStateEntered()),
-	        mainMemoryView, SLOT(refresh()));
-	mainMemoryView->setSymbolTable(&session.symbolTable());
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create register viewer
 	regsView = new CPURegsViewer();
@@ -527,13 +514,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-
-	// Hook up the register viewer with the MainMemory viewer
-	connect(regsView, SIGNAL(registerChanged(int,int)),
-	        mainMemoryView, SLOT(registerChanged(int,int)));
-	mainMemoryView->setRegsView(regsView);
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create flags viewer
 	flagsView = new FlagsViewer();
@@ -545,8 +526,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create stack viewer
 	stackView = new StackViewer();
@@ -558,8 +538,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create slot viewer
 	slotView = new SlotViewer();
@@ -571,16 +550,10 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
-	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create breakpoints viewer
 	bpView = new BreakpointViewer(this);
-	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
-	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
-
 	dw = new DockableWidget(dockMan);
 	dw->setWidget(bpView);
 	dw->setTitle(tr("Debug list"));
@@ -589,10 +562,7 @@ void DebuggerForm::createForm()
 	dw->setDestroyable(false);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this,
-		&DebuggerForm::dockWidgetVisibilityChanged);
-	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
-	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
+	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// restore layout
 	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
@@ -652,20 +622,30 @@ void DebuggerForm::createForm()
 	// disable all widgets
 	connectionClosed();
 
-	connect(regsView,   SIGNAL(pcChanged(quint16)),
-	        disasmView, SLOT(setProgramCounter(quint16)));
-	connect(regsView,   SIGNAL(flagsChanged(quint8)),
-	        flagsView,  SLOT(setFlags(quint8)));
-	connect(regsView,   SIGNAL(spChanged(quint16)),
-	        stackView,  SLOT(setStackPointer(quint16)));
-	connect(disasmView, SIGNAL(breakpointToggled(int)),
-	                    SLOT(toggleBreakpoint(int)));
-	connect(&comm, SIGNAL(connectionReady()),
-	        SLOT(initConnection()));
-	connect(&comm, SIGNAL(updateParsed(const QString&, const QString&, const QString&)),
-	        SLOT(handleUpdate(const QString&, const QString&, const QString&)));
-	connect(&comm, SIGNAL(connectionTerminated()),
-	        SLOT(connectionClosed()));
+	// Disasm viewer
+	connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpoint);
+	connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
+	connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
+	// Main memory viewer
+	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
+	connect(this, &DebuggerForm::breakStateEntered, mainMemoryView, &MainMemoryViewer::refresh);
+	// Slot viewer
+	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
+	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
+	// Breakpoint viewer
+	connect(this, &DebuggerForm::connected, bpView, &BreakpointViewer::sync);
+	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
+	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
+	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
+	// Hook up the register viewer with the main memory viewer
+	connect(regsView, &CPURegsViewer::registerChanged, mainMemoryView, &MainMemoryViewer::registerChanged);
+
+	connect(regsView, &CPURegsViewer::flagsChanged, flagsView, &FlagsViewer::setFlags);
+	connect(regsView, &CPURegsViewer::spChanged, stackView, &StackViewer::setStackPointer);
+
+	connect(&comm, &CommClient::connectionReady, this, &DebuggerForm::initConnection);
+	connect(&comm, &CommClient::updateParsed, this, &DebuggerForm::handleUpdate);
+	connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
 	// init main memory
 	// added four bytes as runover buffer for dasm
@@ -677,6 +657,8 @@ void DebuggerForm::createForm()
 	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
 	disasmView->setSymbolTable(&session.symbolTable());
+	mainMemoryView->setRegsView(regsView);
+	mainMemoryView->setSymbolTable(&session.symbolTable());
 	mainMemoryView->setDebuggable("memory", 65536);
 	stackView->setData(mainMemory, 65536);
 	slotView->setMemoryLayout(&memLayout);

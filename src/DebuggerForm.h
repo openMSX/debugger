@@ -29,7 +29,6 @@ public:
 	DebuggerForm(QWidget* parent = nullptr);
 	~DebuggerForm() override;
 
-public slots:
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
 
@@ -148,7 +147,6 @@ private:
 
 	static int counter;
 
-private slots:
 	void fileNewSession();
 	void fileOpenSession();
 	void fileSaveSession();
