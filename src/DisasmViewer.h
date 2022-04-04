@@ -23,23 +23,26 @@ public:
 	void setSymbolTable(SymbolTable* st);
 	void memoryUpdated(CommMemoryRequest* req);
 	void updateCancelled(CommMemoryRequest* req);
-	quint16 programCounter() const;
-	quint16 cursorAddress() const;
+	uint16_t programCounter() const;
+	uint16_t cursorAddress() const;
 
 	QSize sizeHint() const override;
 
-	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways};
+	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways, Reload};
 
 public slots:
-	void setAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
-	void setCursorAddress(quint16 addr, int infoLine = FIRST_INFO_LINE, int method = Top);
-	void setProgramCounter(quint16 pc);
+	void setAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
+	void setCursorAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
+	void setProgramCounter(uint16_t pc, bool reload = false);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
 	void updateLayout();
 	void refresh();
 
 private:
+	void requestMemory(uint16_t start, uint16_t end, uint16_t addr, int infoLine, int method);
+	int findPosition(uint16_t addr, int infoLine, int method);
+
 	void resizeEvent(QResizeEvent* e) override;
 	void paintEvent(QPaintEvent* e) override;
 	void keyPressEvent(QKeyEvent* e) override;
@@ -52,8 +55,8 @@ private:
 	QPixmap watchMarker;
 	QPixmap pcMarker;
 
-	quint16 programAddr;
-	quint16 cursorAddr;
+	uint16_t programAddr;
+	uint16_t cursorAddr;
 	int cursorLine;
 
 	QList<int> jumpStack;
@@ -77,7 +80,7 @@ private:
 	MemoryLayout* memLayout;
 	SymbolTable* symTable;
 
-	int findDisasmLine(quint16 lineAddr, int infoLine = 0);
+	int findDisasmLine(uint16_t lineAddr, int infoLine = 0);
 	int lineAtPos(const QPoint& pos);
 
 signals:

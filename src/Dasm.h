@@ -23,8 +23,7 @@ static const int LAST_INFO_LINE = -65536;
 
 using DisasmLines = std::vector<DisasmRow>;
 
-void dasm(const unsigned char* membuf, unsigned short startAddr,
-          unsigned short endAddr, DisasmLines& disasm,
+void dasm(const unsigned char* membuf, uint16_t startAddr, uint16_t endAddr, DisasmLines& disasm,
           MemoryLayout *memLayout, SymbolTable *symTable, int currentPC);
 
 #endif // DASM_H

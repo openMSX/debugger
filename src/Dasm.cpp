@@ -36,9 +36,8 @@ static int get16(const unsigned char* memBuf, int address)
 	return memBuf[address] + 256 * memBuf[address + 1];
 }
 
-void dasm(const unsigned char* membuf, unsigned short startAddr,
-          unsigned short endAddr, DisasmLines& disasm,
-          MemoryLayout* memLayout, SymbolTable* symTable, int currentPC)
+void dasm(const unsigned char* membuf, uint16_t startAddr, uint16_t endAddr,
+          DisasmLines& disasm, MemoryLayout* memLayout, SymbolTable* symTable, int currentPC)
 {
 	int pc = startAddr;
 	int labelCount = 0;

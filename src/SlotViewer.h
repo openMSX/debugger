@@ -34,7 +34,8 @@ private:
 	bool segmentsChanged[4];
 
 signals:
-	void slotsUpdated();
+	void slotsUpdated(bool slotsChanged);
+	void contentsChanged();
 };
 
 #endif // SLOTVIEWER_H

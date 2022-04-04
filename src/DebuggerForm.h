@@ -29,9 +29,10 @@ public:
 	DebuggerForm(QWidget* parent = nullptr);
 	~DebuggerForm() override;
 
-public slots:
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
+	void onSlotsUpdated(bool slotsChanged);
+	void onPCChanged(uint16_t address);
 
 private:
 	void closeEvent(QCloseEvent* e) override;
@@ -50,7 +51,6 @@ private:
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
 	void breakOccured();
-	void setBreakMode();
 	void setRunMode();
 	void updateData();
 
@@ -147,8 +147,9 @@ private:
 	QMap<QString, int> debuggables;
 
 	static int counter;
+	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
+	uint16_t disasmAddress;
 
-private slots:
 	void fileNewSession();
 	void fileOpenSession();
 	void fileSaveSession();

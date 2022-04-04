@@ -18,7 +18,7 @@
 class CommMemoryRequest : public ReadDebugBlockCommand
 {
 public:
-	CommMemoryRequest(unsigned offset_, unsigned size_, unsigned char* target,
+	CommMemoryRequest(uint16_t offset_, uint16_t size_, unsigned char* target,
 	                  DisasmViewer& viewer_)
 		: ReadDebugBlockCommand("memory", offset_, size_, target)
 		, offset(offset_), size(size_)
@@ -135,16 +135,12 @@ void DisasmViewer::updateLayout()
 	update();
 }
 
-void DisasmViewer::refresh()
+void DisasmViewer::requestMemory(uint16_t start, uint16_t end, uint16_t addr, int infoLine, int method)
 {
-	int disasmStart = disasmLines.front().addr;
-	int disasmEnd = disasmLines.back().addr + disasmLines.back().numBytes;
-
-	auto* req = new CommMemoryRequest(
-		disasmStart, disasmEnd - disasmStart, &memory[disasmStart], *this);
-	req->address = disasmLines[disasmTopLine].addr;
-	req->line = disasmLines[disasmTopLine].infoLine;
-	req->method = TopAlways;
+	auto* req = new CommMemoryRequest(start, end - start, &memory[start], *this);
+	req->address = addr;
+	req->line = infoLine;
+	req->method = method;
 
 	if (waitingForData) {
 		delete nextRequest;
@@ -153,6 +149,15 @@ void DisasmViewer::refresh()
 		waitingForData = true;
 		CommClient::instance().sendCommand(req);
 	}
+}
+
+void DisasmViewer::refresh()
+{
+	int start = disasmLines.front().addr;
+	int end = disasmLines.back().addr + disasmLines.back().numBytes;
+	int infoLine = disasmLines[disasmTopLine].infoLine;
+
+	requestMemory(start, end, disasmLines[disasmTopLine].addr, infoLine, TopAlways);
 }
 
 void DisasmViewer::paintEvent(QPaintEvent* e)
@@ -276,18 +281,18 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	visibleLines -= partialBottomLine;
 }
 
-void DisasmViewer::setCursorAddress(quint16 addr, int infoLine, int method)
+void DisasmViewer::setCursorAddress(uint16_t addr, int infoLine, int method)
 {
 	cursorAddr = addr;
 	cursorLine = 0;
 	setAddress(addr, infoLine, method);
 }
 
-void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
+int DisasmViewer::findPosition(uint16_t addr, int infoLine, int method)
 {
-	int line = findDisasmLine(addr, infoLine);
-	if (line >= 0) {
+	if (int line = findDisasmLine(addr, infoLine); line >= 0) {
 		int dt, db;
+
 		switch (method) {
 		case Top:
 		case Middle:
@@ -313,10 +318,22 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 
 		if ((line > dt || disasmLines[0].addr == 0) &&
 		    (line < int(disasmLines.size()) - db ||
-		     disasmLines.back().addr+disasmLines.back().numBytes > 0xFFFF)) {
+		     disasmLines.back().addr + disasmLines.back().numBytes > 0xFFFF)) {
+			return line;
+		}
+	}
+
+	return -1;
+}
+
+void DisasmViewer::setAddress(uint16_t addr, int infoLine, int method)
+{
+	if (method != Reload) {
+		int line = findPosition(addr, infoLine, method);
+
+		if (line >= 0) {
 			// line is within existing disasm'd data. Find where to put it.
-			if (method == Top || method == TopAlways ||
-			    (method == Closest && line < disasmTopLine)) {
+			if (method == Top || method == TopAlways || (method == Closest && line < disasmTopLine)) {
 				// Move line to top
 				disasmTopLine = line;
 			} else if (method == Bottom || method == BottomAlways ||
@@ -334,14 +351,17 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 			update();
 			return;
 		}
-	}
 
-	if (method == Closest) {
-		if (addr < disasmLines[disasmTopLine].addr) {
-			method = Top;
-		} else {
-			method = Bottom;
+		if (method == Closest) {
+			if (addr < disasmLines[disasmTopLine].addr) {
+				method = Top;
+			} else {
+				method = Bottom;
+			}
 		}
+	} else {
+		// cursor always on the middle when on break state anyway.
+		method = MiddleAlways;
 	}
 
 	// The requested address it outside the pre-disassembled bounds.
@@ -370,19 +390,7 @@ void DisasmViewer::setAddress(quint16 addr, int infoLine, int method)
 	disasmStart = std::max(disasmStart, 0);
 	disasmEnd   = std::min(disasmEnd,   0xFFFF);
 
-	auto* req = new CommMemoryRequest(
-		disasmStart, disasmEnd - disasmStart + 1, &memory[disasmStart], *this);
-	req->address = addr;
-	req->line = infoLine;
-	req->method = method;
-
-	if (waitingForData) {
-		delete nextRequest;
-		nextRequest = req;
-	} else {
-		waitingForData = true;
-		CommClient::instance().sendCommand(req);
-	}
+	requestMemory(disasmStart, disasmEnd + 1, addr, infoLine, method);
 }
 
 void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
@@ -437,24 +445,24 @@ void DisasmViewer::updateCancelled(CommMemoryRequest* req)
 	}
 }
 
-quint16 DisasmViewer::cursorAddress() const
+uint16_t DisasmViewer::cursorAddress() const
 {
 	return cursorAddr;
 }
 
-quint16 DisasmViewer::programCounter() const
+uint16_t DisasmViewer::programCounter() const
 {
 	return programAddr;
 }
 
-void DisasmViewer::setProgramCounter(quint16 pc)
+void DisasmViewer::setProgramCounter(uint16_t pc, bool reload)
 {
 	cursorAddr = pc;
 	programAddr = pc;
-	setAddress(pc, 0, MiddleAlways);
+	setAddress(pc, 0, reload ? Reload : MiddleAlways);
 }
 
-int DisasmViewer::findDisasmLine(quint16 lineAddr, int infoLine)
+int DisasmViewer::findDisasmLine(uint16_t lineAddr, int infoLine)
 {
 	int line = disasmLines.size() - 1;
 	while (line >= 0) {
