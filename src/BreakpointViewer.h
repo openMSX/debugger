@@ -11,6 +11,16 @@
 class QPaintEvent;
 class Breakpoints;
 
+struct AddressRange {
+	int start; // a single address is represented by end <= start
+	int end;   // end point is inclusive
+};
+
+struct Slot {
+    int8_t ps; // primary slot, always 0..3
+    int8_t ss; // secundary slot, 0..3 or -1 when the primary slot is not expanded
+};
+
 struct BreakpointRef {
 	enum Type { BREAKPOINT, WATCHPOINT, CONDITION, ALL } type;
 
@@ -39,15 +49,16 @@ private:
 	Breakpoints* breakpoints;
 
 	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value);
-	std::optional<std::tuple<int, int>> parseLocationField(int index, BreakpointRef::Type type, const QString& field,
-	                                                       const QString& combo = {});
-	std::optional<std::tuple<qint8, qint8>> parseSlotField(int index, const QString& field);
+	std::optional<AddressRange> parseLocationField(int index, BreakpointRef::Type type, const QString& field,
+	                                               const QString& combo = {});
+	std::optional<Slot> parseSlotField(int index, const QString& field);
 	std::optional<qint16> parseSegmentField(int index, const QString& field);
 	void changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);
 	int  createTableRow(BreakpointRef::Type type, int row = -1);
 	void fillTableRow(int index, BreakpointRef::Type type, int row);
+	std::optional<Breakpoint> parseTableRow(BreakpointRef::Type type, int row);
 	bool connectBreakpointID(const QString& id, BreakpointRef& data);
 	void populate();
 
@@ -65,8 +76,9 @@ private:
 	void onRemoveBtnClicked(BreakpointRef::Type type);
 	void stretchTable(BreakpointRef::Type type = BreakpointRef::ALL);
 
-	std::map<QString, BreakpointRef>::iterator scanBreakpointRef(const Breakpoint& bp);
-	std::map<QString, BreakpointRef>::iterator findBreakpointRef(BreakpointRef::Type type, const QString& id);
+	BreakpointRef* scanBreakpointRef(BreakpointRef::Type type, int row);
+	BreakpointRef* findBreakpointRef(BreakpointRef::Type type, int row);
+	BreakpointRef* scanBreakpointRef(const Breakpoint& bp);
 
 private slots:
 	void changeCurrentWpType(int row, int index);

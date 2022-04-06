@@ -10,6 +10,8 @@
 #include <QComboBox>
 #include <cassert>
 
+static constexpr int UNDEFINED_ROW = -1;
+
 enum TableColumns {
 	ENABLED = 0,
 	WP_TYPE = 1,
@@ -28,6 +30,7 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 {
 	setupUi(this);
 
+	bpTableWidget->horizontalHeader()->setHighlightSections(false);
 	bpTableWidget->sortByColumn(BP_ADDRESS, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);
 	bpTableWidget->setColumnHidden(ID, true);
@@ -38,6 +41,7 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 	connect(bpTableWidget->horizontalHeader(), &QHeaderView::sectionClicked, this,
 	        &BreakpointViewer::on_headerClicked);
 
+	wpTableWidget->horizontalHeader()->setHighlightSections(false);
 	wpTableWidget->setColumnHidden(ID, true);
 	wpTableWidget->sortByColumn(WP_REGION, Qt::AscendingOrder);
 	wpTableWidget->resizeColumnsToContents();
@@ -45,6 +49,7 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 	connect(wpTableWidget, &QTableWidget::itemChanged, this,
 	        &BreakpointViewer::changeWpTableItem);
 
+	cnTableWidget->horizontalHeader()->setHighlightSections(false);
 	cnTableWidget->setColumnHidden(WP_TYPE, true);
 	cnTableWidget->setColumnHidden(LOCATION, true);
 	cnTableWidget->setColumnHidden(SLOT, true);
@@ -115,7 +120,7 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 	auto loc = parseLocationField(-1, type, location, combo ? combo->currentText() : "");
 	setBreakpointChecked(type, row, loc ? Qt::Checked : Qt::Unchecked);
 	if (!loc) return;
-	auto [address, endRange] = *loc;
+	auto [start, end] = *loc;
 
 	QString condition = table->item(row, T_CONDITION)->text();
 
@@ -126,13 +131,13 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 	auto segment = parseSegmentField(-1, table->item(row, SEGMENT)->text());
 	assert(segment);
 
-	const QString cmdStr = Breakpoints::createSetCommand(wtype, address, ps, ss, *segment, endRange, condition);
+	const QString cmdStr = Breakpoints::createSetCommand(wtype, start, ps, ss, *segment, end, condition);
 
 	auto* command = new Command(cmdStr,
 		[this, type, row] (const QString& id) {
 			setTextField(type, row, ID, id);
 
-			BreakpointRef ref { type, id, row, -1 };
+			BreakpointRef ref{type, id, row, -1};
 			if (!connectBreakpointID(id, ref)) {
 				setBreakpointChecked(type, row, Qt::Unchecked);
 				_handleKeyAlreadyExists();
@@ -219,7 +224,7 @@ void BreakpointViewer::_createCondition(int row)
 		[this, row] (const QString& id) {
 			setTextField(BreakpointRef::CONDITION, row, ID, id);
 
-			BreakpointRef ref { BreakpointRef::CONDITION, id, row, -1 };
+			BreakpointRef ref{BreakpointRef::CONDITION, id, row, -1};
 			if (!connectBreakpointID(id, ref)) {
 				_handleKeyAlreadyExists();
 				return;
@@ -261,7 +266,7 @@ void BreakpointViewer::setTextField(BreakpointRef::Type type, int row, int colum
 	table->setSortingEnabled(oldValue);
 }
 
-std::optional<std::tuple<qint8, qint8>> BreakpointViewer::parseSlotField(int index, const QString& field)
+std::optional<Slot> BreakpointViewer::parseSlotField(int index, const QString& field)
 {
 	QStringList s = field.simplified().split("/", Qt::SplitBehaviorFlags::SkipEmptyParts);
 
@@ -299,7 +304,7 @@ std::optional<std::tuple<qint8, qint8>> BreakpointViewer::parseSlotField(int ind
 	} else {
 		ss = -1;
 	}
-	return std::tuple{ps, ss};
+	return Slot{ps, ss};
 }
 
 std::optional<qint16> BreakpointViewer::parseSegmentField(int index, const QString& field)
@@ -325,14 +330,15 @@ std::optional<qint16> BreakpointViewer::parseSegmentField(int index, const QStri
 
 static const char* ComboTypeNames[] = { "read_mem", "write_mem", "read_io", "write_io" };
 
-std::optional<std::tuple<int, int>> BreakpointViewer::parseLocationField(
+std::optional<AddressRange> BreakpointViewer::parseLocationField(
 	int index, BreakpointRef::Type type, const QString& field, const QString& comboTxt)
 {
 	if (type == BreakpointRef::BREAKPOINT) {
 		if (int value = stringToValue(field.simplified()); value > -1 && value < 0x10000) {
-			return std::tuple{value, -1};
+			return AddressRange{value, value};
 		} else if (index != -1) {
-			return std::tuple{breakpoints->getBreakpoint(index).address, -1};
+			auto address = breakpoints->getBreakpoint(index).address;
+			return AddressRange{address, address};
 		}
 		return {};
 	}
@@ -347,11 +353,11 @@ std::optional<std::tuple<int, int>> BreakpointViewer::parseLocationField(
 	     && (begin > 0xFF || end > 0xFF)) {
 		return {};
 	}
-	if (begin != -1 && end != -1 && end >= begin) return std::tuple{begin, end};
+	if (begin != -1 && end != -1 && end >= begin) return AddressRange{begin, end};
 
 	if (index == -1) return {};
 	const auto& bp = breakpoints->getBreakpoint(index);
-	return std::tuple{bp.address, bp.regionEnd};
+	return AddressRange{bp.address, bp.regionEnd};
 }
 
 void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item)
@@ -361,9 +367,8 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 
 	// trying to modify a bp instead of creating a new one
 	bool  createBp = false;
-	auto* idItem   = table->item(row, ID);
-	auto  it       = findBreakpointRef(type, idItem->text());
-	int   index    = it != maps[type].end() ? std::distance(maps[type].begin(), it) : -1;
+	auto  ref      = findBreakpointRef(type, row);
+	int   index    = ref ? ref->index : -1;
 
 	// check if breakpoint is enabled
 	auto* enabledItem = table->item(row, ENABLED);
@@ -521,20 +526,18 @@ void BreakpointViewer::stretchTable(BreakpointRef::Type type)
 	}
 }
 
-std::map<QString, BreakpointRef>::iterator
-BreakpointViewer::scanBreakpointRef(const Breakpoint& bp)
+BreakpointRef* BreakpointViewer::scanBreakpointRef(const Breakpoint& bp)
 {
 	BreakpointRef::Type type = bp.type == Breakpoint::BREAKPOINT ? BreakpointRef::BREAKPOINT
 	                        : (bp.type == Breakpoint::CONDITION  ? BreakpointRef::CONDITION : BreakpointRef::WATCHPOINT);
-	if (maps[type].empty()) return maps[type].end();
 
 	// assumed premise: a new bp will never repeat same name again
 	if (auto it = maps[type].find(bp.id); it != maps[type].end() && it->second.index == -1) {
 		// assumed premise 2: if name remains the same, bp is exactly the same.
-		return it;
+		return &it->second;
 	}
 
-	return maps[type].end();
+	return nullptr;
 }
 
 bool BreakpointViewer::connectBreakpointID(const QString& id, BreakpointRef& ref)
@@ -566,14 +569,14 @@ void BreakpointViewer::sync()
 		                         : (bp.type == Breakpoint::CONDITION  ? BreakpointRef::CONDITION : BreakpointRef::WATCHPOINT);
 
 		if (!empty[type]) {
-			if (auto it = scanBreakpointRef(bp); it != maps[type].end()) {
-				it->second.index = index;
+			if (auto* ref = scanBreakpointRef(bp)) {
+				ref->index = index;
 				continue;
 			}
 		}
 
-		// create new BreakpointDatas
-		BreakpointRef ref { type, bp.id, -1, index };
+		// create new BreakpointRef
+		BreakpointRef ref{type, bp.id, UNDEFINED_ROW, index};
 		bool result = connectBreakpointID(bp.id, ref);
 		assert(result);
 	}
@@ -611,16 +614,12 @@ void BreakpointViewer::populate()
 		auto* table = tables[index];
 
 		for (int row = 0; row < table->rowCount(); ++row) {
-			auto* idItem = table->item(row, ID);
-			assert(idItem);
-			auto  it     = findBreakpointRef(type, idItem->text());
-
-			// update reused breakpoint
-			if (it != maps[type].end()) {
-				it->second.row = row;
+			// reuse existing table row
+			if (auto* ref = scanBreakpointRef(type, row)) {
+				fillTableRow(ref->index, type, row);
+				ref->row = row;
 			} else {
-				auto* enabledItem = table->item(row, ENABLED);
-				enabledItem->setCheckState(Qt::Unchecked);
+				setBreakpointChecked(type, row, Qt::Unchecked);
 			}
 		}
 	}
@@ -641,10 +640,34 @@ void BreakpointViewer::populate()
 	cnTableWidget->selectRow(cnFocus);
 }
 
-std::map<QString, BreakpointRef>::iterator
-BreakpointViewer::findBreakpointRef(BreakpointRef::Type type, const QString& id)
+BreakpointRef* BreakpointViewer::findBreakpointRef(BreakpointRef::Type type, int row)
 {
-	return maps[type].find(id);
+	auto& table = tables[type];
+	auto* idItem = table->item(row, ID);
+	auto it = maps[type].find(idItem->text());
+	if (it != maps[type].end()) return &it->second;
+	return nullptr;
+}
+
+BreakpointRef* BreakpointViewer::scanBreakpointRef(BreakpointRef::Type type, int row)
+{
+	auto tmp = parseTableRow(type, row);
+	if (!tmp) return nullptr;
+
+	for (auto& [_, ref] : maps[type]) {
+		const Breakpoint& bp = breakpoints->getBreakpoint(ref.index);
+		// exact match
+		if (tmp->id == bp.id) return &ref;
+
+		// otherwise, try to find by similarity
+		if (tmp->type == bp.type && tmp->address == bp.address
+		    && (tmp->regionEnd == bp.regionEnd || (tmp->regionEnd == tmp->address && bp.regionEnd == bp.address))
+		    && (tmp->segment == -1 || tmp->segment == bp.segment) && tmp->condition == bp.condition) {
+			return &ref;
+		}
+	}
+
+	return nullptr;
 }
 
 void BreakpointViewer::changeCurrentWpType(int row, int /*selected*/)
@@ -793,8 +816,38 @@ void BreakpointViewer::fillTableRow(int index, BreakpointRef::Type type, int row
 	auto* item5 = table->item(row, SEGMENT);
 	item5->setText(segment);
 
+	// id
 	auto* item6 = table->item(row, ID);
 	item6->setText(bp.id);
+}
+
+std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointRef::Type type, int row)
+{
+	Breakpoint bp;
+
+	auto* table = tables[type];
+	auto* model = table->model();
+	auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
+	bp.type = type == BreakpointRef::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
+
+	QString location = table->item(row, LOCATION)->text();
+	auto loc = parseLocationField(-1, type, location, combo ? combo->currentText() : "");
+	if (!loc) return {};
+	bp.address = loc->start;
+	bp.regionEnd = loc->end;
+
+	QString condition = table->item(row, T_CONDITION)->text();
+
+	auto slot = parseSlotField(-1, table->item(row, SLOT)->text());
+	if (!slot) return {};
+    bp.ps = slot->ps;
+    bp.ss = slot->ss;
+
+	auto segment = parseSegmentField(-1, table->item(row, SEGMENT)->text());
+	if (!segment) return {};
+	bp.segment = *segment;
+
+	return bp;
 }
 
 void BreakpointViewer::onAddBtnClicked(BreakpointRef::Type type)
