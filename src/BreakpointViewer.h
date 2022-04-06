@@ -11,7 +11,7 @@
 class QPaintEvent;
 class Breakpoints;
 
-struct BreakpointData {
+struct BreakpointRef {
 	enum Type { BREAKPOINT, WATCHPOINT, CONDITION, ALL } type;
 
 	QString id;
@@ -29,8 +29,8 @@ public:
 
 private:
 	Ui::BreakpointViewer* ui;
-	QTableWidget* tables[BreakpointData::ALL];
-	std::map<QString, BreakpointData> maps[BreakpointData::ALL];
+	QTableWidget* tables[BreakpointRef::ALL];
+	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
 
 	bool selfUpdating = false;
 	bool userMode = true;
@@ -38,39 +38,39 @@ private:
 	bool conditionsMsg = false;
 	Breakpoints* breakpoints;
 
-	void setTextField(BreakpointData::Type type, int row, int column, const QString& value);
-	std::optional<std::tuple<int, int>> parseLocationField(int index, BreakpointData::Type type, const QString& field,
-		                                               const QString& combo = {});
+	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value);
+	std::optional<std::tuple<int, int>> parseLocationField(int index, BreakpointRef::Type type, const QString& field,
+	                                                       const QString& combo = {});
 	std::optional<std::tuple<qint8, qint8>> parseSlotField(int index, const QString& field);
 	std::optional<qint16> parseSegmentField(int index, const QString& field);
-	void changeTableItem(BreakpointData::Type type, QTableWidgetItem* item);
+	void changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);
-	int  createTableRow(BreakpointData::Type type, int row = -1);
-	void fillTableRow(int index, BreakpointData::Type type, int row);
-	bool connectBreakpointID(const QString& id, BreakpointData& data);
+	int  createTableRow(BreakpointRef::Type type, int row = -1);
+	void fillTableRow(int index, BreakpointRef::Type type, int row);
+	bool connectBreakpointID(const QString& id, BreakpointRef& data);
 	void populate();
 
-	void createBreakpoint(BreakpointData::Type type, int row);
+	void createBreakpoint(BreakpointRef::Type type, int row);
 	void _handleSyncError(const QString& error);
 	void _handleKeyAlreadyExists();
 	void _handleKeyNotFound();
-	void _createBreakpoint(BreakpointData::Type type, int row);
+	void _createBreakpoint(BreakpointRef::Type type, int row);
 	void _createCondition(int row);
 
-	void replaceBreakpoint(BreakpointData::Type type, int row);
-	void removeBreakpoint(BreakpointData::Type type, int row, bool logical = false);
-	void setBreakpointChecked(BreakpointData::Type type, int row, Qt::CheckState state);
-	void onAddBtnClicked(BreakpointData::Type type);
-	void onRemoveBtnClicked(BreakpointData::Type type);
-	void stretchTable(BreakpointData::Type type = BreakpointData::ALL);
+	void replaceBreakpoint(BreakpointRef::Type type, int row);
+	void removeBreakpoint(BreakpointRef::Type type, int row, bool logical = false);
+	void setBreakpointChecked(BreakpointRef::Type type, int row, Qt::CheckState state);
+	void onAddBtnClicked(BreakpointRef::Type type);
+	void onRemoveBtnClicked(BreakpointRef::Type type);
+	void stretchTable(BreakpointRef::Type type = BreakpointRef::ALL);
 
-	std::map<QString, BreakpointData>::iterator scanBreakpointData(const Breakpoint& bp);
-	std::map<QString, BreakpointData>::iterator findBreakpointData(BreakpointData::Type type, const QString& id);
+	std::map<QString, BreakpointRef>::iterator scanBreakpointRef(const Breakpoint& bp);
+	std::map<QString, BreakpointRef>::iterator findBreakpointRef(BreakpointRef::Type type, const QString& id);
 
 private slots:
 	void changeCurrentWpType(int row, int index);
-	void disableSorting(BreakpointData::Type type = BreakpointData::ALL);
+	void disableSorting(BreakpointRef::Type type = BreakpointRef::ALL);
 	void changeBpTableItem(QTableWidgetItem* item);
 	void changeWpTableItem(QTableWidgetItem* item);
 	void changeCnTableItem(QTableWidgetItem* item);
