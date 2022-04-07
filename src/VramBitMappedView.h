@@ -51,10 +51,10 @@ private:
 	void setPixel1x2(int x, int y, QRgb c);
 	QRgb getColor(int c);
 
-	QRgb msxpallet[16];
+	QRgb msxPalette[16];
 	QImage image;
 	QPixmap piximage;
-	const unsigned char* pallet;
+	const unsigned char* palette;
 	const unsigned char* vramBase;
 	float zoomFactor;
 	unsigned vramAddress;

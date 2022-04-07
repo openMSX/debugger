@@ -182,8 +182,8 @@ void DockableWidgetLayout::setGeometry(const QRect& rect)
 	QLayout::setGeometry(rect);
 
 	// Qt sometimes sets the geometry outside the minimumSize/maximumSize range. :/
-	int W = std::min(maxWidth,  std::max(minWidth,  rect.width ()));
-	int H = std::min(maxHeight, std::max(minHeight, rect.height()));
+	int W = std::clamp(rect.width(),  minWidth,  maxWidth );
+	int H = std::clamp(rect.height(), minHeight, maxHeight);
 
 	// set main widget size
 	int dx = W - layoutWidth;

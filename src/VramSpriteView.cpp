@@ -129,8 +129,8 @@ std::optional<VramSpriteView::MouseEventInfo> VramSpriteView::infoFromMouseEvent
     int x = std::max(0, e->x());
     int y = std::max(0, e->y());
     // maybe clip to maximum to furthest spritepixel drawn?
-    //x = std::max(0, std::min(e->x(), nrOfSpritesHorizontal * sizeOfSpritesHorizontal * zoomFactor - 1));
-    //y = std::max(0, std::min(e->y(), nrOfSpritesVertical   * sizeOfSpritesVertical   * zoomFactor - 1));
+    //x = std::clamp(e->x(), 0, nrOfSpritesHorizontal * sizeOfSpritesHorizontal * zoomFactor - 1);
+    //y = std::clamp(e->y(), 0, nrOfSpritesVertical   * sizeOfSpritesVertical   * zoomFactor - 1);
     if (x >= imageWidth) return {};
     if (y >= imageHeight) return {};
 
