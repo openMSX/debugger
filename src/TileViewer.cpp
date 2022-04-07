@@ -259,8 +259,8 @@ void TileViewer::on_cb_screen_currentIndexChanged(int index)
 void TileViewer::on_le_nametable_textChanged(const QString& text)
 {
     auto font = le_nametable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setNameTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setNameTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);
@@ -271,8 +271,8 @@ void TileViewer::on_le_nametable_textChanged(const QString& text)
 void TileViewer::on_le_colortable_textChanged(const QString& text)
 {
     auto font = le_colortable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setColorTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setColorTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);
@@ -283,8 +283,8 @@ void TileViewer::on_le_colortable_textChanged(const QString& text)
 void TileViewer::on_le_patterntable_textChanged(const QString& text)
 {
     auto font = le_patterntable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setPatternTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setPatternTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);

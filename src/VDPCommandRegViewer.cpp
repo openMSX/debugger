@@ -76,11 +76,11 @@ VDPCommandRegViewer::~VDPCommandRegViewer()
 void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 {
 	//for now simply recheck all the checkBoxes and recreate R45
-	int val = stringToValue(lineEdit_r45->text());
+	auto val = stringToValue<int>(lineEdit_r45->text());
 	int r45 = 0;
 	for (auto* item : findChildren<QCheckBox*>()) {
 	        int order = QString(item->objectName().right(1)).toInt();
-		if (val & (1 << order)) {
+		if (val && *val & (1 << order)) {
 			r45 = r45 | (1 << order);
 			item->setChecked(true);
 		} else {
@@ -193,23 +193,22 @@ void VDPCommandRegViewer::on_syncPushButton_clicked()
 
 void VDPCommandRegViewer::on_launchPushButton_clicked()
 {
-	unsigned char newregs[64];
-	memset(newregs, 0, 64);
-	newregs[32] = stringToValue(lineEdit_r32->text());
-	newregs[33] = stringToValue(lineEdit_r33->text());
-	newregs[34] = stringToValue(lineEdit_r34->text());
-	newregs[35] = stringToValue(lineEdit_r35->text());
-	newregs[36] = stringToValue(lineEdit_r36->text());
-	newregs[37] = stringToValue(lineEdit_r37->text());
-	newregs[38] = stringToValue(lineEdit_r38->text());
-	newregs[39] = stringToValue(lineEdit_r39->text());
-	newregs[40] = stringToValue(lineEdit_r40->text());
-	newregs[41] = stringToValue(lineEdit_r41->text());
-	newregs[42] = stringToValue(lineEdit_r42->text());
-	newregs[43] = stringToValue(lineEdit_r43->text());
-	newregs[44] = stringToValue(lineEdit_r44->text());
-	newregs[45] = stringToValue(lineEdit_r45->text());
-	newregs[46] = stringToValue(lineEdit_r46->text());
+	uint8_t newregs[64] = {};
+	newregs[32] = stringToValue<uint8_t>(lineEdit_r32->text()).value_or(255);
+	newregs[33] = stringToValue<uint8_t>(lineEdit_r33->text()).value_or(255);
+	newregs[34] = stringToValue<uint8_t>(lineEdit_r34->text()).value_or(255);
+	newregs[35] = stringToValue<uint8_t>(lineEdit_r35->text()).value_or(255);
+	newregs[36] = stringToValue<uint8_t>(lineEdit_r36->text()).value_or(255);
+	newregs[37] = stringToValue<uint8_t>(lineEdit_r37->text()).value_or(255);
+	newregs[38] = stringToValue<uint8_t>(lineEdit_r38->text()).value_or(255);
+	newregs[39] = stringToValue<uint8_t>(lineEdit_r39->text()).value_or(255);
+	newregs[40] = stringToValue<uint8_t>(lineEdit_r40->text()).value_or(255);
+	newregs[41] = stringToValue<uint8_t>(lineEdit_r41->text()).value_or(255);
+	newregs[42] = stringToValue<uint8_t>(lineEdit_r42->text()).value_or(255);
+	newregs[43] = stringToValue<uint8_t>(lineEdit_r43->text()).value_or(255);
+	newregs[44] = stringToValue<uint8_t>(lineEdit_r44->text()).value_or(255);
+	newregs[45] = stringToValue<uint8_t>(lineEdit_r45->text()).value_or(255);
+	newregs[46] = stringToValue<uint8_t>(lineEdit_r46->text()).value_or(255);
 
 	auto* req = new WriteDebugBlockCommand("{VDP regs}", 32, 15, newregs);
 	CommClient::instance().sendCommand(req);
@@ -217,10 +216,10 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 
 void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()
 {
-	int val = stringToValue(lineEdit_r44->text());
+	auto val = stringToValue<int>(lineEdit_r44->text());
 	label_color->setText(QString("%1 %2").
-			arg((val >> 4) & 15, 4, 2, QChar('0')).
-			arg((val >> 0) & 15, 4, 2, QChar('0')));
+			arg((val.value_or(-1) >> 4) & 15, 4, 2, QChar('0')).
+			arg((val.value_or(-1) >> 0) & 15, 4, 2, QChar('0')));
 }
 
 void VDPCommandRegViewer::R45BitChanged(int /*state*/)
@@ -239,12 +238,13 @@ void VDPCommandRegViewer::R45BitChanged(int /*state*/)
 
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
-	int val = stringToValue(lineEdit_r46->text()) & 0xFF;
-	lineEdit_r46->setText(hexValue(val, 2));
-	R46 = val;
-	decodeR46(R46);
-	comboBox_operator->setCurrentIndex(R46 & 15);
-	comboBox_cmd->setCurrentIndex((R46 >> 4) & 15); // this might hide the operator again :-)
+	if (auto val = stringToValue<uint8_t>(lineEdit_r46->text())) {
+		lineEdit_r46->setText(hexValue(*val, 2));
+		R46 = *val;
+		decodeR46(R46);
+		comboBox_operator->setCurrentIndex(R46 & 15);
+		comboBox_cmd->setCurrentIndex((R46 >> 4) & 15); // this might hide the operator again :-)
+	}
 }
 
 void VDPCommandRegViewer::refresh()

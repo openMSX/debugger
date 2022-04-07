@@ -1,10 +1,11 @@
 #ifndef DEBUGGERDATA_H
 #define DEBUGGERDATA_H
 
-#include <list>
 #include <QString>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <list>
+#include <optional>
 
 struct MemoryLayout
 {
@@ -19,18 +20,25 @@ struct MemoryLayout
 	int mapperSize[4][4];
 };
 
+struct AddressRange {
+    uint16_t start;                // a single address when end is not used
+    std::optional<uint16_t> end;   // end point is inclusive
+};
+
+struct Slot {
+    std::optional<int8_t> ps; // primary slot, always 0..3 or empty if it is a mask
+    std::optional<int8_t> ss; // secundary slot, 0..3 or empty when the primary slot is not expanded
+};
+
 struct Breakpoint {
 	enum Type { BREAKPOINT, WATCHPOINT_MEMREAD, WATCHPOINT_MEMWRITE,
 	            WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE, CONDITION };
 	Type type;
 	QString id;
-	quint16 address;
-	// end for watchpoint region
-	quint16 regionEnd;
-	// gui specific condition variables
-	qint8 ps;
-	qint8 ss;
-	qint16 segment;
+	AddressRange range;
+	// GUI specific condition variables
+	Slot slot;
+	std::optional<uint8_t> segment; 
 	// general condition
 	QString condition;
 	// compare content
@@ -53,11 +61,11 @@ public:
 	void saveBreakpoints(QXmlStreamWriter& xml);
 	void loadBreakpoints(QXmlStreamReader& xml);
 
-	int findBreakpoint(quint16 addr);
+	std::optional<uint16_t> findBreakpoint(uint16_t addr);
 
-	static QString createSetCommand(Breakpoint::Type type, quint16 address,
-	                                qint8 ps = -1, qint8 ss = -1, qint16 segment = -1,
-	                                int endRange = -1, QString condition = QString());
+	static QString createSetCommand(Breakpoint::Type type, std::optional<AddressRange> range = {},
+	                                Slot slot = {}, std::optional<uint8_t> segment = {},
+                                    QString condition = {});
 	static QString createRemoveCommand(const QString& id);
 
 	const Breakpoint& getBreakpoint(int index);

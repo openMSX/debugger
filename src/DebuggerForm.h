@@ -57,9 +57,9 @@ private:
 	void refreshBreakpoints();
 
 	struct AddressSlotResult {
-		qint8 ps;
-		qint8 ss;
-		int segment;
+		uint8_t ps;
+		std::optional<uint8_t> ss;
+		std::optional<uint8_t> segment;
 	};
 	AddressSlotResult addressSlot(int addr) const;
 
@@ -182,7 +182,9 @@ private:
 	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
-	void toggleBreakpoint(int addr = -1);
+
+	void toggleBreakpoint();
+	void toggleBreakpointAddress(uint16_t addr);
 	void addBreakpoint();
 
 	void toggleView(DockableWidget* widget);

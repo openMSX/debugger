@@ -9,8 +9,6 @@ BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession* session
 {
 	setupUi(this);
 
-	value = valueEnd = -1;
-
 	debugSession = session;
 	if (session) {
 		// create address completer
@@ -22,8 +20,8 @@ BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession* session
 		connect(allCompleter.get(),  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
 	}
 
-	connect(edtAddress,      SIGNAL(textEdited(const QString&)), this, SLOT(addressChanged(const QString&)));
-	connect(edtAddressRange, SIGNAL(textEdited(const QString&)), this, SLOT(addressChanged(const QString&)));
+	connect(edtAddress, &QLineEdit::textEdited, this, &BreakpointDialog::addressChanged);
+	connect(edtAddressRange, &QLineEdit::textEdited, this, &BreakpointDialog::addressChanged);
 	connect(cmbxType,    SIGNAL(activated(int)), this, SLOT(typeChanged(int)));
 	connect(cmbxSlot,    SIGNAL(activated(int)), this, SLOT(slotChanged(int)));
 	connect(cmbxSubslot, SIGNAL(activated(int)), this, SLOT(subslotChanged(int)));
@@ -40,29 +38,47 @@ Breakpoint::Type BreakpointDialog::type() const
 	return Breakpoint::Type(cmbxType->currentIndex());
 }
 
-int BreakpointDialog::address() const
-{
-	return value;
+std::optional<uint16_t> BreakpointDialog::parseInput(QLineEdit* ed, Symbol** symbol) const {
+	if (auto value = stringToValue<uint16_t>(ed->text())) {
+		return value;
+	}
+
+	// convert symbol to value
+	if (debugSession) {
+		Symbol* s = debugSession->symbolTable().getAddressSymbol(ed->text());
+
+		if (s) {
+			if (symbol) *symbol = s;
+			return s->value();
+		}
+	}
+
+	return {};
 }
 
-int BreakpointDialog::addressEndRange() const
+std::optional<AddressRange> BreakpointDialog::addressRange(Symbol** symbol) const
 {
-	return (valueEnd < value) ? value : valueEnd;
+	if (auto address = parseInput(edtAddress, symbol)) {
+		auto input = !edtAddressRange->text().isEmpty();
+		auto rangeEnd = parseInput(edtAddressRange);
+
+		if ((!rangeEnd && !input) || (rangeEnd && *rangeEnd >= address)) {
+			return AddressRange{*address, make_if(rangeEnd != address, rangeEnd)};
+		}
+	}
+	return {};
 }
 
-int BreakpointDialog::slot() const
+Slot BreakpointDialog::slot() const
 {
-	return cmbxSlot->currentIndex() - 1;
+	auto slot = make_positive_optional<uint8_t>(cmbxSlot->currentIndex() - 1);
+	auto subslot = make_positive_optional<uint8_t>(cmbxSubslot->currentIndex() - 1);
+	return Slot{slot, subslot};
 }
 
-int BreakpointDialog::subslot() const
+std::optional<uint8_t> BreakpointDialog::segment() const
 {
-	return cmbxSubslot->currentIndex() - 1;
-}
-
-int BreakpointDialog::segment() const
-{
-	return cmbxSegment->currentIndex() - 1;
+	return make_positive_optional<uint8_t>(cmbxSegment->currentIndex() - 1);
 }
 
 QString BreakpointDialog::condition() const
@@ -70,40 +86,40 @@ QString BreakpointDialog::condition() const
 	return (cbCondition->checkState() == Qt::Checked) ? txtCondition->toPlainText() : "";
 }
 
-void BreakpointDialog::setData(Breakpoint::Type type, int address, qint8 ps, qint8 ss,
-                               qint16 segment, int addressEnd, QString condition)
+void BreakpointDialog::setData(Breakpoint::Type type, std::optional<AddressRange> range, Slot slot,
+                               std::optional<uint8_t> segment, QString condition)
 {
 	// set type
 	cmbxType->setCurrentIndex(int(type));
 	typeChanged(cmbxType->currentIndex());
 
 	// set address
-	if (address >= 0) {
-		edtAddress->setText(hexValue(address));
+	if (range) {
+		edtAddress->setText(hexValue(range->start));
 		addressChanged(edtAddress->text());
 	}
 
+	// end address
+	if (edtAddressRange->isEnabled() && range && range->end) {
+		edtAddressRange->setText(hexValue(*range->end));
+		addressChanged(edtAddressRange->text());
+	}
+
 	// primary slot
-	if (cmbxSlot->isEnabled() && ps >= 0) {
-		cmbxSlot->setCurrentIndex(ps + 1);
+	if (cmbxSlot->isEnabled() && slot.ps) {
+		cmbxSlot->setCurrentIndex(*slot.ps + 1);
 		slotChanged(cmbxSlot->currentIndex());
 	}
 
 	// secondary slot
-	if (cmbxSubslot->isEnabled() && ss >= 0) {
-		cmbxSubslot->setCurrentIndex(ss + 1);
+	if (cmbxSubslot->isEnabled() && slot.ss) {
+		cmbxSubslot->setCurrentIndex(*slot.ss + 1);
 		subslotChanged(cmbxSubslot->currentIndex());
 	}
 
 	// segment
-	if (cmbxSegment->isEnabled() && segment >= 0) {
-		cmbxSegment->setCurrentIndex(segment + 1);
-	}
-
-	// end address
-	if (edtAddressRange->isEnabled() && addressEnd >= 0) {
-		edtAddressRange->setText(hexValue(addressEnd));
-		addressChanged(edtAddressRange->text());
+	if (cmbxSegment->isEnabled() && segment) {
+		cmbxSegment->setCurrentIndex(*segment + 1);
 	}
 
 	// condition
@@ -113,85 +129,66 @@ void BreakpointDialog::setData(Breakpoint::Type type, int address, qint8 ps, qin
 	txtCondition->setText(condition);
 }
 
-void BreakpointDialog::addressChanged(const QString& text)
+void BreakpointDialog::disableSlots()
 {
-	// determine source
-	QLineEdit *ed;
-	if (text == edtAddress->text())
-		ed = edtAddress;
-	else
-		ed = edtAddressRange;
-	bool first = ed == edtAddress;
+	cmbxSlot->setCurrentIndex(0);
+	cmbxSlot->setEnabled(false);
+}
 
-	// convert value
-	int v = stringToValue(text);
-	if (v == -1 && debugSession) {
-		Symbol *s = debugSession->symbolTable().getAddressSymbol(text);
-		if (s) v = s->value();
-		if (first) currentSymbol = s;
-	}
-
-	// assign address
-	if (first)
-		value = v;
-	else {
-		if (v > value)
-			valueEnd = v;
-		else {
-			valueEnd = -1;
-			v = -1;
-		}
-	}
-
-	// adjust controls for (in)correct values
+void BreakpointDialog::enableSlots()
+{
 	auto* model = qobject_cast<QStandardItemModel*>(cmbxSlot->model());
+	cmbxSlot->setEnabled(true);
+
+	if (currentSymbol) {
+		// enable allowed slots
+		int s = currentSymbol->validSlots();
+		int num = 0;
+		int last = 0;
+
+		for (int i = 4; i >= 0; i--) {
+			QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
+			if (i) {
+				bool ena = (s & (15 << (4 * (i - 1)))) != 0;
+				model->itemFromIndex(index)->setEnabled(ena);
+				if (ena) {
+					num++;
+					last = i;
+				}
+			} else {
+				model->itemFromIndex(index)->setEnabled(num == 4);
+				if (num == 4) last = 0;
+			}
+		}
+		cmbxSlot->setCurrentIndex(last);
+	} else {
+		// enable everything
+		for (int i = 0; i < 5; i++) {
+			QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
+			model->itemFromIndex(index)->setEnabled(true);
+		}
+		cmbxSlot->setCurrentIndex(idxSlot);
+	}
+}
+
+void BreakpointDialog::addressChanged([[maybe_unused]] const QString& text)
+{
+	// adjust controls for (in)correct values
+	auto range = addressRange(&currentSymbol);
 	QPalette pal;
-	if (v == -1) {
+
+	if (!range) {
 		// set line edit text to red for invalid values TODO: make configurable
 		pal.setColor(QPalette::Normal, QPalette::Text, Qt::red);
-		ed->setPalette(pal);
-		if (first) {
-			cmbxSlot->setCurrentIndex(0);
-			cmbxSlot->setEnabled(false);
-		}
+		disableSlots();
 	} else {
-		//pal.setColor(QPalette::Normal, QPalette::Text, Qt::black);
-		ed->setPalette(pal);
-
-		if (!first) return;
-
-		cmbxSlot->setEnabled(true);
-
-		if (currentSymbol) {
-			// enable allowed slots
-			int s = currentSymbol->validSlots();
-			int num = 0;
-			int last = 0;
-			for (int i = 4; i >= 0; i--) {
-				QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
-				if (i) {
-					bool ena = (s & (15 << (4 * (i - 1)))) != 0;
-					model->itemFromIndex(index)->setEnabled(ena);
-					if (ena) {
-						num++;
-						last = i;
-					}
-				} else {
-					model->itemFromIndex(index)->setEnabled(num == 4);
-					if (num == 4) last = 0;
-				}
-			}
-			cmbxSlot->setCurrentIndex(last);
-		} else {
-			// enable everything
-			for (int i = 0; i < 5; i++) {
-				QModelIndex index = model->index(i, 0, cmbxSlot->rootModelIndex());
-				model->itemFromIndex(index)->setEnabled(true);
-			}
-			cmbxSlot->setCurrentIndex(idxSlot);
-		}
+		enableSlots();
+		slotChanged(cmbxSlot->currentIndex());
 	}
-	slotChanged(cmbxSlot->currentIndex());
+
+	edtAddress->setPalette(pal);
+	edtAddressRange->setPalette(pal);
+	okButton->setEnabled(range ? true : false);
 }
 
 void BreakpointDialog::typeChanged(int s)
@@ -255,7 +252,7 @@ void BreakpointDialog::slotChanged(int s)
 	if (s && memLayout.isSubslotted[s - 1]) {
 		if (currentSymbol) {
 			// enable subslots
-			int v = (currentSymbol->validSlots() >> (4*(s-1))) & 15;
+			int v = (currentSymbol->validSlots() >> (4 * (s - 1))) & 15;
 			int num = 0;
 			int last = 0;
 			auto* model = qobject_cast<QStandardItemModel*>(cmbxSubslot->model());
@@ -288,19 +285,21 @@ void BreakpointDialog::slotChanged(int s)
 void BreakpointDialog::subslotChanged(int i)
 {
 	if (!currentSymbol) idxSubSlot = i;
-	int oldseg = cmbxSegment->currentIndex()-1;
+	int oldseg = cmbxSegment->currentIndex() - 1;
 	cmbxSegment->clear();
 	cmbxSegment->addItem("any");
 
 	int ps = cmbxSlot->currentIndex() - 1;
 	int ss = i - 1;
 
-	if (ps >=0 && !memLayout.isSubslotted[ps]) ss = 0;
+	if (ps >= 0 && !memLayout.isSubslotted[ps]) ss = 0;
 
 	int mapsize;
-	if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
+       if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
+		auto range = addressRange();
+
 		// no memory mapper, maybe rom mapper?
-		if (value >= 0 && memLayout.romBlock[((value & 0xE000)>>13)] >= 0) {
+		if (range && memLayout.romBlock[((range->start & 0xE000) >> 13)] >= 0) {
 			mapsize = 256; // TODO: determine real size
 		} else {
 			cmbxSegment->setEnabled(false);
@@ -314,8 +313,9 @@ void BreakpointDialog::subslotChanged(int i)
 		cmbxSegment->addItem(QString("%1").arg(s));
 	}
 	cmbxSegment->setEnabled(true);
-	if (oldseg >= 0 && oldseg < mapsize)
-		cmbxSegment->setCurrentIndex(oldseg+1);
+	if (oldseg >= 0 && oldseg < mapsize) {
+		cmbxSegment->setCurrentIndex(oldseg + 1);
+	}
 }
 
 void BreakpointDialog::hasCondition(int state)
