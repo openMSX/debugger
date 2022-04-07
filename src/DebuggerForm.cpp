@@ -652,7 +652,7 @@ void DebuggerForm::createForm()
 	connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
 
 	// Breakpoint viewer
-	connect(this, &DebuggerForm::connected, bpView, &BreakpointViewer::sync);
+	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
 	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
