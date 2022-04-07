@@ -9,7 +9,7 @@
 /** The highlightDispatcher serves 2 purposes for the InteractiveLabel widgets
   * a) keep a correct state: Assume widget A and B are related (both are
   * highlighted at the same time) and they are touching each other. I don't
-  * think that there is a garuanteed order in the enterEvent,leaveEvent, so if
+  * think that there is a guaranteed order in the enterEvent,leaveEvent, so if
   * we use the MouseOver signal to connect to the highlight slots of A and B
   * then this sequence might arise if our mouse moves from A to B and produce
   * a wrong result:

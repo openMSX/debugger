@@ -452,7 +452,7 @@ void VDPRegViewer::decodeVDPRegs()
 			i->setChecked(regs[r] & (1 << b));
 			if (r < 12) {
 				i->mustBeSet(mustbeone[(vdpid == VDP_TMS99X8) ? 0 : 1][basicscreen][r] & (1 << b));
-				// if A8 of R5 is a 'mustbeone' then we indicate this for A9 also
+				// if A8 of R5 is a 'must-be-one' then we indicate this for A9 also
 				// This bit is cleared in the table since it isn't used in the Sprite
 				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table

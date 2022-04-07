@@ -40,7 +40,7 @@ VramSpriteView::VramSpriteView(QWidget* parent, mode drawer, bool singleSprite)
     }
 
     // Mouse update events when mouse is moved over the image, Quibus likes this
-    // better then my preferred click-on-the-image
+    // better than my preferred click-on-the-image
     setMouseTracking(true);
 }
 

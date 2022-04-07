@@ -1,12 +1,12 @@
 #ifndef VRAMBITMAPPEDVIEW
 #define VRAMBITMAPPEDVIEW
 
-#include <QString>
 #include <QWidget>
 #include <QImage>
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QColor>
+#include <cstdint>
 
 class VramBitMappedView : public QWidget
 {
@@ -18,9 +18,9 @@ public:
 
 	void setScreenMode(int mode);
 	void setLines(int nrLines);
-	void setVramSource(const unsigned char* adr);
+	void setVramSource(const uint8_t* adr);
 	void setVramAddress(int adr);
-	void setPaletteSource(const unsigned char* adr);
+	void setPaletteSource(const uint8_t* adr);
 	void setBorderColor(int value);
 
 	void mousePressEvent(QMouseEvent* e) override;
@@ -31,9 +31,9 @@ public slots:
 
 signals:
 	void imageChanged();
-	void imageHovered(int xcoormsx, int ycoormsx, int color,
+	void imageHovered(int xCoordMsx, int yCoordMsx, int color,
 	                  unsigned addr, int byte);
-	void imageClicked(int xcoormsx, int ycoormsx, int color,
+	void imageClicked(int xCoordMsx, int yCoordMsx, int color,
 	                  unsigned addr, int byte);
 
 private:
@@ -53,14 +53,14 @@ private:
 
 	QRgb msxPalette[16];
 	QImage image;
-	QPixmap piximage;
-	const unsigned char* palette;
-	const unsigned char* vramBase;
+	QPixmap pixImage;
+	const uint8_t* palette = nullptr;
+	const uint8_t* vramBase = nullptr;
 	float zoomFactor;
-	unsigned vramAddress;
-	int lines;
-	int screenMode;
-	int borderColor;
+	unsigned vramAddress = 0;
+	int lines = 212;
+	int screenMode = 5;
+	int borderColor = 0;
 };
 
 #endif // VRAMBITMAPPEDVIEW

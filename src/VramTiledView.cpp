@@ -13,7 +13,7 @@ VramTiledView::VramTiledView(QWidget* parent)
 	setZoom(1.0f);
 
 	// Mouse update events when mouse is moved over the image, Quibus likes this
-	// better then my preferred click-on-the-image.
+	// better than my preferred click-on-the-image.
 	setMouseTracking(true);
 }
 

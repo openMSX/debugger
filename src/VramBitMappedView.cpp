@@ -7,26 +7,18 @@ VramBitMappedView::VramBitMappedView(QWidget* parent)
 	: QWidget(parent)
 	, image(512, 512, QImage::Format_RGB32)
 {
-	lines = 212;
-	screenMode = 5;
-	borderColor = 0;
-	palette = nullptr;
-	vramBase = nullptr;
-	vramAddress = 0;
-	for (int i = 0; i < 15; ++i) {
-		msxPalette[i] = qRgb(80, 80, 80);
-	}
+	std::fill(std::begin(msxPalette), std::end(msxPalette), qRgb(80, 80, 80));
 	setZoom(1.0f);
 
-	// mouse update events when mouse is moved over the image, Quibus likes this
-	// better then my preferd click-on-the-image
+	// Mouse update events when mouse is moved over the image, Quibus likes this
+	// better than my preferred click-on-the-image.
 	setMouseTracking(true);
 }
 
 void VramBitMappedView::setZoom(float zoom)
 {
 	zoomFactor = std::max(1.0f, zoom);
-	setFixedSize(int(512 * zoomFactor), int(lines * 2 * zoomFactor));
+	setFixedSize(int(512.0f * zoomFactor), int(float(lines) * 2.0f * zoomFactor));
 	update();
 }
 
@@ -39,27 +31,15 @@ void VramBitMappedView::decode()
 	       "vram to start decoding: %i\n",
 	       screenMode, vramAddress);
 	switch (screenMode) {
-	case 12:
-		decodeSCR12();
-		break;
-	case 11:
-	case 10:
-		decodeSCR10();
-		break;
-	case 8:
-		decodeSCR8();
-		break;
-	case 7:
-		decodeSCR7();
-		break;
-	case 6:
-		decodeSCR6();
-		break;
-	case 5:
-		decodeSCR5();
-		break;
+		case  5: decodeSCR5();  break;
+		case  6: decodeSCR6();  break;
+		case  7: decodeSCR7();  break;
+		case  8: decodeSCR8();  break;
+		case 10:
+		case 11: decodeSCR10(); break;
+		case 12: decodeSCR12(); break;
 	}
-	piximage = QPixmap::fromImage(image);
+	pixImage = QPixmap::fromImage(image);
 	update();
 }
 
@@ -71,12 +51,8 @@ void VramBitMappedView::decodePallet()
 		int r = (palette[2 * i + 0] & 0xf0) >> 4;
 		int b = (palette[2 * i + 0] & 0x0f);
 		int g = (palette[2 * i + 1] & 0x0f);
-
-		r = (r >> 1) | (r << 2) | (r << 5);
-		b = (b >> 1) | (b << 2) | (b << 5);
-		g = (g >> 1) | (g << 2) | (g << 5);
-
-		msxPalette[i] = qRgb(r, g, b);
+		auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
+		msxPalette[i] = qRgb(scale(r), scale(g), scale(b));
 	}
 }
 
@@ -92,6 +68,7 @@ void VramBitMappedView::setPixel2x2(int x, int y, QRgb c)
 	image.setPixel(2 * x + 0, 2 * y + 1, c);
 	image.setPixel(2 * x + 1, 2 * y + 1, c);
 }
+
 void VramBitMappedView::setPixel1x2(int x, int y, QRgb c)
 {
 	image.setPixel(x, 2 * y + 0, c);
@@ -109,7 +86,7 @@ static QRgb decodeYJK(int y, int j, int k)
 
 void VramBitMappedView::decodeSCR12()
 {
-	unsigned offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 256; x += 4) {
 			uint8_t p[4];
@@ -128,7 +105,7 @@ void VramBitMappedView::decodeSCR12()
 
 void VramBitMappedView::decodeSCR10()
 {
-	unsigned offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 256; x += 4) {
 			uint8_t p[4];
@@ -138,7 +115,6 @@ void VramBitMappedView::decodeSCR10()
 			p[3] = vramBase[interleave(offset++)];
 			int j = (p[2] & 7) + ((p[3] & 3) << 3) - ((p[3] & 4) << 3);
 			int k = (p[0] & 7) + ((p[1] & 3) << 3) - ((p[1] & 4) << 3);
-
 			for (int n = 0; n < 4; ++n) {
 				QRgb c = (p[n] & 0x08) ? msxPalette[p[n] >> 4] // YAE
 				                       : decodeYJK(p[n] >> 3, j, k); // YJK
@@ -150,10 +126,10 @@ void VramBitMappedView::decodeSCR10()
 
 void VramBitMappedView::decodeSCR8()
 {
-	int offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 256; ++x) {
-			unsigned char val = vramBase[interleave(offset++)];
+			uint8_t val = vramBase[interleave(offset++)];
 			int b = val & 0x03;
 			int r = val & 0x1C;
 			int g = val & 0xE0;
@@ -175,7 +151,7 @@ QRgb VramBitMappedView::getColor(int c)
 
 void VramBitMappedView::decodeSCR7()
 {
-	int offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 512; x += 2) {
 			int val = vramBase[interleave(offset++)];
@@ -187,7 +163,7 @@ void VramBitMappedView::decodeSCR7()
 
 void VramBitMappedView::decodeSCR6()
 {
-	int offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 512; x += 4) {
 			int val = vramBase[offset++];
@@ -201,7 +177,7 @@ void VramBitMappedView::decodeSCR6()
 
 void VramBitMappedView::decodeSCR5()
 {
-	int offset = vramAddress;
+	auto offset = vramAddress;
 	for (int y = 0; y < lines; ++y) {
 		for (int x = 0; x < 256; x += 2) {
 			int val = vramBase[offset++];
@@ -214,10 +190,10 @@ void VramBitMappedView::decodeSCR5()
 void VramBitMappedView::paintEvent(QPaintEvent* /*event*/)
 {
 	QRect srcRect(0, 0, 512, 2 * lines);
-	QRect dstRect(0, 0, int(512 * zoomFactor), int(2 * lines * zoomFactor));
+	QRect dstRect(0, 0, int(512.0f * zoomFactor), int(2.0f * float(lines) * zoomFactor));
 	QPainter qp(this);
 	//qp.drawImage(rect(),image,srcRect);
-	qp.drawPixmap(dstRect, piximage, srcRect);
+	qp.drawPixmap(dstRect, pixImage, srcRect);
 }
 
 void VramBitMappedView::refresh()
@@ -229,7 +205,7 @@ void VramBitMappedView::refresh()
 
 void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 {
-	static const unsigned bytes_per_line[] = {
+	static const unsigned bytesPerLine[] = {
 		0,	//screen 0
 		1,	//screen 1
 		2,	// 2
@@ -244,7 +220,7 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		256,
 		256
 	};
-	static const unsigned pixels_per_byte[] = {
+	static const unsigned pixelsPerByte[] = {
 		0,1,2,3,4,
 		2,	// 5
 		4,
@@ -256,8 +232,8 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		1
 	};
 
-	int x = int(e->x() / zoomFactor);
-	int y = int(e->y() / zoomFactor) / 2;
+	int x = int(float(e->x()) / zoomFactor);
+	int y = int(float(e->y()) / zoomFactor) / 2;
 
 	// I see negative y-coords sometimes, so for safety clip the coords
 	x = std::clamp(x, 0, 511);
@@ -267,30 +243,24 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		x /= 2;
 	}
 
-	unsigned offset = bytes_per_line[screenMode] * y
-	                + x / pixels_per_byte[screenMode];
+	unsigned offset = bytesPerLine[screenMode] * y
+	                + x / pixelsPerByte[screenMode];
 	unsigned addr = offset + vramAddress;
 	int val = (screenMode >= 7) ? vramBase[interleave(addr)]
 	                            : vramBase[addr];
 
-	int color;
-	switch (screenMode) {
-		case 5:
-		case 7:
-			color = ((x & 1) ? val : (val >> 4)) & 15;
-			break;
-		case 6:
-			color = (val >> (2 * (3 - (x & 3)))) & 3;
-			break;
-		case 8:
-		case 10:
-		case 11:
-		case 12:
-			color = val;
-			break;
-		default:
-			color = 0; // avoid warning
-	}
+	int color = [&] {
+		switch (screenMode) {
+			case 5: case 7:
+				return ((x & 1) ? val : (val >> 4)) & 15;
+			case 6:
+				return (val >> (2 * (3 - (x & 3)))) & 3;
+			case 8: case 10: case 11: case 12:
+				return val;
+			default:
+				return 0; // avoid warning
+		}
+	}();
 	emit imageHovered(x, y, color, addr, val);
 }
 
@@ -323,7 +293,7 @@ void VramBitMappedView::setLines(int nrLines)
 {
 	lines = nrLines;
 	decode();
-	setFixedSize(int(512 * zoomFactor), int(lines * 2 * zoomFactor));
+	setFixedSize(int(512.0f * zoomFactor), int(float(lines) * 2.0f * zoomFactor));
 	update();
 	//setZoom(zoomFactor);
 }
@@ -336,7 +306,7 @@ void VramBitMappedView::setVramAddress(int adr)
 	update();
 }
 
-void VramBitMappedView::setVramSource(const unsigned char* adr)
+void VramBitMappedView::setVramSource(const uint8_t* adr)
 {
 	vramBase = adr;
 	decodePallet();
@@ -344,7 +314,7 @@ void VramBitMappedView::setVramSource(const unsigned char* adr)
 	update();
 }
 
-void VramBitMappedView::setPaletteSource(const unsigned char* adr)
+void VramBitMappedView::setPaletteSource(const uint8_t* adr)
 {
 	palette = adr;
 	decodePallet();

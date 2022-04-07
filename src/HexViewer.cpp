@@ -143,7 +143,7 @@ void HexViewer::setUseMarker(bool enabled)
 {
 	useMarker = enabled;
 	// below we should check if current marker is visible etc
-	// but since in the debugger we will set this at instanciation
+	// but since in the debugger we will set this at instantiation
 	// and then never change it again this is a quicky in case we do later on
 	if (useMarker) {
 		hexMarkAddress = hexTopAddress;
