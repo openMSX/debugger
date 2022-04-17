@@ -4,7 +4,7 @@
 #include <QPainter>
 #include "PaletteDialog.h"
 #include "Convert.h"
-#include <algorithm>
+#include "ranges.h"
 
 
 PalettePatch::PalettePatch(QWidget* parent, int palNr)
@@ -56,8 +56,8 @@ PaletteDialog::PaletteDialog(QWidget* parent)
     ui->plainTextEdit->setFont(fixedFont);
 
     setWindowTitle("Palette editor");
-    std::fill(std::begin(myPal), std::end(myPal), 0);
-    std::fill(std::begin(myOriginalPal), std::end(myOriginalPal), 0);
+    ranges::fill(myPal, 0);
+    ranges::fill(myOriginalPal, 0);
     // add colors to colorframe
 
     signalMapper = new QSignalMapper(this);

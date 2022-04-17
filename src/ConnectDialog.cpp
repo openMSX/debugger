@@ -1,4 +1,5 @@
 #include "ConnectDialog.h"
+#include "ranges.h"
 #include <QProcess>
 #include <QString>
 #include <QDir>
@@ -316,8 +317,7 @@ void ConnectDialog::on_rescanButton_clicked()
 void ConnectDialog::connectionOk(OpenMSXConnection& connection,
                                  const QString& title)
 {
-	auto it = std::find_if(pendingConnections.begin(), pendingConnections.end(),
-	                       [&](auto& e) { return e.get() == &connection; });
+	auto it = ranges::find(pendingConnections, &connection, [](auto& e) { return e.get(); });
 	if (it == pendingConnections.end()) {
 		// connection is already being destoyed
 		return;
@@ -336,8 +336,7 @@ void ConnectDialog::connectionOk(OpenMSXConnection& connection,
 void ConnectDialog::connectionBad(OpenMSXConnection& connection)
 {
 	auto find = [](auto& coll, auto& conn) {
-		return std::find_if(coll.begin(), coll.end(),
-			[&](auto& e) { return e.get() == &conn; });
+		return ranges::find(coll, &conn, [](auto& e) { return e.get(); });
 	};
 
 	if (auto it = find(pendingConnections, connection);

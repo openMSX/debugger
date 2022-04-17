@@ -1,6 +1,7 @@
 #include "VramTiledView.h"
 #include "VDPDataStore.h"
 #include "Convert.h"
+#include "ranges.h"
 #include <QPainter>
 #include <algorithm>
 #include <cstdio>
@@ -9,7 +10,7 @@ VramTiledView::VramTiledView(QWidget* parent)
 	: QWidget(parent)
 	, image(512, 512, QImage::Format_RGB32)
 {
-	std::fill(std::begin(msxPalette), std::end(msxPalette), qRgb(80, 80, 80));
+	ranges::fill(msxPalette, qRgb(80, 80, 80));
 	setZoom(1.0f);
 
 	// Mouse update events when mouse is moved over the image, Quibus likes this

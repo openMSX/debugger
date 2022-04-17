@@ -1,6 +1,7 @@
 #include "DebuggerData.h"
 #include "Convert.h"
-#include "qglobal.h"
+#include "ranges.h"
+#include <qglobal.h>
 #include <QStringList>
 #include <QDebug>
 #include <algorithm>
@@ -143,14 +144,14 @@ void Breakpoints::setBreakpoints(const QString& str)
 			newBp.type = Breakpoint::BREAKPOINT;
 		} else if (bp.startsWith("wp#")) {
 			// determine watchpoint type
-			static const char* const WpTypeNames[] = { "read_mem", "write_mem", "read_io", "write_io" };
-			QString wptype = getNextArgument(bp, p);
-			auto iter = std::find(std::begin(WpTypeNames), std::end(WpTypeNames), wptype);
-			if (iter == std::end(WpTypeNames)) {
-				qWarning() << "Unknown" << wptype << "watchpoint type";
+			static const char* const WpTypeNames[] = {"read_mem", "write_mem", "read_io", "write_io"};
+			QString wpType = getNextArgument(bp, p);
+			if (auto it = ranges::find(WpTypeNames, wpType); it != std::end(WpTypeNames)) {
+				newBp.type = static_cast<Breakpoint::Type>(std::distance(WpTypeNames, it) + 1);
+			} else {
+				qWarning() << "Unknown" << wpType << "watchpoint type";
 				continue;
 			}
-			newBp.type = static_cast<Breakpoint::Type>(std::distance(WpTypeNames, iter) + 1);
 		} else if (bp.startsWith("cond#")) {
 			newBp.type = Breakpoint::CONDITION;
 		} else { // unknown
@@ -269,11 +270,7 @@ bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 
 void Breakpoints::insertBreakpoint(Breakpoint& bp)
 {
-	auto it = std::upper_bound(breakpoints.begin(), breakpoints.end(), bp,
-	    [](const Breakpoint& bp1, const Breakpoint& bp2) {
-	        return bp1.address < bp2.address;
-	    }
-	);
+	auto it = ranges::upper_bound(breakpoints, bp.address, {}, &Breakpoint::address);
 	breakpoints.insert(it, bp);
 }
 
@@ -314,9 +311,8 @@ bool Breakpoints::isWatchpoint(quint16 addr, QString* id, bool checkSlot)
 
 int Breakpoints::findBreakpoint(quint16 addr)
 {
-	auto i = std::lower_bound(breakpoints.begin(), breakpoints.end(), addr,
-	                [](const Breakpoint& bp, const quint16 addr) { return bp.address < addr; });
-	if (i != breakpoints.end() && i->address == addr) {
+	if (auto i = ranges::lower_bound(breakpoints, addr, {}, &Breakpoint::address);
+	    i != breakpoints.end() && i->address == addr) {
 		return std::distance(breakpoints.begin(), i);
 	}
 	return -1;
@@ -379,12 +375,11 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 			if (xml.name() == "Breakpoint") {
 				// set type
 				QString label = xml.attributes().value("type").toString().toLower();
-				auto iter = std::find(std::begin(TypeNames), std::end(TypeNames), label);
-				if (iter == std::end(TypeNames)) {
+				if (auto it = ranges::find(TypeNames, label); it != std::end(TypeNames)) {
+					bp.type = static_cast<Breakpoint::Type>(std::distance(TypeNames, it));
+				} else {
 					qWarning() << "Unknown type" << label << "in XML";
 					bp.type = Breakpoint::BREAKPOINT;
-				} else {
-					bp.type = static_cast<Breakpoint::Type>(std::distance(TypeNames, iter));
 				}
 
 				// id

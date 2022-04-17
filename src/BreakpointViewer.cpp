@@ -3,6 +3,7 @@
 #include "CommClient.h"
 #include "OpenMSXConnection.h"
 #include "ScopedAssign.h"
+#include "ranges.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMessageBox>
@@ -347,9 +348,9 @@ std::optional<AddressRange> BreakpointViewer::parseLocationField(
 	int begin = (s.size() >= 1) ? stringToValue(s[0]) : -1;
 	int end   = (s.size() == 2) ? stringToValue(s[1]) : (s.size() == 1 ? begin : -1);
 
-	auto iter  = std::find(std::begin(ComboTypeNames), std::end(ComboTypeNames), comboTxt);
-	auto wtype = static_cast<Breakpoint::Type>(std::distance(ComboTypeNames, iter) + 1);
-	if ((wtype == Breakpoint::WATCHPOINT_IOREAD || wtype == Breakpoint::WATCHPOINT_IOWRITE)
+	auto it = ranges::find(ComboTypeNames, comboTxt);
+	auto wType = static_cast<Breakpoint::Type>(std::distance(ComboTypeNames, it) + 1);
+	if ((wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
 	     && (begin > 0xFF || end > 0xFF)) {
 		return {};
 	}
