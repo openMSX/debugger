@@ -128,6 +128,7 @@ void SymbolManager::addFile()
 	      << "asMSX 0.x symbol files (*.sym)"
 	      << "HiTech C symbol files (*.sym)"
 	      << "HiTech C link map files (*.map)"
+	      << "NoICE command files (*.noi)"
 	      << "pasmo symbol files (*.symbol *.publics *.sys)";
 	d->setNameFilters(types);
 	d->setAcceptMode(QFileDialog::AcceptOpen);
@@ -150,6 +151,8 @@ void SymbolManager::addFile()
 			read = symTable.readFile(n, SymbolTable::HTC_FILE);
 		} else if (f.startsWith("HiTech C link")) {
 			read = symTable.readFile(n, SymbolTable::LINKMAP_FILE);
+		} else if (f.startsWith("NoICE")) {
+			read = symTable.readFile(n, SymbolTable::NOICE_FILE);
 		} else if (f.startsWith("pasmo")) {
 			read = symTable.readFile(n, SymbolTable::PASMO_FILE);
 		} else {

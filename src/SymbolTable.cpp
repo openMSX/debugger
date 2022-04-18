@@ -232,6 +232,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 		return readHTCFile(filename);
 	case LINKMAP_FILE:
 		return readLinkMapFile(filename);
+	case NOICE_FILE:
+		return readNoICEFile(filename);
 	case PASMO_FILE:
 		return readPASMOFile(filename);
 	default:
@@ -388,6 +390,29 @@ bool SymbolTable::readHTCFile(const QString& filename)
 		if (l.size() != 3) continue;
 		if (auto value = parseValue("0x" + l.at(1))) {
 			auto* sym = new Symbol(l.at(0), *value);
+			sym->setSource(&symbolFiles.back().fileName);
+			add(sym);
+		}
+	}
+	return true;
+}
+
+bool SymbolTable::readNoICEFile(const QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+
+	appendFile(filename, NOICE_FILE);
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line = in.readLine();
+		QStringList l = line.split(" ", Qt::SplitBehaviorFlags::KeepEmptyParts, Qt::CaseInsensitive);
+		if (l.size() != 3) continue;
+		if (l.at(0).toLower() != "def") continue;
+		if (auto value = parseValue(l.at(2))) {
+			auto* sym = new Symbol(l.at(1), *value);
 			sym->setSource(&symbolFiles.back().fileName);
 			add(sym);
 		}

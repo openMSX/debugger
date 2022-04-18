@@ -82,6 +82,7 @@ public:
 		ASMSX_FILE,
 		LINKMAP_FILE,
 		HTC_FILE,
+		NOICE_FILE,
 		PASMO_FILE
 	};
 
@@ -128,6 +129,7 @@ private:
 	bool readASMSXFile(const QString& filename);
 	bool readSJASMFile(const QString& filename);
 	bool readHTCFile(const QString& filename);
+	bool readNoICEFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
 	bool readPASMOFile(const QString& filename);
 
