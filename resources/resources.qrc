@@ -19,4 +19,7 @@
         <file>icons/symfil.png</file>
         <file>overlay.png</file>
     </qresource>
+    <qresource prefix="/BlendSplitter">
+        <file alias="Expander">expander.png</file>
+    </qresource>
 </RCC>
