@@ -395,7 +395,7 @@ void DebuggerForm::createActions()
 	connect(executeRunAction, &QAction::triggered, this, &DebuggerForm::executeRun);
 	connect(executeStepAction, &QAction::triggered, this, &DebuggerForm::executeStep);
 	connect(executeStepOverAction, &QAction::triggered, this, &DebuggerForm::executeStepOver);
-	connect(executeRunToAction, &QAction::triggered, this, &DebuggerForm::executeRunTo);
+    //connect(executeRunToAction, &QAction::triggered, this, &DebuggerForm::executeRunTo);
 	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
     //connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
@@ -476,7 +476,7 @@ void DebuggerForm::createMenus()
 	executeMenu->addAction(executeStepOverAction);
 	executeMenu->addAction(executeStepOutAction);
 	executeMenu->addAction(executeStepBackAction);
-	executeMenu->addAction(executeRunToAction);
+    //executeMenu->addAction(executeRunToAction);
 
 	// create breakpoint menu
 	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
@@ -508,7 +508,7 @@ void DebuggerForm::createToolbars()
 	executeToolbar->addAction(executeStepOverAction);
 	executeToolbar->addAction(executeStepOutAction);
 	executeToolbar->addAction(executeStepBackAction);
-	executeToolbar->addAction(executeRunToAction);
+    //executeToolbar->addAction(executeRunToAction);
 }
 
 void DebuggerForm::createStatusbar()

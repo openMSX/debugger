@@ -39,6 +39,21 @@ void SwitchingWidget::setCurrentWidget(RegistryItem *item)
     }
 }
 
+bool SwitchingWidget::getEnableWidget()
+{
+    return widgetEnabled;
+}
+
+void SwitchingWidget::setCurrentIndex(int index)
+{
+    setCurrentWidget(WidgetRegistry::getRegistry()->item(index));
+}
+
+int SwitchingWidget::getCurrentIndex()
+{
+    return bar->combo->currentIndex();
+}
+
 void SwitchingWidget::setEnableWidget(bool enable)
 {
     widgetEnabled=enable;

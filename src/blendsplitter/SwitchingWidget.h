@@ -29,6 +29,9 @@ public:
      * \param item A RegistryItem to display in the widget. If nullptr, then WidgetRegistry::getDefault() is used.
      */
     void setCurrentWidget(RegistryItem* item = nullptr);
+    bool getEnableWidget();
+    void setCurrentIndex(int index);
+    int getCurrentIndex();
 public slots:
     void setEnableWidget(bool enable = true);
 private slots:

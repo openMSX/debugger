@@ -86,6 +86,12 @@ public:
      * \param splitter A pointer to the BlendSplitter to be inserted
      */
     void insertSplitter(int index, BlendSplitter* splitter);
+    /**
+     * @brief getNestedWidget A helper function to get the widget that is in the splitter at the given position. The actual widget is a WidgetDecorator or SplitterDecorator so we return the widget that is a direct child of this decorator.
+     * @param index The desired position
+     * @return A pointer to widget that is decorated
+     */
+    QWidget* getNestedWidget(int index);
 private:
     friend Expander;
     friend ExpanderCorner;

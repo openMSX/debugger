@@ -42,6 +42,9 @@ void BlendSplitter::insertWidget(int index)
 
 void BlendSplitter::insertWidget(int index, QWidget* widget)
 {
+    if (widget->inherits("SwitchingWidget")){
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), widget, SLOT(setEnableWidget(bool)));
+    };
     WidgetDecorator* decorator{new WidgetDecorator{widget}};
     QSplitter::insertWidget(index, decorator);
 }
@@ -50,8 +53,6 @@ void BlendSplitter::insertWidget(int index, RegistryItem* item)
 {
     SwitchingWidget* wdg=new SwitchingWidget{item};
     insertWidget(index, wdg);
-    connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
-
 }
 
 void BlendSplitter::addDecoratedWidget(WidgetDecorator* widget)
@@ -73,6 +74,11 @@ void BlendSplitter::insertSplitter(int index, BlendSplitter* splitter)
 {
     SplitterDecorator* decorator{new SplitterDecorator{splitter}};
     QSplitter::insertWidget(index, decorator);
+}
+
+QWidget *BlendSplitter::getNestedWidget(int index)
+{
+    return widget(index)->layout()->itemAt(0)->widget();
 }
 
 QSplitterHandle* BlendSplitter::createHandle()

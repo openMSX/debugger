@@ -5,6 +5,8 @@
 #include "WidgetDecorator.h"
 #include "SplitterDecorator.h"
 
+#include "SignalDispatcher.h"
+
 #include <QDebug>
 
 ExpanderCorner::ExpanderCorner(WidgetDecorator* parent,Qt::Corner location) : Expander{parent} ,
@@ -123,6 +125,9 @@ bool ExpanderCorner::isOnTrailingHandler(BlendSplitter* parentSplitter)
  */
 void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter, Qt::Orientation splitorientation)
 {
+    SwitchingWidget* switchwdg=dynamic_cast<SwitchingWidget*>(parentDecorator->layout()->itemAt(0)->widget());
+    SwitchingWidget* addedWidget=nullptr;
+
     if (parentSplitter->orientation() == splitorientation){
 
         QList<int> sizes{parentSplitter->sizes()};
@@ -131,10 +136,12 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
             sizes.insert(index, BlendSplitter::expanderSize);
             sizes[index + 1] -= BlendSplitter::expanderSize + 1;
             parentSplitter->insertWidget(index);
+            addedWidget=dynamic_cast<SwitchingWidget*>(parentSplitter->getNestedWidget(index));
         } else {
             sizes.insert(index +1, BlendSplitter::expanderSize);
             sizes[index] -= BlendSplitter::expanderSize + 1;
             parentSplitter->insertWidget(index+1);
+            addedWidget=dynamic_cast<SwitchingWidget*>(parentSplitter->getNestedWidget(index+1));
         }
         parentSplitter->setSizes(sizes);
         parentSplitter->handle(index + 1)->grabMouse();
@@ -150,12 +157,20 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
         if (after){
             newSplitter->addWidget();
             newSplitter->addDecoratedWidget(parentDecorator);
+            addedWidget=dynamic_cast<SwitchingWidget*>(newSplitter->getNestedWidget(0));
         } else {
             newSplitter->addDecoratedWidget(parentDecorator);
             newSplitter->addWidget();
+            addedWidget=dynamic_cast<SwitchingWidget*>(newSplitter->getNestedWidget(1));
         }
         parentSplitter->setSizes(sizes);
         newSplitter->handle(1)->grabMouse();
+   }
+
+   //now if the original item was a SwitchingWidget we set the same and the enablestate
+   if (switchwdg && addedWidget){
+        addedWidget->setEnableWidget(switchwdg->getEnableWidget());
+        addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
    }
 }
 
