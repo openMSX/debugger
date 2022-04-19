@@ -23,6 +23,9 @@
 #include "VDPCommandRegViewer.h"
 #include "Settings.h"
 #include "Version.h"
+#include "SignalDispatcher.h"
+#include "blendsplitter/BlendSplitter.h"
+#include "blendsplitter/WidgetRegistry.h"
 #include <QAction>
 #include <QMessageBox>
 #include <QMenu>
@@ -31,6 +34,7 @@
 #include <QStatusBar>
 #include <QWidget>
 #include <QLabel>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QString>
@@ -40,6 +44,9 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <iostream>
+
+QMap<QString, int> DebuggerForm::debuggables;
+
 class QueryPauseHandler : public SimpleCommand
 {
 public:
@@ -95,6 +102,7 @@ public:
 	{
 		copyData(message);
 		form.regsView->setData(buf);
+        SignalDispatcher::getDispatcher()->setData(buf);
 		delete this;
 	}
 
@@ -148,11 +156,13 @@ int DebuggerForm::counter = 0;
 
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
-	, comm(CommClient::instance())
+    , comm(CommClient::instance()),enableWidgetStatus(false)
 {
 	VDPRegView = nullptr;
 	VDPStatusRegView = nullptr;
 	VDPCommandRegView = nullptr;
+
+    session = DebugSession::getDebugSession();
 
 	createActions();
 	createMenus();
@@ -163,7 +173,7 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
 
-	connect(&session.symbolTable(), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
+    connect(&(session->symbolTable()), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
 }
 
 void DebuggerForm::createActions()
@@ -325,18 +335,36 @@ void DebuggerForm::createActions()
 	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeRunToAction->setEnabled(true); });
 
 	breakpointToggleAction = new QAction(tr("Toggle"), this);
-	breakpointToggleAction->setShortcut(tr("F5"));
-	breakpointToggleAction->setStatusTip(tr("Toggle breakpoint on/off at cursor"));
-	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
-	breakpointToggleAction->setEnabled(false);
+    //now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
+//	breakpointToggleAction->setShortcut(tr("F5"));
+//	breakpointToggleAction->setStatusTip(tr("Toggle breakpoint on/off at cursor"));
+//	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
+//	breakpointToggleAction->setEnabled(false);
 
 	breakpointAddAction = new QAction(tr("Add ..."), this);
-	breakpointAddAction->setShortcut(tr("CTRL+B"));
-	breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
-	breakpointAddAction->setEnabled(false);
+    //now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
+//	breakpointAddAction->setShortcut(tr("CTRL+B"));
+//	breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
+//	breakpointAddAction->setEnabled(false);
 
 	helpAboutAction = new QAction(tr("&About"), this);
 	executeRunToAction->setStatusTip(tr("Show the application information"));
+
+    addVDPRegsWorkspaceAction = new QAction(tr("VDP &Regs"), this);
+    addVDPRegsWorkspaceAction->setStatusTip(tr("Show the regular VDP registers"));
+
+    addVDPTilesWorkspaceAction = new QAction(tr("VDP &Tiles"), this);
+    addVDPTilesWorkspaceAction->setStatusTip(tr("Show the VRAM in tiles"));
+
+    addVDPBitmapWorkspaceAction = new QAction(tr("VDP &Bitmap"), this);
+    addVDPBitmapWorkspaceAction->setStatusTip(tr("Show the VRAM in bitmap mode"));
+
+    addEmptyWorkspaceAction = new QAction(tr("&Empty workspace"), this);
+    addEmptyWorkspaceAction->setStatusTip(tr("create an almost empty workspace"));
+
+    addFloatingSwitchingWidgetAction = new QAction(tr("&Create floating item"), this);
+    addFloatingSwitchingWidgetAction->setStatusTip(tr("Create item in seperate window"));
+
 
 	connect(fileNewSessionAction, &QAction::triggered, this, &DebuggerForm::fileNewSession);
 	connect(fileOpenSessionAction, &QAction::triggered, this, &DebuggerForm::fileOpenSession);
@@ -370,9 +398,14 @@ void DebuggerForm::createActions()
 	connect(executeRunToAction, &QAction::triggered, this, &DebuggerForm::executeRunTo);
 	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
-	connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
-	connect(breakpointAddAction, &QAction::triggered, this, &DebuggerForm::addBreakpoint);
+    //connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
+    //connect(breakpointAddAction, &QAction::triggered, this, &DebuggerForm::addBreakpoint);
 	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
+    connect(addVDPRegsWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPRegsWorkspace);
+    connect(addVDPTilesWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPTilesWorkspace);
+    connect(addVDPBitmapWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPBitmapWorkspace);
+    connect(addEmptyWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addEmptyWorkspace);
+    connect(addFloatingSwitchingWidgetAction, &QAction::triggered, this, &DebuggerForm::addFloatingSwitchingWidget);
 }
 
 void DebuggerForm::createMenus()
@@ -447,7 +480,7 @@ void DebuggerForm::createMenus()
 
 	// create breakpoint menu
 	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
-	breakpointMenu->addAction(breakpointToggleAction);
+    //breakpointMenu->addAction(breakpointToggleAction);
 	breakpointMenu->addAction(breakpointAddAction);
 
 	// create help menu
@@ -484,13 +517,259 @@ void DebuggerForm::createStatusbar()
 	statusBar()->showMessage("No emulation running.");
 }
 
+void DebuggerForm::createWidgetRegistry()
+{
+    //0: register the disasm viewer widget
+	RegistryItem *item = new RegistryItem{
+			tr("Code view"),
+            []()->QWidget* {return widgetFactory(disasmViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //1: register the memory view widget
+	item  = new RegistryItem{
+			tr("Main memory"),
+            []()->QWidget* {return widgetFactory(mainMemoryViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //2: register the register viewer
+	item  = new RegistryItem{
+			tr("CPU registers"),
+            []()->QWidget* {return widgetFactory(cpuRegsViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //3: register the flags viewer
+	item  = new RegistryItem{
+			tr("Flags"),
+            []()->QWidget* {return widgetFactory(flagsViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //4: register the stack viewer
+	item  = new RegistryItem{
+			tr("Stack"),
+            []()->QWidget* {return widgetFactory(stackViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //5: register the slot viewer
+	item  = new RegistryItem{
+			tr("Memory layout"),
+            []()->QWidget* {return widgetFactory(slotViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //6: register the breakpoints viewer
+	item  = new RegistryItem{
+			tr("Debug list"),
+            []()->QWidget* {return widgetFactory(breakpointViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //7: register the debuggable viewer
+	item  = new RegistryItem{
+			tr("Debuggable hex view"),
+            []()->QWidget* {return widgetFactory(debuggableViewer);}
+			};
+	//WidgetRegistry::getRegistry()->addItem(item);
+	WidgetRegistry::getRegistry()->setDefault(item);
+
+    //8: register the VDP Status Registers
+	item  = new RegistryItem{
+			tr("VDP status registers"),
+            []()->QWidget* {return widgetFactory(vdpStatusRegViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //9: register the VDP command registers view
+	item  = new RegistryItem{
+			tr("VDP command registers "),
+            []()->QWidget* {return widgetFactory(vdpCommandRegViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //10: register the Bitmapped VRAM View
+	item  = new RegistryItem{
+			tr("VRAM as bitmap"),
+            []()->QWidget* {return widgetFactory(bitMapViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //11: register the Tile VRAM View
+	item  = new RegistryItem{
+			tr("VRAM as tiles"),
+            []()->QWidget* {return widgetFactory(tileViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //12: register the Sprites View
+	item  = new RegistryItem{
+			tr("Sprites View"),
+            []()->QWidget* {return widgetFactory(spriteViewer);}
+			};
+	WidgetRegistry::getRegistry()->addItem(item);
+
+    //13: register the general VDP registers
+    item  = new RegistryItem{
+            tr("VDP registers"),
+            []()->QWidget* {return widgetFactory(vdpRegisters);}
+};
+    WidgetRegistry::getRegistry()->addItem(item);
+
+}
+BlendSplitter* DebuggerForm::createWorkspaceCPU()
+{
+    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split->addWidget(WidgetRegistry::getRegistry()->item(2)); //2: the register viewer
+    split->addWidget(WidgetRegistry::getRegistry()->item(3)); //3: the flags viewer
+    split->addWidget(WidgetRegistry::getRegistry()->item(5)); //5: the slot viewer
+
+    BlendSplitter* split2 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Vertical);
+    split2->addSplitter(split);
+    split2->addWidget(WidgetRegistry::getRegistry()->item(1)); //1: the memory view widget
+    split2->addWidget(WidgetRegistry::getRegistry()->item(6)); //6: the breakpoints viewer
+
+    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split3->addWidget(WidgetRegistry::getRegistry()->item(0)); //0: the disasm viewer
+    split3->addSplitter(split2);
+    split3->addWidget(WidgetRegistry::getRegistry()->item(4)); //4: the stack viewer
+
+    return split3;
+}
+
+BlendSplitter* DebuggerForm::createWorkspaceVDPRegs()
+{
+    BlendSplitter* split2 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Vertical);
+    split2->addWidget(WidgetRegistry::getRegistry()->item(8)); //8: the VDP Status Registers
+    split2->addWidget(WidgetRegistry::getRegistry()->item(9)); //9: the VDP command registers view
+
+    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split3->addWidget(WidgetRegistry::getRegistry()->item(13)); //13: the general VDP registers
+    split3->addSplitter(split2);
+
+    return split3;
+}
+
+BlendSplitter *DebuggerForm::createWorkspaceVDPTiles()
+{
+    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split3->addWidget(WidgetRegistry::getRegistry()->item(11)); //11: the Tile VRAM View
+    split3->addWidget(WidgetRegistry::getRegistry()->item(12)); //12: the Sprites View
+
+    return split3;
+}
+
+BlendSplitter *DebuggerForm::createWorkspaceVDPBitmap()
+{
+    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split3->addWidget(WidgetRegistry::getRegistry()->item(10)); //10: the Bitmapped VRAM View
+    split3->addWidget(WidgetRegistry::getRegistry()->item(12)); //12: the Sprites View
+
+    return split3;
+}
+
+void DebuggerForm::tabCloseRequest(int index)
+{
+    if((index < 0) || (index >= workspaces->count())){
+        return;
+    };
+    //index 0 is the CPU workspace, refuse to delete this one for now
+    //Also this way at least one workspace remains, altough we could do this diferently in the future
+    if (index > 0){
+        QWidget *splitter=workspaces->widget(index);
+        workspaces->removeTab(index);
+        delete splitter;
+    }
+}
+
+void DebuggerForm::addVDPRegsWorkspace(){
+    workspaces->addTab(createWorkspaceVDPRegs(),"VDP Registers");
+}
+void DebuggerForm::addVDPTilesWorkspace(){
+    workspaces->addTab(createWorkspaceVDPTiles(),"VDP tiles");
+}
+void DebuggerForm::addVDPBitmapWorkspace(){
+    workspaces->addTab(createWorkspaceVDPBitmap(),"VDP bitmap");
+}
+
+void DebuggerForm::addEmptyWorkspace()
+{
+    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split->addWidget();
+    workspaces->addTab(split,"custom");
+}
+
+void DebuggerForm::addFloatingSwitchingWidget()
+{
+    SwitchingWidget* wdg=new SwitchingWidget();
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
+    wdg->setEnableWidget(enableWidgetStatus);
+    wdg->show();
+}
+
 void DebuggerForm::createForm()
 {
 	updateWindowTitle();
 
-	mainArea = new DockableWidgetArea();
-	dockMan.addDockArea(mainArea);
-	setCentralWidget(mainArea);
+	createWidgetRegistry();
+
+    workspaces = new QTabWidget();
+    workspaces->setMinimumHeight(500);
+    workspaces->setTabsClosable(true);
+    QMenu *workspacemenu=new QMenu();
+    QMenu *workspacesubmenu=new QMenu("Predefined layouts");
+    workspacesubmenu->addAction(addVDPRegsWorkspaceAction);
+    workspacesubmenu->addAction(addVDPTilesWorkspaceAction);
+    workspacesubmenu->addAction(addVDPBitmapWorkspaceAction);
+    workspacemenu->addMenu(workspacesubmenu);
+    workspacemenu->addSeparator();
+    workspacemenu->addAction(addEmptyWorkspaceAction);
+    workspacemenu->addSeparator();
+    workspacemenu->addAction(addFloatingSwitchingWidgetAction);
+
+
+    QIcon icon = QIcon::fromTheme(QLatin1String("window-new"));
+    QToolButton *btn = new QToolButton();
+	btn->setIcon(icon);
+    btn->setMenu(workspacemenu);
+    btn->setPopupMode(QToolButton::InstantPopup);
+	//connect(btn, &QAbstractButton::clicked, this, &App::OpenNewTab);
+	workspaces->setCornerWidget(btn, Qt::TopRightCorner);
+    connect(workspaces,&QTabWidget::tabCloseRequested,this,&DebuggerForm::tabCloseRequest);
+
+    mainArea = new DockableWidgetArea();
+    dockMan.addDockArea(mainArea);
+
+    QWidget *window = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout;
+    QSplitter *cpusplit=new QSplitter();
+    cpusplit->addWidget(workspaces);
+    cpusplit->addWidget(mainArea);
+    cpusplit->setChildrenCollapsible(true);
+    layout->addWidget(cpusplit);
+    window->setLayout(layout);
+
+//    workspaces->addTab(mainArea,"mainArea");
+    workspaces->addTab(createWorkspaceCPU(),"CPU");
+    addVDPRegsWorkspace();
+    addVDPTilesWorkspace();
+    addVDPBitmapWorkspace();
+
+
+    setCentralWidget(window);
+
+    //have the SignalDispatcher refresh it data for the widgets in the blendsplitter
+    connect(this, SIGNAL(connected()), SignalDispatcher::getDispatcher(), SLOT(refresh()));
+    connect(this, SIGNAL(breakStateEntered()), SignalDispatcher::getDispatcher(), SLOT(refresh()));
+    //and have it propagate the signals
+    connect(this, SIGNAL(connected()), SignalDispatcher::getDispatcher(), SIGNAL(connected()));
+    connect(this, SIGNAL(breakStateEntered()), SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()));
+    connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
+            SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString,int>&)) );
+    connect(this, &DebuggerForm::breakpointsUpdated, SignalDispatcher::getDispatcher(), &SignalDispatcher::breakpointsUpdated);
+
 
 	// Create main widgets and append them to the list first
 	auto* dw = new DockableWidget(dockMan);
@@ -637,9 +916,19 @@ void DebuggerForm::createForm()
 	connectionClosed();
 
 	// Disasm viewer
-	connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpoint);
-	connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
-	connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
+    //split in 2 below: connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpoint);
+    connect(disasmView,SIGNAL(breakpointToggled(uint16_t)), SignalDispatcher::getDispatcher(), SIGNAL(breakpointToggled(uint16_t)));
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointToggled(uint16_t)), this, SLOT(toggleBreakpoint(uint16_t)));
+    //in DebuggerForm::processBreakpoints bo direct call to update() anymore
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointsUpdated()), disasmView, SLOT(update()));
+
+    //split in 2 below:connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
+    connect(this, SIGNAL(symbolsChanged()), SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()) );
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()), disasmView, SLOT(refresh()));
+
+    //split in 2 below:connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
+    connect(this, SIGNAL(settingsChanged()), SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()) );
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()), disasmView, SLOT(updateLayout()));
 
 	// Main memory viewer
 	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
@@ -669,27 +958,124 @@ void DebuggerForm::createForm()
 	connect(&comm, &CommClient::updateParsed, this, &DebuggerForm::handleUpdate);
 	connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
-	// init main memory
-	// added four bytes as runover buffer for dasm
-	// otherwise dasm would need to check the buffer end continously.
-	session.breakpoints().setMemoryLayout(&memLayout);
-	mainMemory = new unsigned char[65536 + 4];
-	memset(mainMemory, 0, 65536 + 4);
-	disasmView->setMemory(mainMemory);
-	disasmView->setBreakpoints(&session.breakpoints());
-	disasmView->setMemoryLayout(&memLayout);
-	disasmView->setSymbolTable(&session.symbolTable());
-	mainMemoryView->setRegsView(regsView);
-	mainMemoryView->setSymbolTable(&session.symbolTable());
+
+
+    session->breakpoints().setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+    disasmView->setMemory(SignalDispatcher::getDispatcher()->getMainMemory());
+    disasmView->setBreakpoints(&session->breakpoints());
+    disasmView->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+    disasmView->setSymbolTable(&session->symbolTable());
+//	mainMemoryView->setRegsView(regsView);
+    mainMemoryView->setSymbolTable(&session->symbolTable());
 	mainMemoryView->setDebuggable("memory", 65536);
-	stackView->setData(mainMemory, 65536);
-	slotView->setMemoryLayout(&memLayout);
-	bpView->setBreakpoints(&session.breakpoints());
+    stackView->setData(SignalDispatcher::getDispatcher()->getMainMemory(), 65536);
+    slotView->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+    bpView->setBreakpoints(&session->breakpoints());
+}
+
+QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
+{
+    QWidget* wdgt;
+    switch (fctwidget) {
+    case disasmViewer:
+    {
+        wdgt= new DisasmViewer();
+        connect(wdgt, SIGNAL(breakpointToggled(uint16_t)), SignalDispatcher::getDispatcher(), SIGNAL(breakpointToggled(uint16_t)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()), wdgt, SLOT(updateLayout()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(setCursorAddress(uint16_t,int,int)), wdgt, SLOT(setCursorAddress(uint16_t,int,int)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(setProgramCounter(uint16_t,bool)), wdgt, SLOT(setProgramCounter(uint16_t,bool)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointsUpdated()), wdgt, SLOT(update()));
+        static_cast<DisasmViewer*>(wdgt)->setMemory(SignalDispatcher::getDispatcher()->getMainMemory());
+        static_cast<DisasmViewer*>(wdgt)->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
+        static_cast<DisasmViewer*>(wdgt)->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+        static_cast<DisasmViewer*>(wdgt)->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+
+    };
+        break;
+    case mainMemoryViewer:
+        wdgt = new MainMemoryViewer();
+        // Main memory viewer
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(registerChanged(int,int)), wdgt, SLOT(registerChanged(int,int)));
+        //mainMemoryView->setRegsView(regsView);
+        static_cast<MainMemoryViewer*>(wdgt)->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+        static_cast<MainMemoryViewer*>(wdgt)->setDebuggable("memory", 65536);
+        break;
+    case cpuRegsViewer:
+        wdgt = new CPURegsViewer();
+        //copy current registers to new widget
+        for(int id=0;id<15;id++){ // CpuRegs::REG_AF up to CpuRegs::REG_IFF
+        static_cast<CPURegsViewer*>(wdgt)->setRegister(id,
+                                                       SignalDispatcher::getDispatcher()->readRegister(id));
+        };
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(registersUpdate(unsigned char*)), wdgt, SLOT(setData(unsigned char*)));
+        break;
+    case flagsViewer:
+        wdgt = new FlagsViewer();
+        static_cast<FlagsViewer*>(wdgt)->setFlags(SignalDispatcher::getDispatcher()->readRegister(CpuRegs::REG_AF) & 0xFF);
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(flagsChanged(quint8)), wdgt, SLOT(setFlags(quint8)));
+        break;
+    case stackViewer:
+        wdgt = new StackViewer();
+        static_cast<StackViewer*>(wdgt)->setData(SignalDispatcher::getDispatcher()->getMainMemory(), 65536);
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(spChanged(quint16)), wdgt, SLOT(setStackPointer(quint16)));
+        break;
+    case slotViewer:
+        wdgt = new SlotViewer();
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+        static_cast<SlotViewer*>(wdgt)->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(updateSlots(const QString&)), wdgt, SLOT(updateSlots(const QString&)));
+        // Received status update back from widget after breakStateEntered/connected
+        //TODO  has to move to SignalDispatcher just as the register stuff!!!!
+//        connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
+
+        break;
+    case breakpointViewer:
+        wdgt = new BreakpointViewer();
+        break;
+    case debuggableViewer:
+        wdgt = new DebuggableViewer();
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
+                wdgt, SLOT(setDebuggables(const QMap<QString,int>&)));
+        static_cast<DebuggableViewer*>(wdgt)->setDebuggables(debuggables);
+        if (!debuggables.isEmpty()){
+            static_cast<DebuggableViewer*>(wdgt)->debuggableSelected(0);
+            static_cast<DebuggableViewer*>(wdgt)->refresh();
+        };
+        break;
+    case vdpStatusRegViewer:
+        wdgt = new VDPStatusRegViewer();
+        break;
+    case vdpCommandRegViewer:
+        wdgt = new VDPCommandRegViewer();
+        break;
+    case bitMapViewer:
+        wdgt = new BitMapViewer();
+        break;
+    case tileViewer:
+        wdgt = new TileViewer();
+        break;
+    case spriteViewer:
+        wdgt = new SpriteViewer();
+        break;
+    case vdpRegisters:
+        wdgt = new VDPRegViewer();
+        break;
+    default:
+        wdgt = new QLabel("Not yet implemented in widgetFactory!");
+        break;
+    };
+    return wdgt;
 }
 
 DebuggerForm::~DebuggerForm()
 {
-	delete[] mainMemory;
 	delete mainArea;
 }
 
@@ -698,7 +1084,7 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 	// handle unsaved session
 	fileNewSession();
 	// cancel if session is still modified
-	if (session.isModified()) {
+    if (session->isModified()) {
 		e->ignore();
 		return;
 	}
@@ -766,12 +1152,12 @@ void DebuggerForm::removeRecentFile(const QString& file)
 void DebuggerForm::updateWindowTitle()
 {
 	QString title = "openMSX debugger [%1%2]";
-	if (session.existsAsFile()) {
-		title = title.arg(session.filename());
+    if (session->existsAsFile()) {
+        title = title.arg(session->filename());
 	} else {
 		title = title.arg("unnamed session");
 	}
-	if (session.isModified()) {
+    if (session->isModified()) {
 		title = title.arg('*');
 	} else {
 		title = title.arg("");
@@ -880,7 +1266,14 @@ void DebuggerForm::connectionClosed()
 
 	for (auto* w : dockMan.managedWidgets()) {
 		w->widget()->setEnabled(false);
-	}
+    }
+//    replaced by signal from SignalDispatcher
+//    QList<SwitchingWidget*> allSwitchItems= this->findChildren<SwitchingWidget*>();
+//    foreach(SwitchingWidget* wdgt,allSwitchItems){
+//        wdgt->setEnableWidget(false);
+//    }
+    enableWidgetStatus=false;
+    emit SignalDispatcher::getDispatcher()->enableWidget(false);
 }
 
 void DebuggerForm::finalizeConnection(bool halted)
@@ -903,6 +1296,13 @@ void DebuggerForm::finalizeConnection(bool halted)
 	for (auto* w : dockMan.managedWidgets()) {
 		w->widget()->setEnabled(true);
 	}
+//    replaced by signal from SignalDispatcher
+//    QList<SwitchingWidget*> allSwitchItems= this->findChildren<SwitchingWidget*>();
+//    foreach(SwitchingWidget* wdgt,allSwitchItems){
+//        wdgt->setEnableWidget(true);
+//    }
+    enableWidgetStatus=true;
+    emit SignalDispatcher::getDispatcher()->enableWidget(true);
 }
 
 void DebuggerForm::handleUpdate(const QString& type, const QString& name,
@@ -951,7 +1351,7 @@ void DebuggerForm::setRunMode()
 
 void DebuggerForm::fileNewSession()
 {
-	if (session.isModified()) {
+    if (session->isModified()) {
 		// save current session?
 		int choice = QMessageBox::warning(this, tr("Unsaved session"),
 		                tr("The current session has unsaved data.\n"
@@ -963,10 +1363,10 @@ void DebuggerForm::fileNewSession()
 		} else if (choice == QMessageBox::Save) {
 			fileSaveSession();
 			// skip new if session is still modified (save was cancelled)
-			if (session.isModified()) return;
+            if (session->isModified()) return;
 		}
 	}
-	session.clear();
+    session->clear();
 	updateWindowTitle();
 }
 
@@ -983,13 +1383,13 @@ void DebuggerForm::fileOpenSession()
 void DebuggerForm::openSession(const QString& file)
 {
 	fileNewSession();
-	session.open(file);
+    session->open(file);
 	if (systemDisconnectAction->isEnabled()) {
 		// active connection, merge loaded breakpoints
 		reloadBreakpoints(true);
 	}
 	// update recent
-	if (session.existsAsFile()) {
+    if (session->existsAsFile()) {
 		addRecentFile(file);
 	} else {
 		removeRecentFile(file);
@@ -1000,8 +1400,8 @@ void DebuggerForm::openSession(const QString& file)
 
 void DebuggerForm::fileSaveSession()
 {
-	if (session.existsAsFile()) {
-		session.save();
+    if (session->existsAsFile()) {
+        session->save();
 	} else {
 		fileSaveSessionAs();
 	}
@@ -1017,10 +1417,10 @@ void DebuggerForm::fileSaveSessionAs()
 	d.setAcceptMode(QFileDialog::AcceptSave);
 	d.setFileMode(QFileDialog::AnyFile);
 	if (d.exec()) {
-		session.saveAs(d.selectedFiles().at(0));
+        session->saveAs(d.selectedFiles().at(0));
 		// update recent
-		if (session.existsAsFile()) {
-			addRecentFile(session.filename());
+        if (session->existsAsFile()) {
+            addRecentFile(session->filename());
 		}
 	}
 	updateWindowTitle();
@@ -1064,9 +1464,9 @@ void DebuggerForm::systemReboot()
 
 void DebuggerForm::systemSymbolManager()
 {
-	SymbolManager symManager(session.symbolTable(), this);
+    SymbolManager symManager(session->symbolTable(), this);
 	connect(&symManager, SIGNAL(symbolTableChanged()),
-	        &session, SLOT(sessionModified()));
+            session, SLOT(sessionModified()));
 	symManager.exec();
 	emit symbolsChanged();
 	updateWindowTitle();
@@ -1081,11 +1481,12 @@ void DebuggerForm::systemPreferences()
 
 void DebuggerForm::searchGoto()
 {
-	GotoDialog gtd(memLayout, &session, this);
+    GotoDialog gtd(*SignalDispatcher::getDispatcher()->getMemLayout(), session, this);
 	if (gtd.exec()) {
 		int addr = gtd.address();
 		if (addr >= 0) {
 			disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
+            SignalDispatcher::getDispatcher()->setCursorAddress(addr,0,DisasmViewer::MiddleAlways);
 		}
 	}
 }
@@ -1136,14 +1537,11 @@ void DebuggerForm::executeStepBack()
 	setRunMode();
 }
 
-void DebuggerForm::toggleBreakpoint(int addr)
+void DebuggerForm::toggleBreakpoint(uint16_t addr)
 {
-	// toggle address unspecified, use cursor address
-	if (addr < 0) addr = disasmView->cursorAddress();
-
 	QString cmd;
 	QString id;
-	if (session.breakpoints().isBreakpoint(addr, &id)) {
+    if (session->breakpoints().isBreakpoint(addr, &id)) {
 		cmd = Breakpoints::createRemoveCommand(id);
 	} else {
 		// get slot
@@ -1156,10 +1554,10 @@ void DebuggerForm::toggleBreakpoint(int addr)
 	reloadBreakpoints();
 }
 
-void DebuggerForm::addBreakpoint()
+void DebuggerForm::addBreakpoint(uint16_t cursorAddress)
 {
-	BreakpointDialog bpd(memLayout, &session, this);
-	int addr = disasmView->cursorAddress();
+    BreakpointDialog bpd(*SignalDispatcher::getDispatcher()->getMemLayout(), session, this);
+    int addr =  cursorAddress;
 	auto [ps, ss, seg] = addressSlot(addr);
 	bpd.setData(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
 	if (bpd.exec()) {
@@ -1455,7 +1853,8 @@ void DebuggerForm::setDebuggableSize(const QString& debuggable, int size)
 	debuggables[debuggable] = size;
 	// emit update if size of last debuggable was set
 	if (debuggable == debuggables.keys().last()) {
-		emit debuggablesChanged(debuggables);
+        emit debuggablesChanged(debuggables);
+        emit SignalDispatcher::getDispatcher()->debuggablesChanged(debuggables);
 	}
 }
 
@@ -1470,20 +1869,20 @@ void DebuggerForm::symbolFileChanged()
 	                QMessageBox::Yes | QMessageBox::No);
 	shown = false;
 	if (choice == QMessageBox::Yes)
-		session.symbolTable().reloadFiles();
+        session->symbolTable().reloadFiles();
 }
 
 DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
 {
 	int p = (addr & 0xC000) >> 14;
-	auto ps = qint8(memLayout.primarySlot[p]);
-	auto ss = qint8(memLayout.secondarySlot[p]);
+    auto ps = qint8(SignalDispatcher::getDispatcher()->getMemLayout()->primarySlot[p]);
+    auto ss = qint8(SignalDispatcher::getDispatcher()->getMemLayout()->secondarySlot[p]);
 	int segment = [&] { // figure out (rom) mapper segment
-		if (memLayout.mapperSize[ps][ss == -1 ? 0 : ss] > 0) {
-			return memLayout.mapperSegment[p];
+        if (SignalDispatcher::getDispatcher()->getMemLayout()->mapperSize[ps][ss == -1 ? 0 : ss] > 0) {
+            return SignalDispatcher::getDispatcher()->getMemLayout()->mapperSegment[p];
 		} else {
 			int q = 2 * p + ((addr & 0x2000) >> 13);
-			int b = memLayout.romBlock[q];
+            int b = SignalDispatcher::getDispatcher()->getMemLayout()->romBlock[q];
 			return (b >= 0) ? b : -1;
 		}
 	}();
@@ -1505,16 +1904,16 @@ void DebuggerForm::reloadBreakpoints(bool merge)
 
 void DebuggerForm::processBreakpoints(const QString& message)
 {
-	session.breakpoints().setBreakpoints(message);
-	disasmView->update();
-	session.sessionModified();
+    session->breakpoints().setBreakpoints(message);
+//    disasmView->update();
+    session->sessionModified();
 	updateWindowTitle();
 	emit breakpointsUpdated();
 }
 
 void DebuggerForm::processMerge(const QString& message)
 {
-	QString bps = session.breakpoints().mergeBreakpoints(message);
+    QString bps = session->breakpoints().mergeBreakpoints(message);
 	if (!bps.isEmpty()) {
 		comm.sendCommand(new SimpleCommand(bps));
 		reloadBreakpoints(false);
@@ -1527,7 +1926,8 @@ void DebuggerForm::onSlotsUpdated(bool slotsChanged)
 {
 	if (disasmStatus == PC_CHANGED) {
 		disasmView->setProgramCounter(disasmAddress, slotsChanged);
-		disasmStatus = RESET;
+        SignalDispatcher::getDispatcher()->setProgramCounter(disasmAddress, slotsChanged);
+        disasmStatus = RESET;
 	} else {
 		disasmStatus = slotsChanged ? SLOTS_CHANGED : SLOTS_CHECKED;
 	}
@@ -1539,6 +1939,7 @@ void DebuggerForm::onPCChanged(uint16_t address)
 	assert(disasmStatus != PC_CHANGED);
 	if (disasmStatus != RESET) {
 		disasmView->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
+        SignalDispatcher::getDispatcher()->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
 	} else {
 		disasmStatus = PC_CHANGED;
 		disasmAddress = address;

@@ -2,9 +2,11 @@
 #include "DebuggerData.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
+#include "SignalDispatcher.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QStyleOptionHeader>
+
 
 
 class DebugMemMapperHandler : public SimpleCommand
@@ -19,6 +21,7 @@ public:
 	void replyOk(const QString& message) override
 	{
 		viewer.updateSlots(message);
+        SignalDispatcher::getDispatcher()->updateSlots(message);
 		delete this;
 	}
 

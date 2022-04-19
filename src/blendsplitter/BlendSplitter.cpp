@@ -6,8 +6,10 @@
 #include "SplitterHandle.h"
 #include "WidgetDecorator.h"
 
+#include "SignalDispatcher.h"
+
 int BlendSplitter::expanderSize{12};
-int BlendSplitter::switchingBarHeight{36};
+int BlendSplitter::switchingBarHeight{32};
 QString BlendSplitter::expanderImage{":/BlendSplitter/Expander"};
 
 BlendSplitter::BlendSplitter(QWidget* (*defaultWidget) (), Qt::Orientation orientation) : QSplitter{orientation, nullptr}, defaultWidget{defaultWidget}
@@ -46,7 +48,10 @@ void BlendSplitter::insertWidget(int index, QWidget* widget)
 
 void BlendSplitter::insertWidget(int index, RegistryItem* item)
 {
-    insertWidget(index, new SwitchingWidget{item});
+    SwitchingWidget* wdg=new SwitchingWidget{item};
+    insertWidget(index, wdg);
+    connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
+
 }
 
 void BlendSplitter::addDecoratedWidget(WidgetDecorator* widget)

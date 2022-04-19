@@ -4,6 +4,7 @@
 #include "CPURegsViewer.h"
 #include "SymbolTable.h"
 #include "Convert.h"
+#include "SignalDispatcher.h"
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -52,7 +53,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 
 	isLinked = false;
 	linkedId = 0;
-	regsViewer = nullptr;
+//	regsViewer = nullptr;
 	symTable = nullptr;
 
 	connect(hexView, SIGNAL(locationChanged(int)),
@@ -79,10 +80,10 @@ void MainMemoryViewer::setDebuggable(const QString& name, int size)
 	hexView->setDebuggable(name, size);
 }
 
-void MainMemoryViewer::setRegsView(CPURegsViewer* viewer)
-{
-	regsViewer = viewer;
-}
+//void MainMemoryViewer::setRegsView(CPURegsViewer* viewer)
+//{
+//	regsViewer = viewer;
+//}
 
 void MainMemoryViewer::setSymbolTable(SymbolTable* symtable)
 {
@@ -136,8 +137,9 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 		linkedId = linkRegisters[index - 1];
 		addressValue->setReadOnly(true);
 		hexView->setIsInteractive(false);
-		if (regsViewer) {
-			setLocation(regsViewer->readRegister(linkedId));
-		}
+//		if (regsViewer) {
+//			setLocation(regsViewer->readRegister(linkedId));
+//		}
+        setLocation(SignalDispatcher::getDispatcher()->readRegister(linkedId));
 	}
 }

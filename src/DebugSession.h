@@ -10,8 +10,9 @@ class QXmlStreamReader;
 class DebugSession : public QObject
 {
 	Q_OBJECT
+    Q_DISABLE_COPY(DebugSession)
 public:
-	DebugSession();
+    static DebugSession* getDebugSession();
 
 	// session
 	void clear();
@@ -25,6 +26,9 @@ public:
 	Breakpoints& breakpoints();
 	SymbolTable& symbolTable();
 
+public slots:
+    void sessionModified();
+
 private:
 	void skipUnknownElement(QXmlStreamReader& ses);
 
@@ -33,8 +37,8 @@ private:
 	QString fileName;
 	bool modified;
 
-public slots:
-	void sessionModified();
+    static DebugSession* theDebugSession;
+    DebugSession();
 };
 
 #endif // DEBUGSESSION_H

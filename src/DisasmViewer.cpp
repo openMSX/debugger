@@ -215,7 +215,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 			           palette().color(QPalette::Highlight));
 			if (hasFocus()) {
 				QStyleOptionFocusRect so;
-				so.backgroundColor = palette().color(QPalette::Highlight);
+                so.backgroundColor = palette().color(QPalette::Midlight);
 				so.rect = QRect(frameL + 32, y, width() - 32 - frameL - frameR, h);
 				style()->drawPrimitive(QStyle::PE_FrameFocusRect, &so, &p, this);
 			}

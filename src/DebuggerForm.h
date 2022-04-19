@@ -21,6 +21,8 @@ class VDPStatusRegViewer;
 class VDPRegViewer;
 class VDPCommandRegViewer;
 class BreakpointViewer;
+class BlendSplitter;
+class QTabWidget;
 
 class DebuggerForm : public QMainWindow
 {
@@ -34,14 +36,34 @@ public:
 	void onSlotsUpdated(bool slotsChanged);
 	void onPCChanged(uint16_t address);
 
+    enum factoryclasses {
+        disasmViewer,
+        mainMemoryViewer,
+        cpuRegsViewer,
+        flagsViewer,
+        stackViewer,
+        slotViewer,
+        breakpointViewer,
+        debuggableViewer,
+        vdpStatusRegViewer,
+        vdpCommandRegViewer,
+        bitMapViewer,
+        tileViewer,
+        spriteViewer,
+        vdpRegisters
+    };
+
 private:
 	void closeEvent(QCloseEvent* e) override;
 
+	void createWidgetRegistry();
 	void createActions();
 	void createMenus();
 	void createToolbars();
 	void createStatusbar();
 	void createForm();
+
+    static QWidget* widgetFactory(factoryclasses fctwidget);
 
 	void openSession(const QString& file);
 	void updateRecentFiles();
@@ -123,6 +145,12 @@ private:
 
 	QAction* helpAboutAction;
 
+    QAction* addVDPRegsWorkspaceAction;
+    QAction* addVDPTilesWorkspaceAction;
+    QAction* addVDPBitmapWorkspaceAction;
+    QAction* addEmptyWorkspaceAction;
+    QAction* addFloatingSwitchingWidgetAction;
+
 	DockManager dockMan;
 	DockableWidgetArea* mainArea;
 	QStringList recentFiles;
@@ -139,12 +167,12 @@ private:
 	BreakpointViewer* bpView;
 
 	CommClient& comm;
-	DebugSession session;
-	MemoryLayout memLayout;
-	unsigned char* mainMemory;
+    DebugSession* session;
+
+    QTabWidget *workspaces;
 
 	bool mergeBreakpoints;
-	QMap<QString, int> debuggables;
+    static QMap<QString, int> debuggables;
 
 	static int counter;
 	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
@@ -182,9 +210,10 @@ private:
 	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
-	void toggleBreakpoint(int addr = -1);
-	void addBreakpoint();
-
+private slots:
+    void toggleBreakpoint(uint16_t addr);
+private:
+    void addBreakpoint(uint16_t cursorAddress);
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
@@ -216,7 +245,24 @@ signals:
 	void runStateEntered();
 	void breakStateEntered();
 	void breakpointsUpdated();
-	void debuggablesChanged(const QMap<QString, int>& list);
+    void debuggablesChanged(const QMap<QString, int>& list);
+
+protected:
+    BlendSplitter *createWorkspaceCPU();
+    BlendSplitter *createWorkspaceVDPRegs();
+    BlendSplitter *createWorkspaceVDPTiles();
+    BlendSplitter *createWorkspaceVDPBitmap();
+    void addVDPRegsWorkspace();
+    void addVDPTilesWorkspace();
+    void addVDPBitmapWorkspace();
+    void addEmptyWorkspace();
+    void addFloatingSwitchingWidget();
+
+    bool enableWidgetStatus;
+
+
+protected slots:
+    void tabCloseRequest(int index);
 };
 
 #endif // DEBUGGERFORM_H

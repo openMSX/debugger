@@ -12,7 +12,16 @@ MOC_SRC_HDR:= \
 	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
 	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable \
 	TileViewer VramTiledView PaletteDialog VramSpriteView SpriteViewer \
-	BreakpointViewer
+	BreakpointViewer SignalDispatcher \
+	blendsplitter/BlendSplitter blendsplitter/Expander \
+	blendsplitter/Overlay blendsplitter/SplitterDecorator \
+	blendsplitter/SwitchingBar blendsplitter/SwitchingWidget \
+	blendsplitter/WidgetRegistry blendsplitter/ExpanderCorner \
+	blendsplitter/RegistryItem \
+	blendsplitter/SplitterHandle blendsplitter/SwitchingCombo \
+	blendsplitter/WidgetDecorator
+
+
 
 SRC_HDR:= \
 	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \

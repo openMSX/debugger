@@ -84,7 +84,7 @@ private:
 	int lineAtPos(const QPoint& pos);
 
 signals:
-	void breakpointToggled(int addr);
+    void breakpointToggled(uint16_t addr);
 };
 
 #endif // DISASMVIEWER_H

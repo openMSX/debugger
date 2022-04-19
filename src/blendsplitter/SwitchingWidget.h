@@ -22,15 +22,21 @@ public:
      * \param item A RegistryItem to display in the widget. If nullptr, then WidgetRegistry::getDefault() is used.
      * \param parent A parent widget
      */
-    SwitchingWidget(RegistryItem* item = nullptr, QWidget* parent = nullptr);
+    SwitchingWidget(RegistryItem* item = nullptr, QWidget* parent = nullptr,bool menuAtTop=true);
     /** \brief Set the current Widget displayed.
      *
      * Sets the current widget to be the item
      * \param item A RegistryItem to display in the widget. If nullptr, then WidgetRegistry::getDefault() is used.
      */
     void setCurrentWidget(RegistryItem* item = nullptr);
+public slots:
+    void setEnableWidget(bool enable = true);
 private slots:
     void changeCurrentWidget(int index);
 private:
+    int barIndex();
+    int widgetIndex();
     SwitchingBar* bar;
+    bool widgetEnabled;
+    bool barAtTop;
 };

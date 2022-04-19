@@ -83,4 +83,9 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 		debuggableList->setCurrentIndex(select);
 		hexView->setLocation(lastLocation);
 	}
+    if (!list.empty() && select == -1) {
+        hexView->setLocation(0);
+        debuggableList->setCurrentIndex(0);
+    }
+
 }

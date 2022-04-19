@@ -21,10 +21,13 @@ void SwitchingBar::addWidget(QWidget* widget)
 
 SwitchingBar::SwitchingBar(QWidget* parent) : QWidget(parent), layout{new QHBoxLayout{}}, combo{new SwitchingCombo{}}
 {
-    layout->setContentsMargins(BlendSplitter::expanderSize * 3 / 4, 0, 0, 0);
+    layout->setContentsMargins(BlendSplitter::expanderSize * 3 / 4, 0, BlendSplitter::expanderSize * 3 / 4, 0);
     setLayout(layout);
-    setMinimumHeight(BlendSplitter::switchingBarHeight);
+//    setMinimumHeight(BlendSplitter::switchingBarHeight);
     setMaximumHeight(BlendSplitter::switchingBarHeight);
+    setMinimumHeight(combo->minimumHeight());
+//    setMaximumHeight(combo->maximumHeight());
+//    setMaximumHeight(combo->minimumHeight());
     layout->addWidget(combo);
     layout->addStretch();
 }

@@ -26,6 +26,8 @@ private:
 private slots:
 	void debuggableSelected(int index);
 	void locationChanged(int loc);
+
+friend class DebuggerForm; // to get to  debuggableSelected  from the widgetFactory
 };
 
 #endif // DEBUGGABLEVIEWER_H

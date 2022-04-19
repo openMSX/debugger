@@ -16,7 +16,7 @@ public:
 	MainMemoryViewer(QWidget* parent = nullptr);
 
 	void setDebuggable(const QString& name, int size);
-	void setRegsView(CPURegsViewer* viewer);
+//	void setRegsView(CPURegsViewer* viewer);
 	void setSymbolTable(SymbolTable* symtable);
 
 public slots:
@@ -34,7 +34,7 @@ private:
 	QComboBox* addressSourceList;
 	QLineEdit* addressValue;
 
-	CPURegsViewer* regsViewer;
+//	CPURegsViewer* regsViewer;
 	SymbolTable* symTable;
 	int linkedId;
 	bool isLinked;
