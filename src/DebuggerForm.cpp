@@ -1420,7 +1420,7 @@ void DebuggerForm::updateViewFloatingWidgetsMenu()
 			auto* action = new QAction(w->title());
 			// Set the widget_id as a property on the menu item action, so we can read it out later again via sender() on the receiving functor
 			action->setProperty("widget_id", w->id());
-			connect(action, SIGNAL(triggered()), this, SLOT(showFloatingWidget()));
+			connect(action, &QAction::triggered, this, &DebuggerForm::showFloatingWidget);
 			viewFloatingWidgetsMenu->addAction(action);
 		}
 	}
