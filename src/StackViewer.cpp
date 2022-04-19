@@ -117,7 +117,7 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	int d = fontMetrics().descent();
 
 	// set font
-	p.setPen(Qt::black);
+//    p.setPen(palette().color(QPalette::Text));
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
@@ -132,16 +132,25 @@ void StackViewer::paintEvent(QPaintEvent* e)
 
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
-	int xStack = xAddr + fontMetrics().horizontalAdvance("FFFFF");
+    int xStack = xAddr + fontMetrics().horizontalAdvance("FFFFFF");
 	int y = frameT + h - 1;
 	int address = topAddress;
 
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
+        // draw background
+        if (address==stackPointer){
+//            p.fillRect(frameL,y-h,width() - frameL- frameR, h,
+//                   palette().color(QPalette::Highlight));
+            p.setPen(palette().color(QPalette::LinkVisited));
+        } else {
+            p.setPen(palette().color(QPalette::Text));
+        };
 		// print address
 		QString hexStr;
-		hexStr = QString("%1").arg(address, 4, 16, QChar('0')).toUpper();
+        hexStr = QString("%1").arg(isEnabled()?address:0, 4, 16, QChar('0')).toUpper();
 		p.drawText(xAddr,  y - d, hexStr);
-		hexStr = QString("%1").arg(memory[address + 1] << 8 | memory[address], 4, 16, QChar('0')).toUpper();
+        int val=isEnabled()?(memory[address + 1] << 8 | memory[address]):0;
+        hexStr = QString("%1").arg(val, 4, 16, QChar('0')).toUpper();
 		p.drawText(xStack, y - d, hexStr);
 		y += h;
 		address += 2;
