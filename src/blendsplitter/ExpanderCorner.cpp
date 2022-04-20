@@ -230,7 +230,7 @@ void ExpanderCorner::followDragJoiners(WidgetDecorator *parentDecorator, BlendSp
         // already an overlay and we are still dragging 'inside' of the splitter, so
         externalOverlay->show();
         // maybe we need to change direction of the join ?
-        qDebug() << "overlay->parentWidget()!=externalJoinWidget" << externalOverlay->parentWidget() << "  " <<externalJoinWidget;
+        //qDebug() << "overlay->parentWidget()!=externalJoinWidget" << externalOverlay->parentWidget() << "  " <<externalJoinWidget;
 
         Qt::Orientation o=parentSplitter->orientation();
         if ((isOnTrailingHandler(parentSplitter) and pickCoordinate(x,y,o)>pickSize(parentDecorator->size(),o))

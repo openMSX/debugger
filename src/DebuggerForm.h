@@ -1,12 +1,10 @@
 #ifndef DEBUGGERFORM_H
 #define DEBUGGERFORM_H
 
-#include "DockManager.h"
 #include "DebugSession.h"
 #include <QMainWindow>
 #include <QMap>
 
-class DockableWidgetArea;
 class DisasmViewer;
 class MainMemoryViewer;
 class CPURegsViewer;
@@ -88,12 +86,8 @@ private:
 	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* searchMenu;
-    /*
-	QMenu* viewMenu;
-	QMenu* viewVDPDialogsMenu;
-	QMenu* viewFloatingWidgetsMenu;
-    */
-    QMenu* executeMenu;
+
+	QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
 
@@ -118,31 +112,13 @@ private:
 	QAction* systemPreferencesAction;
 
 	QAction* searchGotoAction;
-/*
-	QAction* viewRegistersAction;
-	QAction* viewFlagsAction;
-	QAction* viewStackAction;
-	QAction* viewSlotsAction;
-	QAction* viewMemoryAction;
-	QAction* viewBreakpointsAction;
-	QAction* viewDebuggableViewerAction;
-
-	QAction* viewBitMappedAction;
-	QAction* viewCharMappedAction;
-	QAction* viewSpritesAction;
-	QAction* viewVDPStatusRegsAction;
-	QAction* viewVDPRegsAction;
-	QAction* viewVDPCommandRegsAction;
-*/
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
 	QAction* executeStepAction;
 	QAction* executeStepOverAction;
-    //QAction* executeRunToAction;
 	QAction* executeStepOutAction;
 	QAction* executeStepBackAction;
 
-    //QAction* breakpointToggleAction;
 	QAction* breakpointAddAction;
 
 	QAction* helpAboutAction;
@@ -153,20 +129,7 @@ private:
     QAction* addEmptyWorkspaceAction;
     QAction* addFloatingSwitchingWidgetAction;
 
-//	DockManager dockMan;
-//	DockableWidgetArea* mainArea;
 	QStringList recentFiles;
-
-//	DisasmViewer* disasmView;
-//	MainMemoryViewer* mainMemoryView;
-//	CPURegsViewer* regsView;
-//	FlagsViewer* flagsView;
-//	StackViewer* stackView;
-//	SlotViewer* slotView;
-//	VDPStatusRegViewer* VDPStatusRegView;
-//	VDPRegViewer* VDPRegView;
-//	VDPCommandRegViewer* VDPCommandRegView;
-//	BreakpointViewer* bpView;
 
 	CommClient& comm;
     DebugSession* session;
@@ -216,14 +179,12 @@ private slots:
     void toggleBreakpoint(uint16_t addr);
 private:
     void addBreakpoint(uint16_t cursorAddress);
-	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
 	                  const QString& message);
 	void setDebuggables(const QString& list);
 	void setDebuggableSize(const QString& debuggable, int size);
 	void connectionClosed();
-	void dockWidgetVisibilityChanged(DockableWidget* w);
 	void updateViewMenu();
 	void updateVDPViewMenu();
 	void updateViewFloatingWidgetsMenu();

@@ -2,8 +2,6 @@
 #include "BitMapViewer.h"
 #include "TileViewer.h"
 #include "SpriteViewer.h"
-#include "DockableWidgetArea.h"
-#include "DockableWidget.h"
 #include "DisasmViewer.h"
 #include "MainMemoryViewer.h"
 #include "CPURegsViewer.h"
@@ -101,7 +99,6 @@ public:
 	void replyOk(const QString& message) override
 	{
 		copyData(message);
-//		form.regsView->setData(buf);
         SignalDispatcher::getDispatcher()->setData(buf);
 		delete this;
 	}
@@ -158,11 +155,6 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
     , comm(CommClient::instance()),enableWidgetStatus(false)
 {
-    /*
-	VDPRegView = nullptr;
-	VDPStatusRegView = nullptr;
-	VDPCommandRegView = nullptr;
-    */
     session = DebugSession::getDebugSession();
 
 	createActions();
@@ -234,52 +226,8 @@ void DebuggerForm::createActions()
 	searchGotoAction = new QAction(tr("&Goto ..."), this);
 	searchGotoAction->setStatusTip(tr("Jump to a specific address or label in the disassembly view"));
 	searchGotoAction->setShortcut(tr("Ctrl+G"));
-/*
-	viewRegistersAction = new QAction(tr("CPU &Registers"), this);
-	viewRegistersAction->setStatusTip(tr("Toggle the cpu registers display"));
-	viewRegistersAction->setCheckable(true);
 
-	viewBreakpointsAction = new QAction(tr("Debug &List"), this);
-	viewBreakpointsAction->setStatusTip(tr("Toggle the breakpoints/watchpoints display"));
-	viewBreakpointsAction->setCheckable(true);
-
-	viewFlagsAction = new QAction(tr("CPU &Flags"), this);
-	viewFlagsAction->setStatusTip(tr("Toggle the cpu flags display"));
-	viewFlagsAction->setCheckable(true);
-
-	viewStackAction = new QAction(tr("Stack"), this);
-	viewStackAction->setStatusTip(tr("Toggle the stack display"));
-	viewStackAction->setCheckable(true);
-
-	viewSlotsAction = new QAction(tr("Slots"), this);
-	viewSlotsAction->setStatusTip(tr("Toggle the slots display"));
-	viewSlotsAction->setCheckable(true);
-
-	viewMemoryAction = new QAction(tr("Memory"), this);
-	viewMemoryAction->setStatusTip(tr("Toggle the main memory display"));
-	viewMemoryAction->setCheckable(true);
-
-	viewDebuggableViewerAction = new QAction(tr("Add debuggable viewer"), this);
-	viewDebuggableViewerAction->setStatusTip(tr("Add a hex viewer for debuggables"));
-
-	viewVDPStatusRegsAction = new QAction(tr("Status Registers"), this);
-	viewVDPStatusRegsAction->setStatusTip(tr("The VDP status registers interpreted"));
-	viewVDPStatusRegsAction->setCheckable(true);
-	viewVDPCommandRegsAction = new QAction(tr("Command Registers"), this);
-	viewVDPCommandRegsAction->setStatusTip(tr("Interact with the VDP command registers"));
-	viewVDPCommandRegsAction->setCheckable(true);
-	viewVDPRegsAction = new QAction(tr("Registers"), this);
-	viewVDPRegsAction->setStatusTip(tr("Interact with the VDP registers"));
-	viewVDPRegsAction->setCheckable(true);
-	viewBitMappedAction = new QAction(tr("Bitmapped VRAM"), this);
-	viewBitMappedAction->setStatusTip(tr("Decode VRAM as screen 5/6/7/8 image"));
-	//viewBitMappedAction->setCheckable(true);
-	viewCharMappedAction = new QAction(tr("Tiles in VRAM"), this);
-	viewCharMappedAction->setStatusTip(tr("Decode VRAM as MSX1 screen tiles"));
-	viewSpritesAction = new QAction(tr("Sprites in VRAM"), this);
-	viewSpritesAction->setStatusTip(tr("Decode sprites tiles"));
-*/
-	executeBreakAction = new QAction(tr("Break"), this);
+    executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
 	executeBreakAction->setIcon(QIcon(":/icons/break.png"));
@@ -326,22 +274,6 @@ void DebuggerForm::createActions()
 	executeStepBackAction->setEnabled(false);
 	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeStepBackAction->setEnabled(false); });
 	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepBackAction->setEnabled(true); });
-/*
-	executeRunToAction = new QAction(tr("Run to"), this);
-	executeRunToAction->setShortcut(tr("F4"));
-	executeRunToAction->setStatusTip(tr("Resume execution until the selected line is reached"));
-	executeRunToAction->setIcon(QIcon(":/icons/runto.png"));
-	executeRunToAction->setEnabled(false);
-	connect(this, &DebuggerForm::runStateEntered,   [this]{ executeRunToAction->setEnabled(false); });
-	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeRunToAction->setEnabled(true); });
-*/
-
-//	breakpointToggleAction = new QAction(tr("Toggle"), this);
-    //now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
-//	breakpointToggleAction->setShortcut(tr("F5"));
-//	breakpointToggleAction->setStatusTip(tr("Toggle breakpoint on/off at cursor"));
-//	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
-//	breakpointToggleAction->setEnabled(false);
 
 	breakpointAddAction = new QAction(tr("Add ..."), this);
     //now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
@@ -350,7 +282,6 @@ void DebuggerForm::createActions()
 //	breakpointAddAction->setEnabled(false);
 
 	helpAboutAction = new QAction(tr("&About"), this);
-//	executeRunToAction->setStatusTip(tr("Show the application information"));
 
     addVDPRegsWorkspaceAction = new QAction(tr("VDP &Regs"), this);
     addVDPRegsWorkspaceAction->setStatusTip(tr("Show the regular VDP registers"));
@@ -380,28 +311,13 @@ void DebuggerForm::createActions()
 	connect(systemSymbolManagerAction, &QAction::triggered, this, &DebuggerForm::systemSymbolManager);
 	connect(systemPreferencesAction, &QAction::triggered, this, &DebuggerForm::systemPreferences);
 	connect(searchGotoAction, &QAction::triggered, this, &DebuggerForm::searchGoto);
-/*	connect(viewRegistersAction, &QAction::triggered, this, &DebuggerForm::toggleRegisterDisplay);
-	connect(viewBreakpointsAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpointsDisplay);
-	connect(viewFlagsAction, &QAction::triggered, this, &DebuggerForm::toggleFlagsDisplay);
-	connect(viewStackAction, &QAction::triggered, this, &DebuggerForm::toggleStackDisplay);
-	connect(viewSlotsAction, &QAction::triggered, this, &DebuggerForm::toggleSlotsDisplay);
-	connect(viewMemoryAction, &QAction::triggered, this, &DebuggerForm::toggleMemoryDisplay);
-	connect(viewDebuggableViewerAction, &QAction::triggered, this, &DebuggerForm::addDebuggableViewer);
-	connect(viewBitMappedAction, &QAction::triggered, this, &DebuggerForm::toggleBitMappedDisplay);
-	connect(viewCharMappedAction, &QAction::triggered, this, &DebuggerForm::toggleCharMappedDisplay);
-	connect(viewSpritesAction, &QAction::triggered, this, &DebuggerForm::toggleSpritesDisplay);
-	connect(viewVDPRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPRegsDisplay);
-	connect(viewVDPCommandRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPCommandRegsDisplay);
-	connect(viewVDPStatusRegsAction, &QAction::triggered, this, &DebuggerForm::toggleVDPStatusRegsDisplay);
-*/	connect(executeBreakAction, &QAction::triggered, this, &DebuggerForm::executeBreak);
+
+    connect(executeBreakAction, &QAction::triggered, this, &DebuggerForm::executeBreak);
 	connect(executeRunAction, &QAction::triggered, this, &DebuggerForm::executeRun);
 	connect(executeStepAction, &QAction::triggered, this, &DebuggerForm::executeStep);
 	connect(executeStepOverAction, &QAction::triggered, this, &DebuggerForm::executeStepOver);
-    //connect(executeRunToAction, &QAction::triggered, this, &DebuggerForm::executeRunTo);
 	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
-    //connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
-    //connect(breakpointAddAction, &QAction::triggered, this, &DebuggerForm::addBreakpoint);
 	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
     connect(addVDPRegsWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPRegsWorkspace);
     connect(addVDPTilesWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPTilesWorkspace);
@@ -443,33 +359,6 @@ void DebuggerForm::createMenus()
 	searchMenu = menuBar()->addMenu(tr("Se&arch"));
 	searchMenu->addAction(searchGotoAction);
 
-    /*
-	// create view menu
-	viewMenu = menuBar()->addMenu(tr("&View"));
-	viewMenu->addAction(viewRegistersAction);
-	viewMenu->addAction(viewFlagsAction);
-	viewMenu->addAction(viewStackAction);
-	viewMenu->addAction(viewSlotsAction);
-	viewMenu->addAction(viewMemoryAction);
-	viewMenu->addAction(viewBreakpointsAction);
-	viewVDPDialogsMenu = viewMenu->addMenu("VDP");
-	viewMenu->addSeparator();
-	viewFloatingWidgetsMenu = viewMenu->addMenu("Floating widgets:");
-	viewMenu->addAction(viewDebuggableViewerAction);
-	connect(viewMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateViewMenu);
-
-	// create VDP dialogs menu
-	viewVDPDialogsMenu->addAction(viewVDPRegsAction);
-	viewVDPDialogsMenu->addAction(viewVDPCommandRegsAction);
-	viewVDPDialogsMenu->addAction(viewVDPStatusRegsAction);
-	viewVDPDialogsMenu->addAction(viewBitMappedAction);
-	viewVDPDialogsMenu->addAction(viewCharMappedAction);
-	viewVDPDialogsMenu->addAction(viewSpritesAction);
-	connect(viewVDPDialogsMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateVDPViewMenu);
-
-	// create Debuggable Viewers menu (so the user can focus an existing one)
-	connect(viewFloatingWidgetsMenu, &QMenu::aboutToShow, this, &DebuggerForm::updateViewFloatingWidgetsMenu);
-*/
 	// create execute menu
 	executeMenu = menuBar()->addMenu(tr("&Execute"));
 	executeMenu->addAction(executeBreakAction);
@@ -479,7 +368,6 @@ void DebuggerForm::createMenus()
 	executeMenu->addAction(executeStepOverAction);
 	executeMenu->addAction(executeStepOutAction);
 	executeMenu->addAction(executeStepBackAction);
-    //executeMenu->addAction(executeRunToAction);
 
 	// create breakpoint menu
 	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
@@ -738,30 +626,14 @@ void DebuggerForm::createForm()
 	btn->setIcon(icon);
     btn->setMenu(workspacemenu);
     btn->setPopupMode(QToolButton::InstantPopup);
-	//connect(btn, &QAbstractButton::clicked, this, &App::OpenNewTab);
 	workspaces->setCornerWidget(btn, Qt::TopRightCorner);
     connect(workspaces,&QTabWidget::tabCloseRequested,this,&DebuggerForm::tabCloseRequest);
 
-    /*
-    mainArea = new DockableWidgetArea();
-    dockMan.addDockArea(mainArea);
-    */
-
     QWidget *window = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout;
-    /*
-    QSplitter *cpusplit=new QSplitter();
-    cpusplit->addWidget(workspaces);
-    cpusplit->addWidget(mainArea);
-    cpusplit->setChildrenCollapsible(true);
-    layout->addWidget(cpusplit);
-    */
-    //only splitter now
     layout->addWidget(workspaces);
-
     window->setLayout(layout);
 
-//    workspaces->addTab(mainArea,"mainArea");
     workspaces->addTab(createWorkspaceCPU(),"CPU");
     addVDPRegsWorkspace();
     addVDPTilesWorkspace();
@@ -780,214 +652,15 @@ void DebuggerForm::createForm()
             SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString,int>&)) );
     connect(this, &DebuggerForm::breakpointsUpdated, SignalDispatcher::getDispatcher(), &SignalDispatcher::breakpointsUpdated);
 
-    /*
-
-	// Create main widgets and append them to the list first
-	auto* dw = new DockableWidget(dockMan);
-	// create the disasm viewer widget
-	disasmView = new DisasmViewer();
-	dw->setWidget(disasmView);
-	dw->setTitle(tr("Code view"));
-	dw->setId("CODEVIEW");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(false);
-	dw->setClosable(false);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create the memory view widget
-	mainMemoryView = new MainMemoryViewer();
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(mainMemoryView);
-	dw->setTitle(tr("Main memory"));
-	dw->setId("MEMORY");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create register viewer
-	regsView = new CPURegsViewer();
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(regsView);
-	dw->setTitle(tr("CPU registers"));
-	dw->setId("REGISTERS");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create flags viewer
-	flagsView = new FlagsViewer();
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(flagsView);
-	dw->setTitle(tr("Flags"));
-	dw->setId("FLAGS");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create stack viewer
-	stackView = new StackViewer();
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(stackView);
-	dw->setTitle(tr("Stack"));
-	dw->setId("STACK");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create slot viewer
-	slotView = new SlotViewer();
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(slotView);
-	dw->setTitle(tr("Memory layout"));
-	dw->setId("SLOTS");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// create breakpoints viewer
-	bpView = new BreakpointViewer(this);
-	dw = new DockableWidget(dockMan);
-	dw->setWidget(bpView);
-	dw->setTitle(tr("Debug list"));
-	dw->setId("DEBUG");
-	dw->setFloating(false);
-	dw->setDestroyable(false);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
-
-	// restore layout
-	restoreGeometry(Settings::get().value("Layout/WindowGeometry", saveGeometry()).toByteArray());
-
-	QStringList list = Settings::get().value("Layout/WidgetLayout").toStringList();
-	// defaults needed?
-	if (list.empty() || !list.at(0).startsWith("CODEVIEW ")) {
-		list.clear();
-		list.append("CODEVIEW D V R 0 -1 -1");
-		list.append("REGISTERS D V R 0 -1 -1");
-		list.append("FLAGS D V R 0 -1 -1");
-		int regW  = dockMan.findDockableWidget("REGISTERS")->sizeHint().width();
-		int regH  = dockMan.findDockableWidget("REGISTERS")->sizeHint().height();
-		list.append(QString("SLOTS D V R 0 -1 %1").arg(regH));
-		int codeW = dockMan.findDockableWidget("CODEVIEW")->sizeHint().width();
-		int codeH = dockMan.findDockableWidget("CODEVIEW")->sizeHint().height();
-		int flagW = dockMan.findDockableWidget("FLAGS")->sizeHint().width();
-		int slotW = dockMan.findDockableWidget("SLOTS")->sizeHint().width();
-		list.append(QString("STACK D V R 0 -1 %1").arg(codeH));
-		list.append(QString("MEMORY D V B %1 %2 %3").arg(codeW)
-		                                             .arg(regW + flagW + slotW)
-		                                             .arg(codeH - regH));
-		int stackW = dockMan.findDockableWidget("STACK")->sizeHint().width();
-		list.append(QString("DEBUG D V B %1 %2 -1").arg(codeW)
-		                                             .arg(regW + flagW + slotW + stackW));
-	}
-
-	// add widgets
-	for (int i = 0; i < list.size(); ++i) {
-		QStringList s = list.at(i).split(" ", Qt::SplitBehaviorFlags::SkipEmptyParts);
-		// get widget
-		if ((dw = dockMan.findDockableWidget(s.at(0)))) {
-			if (s.at(1) == "D") {
-				// dock widget
-				DockableWidgetLayout::DockSide side;
-				if        (s.at(3) == "T") {
-					side = DockableWidgetLayout::TOP;
-				} else if (s.at(3) == "L") {
-					side = DockableWidgetLayout::LEFT;
-				} else if (s.at(3) == "R") {
-					side = DockableWidgetLayout::RIGHT;
-				} else {
-					side = DockableWidgetLayout::BOTTOM;
-				}
-				dockMan.insertWidget(dw, 0, side, s.at(4).toInt(),
-				                     s.at(5).toInt(), s.at(6).toInt());
-				if (s.at(2) == "H") dw->hide();
-			} else if (s.at(1) == "F") {
-				//  float widget
-				dw->setFloating(true, s.at(2) == "V");
-				dw->resize(s.at(5).toInt(), s.at(6).toInt());
-				dw->move  (s.at(3).toInt(), s.at(4).toInt());
-			}
-		}
-	}
-
-    */
-
 
 	// disable all widgets
 	connectionClosed();
-/*
-	// Disasm viewer
-    //split in 2 below: connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpoint);
-    connect(disasmView,SIGNAL(breakpointToggled(uint16_t)), SignalDispatcher::getDispatcher(), SIGNAL(breakpointToggled(uint16_t)));
-    connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointToggled(uint16_t)), this, SLOT(toggleBreakpoint(uint16_t)));
-    //in DebuggerForm::processBreakpoints bo direct call to update() anymore
-    connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointsUpdated()), disasmView, SLOT(update()));
-
-    //split in 2 below:connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
-    connect(this, SIGNAL(symbolsChanged()), SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()) );
-    connect(SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()), disasmView, SLOT(refresh()));
-
-    //split in 2 below:connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
-    connect(this, SIGNAL(settingsChanged()), SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()) );
-    connect(SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()), disasmView, SLOT(updateLayout()));
-
-	// Main memory viewer
-	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
-	connect(this, &DebuggerForm::breakStateEntered, mainMemoryView, &MainMemoryViewer::refresh);
-
-	// Slot viewer
-	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
-	connect(this, &DebuggerForm::breakStateEntered, slotView, &SlotViewer::refresh);
-	// Received status update back from widget after breakStateEntered/connected
-	connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
-
-	// Breakpoint viewer
-	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
-	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
-	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
-	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
-
-	// CPU regs viewer
-	// Hook up the register viewer with the main memory viewer
-	connect(regsView, &CPURegsViewer::registerChanged, mainMemoryView, &MainMemoryViewer::registerChanged);
-	connect(regsView, &CPURegsViewer::flagsChanged, flagsView, &FlagsViewer::setFlags);
-	connect(regsView, &CPURegsViewer::spChanged, stackView, &StackViewer::setStackPointer);
-	// Received status update back from widgets after update
-	connect(regsView, &CPURegsViewer::pcChanged, this, &DebuggerForm::onPCChanged);
-
-    */
 
 	connect(&comm, &CommClient::connectionReady, this, &DebuggerForm::initConnection);
 	connect(&comm, &CommClient::updateParsed, this, &DebuggerForm::handleUpdate);
 	connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
-
-
     session->breakpoints().setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
-/*
-    disasmView->setMemory(SignalDispatcher::getDispatcher()->getMainMemory());
-    disasmView->setBreakpoints(&session->breakpoints());
-    disasmView->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
-    disasmView->setSymbolTable(&session->symbolTable());
-//	mainMemoryView->setRegsView(regsView);
-    mainMemoryView->setSymbolTable(&session->symbolTable());
-	mainMemoryView->setDebuggable("memory", 65536);
-    stackView->setData(SignalDispatcher::getDispatcher()->getMainMemory(), 65536);
-    slotView->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
-    bpView->setBreakpoints(&session->breakpoints());
-*/
 }
 
 QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
@@ -1109,28 +782,6 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 	// store layout
 	Settings::get().setValue("Layout/WindowGeometry", saveGeometry());
 
-	QStringList layoutList;
-	// fill layout list with docked widgets
-    /*
-	dockMan.getConfig(0, layoutList);
-	// append floating widgets
-	for (auto* widget : dockMan.managedWidgets()) {
-		if (widget->isFloating()) {
-			QString s("%1 F %2 %3 %4 %5 %6");
-			s = s.arg(widget->id());
-			if (widget->isHidden()) {
-				s = s.arg("H");
-			} else {
-				s = s.arg("V");
-			}
-			s = s.arg(widget->x()).arg(widget->y())
-			     .arg(widget->width()).arg(widget->height());
-			layoutList.append(s);
-		}
-		widget->hide();
-	}
-	Settings::get().setValue("Layout/WidgetLayout", layoutList);
-    */
 	QMainWindow::closeEvent(e);
 }
 
@@ -1276,22 +927,10 @@ void DebuggerForm::connectionClosed()
 	executeStepOverAction->setEnabled(false);
 	executeStepOutAction->setEnabled(false);
 	executeStepBackAction->setEnabled(false);
-//	executeRunToAction->setEnabled(false);
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
-//	breakpointToggleAction->setEnabled(false);
 	breakpointAddAction->setEnabled(false);
 
-    /*
-	for (auto* w : dockMan.managedWidgets()) {
-		w->widget()->setEnabled(false);
-    }
-    */
-//    replaced by signal from SignalDispatcher
-//    QList<SwitchingWidget*> allSwitchItems= this->findChildren<SwitchingWidget*>();
-//    foreach(SwitchingWidget* wdgt,allSwitchItems){
-//        wdgt->setEnableWidget(false);
-//    }
     enableWidgetStatus=false;
     emit SignalDispatcher::getDispatcher()->enableWidget(false);
 }
@@ -1300,7 +939,6 @@ void DebuggerForm::finalizeConnection(bool halted)
 {
 	systemPauseAction->setEnabled(true);
 	systemRebootAction->setEnabled(true);
-//	breakpointToggleAction->setEnabled(true);
 	breakpointAddAction->setEnabled(true);
 	// merge breakpoints on connect
 	mergeBreakpoints = true;
@@ -1312,16 +950,7 @@ void DebuggerForm::finalizeConnection(bool halted)
 	}
 
 	emit connected();
-    /*
-	for (auto* w : dockMan.managedWidgets()) {
-		w->widget()->setEnabled(true);
-	}
-    */
-//    replaced by signal from SignalDispatcher
-//    QList<SwitchingWidget*> allSwitchItems= this->findChildren<SwitchingWidget*>();
-//    foreach(SwitchingWidget* wdgt,allSwitchItems){
-//        wdgt->setEnableWidget(true);
-//    }
+
     enableWidgetStatus=true;
     emit SignalDispatcher::getDispatcher()->enableWidget(true);
 }
@@ -1537,13 +1166,6 @@ void DebuggerForm::executeStepOver()
 	setRunMode();
 }
 
-//void DebuggerForm::executeRunTo()
-//{
-//	comm.sendCommand(new SimpleCommand(
-//	                  "run_to " + QString::number(disasmView->cursorAddress())));
-//	setRunMode();
-//}
-
 void DebuggerForm::executeStepOut()
 {
 	comm.sendCommand(new SimpleCommand("step_out"));
@@ -1598,261 +1220,6 @@ void DebuggerForm::showAbout()
 	QMessageBox::about(
 		this, "openMSX Debugger", QString(Version::full().c_str()));
 }
-/*
-void DebuggerForm::toggleBreakpointsDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(bpView->parentWidget()));
-}
-
-void DebuggerForm::toggleRegisterDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(regsView->parentWidget()));
-}
-
-void DebuggerForm::toggleFlagsDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(flagsView->parentWidget()));
-}
-
-void DebuggerForm::toggleStackDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(stackView->parentWidget()));
-}
-
-void DebuggerForm::toggleSlotsDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
-}
-*/
-
-        /*
-void DebuggerForm::toggleBitMappedDisplay()
-{
-	//toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
-	// not sure if this a good idea for a docable widget
-
-	// create new debuggable viewer window
-	auto* viewer = new BitMapViewer();
-	auto* dw = new DockableWidget(dockMan);
-	dw->setWidget(viewer);
-	dw->setTitle(tr("Bitmapped VRAM View"));
-	dw->setId("BITMAPVRAMVIEW");
-	dw->setFloating(true);
-	dw->setDestroyable(true);
-	dw->setMovable(true);
-	dw->setClosable(true);
-    */
-	/*
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
-	*/
-
-    /*
-    // TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
-    */
-
-	/*
-	viewer->setDebuggables(debuggables);
-	viewer->setEnabled(disasmView->isEnabled());
-	*/
-        /*
-}
-    */
-
-/*
-void DebuggerForm::toggleCharMappedDisplay()
-{
-	//toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
-	// not sure if this a good idea for a docable widget
-
-	// create new debuggable viewer window
-	auto* viewer = new TileViewer();
-	//    viewer->adjustSize();
-	auto* dw = new DockableWidget(dockMan);
-	dw->setWidget(viewer);
-	dw->setTitle(tr("Tile VRAM View"));
-	dw->setId("CHARMAPVRAMVIEW");
-	dw->setFloating(true);
-	dw->setDestroyable(true);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	//    dw->adjustSize();
-
-	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
-}
-
-void DebuggerForm::toggleSpritesDisplay()
-{
-	//toggleView(qobject_cast<DockableWidget*>(slotView->parentWidget()));
-	// not sure if this a good idea for a docable widget
-
-	// create new debuggable viewer window
-	auto* viewer = new SpriteViewer();
-	auto* dw = new DockableWidget(dockMan);
-	dw->setWidget(viewer);
-	dw->setTitle(tr("Sprites View"));
-	dw->setId("SPRITESVRAMVIEW");
-	dw->setFloating(true);
-	dw->setDestroyable(true);
-	dw->setMovable(true);
-	dw->setClosable(true);
-
-	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
-}
-
-void DebuggerForm::toggleVDPCommandRegsDisplay()
-{
-	if (VDPCommandRegView == nullptr) {
-		VDPCommandRegView = new VDPCommandRegViewer();
-		auto* dw = new DockableWidget(dockMan);
-		dw->setWidget(VDPCommandRegView);
-		dw->setTitle(tr("VDP registers view"));
-		dw->setId("VDPCommandRegView");
-		dw->setFloating(true);
-		dw->setDestroyable(false);
-		dw->setMovable(true);
-		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPCommandRegView, SLOT(refresh()));
-	} else {
-		toggleView(qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
-	}
-}
-
-void DebuggerForm::toggleVDPRegsDisplay()
-{
-	if (VDPRegView == nullptr) {
-		VDPRegView = new VDPRegViewer();
-		auto* dw = new DockableWidget(dockMan);
-		dw->setWidget(VDPRegView);
-		dw->setTitle(tr("VDP registers view"));
-		dw->setId("VDPREGVIEW");
-		dw->setFloating(true);
-		dw->setDestroyable(false);
-		dw->setMovable(true);
-		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPRegView, SLOT(refresh()));
-	} else {
-		toggleView(qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
-	}
-}
-
-void DebuggerForm::toggleVDPStatusRegsDisplay()
-{
-	if (VDPStatusRegView == nullptr) {
-		VDPStatusRegView = new VDPStatusRegViewer();
-		auto* dw = new DockableWidget(dockMan);
-		dw->setWidget(VDPStatusRegView);
-		dw->setTitle(tr("VDP status registers view"));
-		dw->setId("VDPSTATUSREGVIEW");
-		dw->setFloating(true);
-		dw->setDestroyable(false);
-		dw->setMovable(true);
-		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPStatusRegView, SLOT(refresh()));
-	} else {
-		toggleView(qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
-	}
-}
-
-void DebuggerForm::toggleMemoryDisplay()
-{
-	toggleView(qobject_cast<DockableWidget*>(mainMemoryView->parentWidget()));
-}
-
-void DebuggerForm::toggleView(DockableWidget* widget)
-{
-	if (widget->isHidden()) {
-		widget->show();
-	} else {
-		widget->hide();
-	}
-	dockMan.visibilityChanged(widget);
-}
-
-void DebuggerForm::addDebuggableViewer()
-{
-	// create new debuggable viewer window
-	auto* viewer = new DebuggableViewer();
-	auto* dw = new DockableWidget(dockMan);
-	dw->setWidget(viewer);
-	dw->setTitle(tr("Debuggable hex view"));
-	dw->setId("DEBUGVIEW-" + QString::number(++counter));
-	dw->setFloating(true);
-	dw->setDestroyable(true);
-	dw->setMovable(true);
-	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
-	connect(this, SIGNAL(breakStateEntered()),
-	        viewer, SLOT(refresh()));
-	viewer->setDebuggables(debuggables);
-	viewer->setEnabled(disasmView->isEnabled());
-}
-
-void DebuggerForm::showFloatingWidget()
-{
-	QObject * s = sender();
-	QString widget_id = s->property("widget_id").toString();
-	DockableWidget* w = dockMan.findDockableWidget(widget_id);
-	w->show();
-	w->activateWindow();
-	w->raise();
-}
-
-void DebuggerForm::dockWidgetVisibilityChanged(DockableWidget* w)
-{
-	dockMan.visibilityChanged(w);
-	updateViewMenu();
-}
-
-void DebuggerForm::updateViewMenu()
-{
-	viewRegistersAction->setChecked(regsView->parentWidget()->isVisible());
-	viewFlagsAction->setChecked(flagsView->isVisible());
-	viewStackAction->setChecked(stackView->isVisible());
-	viewSlotsAction->setChecked(slotView->isVisible());
-	viewMemoryAction->setChecked(mainMemoryView->isVisible());
-	viewBreakpointsAction->setChecked(bpView->isVisible());
-}
-
-void DebuggerForm::updateVDPViewMenu()
-{
-	if (VDPCommandRegView) {
-		viewVDPCommandRegsAction->setChecked(VDPCommandRegView->isVisible());
-	}
-	if (VDPRegView) {
-		viewVDPRegsAction->setChecked(VDPRegView->isVisible());
-	}
-	if (VDPStatusRegView) {
-		viewVDPStatusRegsAction->setChecked(VDPStatusRegView->isVisible());
-	}
-}
-
-void DebuggerForm::updateViewFloatingWidgetsMenu()
-{
-	viewFloatingWidgetsMenu->clear();
-	for (auto* w : dockMan.managedWidgets()) {
-		if (w->isFloating()) {
-			// Build up the window title
-			auto* action = new QAction(w->title());
-			// Set the widget_id as a property on the menu item action, so we can read it out later again via sender() on the receiving functor
-			action->setProperty("widget_id", w->id());
-			connect(action, &QAction::triggered, this, &DebuggerForm::showFloatingWidget);
-			viewFloatingWidgetsMenu->addAction(action);
-		}
-	}
-}
-*/
 
 void DebuggerForm::setDebuggables(const QString& list)
 {

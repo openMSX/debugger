@@ -4,7 +4,6 @@ SUBDIRS:= \
 	openmsx
 
 MOC_SRC_HDR:= \
-	DockableWidget DockableWidgetArea DockableWidgetLayout \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager \
 	Settings PreferencesDialog BreakpointDialog DebuggableViewer \
@@ -24,7 +23,7 @@ MOC_SRC_HDR:= \
 
 
 SRC_HDR:= \
-	DockManager Dasm DasmTables DebuggerData SymbolTable Convert Version \
+	Dasm DasmTables DebuggerData SymbolTable Convert Version \
 	CPURegs SimpleHexRequest
 
 SRC_ONLY:= \

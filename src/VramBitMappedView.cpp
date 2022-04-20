@@ -27,10 +27,6 @@ void VramBitMappedView::decode()
 {
 	if (!vramBase) return;
 
-	printf("\n"
-	       "screenMode: %i\n"
-	       "vram to start decoding: %i\n",
-	       screenMode, vramAddress);
 	switch (screenMode) {
 		case  5: decodeSCR5();  break;
 		case  6: decodeSCR6();  break;
