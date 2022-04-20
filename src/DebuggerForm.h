@@ -88,10 +88,12 @@ private:
 	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* searchMenu;
+    /*
 	QMenu* viewMenu;
 	QMenu* viewVDPDialogsMenu;
 	QMenu* viewFloatingWidgetsMenu;
-	QMenu* executeMenu;
+    */
+    QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
 
@@ -116,7 +118,7 @@ private:
 	QAction* systemPreferencesAction;
 
 	QAction* searchGotoAction;
-
+/*
 	QAction* viewRegistersAction;
 	QAction* viewFlagsAction;
 	QAction* viewStackAction;
@@ -131,16 +133,16 @@ private:
 	QAction* viewVDPStatusRegsAction;
 	QAction* viewVDPRegsAction;
 	QAction* viewVDPCommandRegsAction;
-
+*/
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
 	QAction* executeStepAction;
 	QAction* executeStepOverAction;
-	QAction* executeRunToAction;
+    //QAction* executeRunToAction;
 	QAction* executeStepOutAction;
 	QAction* executeStepBackAction;
 
-	QAction* breakpointToggleAction;
+    //QAction* breakpointToggleAction;
 	QAction* breakpointAddAction;
 
 	QAction* helpAboutAction;
@@ -151,20 +153,20 @@ private:
     QAction* addEmptyWorkspaceAction;
     QAction* addFloatingSwitchingWidgetAction;
 
-	DockManager dockMan;
-	DockableWidgetArea* mainArea;
+//	DockManager dockMan;
+//	DockableWidgetArea* mainArea;
 	QStringList recentFiles;
 
-	DisasmViewer* disasmView;
-	MainMemoryViewer* mainMemoryView;
-	CPURegsViewer* regsView;
-	FlagsViewer* flagsView;
-	StackViewer* stackView;
-	SlotViewer* slotView;
-	VDPStatusRegViewer* VDPStatusRegView;
-	VDPRegViewer* VDPRegView;
-	VDPCommandRegViewer* VDPCommandRegView;
-	BreakpointViewer* bpView;
+//	DisasmViewer* disasmView;
+//	MainMemoryViewer* mainMemoryView;
+//	CPURegsViewer* regsView;
+//	FlagsViewer* flagsView;
+//	StackViewer* stackView;
+//	SlotViewer* slotView;
+//	VDPStatusRegViewer* VDPStatusRegView;
+//	VDPRegViewer* VDPRegView;
+//	VDPCommandRegViewer* VDPCommandRegView;
+//	BreakpointViewer* bpView;
 
 	CommClient& comm;
     DebugSession* session;
@@ -207,7 +209,7 @@ private:
 	void executeRun();
 	void executeStep();
 	void executeStepOver();
-	void executeRunTo();
+//	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
 private slots:
