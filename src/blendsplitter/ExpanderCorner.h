@@ -42,7 +42,6 @@ private:
 
     Overlay* internalOverlay;
     Overlay* externalOverlay;
-    QWidget* externalJoinWidget;
     Qt::ArrowType joinarrow;
     int pickCoordinate(int x,int y,Qt::Orientation orient);
     int pickSize(const QSize &size, Qt::Orientation orient);

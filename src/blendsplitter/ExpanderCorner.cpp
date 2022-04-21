@@ -12,7 +12,7 @@
 ExpanderCorner::ExpanderCorner(WidgetDecorator* parent,Qt::Corner location) : Expander{parent} ,
     corner{location},unitX{1},unitY{1},hotspotX{0},hotspotY{0},dragaction{undecidedDrag},
     dragorientation{Qt::Horizontal},internalOverlay{nullptr},externalOverlay{nullptr},
-    externalJoinWidget{nullptr},joinarrow{Qt::NoArrow}
+    joinarrow{Qt::NoArrow}
 {
     //now do some masking and pixmap rotating depending on location
     //also set out unit steps
@@ -204,10 +204,10 @@ void ExpanderCorner::setupJoiners(WidgetDecorator *parentDecorator, BlendSplitte
         //now show overlay if we started a valid joindrag
         if (externalOverlay){
             externalOverlay->show();
-            externalJoinWidget=wdgt;
             internalOverlay=new Overlay{parentDecorator,Overlay::invertArrow(joinarrow)};
             internalOverlay->hide();
             dragaction=joinDrag;
+            //qDebug() << "starting joindrag " << wdgt << " ( <-wdgt   parentDecorator->) " << parentDecorator;
         }
     }
 }
@@ -227,27 +227,26 @@ void ExpanderCorner::followDragJoiners(WidgetDecorator *parentDecorator, BlendSp
     y=pos().y()+y;
 
     if (isInContinuationOfSplitter(parentSplitter,x,y)){
-        // already an overlay and we are still dragging 'inside' of the splitter, so
-        externalOverlay->show();
         // maybe we need to change direction of the join ?
-        //qDebug() << "overlay->parentWidget()!=externalJoinWidget" << externalOverlay->parentWidget() << "  " <<externalJoinWidget;
-
         Qt::Orientation o=parentSplitter->orientation();
         if ((isOnTrailingHandler(parentSplitter) and pickCoordinate(x,y,o)>pickSize(parentDecorator->size(),o))
                 or (!isOnTrailingHandler(parentSplitter) and pickCoordinate(x,y,o)<0)
                 ) {
             externalOverlay->show();
             internalOverlay->hide();
+            setCursor(parentSplitter->orientation()==Qt::Horizontal?Qt::SizeHorCursor:Qt::SizeVerCursor);
         } else if ((isOnTrailingHandler(parentSplitter) and pickCoordinate(x,y,o)<=pickSize(parentDecorator->size(),o))
                    or (!isOnTrailingHandler(parentSplitter) and pickCoordinate(x,y,o)>=0)
                    ) {
             externalOverlay->hide();
             internalOverlay->show();
+            setCursor(parentSplitter->orientation()==Qt::Horizontal?Qt::SizeHorCursor:Qt::SizeVerCursor);
         }
     } else {
         // hide all overlay since we dragged 'to the side' of the splitter
         externalOverlay->hide();
         internalOverlay->hide();
+        setCursor(Qt::ForbiddenCursor);
     }
 }
 
@@ -361,6 +360,9 @@ void ExpanderCorner::mouseReleaseEvent(QMouseEvent *event)
     if(event->button() != Qt::LeftButton or dragaction != joinDrag){
         return;
     };
+    //back to default cursor for handler
+    setCursor(Qt::SizeAllCursor);
+
     //correct button and we have an overlay, so continue...
     if(externalOverlay->isVisible() && internalOverlay->isVisible())
     {
@@ -370,23 +372,36 @@ void ExpanderCorner::mouseReleaseEvent(QMouseEvent *event)
 
 
     QWidget* widgetToRemove=nullptr; //improved readability later on
-    if (externalOverlay->isHidden()){
-        externalOverlay->deleteLater();
-    } else {
-        widgetToRemove=externalOverlay->parentWidget();
-    };
+    QWidget* widgetToKeep=nullptr; //improved readability later on
 
-    if (internalOverlay->isHidden()){
-        internalOverlay->deleteLater();
-    } else {
+    if (externalOverlay->isVisible() && !internalOverlay->isVisible()){
+        widgetToKeep=internalOverlay->parentWidget();
+        widgetToRemove=externalOverlay->parentWidget();
+    } else if (!externalOverlay->isVisible() && internalOverlay->isVisible()){
+        widgetToKeep=externalOverlay->parentWidget();
         widgetToRemove=internalOverlay->parentWidget();
     };
 
 
+    // The visible overlays will be deleted when we remove the widget,
+    // so we need to clean up the invisble overlays
+    if (!internalOverlay->isVisible()){
+        internalOverlay->deleteLater();
+    };
+    if (!externalOverlay->isVisible()){
+        externalOverlay->deleteLater();
+    };
+
+    //do nothing if both overlays were hidden
+    if (widgetToRemove==nullptr){
+        externalOverlay = nullptr;
+        internalOverlay = nullptr;
+        return;
+    }
 
     //first get our decorator and the parent blendSplitter
-    WidgetDecorator* parentDecorator{qobject_cast<WidgetDecorator*>(parentWidget())};
-    if(parentDecorator == 0)
+    WidgetDecorator* toKeepDecorator{qobject_cast<WidgetDecorator*>(widgetToKeep)};
+    if(toKeepDecorator == 0)
     {
         qCritical("A BlendSplitter library error occurred. Error code: 1");
         return;
@@ -399,16 +414,16 @@ void ExpanderCorner::mouseReleaseEvent(QMouseEvent *event)
     }
 
 
-    //now delete the item with the overlay from the splitter
+    //now delete the item with the visible overlay from the splitter
 
     QList<int> sizes{parentSplitter->sizes()};
-    int parentIndex{parentSplitter->indexOf(parentDecorator)};
-    int overlayIndex{parentSplitter->indexOf(widgetToRemove)};
-    sizes[parentIndex] += sizes[overlayIndex] + 1;
-    sizes.removeAt(overlayIndex);
-    delete parentSplitter->widget(overlayIndex);
+    int toKeepIndex{parentSplitter->indexOf(toKeepDecorator)};
+    int toRemoveIndex{parentSplitter->indexOf(widgetToRemove)};
+    sizes[toKeepIndex] += sizes[toRemoveIndex] + 1;
+    sizes.removeAt(toRemoveIndex);
+    delete parentSplitter->widget(toRemoveIndex);
     externalOverlay = nullptr;
-    externalJoinWidget = nullptr;
+    internalOverlay = nullptr;
 
     // if we now have a blendSplitter with a single item, which is inside
     // another blendSplitter then we remove this singular-item splitter
@@ -422,7 +437,7 @@ void ExpanderCorner::mouseReleaseEvent(QMouseEvent *event)
             return;
         }
         QList<int> sizes2{newParent->sizes()};
-        newParent->insertDecoratedWidget(newParent->indexOf(parentSplitter->parentWidget()), parentDecorator);
+        newParent->insertDecoratedWidget(newParent->indexOf(parentSplitter->parentWidget()), toKeepDecorator);
         delete parentSplitter->parentWidget();
         newParent->setSizes(sizes2);
     }
