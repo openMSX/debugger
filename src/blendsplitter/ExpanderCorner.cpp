@@ -172,6 +172,10 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
         addedWidget->setEnableWidget(switchwdg->getEnableWidget());
         addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
    }
+
+    //have the cursor take the correct shape
+   setCursor(splitorientation == Qt::Horizontal ? Qt::SplitHCursor : Qt::SplitVCursor);
+
 }
 
 void ExpanderCorner::setupJoiners(WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter, int x, int y, Qt::Orientation /*splitorientation*/)
@@ -219,6 +223,12 @@ int ExpanderCorner::pickCoordinate(int x,int y,Qt::Orientation orient)
 int ExpanderCorner::pickSize(const QSize &size, Qt::Orientation orient)
 {
     return (orient == Qt::Horizontal) ? size.width() : size.height();
+}
+
+void ExpanderCorner::enterEvent(QEvent *event)
+{
+    setCursor(Qt::CrossCursor); //after innersplit the cursor is still wrong when entering...
+    Expander::enterEvent(event);
 }
 
 void ExpanderCorner::followDragJoiners(WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter, int x, int y, Qt::Orientation /*splitorientation*/)
@@ -357,11 +367,15 @@ void ExpanderCorner::mousePressEvent(QMouseEvent *event)
 
 void ExpanderCorner::mouseReleaseEvent(QMouseEvent *event)
 {
+    if(event->button() == Qt::LeftButton){
+        //releasing leftbutton set us back to default cursor for handler
+        // since we might have changed due to split or join
+        setCursor(Qt::CrossCursor);
+    };
+
     if(event->button() != Qt::LeftButton or dragaction != joinDrag){
         return;
     };
-    //back to default cursor for handler
-    setCursor(Qt::SizeAllCursor);
 
     //correct button and we have an overlay, so continue...
     if(externalOverlay->isVisible() && internalOverlay->isVisible())

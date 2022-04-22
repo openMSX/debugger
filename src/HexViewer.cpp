@@ -43,14 +43,13 @@ private:
 
 HexViewer::HexViewer(QWidget* parent)
 	: QFrame(parent)
-	, wheelRemainder(0)
+    , wheelRemainder(0),horBytes{16}
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	horBytes = 16;
 	hexTopAddress = 0;
 	hexMarkAddress = 0;
 	hexData = nullptr;
@@ -166,7 +165,7 @@ void HexViewer::setDisplayMode(Mode mode)
 void HexViewer::setDisplayWidth(short width)
 {
 	displayMode = FIXED;
-	horBytes = width;
+    horBytes = std::max(short{1},width);
 	setSizes();
 }
 
@@ -492,7 +491,12 @@ void HexViewer::transferCancelled(HexRequest* r)
 	delete r;
 	waitingForData = false;
 	// check whether a new value is available
-	if (int(hexTopAddress / horBytes) != vertScrollBar->value()) {
+    if (horBytes==0) {
+        // for some reasson we could get a floating point exception here when cerating a new Hexviewer in disconnected mode??
+        qDebug()<< "Avoided divide by zero??";
+        return;
+    };
+    if (int(hexTopAddress / horBytes) != vertScrollBar->value()) {
 		vertScrollBar->setValue(hexTopAddress / horBytes);
 	}
 }

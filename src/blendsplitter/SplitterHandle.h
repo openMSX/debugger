@@ -15,13 +15,26 @@ public:
     SplitterHandle(Qt::Orientation orientation, QSplitter* parent);
     ~SplitterHandle();
 
+protected:
+    void createPopupMenu();
+    void destroyPopupMenu();
+
+    void removeFromSplitter(int toKeepIndex,int toRemoveIndex);
+
 protected slots:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual bool event(QEvent *event) override;
 
+
+
+
 private:
     QMenu* popupmenu;
-    QAction* joinAction;
-    QAction* splitAction;
+    QAction* joinBeforeAction;
+    QAction* joinAfterAction;
+    QAction* splitHoriBeforeAction;
+    QAction* splitHoriAfterAction;
+    QAction* splitVertBeforeAction;
+    QAction* splitVertAfterAction;
 };

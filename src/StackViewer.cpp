@@ -66,7 +66,7 @@ StackViewer::StackViewer(QWidget* parent)
 
 QSize StackViewer::sizeHint() const
 {
-	return {frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF ") + 4 + frameR,
+    return {frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF   ") + 4 + frameR,
 	        frameT + 8 * fontMetrics().height() + frameB};
 }
 

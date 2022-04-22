@@ -19,7 +19,7 @@ protected:
 protected slots:
 //    virtual void enterEvent(QEvent* event) override final;
 //    virtual void leaveEvent(QEvent* event) override final;
-    virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent* event) override = 0;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+//    virtual void mousePressEvent(QMouseEvent* event) override;
+//    virtual void mouseMoveEvent(QMouseEvent* event) override = 0;
+//    virtual void mouseReleaseEvent(QMouseEvent* event) override;
 };

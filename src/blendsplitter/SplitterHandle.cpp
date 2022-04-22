@@ -1,13 +1,16 @@
 #include "SplitterHandle.h"
+#include "BlendSplitter.h"
+#include "WidgetDecorator.h"
 #include <QAction>
 #include <QMenu>
 #include <QDebug>
+#include <QMessageBox>
 
-SplitterHandle::SplitterHandle(Qt::Orientation orientation, QSplitter* parent) : QSplitterHandle(orientation, parent)
+SplitterHandle::SplitterHandle(Qt::Orientation orientation, QSplitter* parent) : QSplitterHandle(orientation, parent),
+    popupmenu{nullptr},joinBeforeAction{nullptr},joinAfterAction{nullptr},
+    splitHoriBeforeAction{nullptr},splitHoriAfterAction{nullptr},
+    splitVertBeforeAction{nullptr},splitVertAfterAction{nullptr}
 {
-    popupmenu= new QMenu(this);
-    splitAction= popupmenu->addAction(tr("Split"));
-    joinAction= popupmenu->addAction(tr("Join"));
 }
 
 SplitterHandle::~SplitterHandle()
@@ -68,7 +71,18 @@ SplitterHandle::~SplitterHandle()
 void SplitterHandle::mousePressEvent(QMouseEvent *event)
 {
 
-    if (event->button() == Qt::RightButton){
+    if (false && event->button() == Qt::RightButton){ //this causes too much crashes so disabled for now
+        // Probably the QT internal code deletes the handler when we remove widgets from
+        // the QSplitters and the rest of the Qt internals event handlers are then calling invalidated memory.
+        // It is never a good idea to delete objects while they are still needed :-)
+        //
+        // So either I remove this entirely or I use the old trick of decoupling the event from the deletion
+        // like setting it up with a QTimer so that the main Qt loop will trigger the deletion while there is no handler code active...
+
+
+
+
+        createPopupMenu();
         QPoint pos=event->globalPos();
         // When positioning a menu with exec() or popup(), bear in mind that you
         // cannot rely on the menu's current size(). For performance reasons,
@@ -78,15 +92,29 @@ void SplitterHandle::mousePressEvent(QMouseEvent *event)
         // contents.
         pos.setX(pos.x() - popupmenu->sizeHint().width() / 2); //
         QAction* act=popupmenu->exec(pos);
-        if (act==joinAction){
-            //not yet implemented
-        } else if (act==splitAction){
-            //not yet implemented
-        }
+        if (act==nullptr){
+            //if nothing select and some action are nullpointers....
+        } else if (act==joinBeforeAction){
+            releaseMouse();
+            event->accept();
+            int index = splitter()->indexOf(this);
+            removeFromSplitter(index,index-1);
+        } else if (act==joinAfterAction){
+            releaseMouse();
+            event->accept();
+            //calling this will cause a segfault, so disabled...
+            QMessageBox::information(this,"function disabled","The current code would crash the program, so this function is disabled for now.If you are a developper please help us out...");
+            //int index = splitter()->indexOf(this);
+            //removeFromSplitter(index-1,index);
+        } else {
+            QSplitterHandle::mousePressEvent(event);
+        };
+        destroyPopupMenu();
 //        setFocus();
 //        grabMouse();
+    } else {
+        QSplitterHandle::mousePressEvent(event);
     }
-    QSplitterHandle::mousePressEvent(event);
 }
 void SplitterHandle::mouseReleaseEvent(QMouseEvent* event)
 {
@@ -98,4 +126,104 @@ bool SplitterHandle::event(QEvent *event)
 {
 //    qDebug() << " SplitterHandle::event " << event ;
     return QSplitterHandle::event(event);
+}
+
+void SplitterHandle::createPopupMenu()
+{
+    int index=splitter()->indexOf(this);
+    bool joinBeforePossible=splitter()->widget(index-1)->inherits("WidgetDecorator"); //do not join over splitters!
+    bool joinAfterPossible=splitter()->widget(index)->inherits("WidgetDecorator"); //do not join over splitters!
+
+    // given all the crashes with joining and the simplicity of dragsplitting
+    // maybe we should simply drop the idea of reimplementing this blender functionality?
+    bool splitHoriBeforePossible=false;
+    bool splitVertBeforePossible=false;
+    bool splitHoriAfterPossible=false;
+    bool splitVertAfterPossible=false;
+
+    popupmenu= new QMenu(this);
+    bool hori = orientation()==Qt::Horizontal;
+    if (joinBeforePossible){
+        joinBeforeAction = popupmenu->addAction(hori ? tr("remove left") : tr("remove above"));
+    };
+    if (joinAfterPossible){
+        joinAfterAction = popupmenu->addAction(hori ? tr("remove right") : tr("remove below"));
+    }
+
+    if (joinAfterPossible || joinBeforePossible){
+        popupmenu->addSeparator();
+    };
+
+    if (splitHoriBeforePossible){
+        splitHoriBeforeAction = popupmenu->addAction(hori ? tr("split left horizontal") : tr("split above horizontal"));
+    };
+    if (splitVertBeforePossible){
+        splitVertBeforeAction = popupmenu->addAction(hori ? tr("split left vertical") : tr("split above vertical"));
+    };
+    if (splitHoriAfterPossible){
+        splitHoriAfterAction = popupmenu->addAction(hori ? tr("split right horizontal") : tr("split below horizontal"));
+    };
+    if (splitVertAfterPossible){
+        splitVertAfterAction = popupmenu->addAction(hori ? tr("split right horizontal") : tr("split below horizontal"));
+    }
+}
+
+void SplitterHandle::destroyPopupMenu()
+{
+ if (popupmenu){
+     delete popupmenu;
+     popupmenu=nullptr;
+     joinBeforeAction=nullptr;
+     joinAfterAction=nullptr;
+     splitHoriAfterAction=nullptr;
+     splitVertAfterAction=nullptr;
+     splitHoriBeforeAction=nullptr;
+     splitHoriAfterAction=nullptr;
+ }
+}
+
+void SplitterHandle::removeFromSplitter(int toKeepIndex, int toRemoveIndex)
+{
+    QSplitter* parentSplitter=splitter();
+    if(parentSplitter == nullptr)
+    {
+        qCritical("A BlendSplitter library error occurred. Error code: 20");
+        return;
+    }
+    WidgetDecorator* toKeepDecorator{qobject_cast<WidgetDecorator*>(parentSplitter->widget(toKeepIndex))};
+    if(!(toKeepDecorator || parentSplitter->widget(toKeepIndex)->inherits("SplitterDecorator") ))
+    {
+        qCritical("A BlendSplitter library error occurred. Error code: 21");
+        return;
+    }
+    //TODO: exact same code as in ExpanderCorner => isolate in sepereate method later
+
+    QList<int> sizes{parentSplitter->sizes()};
+    sizes[toKeepIndex] += sizes[toRemoveIndex] + 1;
+    sizes.removeAt(toRemoveIndex);
+    QWidget* oldcontent = parentSplitter->widget(toRemoveIndex);
+    // we now avoid delete parentSplitter->widget(toRemoveIndex);
+    // we hope this also impacts the handler...
+    oldcontent->hide();
+    oldcontent->setParent(nullptr); //removes it from splitter and makes it standalone (already hidden) window.
+    oldcontent->deleteLater();
+    if(parentSplitter->count() == 1 and
+            parentSplitter->parentWidget()->inherits("SplitterDecorator"))
+    {
+        BlendSplitter* newParent{qobject_cast<BlendSplitter*>(parentSplitter->parentWidget()->parentWidget())};
+        if(newParent == nullptr)
+        {
+            qCritical("A BlendSplitter library error occurred. Error code: 3");
+            return;
+        }
+        QList<int> sizes2{newParent->sizes()};
+        newParent->insertDecoratedWidget(newParent->indexOf(parentSplitter->parentWidget()), toKeepDecorator);
+        delete parentSplitter->parentWidget();
+        newParent->setSizes(sizes2);
+    }
+    else
+    {
+        parentSplitter->setSizes(sizes);
+    }
+
 }

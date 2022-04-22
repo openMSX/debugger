@@ -98,5 +98,7 @@ private:
     QWidget* (*defaultWidget) ();
     virtual QSplitterHandle* createHandle() override;
     void addDecoratedWidget(WidgetDecorator* widget);
+public:
     void insertDecoratedWidget(int index, WidgetDecorator* widget);
+
 };

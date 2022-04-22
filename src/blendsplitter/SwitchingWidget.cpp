@@ -4,6 +4,7 @@
 #include "RegistryItem.h"
 #include "SwitchingBar.h"
 #include "SwitchingCombo.h"
+#include <QScrollArea>
 
 SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent,bool menuAtTop) : QSplitter(Qt::Vertical, parent), bar{new SwitchingBar{}}, widgetEnabled(true),barAtTop(menuAtTop)
 {
@@ -12,9 +13,9 @@ SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent,bool menuAt
     setStyleSheet("QSplitter::handle{background: grey;}");
     if (barAtTop){
         addWidget(bar);
-        addWidget((*WidgetRegistry::getRegistry()->getDefault()->widget) ());
+        addWidget(wrapInScrollArea( (*WidgetRegistry::getRegistry()->getDefault()->widget) () ) );
     } else {
-        addWidget((*WidgetRegistry::getRegistry()->getDefault()->widget) ());
+        addWidget(wrapInScrollArea( (*WidgetRegistry::getRegistry()->getDefault()->widget) () ) );
         addWidget(bar);
 
     }
@@ -32,7 +33,7 @@ void SwitchingWidget::setCurrentWidget(RegistryItem *item)
     if(WidgetRegistry::getRegistry()->indexOf(item) >= 0)
     {
         delete widget(widgetIndex());
-        insertWidget(widgetIndex(), (*item->widget) ());
+        insertWidget(widgetIndex(),wrapInScrollArea(  (*item->widget) ()));
         bar->reconstruct(*item->populateBar, widget(widgetIndex()));
         bar->combo->setCurrentIndex(bar->combo->findText(item->name));
         widget(widgetIndex())->setEnabled(widgetEnabled);
@@ -59,9 +60,22 @@ void SwitchingWidget::setEnableWidget(bool enable)
     widgetEnabled=enable;
 
     QWidget* wdgt=widget(widgetIndex());
+
+    if (isWrappedInScrollArea){
+        static_cast<QScrollArea*>(wdgt)->setAutoFillBackground(true);
+//        static_cast<QScrollArea*>(wdgt)->setBackgroundRole(QPalette::Text); //trying to force repaint of background
+//        static_cast<QScrollArea*>(wdgt)->update();
+        static_cast<QScrollArea*>(wdgt)->setBackgroundRole(enable ? QPalette::Window : QPalette::Dark);
+        if (static_cast<QScrollArea*>(wdgt)->viewport()){
+            static_cast<QScrollArea*>(wdgt)->viewport()->update();
+        };
+        wdgt=static_cast<QScrollArea*>(wdgt)->widget();
+    };
+
     if (wdgt != nullptr){
         wdgt->setEnabled(enable);
     }
+
 }
 
 void SwitchingWidget::changeCurrentWidget(int index)
@@ -70,6 +84,22 @@ void SwitchingWidget::changeCurrentWidget(int index)
     {
         setCurrentWidget(WidgetRegistry::getRegistry()->item(index));
     }
+}
+
+QWidget *SwitchingWidget::wrapInScrollArea(QWidget *wdgt, bool dowrap)
+{
+    isWrappedInScrollArea=dowrap;
+    if (!dowrap){
+        return wdgt;
+    };
+
+    QScrollArea* scrollArea = new QScrollArea;
+    //scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    scrollArea->setContentsMargins(0,0,0,0);
+    scrollArea->setWidget(wdgt);
+    scrollArea->setWidgetResizable(true);
+    return scrollArea;
 }
 
 int SwitchingWidget::barIndex()

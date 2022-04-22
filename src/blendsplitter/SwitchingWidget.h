@@ -37,9 +37,11 @@ public slots:
 private slots:
     void changeCurrentWidget(int index);
 private:
+    QWidget* wrapInScrollArea(QWidget* wdgt, bool dowrap=true);
     int barIndex();
     int widgetIndex();
     SwitchingBar* bar;
     bool widgetEnabled;
     bool barAtTop;
+    bool isWrappedInScrollArea;
 };
