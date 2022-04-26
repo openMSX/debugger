@@ -18,7 +18,7 @@ MOC_SRC_HDR:= \
 	blendsplitter/WidgetRegistry blendsplitter/ExpanderCorner \
 	blendsplitter/RegistryItem \
 	blendsplitter/SplitterHandle blendsplitter/SwitchingCombo \
-	blendsplitter/WidgetDecorator
+	blendsplitter/WidgetDecorator QuickGuide
 
 
 
@@ -32,6 +32,7 @@ SRC_ONLY:= \
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
 	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters \
-	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer
+	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer \
+	QuickGuide
 
 include build/node-end.mk

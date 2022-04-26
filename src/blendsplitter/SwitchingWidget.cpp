@@ -65,7 +65,7 @@ void SwitchingWidget::setEnableWidget(bool enable)
         static_cast<QScrollArea*>(wdgt)->setAutoFillBackground(true);
 //        static_cast<QScrollArea*>(wdgt)->setBackgroundRole(QPalette::Text); //trying to force repaint of background
 //        static_cast<QScrollArea*>(wdgt)->update();
-        static_cast<QScrollArea*>(wdgt)->setBackgroundRole(enable ? QPalette::Window : QPalette::Dark);
+        /*static_cast<QScrollArea*>(wdgt)->setBackgroundRole(enable ? QPalette::Window : QPalette::Dark);*/
         if (static_cast<QScrollArea*>(wdgt)->viewport()){
             static_cast<QScrollArea*>(wdgt)->viewport()->update();
         };

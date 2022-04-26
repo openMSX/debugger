@@ -48,7 +48,8 @@ public:
         bitMapViewer,
         tileViewer,
         spriteViewer,
-        vdpRegisters
+        vdpRegisters,
+        quickguide
     };
 
 private:

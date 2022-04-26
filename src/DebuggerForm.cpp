@@ -24,6 +24,7 @@
 #include "SignalDispatcher.h"
 #include "blendsplitter/BlendSplitter.h"
 #include "blendsplitter/WidgetRegistry.h"
+#include "QuickGuide.h"
 #include <QAction>
 #include <QMessageBox>
 #include <QMenu>
@@ -464,8 +465,8 @@ void DebuggerForm::createWidgetRegistry()
 			tr("Debuggable hex view"),
             []()->QWidget* {return widgetFactory(debuggableViewer);}
 			};
-	//WidgetRegistry::getRegistry()->addItem(item);
-	WidgetRegistry::getRegistry()->setDefault(item);
+    WidgetRegistry::getRegistry()->addItem(item);
+    //WidgetRegistry::getRegistry()->setDefault(item);
 
     //8: register the VDP Status Registers
 	item  = new RegistryItem{
@@ -506,10 +507,17 @@ void DebuggerForm::createWidgetRegistry()
     item  = new RegistryItem{
             tr("VDP registers"),
             []()->QWidget* {return widgetFactory(vdpRegisters);}
-};
+            };
     WidgetRegistry::getRegistry()->addItem(item);
-
+    //14: register the quick guide manuel
+    item  = new RegistryItem{
+            tr("Quick Guide"),
+            []()->QWidget* {return widgetFactory(quickguide);}
+            };
+    //WidgetRegistry::getRegistry()->addItem(item);
+    WidgetRegistry::getRegistry()->setDefault(item);
 }
+
 BlendSplitter* DebuggerForm::createWorkspaceCPU()
 {
     BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
@@ -756,6 +764,9 @@ QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
         break;
     case vdpRegisters:
         wdgt = new VDPRegViewer();
+        break;
+    case quickguide:
+        wdgt = new QuickGuide();
         break;
     default:
         wdgt = new QLabel("Not yet implemented in widgetFactory!");

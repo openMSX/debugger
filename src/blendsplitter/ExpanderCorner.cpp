@@ -170,7 +170,8 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
    //now if the original item was a SwitchingWidget we set the same and the enablestate
    if (switchwdg && addedWidget){
         addedWidget->setEnableWidget(switchwdg->getEnableWidget());
-        addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
+        //if new user we need show the quickguide (is the default widget) otherwise
+//        addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
    }
 
     //have the cursor take the correct shape
