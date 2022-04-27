@@ -4,6 +4,7 @@
 
 class SwitchingBar;
 class RegistryItem;
+class QJsonObject;
 
 /** \brief A widget whose actual content can be selected from a combo box
  *
@@ -32,6 +33,11 @@ public:
     bool getEnableWidget();
     void setCurrentIndex(int index);
     int getCurrentIndex();
+
+    QJsonObject save2json();
+    static SwitchingWidget* createFromJson(const QJsonObject& obj);
+
+
 public slots:
     void setEnableWidget(bool enable = true);
 private slots:

@@ -12,6 +12,7 @@ class ExpanderCorner;
 class ExpanderBottom;
 class ExpanderTop;
 class WidgetDecorator;
+class QJsonObject;
 
 /** \brief A user-defined Splitter
  *
@@ -92,6 +93,9 @@ public:
      * @return A pointer to widget that is decorated
      */
     QWidget* getNestedWidget(int index);
+
+    QJsonObject save2json() const;
+    static BlendSplitter* createFromJson(const QJsonObject& obj);
 private:
     friend Expander;
     friend ExpanderCorner;

@@ -8,6 +8,11 @@
 
 #include "SignalDispatcher.h"
 
+#include <QDebug>
+#include <QMessageBox>
+#include <QJsonObject>
+#include <QJsonArray>
+
 int BlendSplitter::expanderSize{12};
 int BlendSplitter::switchingBarHeight{32};
 QString BlendSplitter::expanderImage{":/BlendSplitter/Expander"};
@@ -79,6 +84,71 @@ void BlendSplitter::insertSplitter(int index, BlendSplitter* splitter)
 QWidget *BlendSplitter::getNestedWidget(int index)
 {
     return widget(index)->layout()->itemAt(0)->widget();
+}
+
+QJsonObject BlendSplitter::save2json() const
+{
+    QJsonObject obj;
+    QJsonArray ar_sizes,ar_subwidgets;
+
+    obj["type"]="BlendSplitter";
+    obj["orientation"]=orientation();
+    obj["size_width"]=size().width();
+    obj["size_height"]=size().height();
+    foreach(int i,sizes()){
+        ar_sizes.append(i);
+    };
+    obj["sizes"]=ar_sizes;
+    for(int i=0 ; i<count() ; i++){
+//        qDebug() << " i " << i << " : " << widget(i);
+        if (widget(i)->inherits("WidgetDecorator")){
+            QWidget* wdg = widget(i)->layout()->itemAt(0)->widget();
+            if (wdg->inherits("SwitchingWidget")){
+                ar_subwidgets.append(static_cast<SwitchingWidget*>(wdg)->save2json());
+            }
+        } else if (widget(i)->inherits("SplitterDecorator")){
+            QWidget* wdg = widget(i)->layout()->itemAt(0)->widget();
+            ar_subwidgets.append(static_cast<BlendSplitter*>(wdg)->save2json());
+        } else {
+            QJsonObject o;
+            ar_subwidgets.append(o);
+        };
+    };
+    obj["subs"]=ar_subwidgets;
+
+
+    return obj;
+}
+
+BlendSplitter *BlendSplitter::createFromJson(const QJsonObject &obj)
+{
+
+    BlendSplitter *split= new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},
+                                            obj["orientation"].toInt(1)==1?Qt::Horizontal:Qt::Vertical);
+
+    foreach (const QJsonValue & value, obj["subs"].toArray()) {
+        QJsonObject obj = value.toObject();
+        if (obj["type"].toString()=="SwitchingWidget"){
+            split->addWidget(SwitchingWidget::createFromJson(obj));
+        } else if (obj["type"].toString()=="BlendSplitter"){
+            split->addSplitter(BlendSplitter::createFromJson(obj));
+        } else {
+            QMessageBox::warning(nullptr, tr("Open workspaces ..."),
+                                 tr("Unknown subs type:%1").arg(obj["type"].toString())
+                                 );
+        }
+
+    }
+
+    QList<int> sizes;
+    split->resize(obj["size_width"].toInt(),obj["size_height"].toInt());
+    foreach (const QJsonValue & value, obj["sizes"].toArray()) {
+        sizes.append(value.toInt());
+    }
+    split->setSizes(sizes);
+//    qDebug() << "split->size" << split->size();
+
+    return split;
 }
 
 QSplitterHandle* BlendSplitter::createHandle()

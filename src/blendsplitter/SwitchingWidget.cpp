@@ -5,6 +5,7 @@
 #include "SwitchingBar.h"
 #include "SwitchingCombo.h"
 #include <QScrollArea>
+#include <QJsonObject>
 
 SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent,bool menuAtTop) : QSplitter(Qt::Vertical, parent), bar{new SwitchingBar{}}, widgetEnabled(true),barAtTop(menuAtTop)
 {
@@ -53,6 +54,25 @@ void SwitchingWidget::setCurrentIndex(int index)
 int SwitchingWidget::getCurrentIndex()
 {
     return bar->combo->currentIndex();
+}
+
+QJsonObject SwitchingWidget::save2json()
+{
+    QJsonObject obj;
+    obj["type"]="SwitchingWidget";
+    obj["item"]=bar->combo->currentIndex();
+    obj["size_width"]=size().width();
+    obj["size_height"]=size().height();
+    return obj;
+}
+
+SwitchingWidget *SwitchingWidget::createFromJson(const QJsonObject &obj)
+{
+    int i=obj["item"].toInt();
+    SwitchingWidget* wdgt= new SwitchingWidget{WidgetRegistry::getRegistry()->item(i)};
+    wdgt->resize(obj["size_width"].toInt(),obj["size_height"].toInt());
+
+    return wdgt;
 }
 
 void SwitchingWidget::setEnableWidget(bool enable)

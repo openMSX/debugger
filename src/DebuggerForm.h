@@ -99,6 +99,11 @@ private:
 	QAction* fileOpenSessionAction;
 	QAction* fileSaveSessionAction;
 	QAction* fileSaveSessionAsAction;
+
+    QAction* fileOpenWorkspaceLayoutAction;
+    QAction* fileSaveWorkspaceLayoutAction;
+    QAction* fileSaveWorkspaceLayoutAsAction;
+
 	QAction* fileQuitAction;
 
 	enum { MaxRecentFiles = 5 };
@@ -144,11 +149,17 @@ private:
 	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
 	uint16_t disasmAddress;
 
+    bool saveWorkspacesAs(const QString& newFileName);
+    void loadWorkspaces(const QString& filename);
+
 	void fileNewSession();
 	void fileOpenSession();
 	void fileSaveSession();
 	void fileSaveSessionAs();
 	void fileRecentOpen();
+    void fileOpenWorkspace();
+    void fileSaveWorkspace();
+    void fileSaveWorkspaceAs();
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();

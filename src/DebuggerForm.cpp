@@ -43,6 +43,9 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <iostream>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 QMap<QString, int> DebuggerForm::debuggables;
 
@@ -181,10 +184,22 @@ void DebuggerForm::createActions()
 
 	fileSaveSessionAction = new QAction(tr("&Save Session"), this);
 	fileSaveSessionAction->setShortcut(tr("Ctrl+S"));
-	fileSaveSessionAction->setStatusTip(tr("Save the the current debug session"));
+    fileSaveSessionAction->setStatusTip(tr("Save the current debug session"));
 
 	fileSaveSessionAsAction = new QAction(tr("Save Session &As"), this);
 	fileSaveSessionAsAction->setStatusTip(tr("Save the debug session in a selected file"));
+
+    fileOpenWorkspaceLayoutAction = new QAction(tr("&Open workspaces"), this);
+    fileOpenWorkspaceLayoutAction->setStatusTip(tr("Load a workspace layout."));
+
+    fileSaveWorkspaceLayoutAction = new QAction(tr("&Save workspaces"), this);
+    fileSaveWorkspaceLayoutAction->setStatusTip(tr("Save the current workspaces and splitters layout"));
+
+    fileSaveWorkspaceLayoutAsAction = new QAction(tr("Save workspaces &As"), this);
+    fileSaveWorkspaceLayoutAsAction->setStatusTip(tr("Save the current workspaces and splitters in a selected file"));
+
+
+
 
 	fileQuitAction = new QAction(tr("&Quit"), this);
 	fileQuitAction->setShortcut(tr("Ctrl+Q"));
@@ -304,6 +319,11 @@ void DebuggerForm::createActions()
 	connect(fileOpenSessionAction, &QAction::triggered, this, &DebuggerForm::fileOpenSession);
 	connect(fileSaveSessionAction, &QAction::triggered, this, &DebuggerForm::fileSaveSession);
 	connect(fileSaveSessionAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveSessionAs);
+
+    connect(fileOpenWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileOpenWorkspace);
+    connect(fileSaveWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspace);
+    connect(fileSaveWorkspaceLayoutAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspaceAs);
+
 	connect(fileQuitAction, &QAction::triggered, this, &DebuggerForm::close);
 	connect(systemConnectAction, &QAction::triggered, this, &DebuggerForm::systemConnect);
 	connect(systemDisconnectAction, &QAction::triggered, this, &DebuggerForm::systemDisconnect);
@@ -335,6 +355,11 @@ void DebuggerForm::createMenus()
 	fileMenu->addAction(fileOpenSessionAction);
 	fileMenu->addAction(fileSaveSessionAction);
 	fileMenu->addAction(fileSaveSessionAsAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(fileOpenWorkspaceLayoutAction);
+//    fileMenu->addAction(fileSaveWorkspaceLayoutAction);
+    fileMenu->addAction(fileSaveWorkspaceLayoutAsAction);
+    fileMenu->addSeparator();
 
 	recentFileSeparator = fileMenu->addSeparator();
 	for (auto* rfa : recentFileActions)
@@ -1091,7 +1116,41 @@ void DebuggerForm::fileRecentOpen()
 {
 	if (auto* action = qobject_cast<QAction *>(sender())) {
 		openSession(action->data().toString());
-	}
+    }
+}
+
+void DebuggerForm::fileOpenWorkspace()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Open workspace layout"),
+        QDir::currentPath(), tr("Debug Workspace Layout Files (*.omdl)"));
+
+    if (!fileName.isEmpty())
+        loadWorkspaces(fileName);
+}
+
+void DebuggerForm::fileSaveWorkspace()
+{
+
+}
+
+void DebuggerForm::fileSaveWorkspaceAs()
+{
+    QFileDialog d(this, tr("Save workspace layout"));
+    d.setNameFilter(tr("Debug Workspace Layout Files (*.omdl)"));
+    d.setDefaultSuffix("omdl");
+    d.setDirectory(QDir::currentPath());
+    d.setAcceptMode(QFileDialog::AcceptSave);
+    d.setFileMode(QFileDialog::AnyFile);
+    if (d.exec()) {
+//        session->saveAs(d.selectedFiles().at(0));
+        saveWorkspacesAs(d.selectedFiles().at(0));
+        // update recent
+//        if (session->existsAsFile()) {
+//            addRecentFile(session->filename());
+//		}
+    }
+    updateWindowTitle();
 }
 
 void DebuggerForm::systemConnect()
@@ -1294,7 +1353,66 @@ DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
 			return (b >= 0) ? b : -1;
 		}
 	}();
-	return {ps, ss, segment};
+    return {ps, ss, segment};
+}
+
+bool DebuggerForm::saveWorkspacesAs(const QString &newFileName)
+{
+    // open file for save
+    QFile file(newFileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(nullptr, tr("Save session ..."),
+                             tr("Cannot write file %1:\n%2.")
+                              .arg(newFileName, file.errorString()));
+        return false;
+    };
+    QJsonObject jsonObj;
+    QJsonArray spacesArray;
+    //iterate over workspaces
+    for (int i=0;i<workspaces->count();i++){
+        QJsonObject jsonTab;
+        jsonTab["name"]=workspaces->tabText(i);
+        jsonTab["workspace"]=static_cast<BlendSplitter*>(workspaces->widget(i))->save2json();
+        spacesArray.append(jsonTab);
+    };
+    jsonObj["workspaces"]=spacesArray;
+    QJsonDocument jsonDoc(jsonObj);
+    file.write(jsonDoc.toJson());
+    // file.close(); done automatically when going out of scope
+    return true;
+
+}
+
+void DebuggerForm::loadWorkspaces(const QString &filename)
+{
+    QFile file(filename);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(nullptr, tr("Loading workspaces ..."),
+                             tr("Cannot read file %1:\n%2.")
+                                .arg(filename,file.errorString()));
+        return;
+    };
+    //Now try to parse the json file
+    QJsonParseError parseError;
+    QJsonDocument jsonDoc=QJsonDocument::fromJson(file.readAll(), &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        QMessageBox::warning(nullptr, tr("Open workspaces ..."),
+                             tr("Parse error at %1:%2.").arg(QString::number(parseError.offset), parseError.errorString())
+                             );
+        return;
+    };
+
+    // delete all the current tabs before reading the new ones
+    while(workspaces->count()) {
+        delete workspaces->widget(0);
+    };
+    //now recreate workspaces
+    QJsonObject obj = jsonDoc.object();
+    foreach (const QJsonValue & value, obj["workspaces"].toArray()) {
+        QJsonObject obj = value.toObject();
+        BlendSplitter* splitter=BlendSplitter::createFromJson(obj["workspace"].toObject());
+        workspaces->addTab(splitter,obj["name"].toString());
+    }
 }
 
 void DebuggerForm::reloadBreakpoints(bool merge)
