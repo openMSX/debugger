@@ -157,7 +157,7 @@ int DebuggerForm::counter = 0;
 
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
-    , comm(CommClient::instance()),enableWidgetStatus(false)
+    , comm(CommClient::instance())
 {
     session = DebugSession::getDebugSession();
 
@@ -629,7 +629,7 @@ void DebuggerForm::addFloatingSwitchingWidget()
 {
     SwitchingWidget* wdg=new SwitchingWidget();
     connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
-    wdg->setEnableWidget(enableWidgetStatus);
+    wdg->setEnableWidget(SignalDispatcher::getDispatcher()->getEnableWidget());
     wdg->show();
 }
 
@@ -967,8 +967,7 @@ void DebuggerForm::connectionClosed()
 	systemConnectAction->setEnabled(true);
 	breakpointAddAction->setEnabled(false);
 
-    enableWidgetStatus=false;
-    emit SignalDispatcher::getDispatcher()->enableWidget(false);
+    SignalDispatcher::getDispatcher()->setEnableWidget(false);
 }
 
 void DebuggerForm::finalizeConnection(bool halted)
@@ -987,8 +986,7 @@ void DebuggerForm::finalizeConnection(bool halted)
 
 	emit connected();
 
-    enableWidgetStatus=true;
-    emit SignalDispatcher::getDispatcher()->enableWidget(true);
+    SignalDispatcher::getDispatcher()->setEnableWidget(true);
 }
 
 void DebuggerForm::handleUpdate(const QString& type, const QString& name,

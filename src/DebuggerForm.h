@@ -233,8 +233,6 @@ protected:
     void addEmptyWorkspace();
     void addFloatingSwitchingWidget();
 
-    bool enableWidgetStatus;
-
 
 protected slots:
     void tabCloseRequest(int index);

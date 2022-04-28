@@ -80,10 +80,23 @@ void SignalDispatcher::setData(unsigned char *datPtr)
     emit registersUpdate(datPtr); // now tell all listeners the new values
 }
 
+bool SignalDispatcher::getEnableWidget()
+{
+    return isEnableWidget;
+}
+
 void SignalDispatcher::refresh()
 {
     CommClient::instance().sendCommand(new DispatchDebugMemMapperHandler(*this));
 
+}
+
+void SignalDispatcher::setEnableWidget(bool value)
+{
+    if (isEnableWidget != value){
+        isEnableWidget=value;
+        emit enableWidget(value);
+    }
 }
 
 int SignalDispatcher::readRegister(int id)
@@ -91,7 +104,7 @@ int SignalDispatcher::readRegister(int id)
     return regs[id];
 }
 
-SignalDispatcher::SignalDispatcher() {
+SignalDispatcher::SignalDispatcher(): isEnableWidget(false) {
     // avoid UMR
     memset(&regs,         0, sizeof(regs));
     memset(&regsChanged,  0, sizeof(regsChanged));

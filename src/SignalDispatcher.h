@@ -30,8 +30,11 @@ public:
     int readRegister(int id);
     void setData(unsigned char* datPtr);
 
+    bool getEnableWidget();
+
 public slots:
     void refresh();
+    void setEnableWidget(bool value);
 
 private:
     static SignalDispatcher* theDispatcher;
@@ -71,4 +74,7 @@ signals:
     void setProgramCounter(uint16_t pc, bool reload = false);
     //from the GotoDialog
     void setCursorAddress(uint16_t addr, int infoLine, int method);
+
+private:
+    bool isEnableWidget;
 };
