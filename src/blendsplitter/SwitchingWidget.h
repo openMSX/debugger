@@ -40,6 +40,8 @@ public:
 
 public slots:
     void setEnableWidget(bool enable = true);
+    void setWidgetAlwaysEnabled(bool enable = true);
+
 private slots:
     void changeCurrentWidget(int index);
 private:
@@ -48,6 +50,7 @@ private:
     int widgetIndex();
     SwitchingBar* bar;
     bool widgetEnabled;
+    bool isWidgetAlwaysEnabled; //some widgets need to be always enabled even if disconnect from openMSX
     bool barAtTop;
     bool isWrappedInScrollArea;
 };

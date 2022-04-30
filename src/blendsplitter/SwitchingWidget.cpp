@@ -6,8 +6,10 @@
 #include "SwitchingCombo.h"
 #include <QScrollArea>
 #include <QJsonObject>
+#include <QDebug>
 
-SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent,bool menuAtTop) : QSplitter(Qt::Vertical, parent), bar{new SwitchingBar{}}, widgetEnabled(true),barAtTop(menuAtTop)
+SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent,bool menuAtTop) : QSplitter(Qt::Vertical, parent),
+    bar{new SwitchingBar{}}, widgetEnabled(true),isWidgetAlwaysEnabled(false),barAtTop(menuAtTop)
 {
     setChildrenCollapsible(true);
     setHandleWidth(1);
@@ -39,6 +41,9 @@ void SwitchingWidget::setCurrentWidget(RegistryItem *item)
         bar->combo->setCurrentIndex(bar->combo->findText(item->name));
         widget(widgetIndex())->setEnabled(widgetEnabled);
     }
+    //hack to have manual always enabled
+    qDebug() << "WidgetRegistry::getRegistry()->indexOf(item) " << WidgetRegistry::getRegistry()->indexOf(item);
+    setWidgetAlwaysEnabled(WidgetRegistry::getRegistry()->indexOf(item)==14);
 }
 
 bool SwitchingWidget::getEnableWidget()
@@ -93,9 +98,20 @@ void SwitchingWidget::setEnableWidget(bool enable)
     };
 
     if (wdgt != nullptr){
-        wdgt->setEnabled(enable);
+        bool finalstatus=enable||isWidgetAlwaysEnabled;
+//        qDebug() << "wdgt->setEnabled(" << enable << "||" << isWidgetAlwaysEnabled << "= "<< finalstatus<< " )  ";
+
+        wdgt->setEnabled(finalstatus);
+        wdgt->update();
     }
 
+}
+
+void SwitchingWidget::setWidgetAlwaysEnabled(bool enable)
+{
+    isWidgetAlwaysEnabled=enable;
+//    qDebug() << "SwitchingWidget::setWidgetAlwaysEnabled(bool "<<enable<<")";
+    setEnableWidget(widgetEnabled);
 }
 
 void SwitchingWidget::changeCurrentWidget(int index)

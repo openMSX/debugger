@@ -6,6 +6,7 @@
 #include "SplitterDecorator.h"
 
 #include "SignalDispatcher.h"
+#include "Settings.h"
 
 #include <QDebug>
 
@@ -170,8 +171,11 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
    //now if the original item was a SwitchingWidget we set the same and the enablestate
    if (switchwdg && addedWidget){
         addedWidget->setEnableWidget(switchwdg->getEnableWidget());
-        //if new user we need show the quickguide (is the default widget) otherwise
-//        addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
+        //if new user we need show the quickguide (is the default widget) otherwise we split current one
+        Settings& s = Settings::get();
+        if (s.value("creatingWorkspaceType",0).toInt() ){
+            addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
+        }
    }
 
     //have the cursor take the correct shape

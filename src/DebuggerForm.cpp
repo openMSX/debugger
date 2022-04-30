@@ -299,6 +299,9 @@ void DebuggerForm::createActions()
 
 	helpAboutAction = new QAction(tr("&About"), this);
 
+    addCPUWorkspaceAction = new QAction(tr("&Code debugger"), this);
+    addCPUWorkspaceAction->setStatusTip(tr("The default way of debugging CPU code"));
+
     addVDPRegsWorkspaceAction = new QAction(tr("VDP &Regs"), this);
     addVDPRegsWorkspaceAction->setStatusTip(tr("Show the regular VDP registers"));
 
@@ -340,6 +343,7 @@ void DebuggerForm::createActions()
 	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
 	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
+    connect(addCPUWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addCPUWorkspace);
     connect(addVDPRegsWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPRegsWorkspace);
     connect(addVDPTilesWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPTilesWorkspace);
     connect(addVDPBitmapWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPBitmapWorkspace);
@@ -599,15 +603,22 @@ void DebuggerForm::tabCloseRequest(int index)
     if((index < 0) || (index >= workspaces->count())){
         return;
     };
-    //index 0 is the CPU workspace, refuse to delete this one for now
-    //Also this way at least one workspace remains, altough we could do this diferently in the future
-    if (index > 0){
+
+    if (workspaces->count() > 1){
         QWidget *splitter=workspaces->widget(index);
         workspaces->removeTab(index);
         delete splitter;
     }
 }
 
+void DebuggerForm::addInfoWorkspace(){
+    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split->addWidget(WidgetRegistry::getRegistry()->item(14)); //14: the quick guide manuel
+    workspaces->addTab(split,"Welcome new user");
+}
+void DebuggerForm::addCPUWorkspace(){
+    workspaces->addTab(createWorkspaceCPU(),"CPU");
+}
 void DebuggerForm::addVDPRegsWorkspace(){
     workspaces->addTab(createWorkspaceVDPRegs(),"VDP Registers");
 }
@@ -644,6 +655,7 @@ void DebuggerForm::createForm()
     workspaces->setTabsClosable(true);
     QMenu *workspacemenu=new QMenu();
     QMenu *workspacesubmenu=new QMenu("Predefined layouts");
+    workspacesubmenu->addAction(addCPUWorkspaceAction);
     workspacesubmenu->addAction(addVDPRegsWorkspaceAction);
     workspacesubmenu->addAction(addVDPTilesWorkspaceAction);
     workspacesubmenu->addAction(addVDPBitmapWorkspaceAction);
@@ -667,11 +679,22 @@ void DebuggerForm::createForm()
     layout->addWidget(workspaces);
     window->setLayout(layout);
 
-    workspaces->addTab(createWorkspaceCPU(),"CPU");
-    addVDPRegsWorkspace();
-    addVDPTilesWorkspace();
-    addVDPBitmapWorkspace();
+    Settings& s = Settings::get();
 
+    int workspacetype =s.value("creatingWorkspaceType",0).toInt();
+    switch (workspacetype) {
+    case 0:
+        addInfoWorkspace();
+        [[fallthrough]];
+    case 1:
+        addDefaultWorkspaces();
+        break;
+    default:
+        if (!loadWorkspaces(s.value("creatingWorkspaceFile",0).toString())){
+            addDefaultWorkspaces();
+        }
+        break;
+    };
 
     setCentralWidget(window);
 
@@ -694,6 +717,14 @@ void DebuggerForm::createForm()
 	connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
     session->breakpoints().setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
+}
+
+void DebuggerForm::addDefaultWorkspaces()
+{
+    addCPUWorkspace();
+    addVDPRegsWorkspace();
+    addVDPTilesWorkspace();
+    addVDPBitmapWorkspace();
 }
 
 QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
@@ -1123,8 +1154,9 @@ void DebuggerForm::fileOpenWorkspace()
         this, tr("Open workspace layout"),
         QDir::currentPath(), tr("Debug Workspace Layout Files (*.omdl)"));
 
-    if (!fileName.isEmpty())
+    if (!fileName.isEmpty()){
         loadWorkspaces(fileName);
+    }
 }
 
 void DebuggerForm::fileSaveWorkspace()
@@ -1381,14 +1413,14 @@ bool DebuggerForm::saveWorkspacesAs(const QString &newFileName)
 
 }
 
-void DebuggerForm::loadWorkspaces(const QString &filename)
+bool DebuggerForm::loadWorkspaces(const QString &filename)
 {
     QFile file(filename);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         QMessageBox::warning(nullptr, tr("Loading workspaces ..."),
                              tr("Cannot read file %1:\n%2.")
                                 .arg(filename,file.errorString()));
-        return;
+        return false;
     };
     //Now try to parse the json file
     QJsonParseError parseError;
@@ -1397,7 +1429,7 @@ void DebuggerForm::loadWorkspaces(const QString &filename)
         QMessageBox::warning(nullptr, tr("Open workspaces ..."),
                              tr("Parse error at %1:%2.").arg(QString::number(parseError.offset), parseError.errorString())
                              );
-        return;
+        return false;
     };
 
     // delete all the current tabs before reading the new ones
@@ -1410,7 +1442,8 @@ void DebuggerForm::loadWorkspaces(const QString &filename)
         QJsonObject obj = value.toObject();
         BlendSplitter* splitter=BlendSplitter::createFromJson(obj["workspace"].toObject());
         workspaces->addTab(splitter,obj["name"].toString());
-    }
+    };
+    return true;
 }
 
 void DebuggerForm::reloadBreakpoints(bool merge)

@@ -3,27 +3,47 @@
 #include <QListWidgetItem>
 #include <QFontDialog>
 #include <QColorDialog>
+#include <QFileDialog>
+
 
 PreferencesDialog::PreferencesDialog(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
 
-	connect(listFonts, SIGNAL(currentRowChanged(int)),
-	        this, SLOT(fontSelectionChange(int)));
-	connect(rbUseAppFont,    SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(rbUseFixedFont,  SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(rbUseCustomFont, SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(btnSelectFont, SIGNAL(clicked()),
-	        this, SLOT(fontSelectCustom()));
-	connect(btnFontColor,  SIGNAL(clicked()),
-	        this, SLOT(fontSelectColor()));
+    //font stuff
+    connect(listFonts, &QListWidget::currentRowChanged,
+            this, &PreferencesDialog::fontSelectionChange);
+    connect(rbUseAppFont,&QRadioButton::toggled,
+            this, &PreferencesDialog::fontTypeChanged);
+    connect(rbUseFixedFont,  &QRadioButton::toggled,
+            this, &PreferencesDialog::fontTypeChanged);
+    connect(rbUseCustomFont, &QRadioButton::toggled,
+            this, &PreferencesDialog::fontTypeChanged);
+    connect(btnSelectFont, &QPushButton::clicked,
+            this, &PreferencesDialog::fontSelectCustom);
+    connect(btnFontColor, &QPushButton::clicked,
+            this, &PreferencesDialog::fontSelectColor);
 
 	initFontList();
 	listFonts->setCurrentRow(0);
+
+    //layout stuff
+    QList<QRadioButton*> rblayouttypes;
+    rblayouttypes << rbFirstTimeUser << rbDefaultWorkspaces << rbLayoutFromFile;
+    foreach(auto rb, rblayouttypes){
+        connect(rb, &QRadioButton::toggled,
+                this, &PreferencesDialog::layoutTypeChanged);
+    };
+//    connect(rbDefaultWorkspaces, &QRadioButton::toggled,
+//            this, &PreferencesDialog::layoutTypeChanged);
+//    connect(rbLayoutFromFile, &QRadioButton::toggled,
+//            this, &PreferencesDialog::layoutTypeChanged);
+    updating=true;
+    Settings& s = Settings::get();
+    rblayouttypes.at(s.value("creatingWorkspaceType",0).toInt())->setChecked(true);
+    leFileName->setText(s.value("creatingWorkspaceFile","").toString());
+    updating=false;
 }
 
 /*
@@ -106,7 +126,24 @@ void PreferencesDialog::fontSelectColor()
 	if (newColor.isValid()) {
 		Settings::get().setFontColor(f, newColor);
 		setFontPreviewColor(newColor);
-	}
+    }
+}
+
+void PreferencesDialog::layoutTypeChanged(bool state)
+{
+    if (!state || updating) return;
+
+    Settings& s = Settings::get();
+
+    int wst=2;
+    if (rbFirstTimeUser->isChecked()){
+        wst=0;
+    } else if (rbDefaultWorkspaces->isChecked()){
+        wst=1;
+    } else {
+        s.setValue("creatingWorkspaceFile",leFileName->text());
+    }
+    s.setValue("creatingWorkspaceType",wst);
 }
 
 void PreferencesDialog::setFontPreviewColor(const QColor& c)
@@ -119,3 +156,22 @@ void PreferencesDialog::setFontPreviewColor(const QColor& c)
 		lblPreview->setPalette(QPalette());
 	}
 }
+
+void PreferencesDialog::on_btnBrowseLayout_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Select workspace layout"),
+        QDir::currentPath(), tr("Debug Workspace Layout Files (*.omdl)"));
+
+    if (!fileName.isEmpty()){
+        leFileName->setText(fileName);
+        rbLayoutFromFile->setChecked(true); //not sure if setText with already string in lineEdit will trigger the on_leFileName_textChanged
+    }
+}
+
+void PreferencesDialog::on_leFileName_textChanged(const QString &arg1)
+{
+    if (updating) return;
+    rbLayoutFromFile->setChecked(true);
+}
+

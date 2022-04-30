@@ -106,7 +106,7 @@ private:
 
 	QAction* fileQuitAction;
 
-	enum { MaxRecentFiles = 5 };
+    static const int MaxRecentFiles = 5;
 	QAction* recentFileActions[MaxRecentFiles];
 	QAction* recentFileSeparator;
 
@@ -129,6 +129,7 @@ private:
 
 	QAction* helpAboutAction;
 
+    QAction* addCPUWorkspaceAction;
     QAction* addVDPRegsWorkspaceAction;
     QAction* addVDPTilesWorkspaceAction;
     QAction* addVDPBitmapWorkspaceAction;
@@ -150,7 +151,7 @@ private:
 	uint16_t disasmAddress;
 
     bool saveWorkspacesAs(const QString& newFileName);
-    void loadWorkspaces(const QString& filename);
+    bool loadWorkspaces(const QString& filename);
 
 	void fileNewSession();
 	void fileOpenSession();
@@ -227,11 +228,14 @@ protected:
     BlendSplitter *createWorkspaceVDPRegs();
     BlendSplitter *createWorkspaceVDPTiles();
     BlendSplitter *createWorkspaceVDPBitmap();
+    void addInfoWorkspace();
+    void addCPUWorkspace();
     void addVDPRegsWorkspace();
     void addVDPTilesWorkspace();
     void addVDPBitmapWorkspace();
     void addEmptyWorkspace();
     void addFloatingSwitchingWidget();
+    void addDefaultWorkspaces();
 
 
 protected slots:

@@ -21,6 +21,11 @@ private slots:
 	void fontTypeChanged(bool state);
 	void fontSelectCustom();
 	void fontSelectColor();
+
+    void layoutTypeChanged(bool state);
+    void on_btnBrowseLayout_clicked();
+
+    void on_leFileName_textChanged(const QString &arg1);
 };
 
 #endif // PREFERENCESDIALOG_OPENMSX_H
