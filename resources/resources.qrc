@@ -27,5 +27,7 @@
         <file alias="join.png">quickguide/areas_join.png</file>
         <file alias="resize.png">quickguide/areas_resize.png</file>
         <file alias="split.png">quickguide/areas_split.png</file>
+        <file alias="workspaces.png">quickguide/workspaces_tab.png</file>
+        <file alias="switching.png">quickguide/switching_widget.png</file>
     </qresource>
 </RCC>
