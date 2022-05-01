@@ -46,6 +46,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QLineEdit>
 
 QMap<QString, int> DebuggerForm::debuggables;
 
@@ -157,7 +158,7 @@ int DebuggerForm::counter = 0;
 
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
-    , comm(CommClient::instance())
+    , comm(CommClient::instance()), tabLineEdit{nullptr},editedTab{-1}
 {
     session = DebugSession::getDebugSession();
 
@@ -611,6 +612,36 @@ void DebuggerForm::tabCloseRequest(int index)
     }
 }
 
+void DebuggerForm::tabBarDoubleClicked(int index)
+{
+    editedTab=index;
+    if (index==-1){
+        return;
+    };
+    QRect r=workspaces->tabBar()->tabRect(index);
+    QString t=workspaces->tabBar()->tabText(index);
+    tabLineEdit=new QLineEdit{workspaces->tabBar()};
+    tabLineEdit->show();
+    tabLineEdit->move(r.topLeft());
+    tabLineEdit->resize(r.size());
+    tabLineEdit->setText(t);
+    tabLineEdit->selectAll();
+    tabLineEdit->setFocus();
+    connect(tabLineEdit,SIGNAL(editingFinished()),
+            this,SLOT(tabNameEditingFinished()));
+
+}
+
+void DebuggerForm::tabNameEditingFinished()
+{
+    QString newname=tabLineEdit->text();
+    if (!newname.isEmpty()){
+        workspaces->tabBar()->setTabText(editedTab,newname);
+    };
+    tabLineEdit->deleteLater();
+    tabLineEdit=nullptr;
+}
+
 void DebuggerForm::addInfoWorkspace(){
     BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
     split->addWidget(WidgetRegistry::getRegistry()->item(14)); //14: the quick guide manuel
@@ -673,7 +704,8 @@ void DebuggerForm::createForm()
     btn->setPopupMode(QToolButton::InstantPopup);
 	workspaces->setCornerWidget(btn, Qt::TopRightCorner);
     connect(workspaces,&QTabWidget::tabCloseRequested,this,&DebuggerForm::tabCloseRequest);
-
+    connect(workspaces->tabBar(),&QTabBar::tabBarDoubleClicked,
+            this,&DebuggerForm::tabBarDoubleClicked);
     QWidget *window = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(workspaces);

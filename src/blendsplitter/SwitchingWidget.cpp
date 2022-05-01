@@ -42,7 +42,7 @@ void SwitchingWidget::setCurrentWidget(RegistryItem *item)
         widget(widgetIndex())->setEnabled(widgetEnabled);
     }
     //hack to have manual always enabled
-    qDebug() << "WidgetRegistry::getRegistry()->indexOf(item) " << WidgetRegistry::getRegistry()->indexOf(item);
+    //qDebug() << "WidgetRegistry::getRegistry()->indexOf(item) " << WidgetRegistry::getRegistry()->indexOf(item);
     setWidgetAlwaysEnabled(WidgetRegistry::getRegistry()->indexOf(item)==14);
 }
 

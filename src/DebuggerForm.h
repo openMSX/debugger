@@ -21,6 +21,7 @@ class VDPCommandRegViewer;
 class BreakpointViewer;
 class BlendSplitter;
 class QTabWidget;
+class QLineEdit;
 
 class DebuggerForm : public QMainWindow
 {
@@ -238,8 +239,12 @@ protected:
     void addDefaultWorkspaces();
 
 
+    QLineEdit* tabLineEdit;
+    int editedTab;
 protected slots:
     void tabCloseRequest(int index);
+    void tabBarDoubleClicked(int index);
+    void tabNameEditingFinished();
 };
 
 #endif // DEBUGGERFORM_H
