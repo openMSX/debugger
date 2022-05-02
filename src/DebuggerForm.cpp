@@ -25,6 +25,7 @@
 #include "blendsplitter/BlendSplitter.h"
 #include "blendsplitter/WidgetRegistry.h"
 #include "QuickGuide.h"
+#include "TabRenamerHelper.h"
 #include <QAction>
 #include <QMessageBox>
 #include <QMenu>
@@ -46,7 +47,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QLineEdit>
+
 
 QMap<QString, int> DebuggerForm::debuggables;
 
@@ -95,9 +96,9 @@ private:
 class CPURegRequest : public ReadDebugBlockCommand
 {
 public:
-	CPURegRequest(DebuggerForm& form_)
+    CPURegRequest(DebuggerForm& /*form_*/)
 		: ReadDebugBlockCommand("{CPU regs}", 0, 28, buf)
-		, form(form_)
+//		, form(form_)
 	{
 	}
 
@@ -109,7 +110,7 @@ public:
 	}
 
 private:
-	DebuggerForm& form;
+//	DebuggerForm& form;
 	unsigned char buf[28];
 };
 
@@ -158,7 +159,7 @@ int DebuggerForm::counter = 0;
 
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
-    , comm(CommClient::instance()), tabLineEdit{nullptr},editedTab{-1}
+    , comm(CommClient::instance())
 {
     session = DebugSession::getDebugSession();
 
@@ -612,35 +613,6 @@ void DebuggerForm::tabCloseRequest(int index)
     }
 }
 
-void DebuggerForm::tabBarDoubleClicked(int index)
-{
-    editedTab=index;
-    if (index==-1){
-        return;
-    };
-    QRect r=workspaces->tabBar()->tabRect(index);
-    QString t=workspaces->tabBar()->tabText(index);
-    tabLineEdit=new QLineEdit{workspaces->tabBar()};
-    tabLineEdit->show();
-    tabLineEdit->move(r.topLeft());
-    tabLineEdit->resize(r.size());
-    tabLineEdit->setText(t);
-    tabLineEdit->selectAll();
-    tabLineEdit->setFocus();
-    connect(tabLineEdit,SIGNAL(editingFinished()),
-            this,SLOT(tabNameEditingFinished()));
-
-}
-
-void DebuggerForm::tabNameEditingFinished()
-{
-    QString newname=tabLineEdit->text();
-    if (!newname.isEmpty()){
-        workspaces->tabBar()->setTabText(editedTab,newname);
-    };
-    tabLineEdit->deleteLater();
-    tabLineEdit=nullptr;
-}
 
 void DebuggerForm::addInfoWorkspace(){
     BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
@@ -682,8 +654,11 @@ void DebuggerForm::createForm()
 	createWidgetRegistry();
 
     workspaces = new QTabWidget();
+    tabRenamer = new TabRenamerHelper{workspaces};
+
     workspaces->setMinimumHeight(500);
     workspaces->setTabsClosable(true);
+    workspaces->setMovable(true);
     QMenu *workspacemenu=new QMenu();
     QMenu *workspacesubmenu=new QMenu("Predefined layouts");
     workspacesubmenu->addAction(addCPUWorkspaceAction);
@@ -704,8 +679,6 @@ void DebuggerForm::createForm()
     btn->setPopupMode(QToolButton::InstantPopup);
 	workspaces->setCornerWidget(btn, Qt::TopRightCorner);
     connect(workspaces,&QTabWidget::tabCloseRequested,this,&DebuggerForm::tabCloseRequest);
-    connect(workspaces->tabBar(),&QTabBar::tabBarDoubleClicked,
-            this,&DebuggerForm::tabBarDoubleClicked);
     QWidget *window = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(workspaces);

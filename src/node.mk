@@ -18,7 +18,7 @@ MOC_SRC_HDR:= \
 	blendsplitter/WidgetRegistry blendsplitter/ExpanderCorner \
 	blendsplitter/RegistryItem \
 	blendsplitter/SplitterHandle blendsplitter/SwitchingCombo \
-	blendsplitter/WidgetDecorator QuickGuide
+	blendsplitter/WidgetDecorator QuickGuide TabRenamerHelper
 
 
 

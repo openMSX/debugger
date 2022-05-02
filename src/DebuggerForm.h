@@ -21,7 +21,7 @@ class VDPCommandRegViewer;
 class BreakpointViewer;
 class BlendSplitter;
 class QTabWidget;
-class QLineEdit;
+class TabRenamerHelper;
 
 class DebuggerForm : public QMainWindow
 {
@@ -143,6 +143,7 @@ private:
     DebugSession* session;
 
     QTabWidget *workspaces;
+    TabRenamerHelper *tabRenamer;
 
 	bool mergeBreakpoints;
     static QMap<QString, int> debuggables;
@@ -215,6 +216,8 @@ private:
 	friend class ListDebuggablesHandler;
 	friend class DebuggableSizeHandler;
 
+    friend class TabRenamerHelper;
+
 signals:
 	void connected();
 	void settingsChanged();
@@ -239,12 +242,10 @@ protected:
     void addDefaultWorkspaces();
 
 
-    QLineEdit* tabLineEdit;
-    int editedTab;
+
 protected slots:
     void tabCloseRequest(int index);
-    void tabBarDoubleClicked(int index);
-    void tabNameEditingFinished();
+
 };
 
 #endif // DEBUGGERFORM_H
