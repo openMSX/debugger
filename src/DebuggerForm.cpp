@@ -527,17 +527,17 @@ BlendSplitter* DebuggerForm::createWorkspaceCPU()
 {
     auto& registry = WidgetRegistry::instance();
 
-    auto* split = new BlendSplitter({}, Qt::Horizontal);
+    auto* split = new BlendSplitter(Qt::Horizontal);
     split->addWidget(registry.item(2)); //2: the register viewer
     split->addWidget(registry.item(3)); //3: the flags viewer
     split->addWidget(registry.item(5)); //5: the slot viewer
 
-    auto* split2 = new BlendSplitter({}, Qt::Vertical);
+    auto* split2 = new BlendSplitter(Qt::Vertical);
     split2->addSplitter(split);
     split2->addWidget(registry.item(1)); //1: the memory view widget
     split2->addWidget(registry.item(6)); //6: the breakpoints viewer
 
-    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    auto* split3 = new BlendSplitter(Qt::Horizontal);
     split3->addWidget(registry.item(0)); //0: the disasm viewer
     split3->addSplitter(split2);
     split3->addWidget(registry.item(4)); //4: the stack viewer
@@ -549,11 +549,11 @@ BlendSplitter* DebuggerForm::createWorkspaceVDPRegs()
 {
     auto& registry = WidgetRegistry::instance();
 
-    auto* split2 = new BlendSplitter({}, Qt::Vertical);
+    auto* split2 = new BlendSplitter(Qt::Vertical);
     split2->addWidget(registry.item(8)); //8: the VDP Status Registers
     split2->addWidget(registry.item(9)); //9: the VDP command registers view
 
-    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    auto* split3 = new BlendSplitter(Qt::Horizontal);
     split3->addWidget(registry.item(13)); //13: the general VDP registers
     split3->addSplitter(split2);
 
@@ -563,7 +563,7 @@ BlendSplitter* DebuggerForm::createWorkspaceVDPRegs()
 BlendSplitter *DebuggerForm::createWorkspaceVDPTiles()
 {
     auto& registry = WidgetRegistry::instance();
-    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    auto* split3 = new BlendSplitter(Qt::Horizontal);
     split3->addWidget(registry.item(11)); //11: the Tile VRAM View
     split3->addWidget(registry.item(12)); //12: the Sprites View
     return split3;
@@ -572,7 +572,7 @@ BlendSplitter *DebuggerForm::createWorkspaceVDPTiles()
 BlendSplitter *DebuggerForm::createWorkspaceVDPBitmap()
 {
     auto& registry = WidgetRegistry::instance();
-    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    auto* split3 = new BlendSplitter(Qt::Horizontal);
     split3->addWidget(registry.item(10)); //10: the Bitmapped VRAM View
     split3->addWidget(registry.item(12)); //12: the Sprites View
     return split3;
@@ -592,7 +592,7 @@ void DebuggerForm::tabCloseRequest(int index)
 
 void DebuggerForm::addInfoWorkspace()
 {
-    auto* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    auto* split = new BlendSplitter(Qt::Horizontal);
     split->addWidget(WidgetRegistry::instance().item(14)); //14: the quick guide manuel
     workspaces->addTab(split, "Welcome new user");
 }
@@ -618,14 +618,14 @@ void DebuggerForm::addVDPBitmapWorkspace(){
 
 void DebuggerForm::addEmptyWorkspace()
 {
-    auto* split = new BlendSplitter({}, Qt::Horizontal);
+    auto* split = new BlendSplitter(Qt::Horizontal);
     split->addWidget();
     workspaces->addTab(split, "custom");
 }
 
 void DebuggerForm::addFloatingSwitchingWidget()
 {
-    SwitchingWidget* wdg=new SwitchingWidget();
+    auto* wdg = new SwitchingWidget();
     connect(SignalDispatcher::getDispatcher(), SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
     wdg->setEnableWidget(SignalDispatcher::getDispatcher()->getEnableWidget());
     wdg->show();
@@ -1430,11 +1430,11 @@ bool DebuggerForm::loadWorkspaces(const QString &filename)
     };
     //now recreate workspaces
     QJsonObject obj = jsonDoc.object();
-    foreach (const QJsonValue & value, obj["workspaces"].toArray()) {
+    for (const auto& value : obj["workspaces"].toArray()) {
         QJsonObject obj = value.toObject();
-        BlendSplitter* splitter=BlendSplitter::createFromJson(obj["workspace"].toObject());
+        auto* splitter = BlendSplitter::createFromJson(obj["workspace"].toObject());
         workspaces->addTab(splitter, obj["name"].toString());
-    };
+    }
     return true;
 }
 

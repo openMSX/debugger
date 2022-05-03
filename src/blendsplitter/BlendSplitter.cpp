@@ -13,7 +13,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-BlendSplitter::BlendSplitter(std::function<QWidget*()> defaultWidget, Qt::Orientation orientation)
+BlendSplitter::BlendSplitter(Qt::Orientation orientation, std::function<QWidget*()> defaultWidget)
     : QSplitter{orientation, nullptr}
     , defaultWidget{defaultWidget}
 {
@@ -124,7 +124,7 @@ QJsonObject BlendSplitter::save2json() const
 
 BlendSplitter* BlendSplitter::createFromJson(const QJsonObject &obj)
 {
-    auto* split = new BlendSplitter({}, obj["orientation"].toInt(1) == 1 ? Qt::Horizontal : Qt::Vertical);
+    auto* split = new BlendSplitter(obj["orientation"].toInt(1) == 1 ? Qt::Horizontal : Qt::Vertical);
 
     for (const QJsonValue& value : obj["subs"].toArray()) {
         QJsonObject obj = value.toObject();
@@ -140,7 +140,7 @@ BlendSplitter* BlendSplitter::createFromJson(const QJsonObject &obj)
 
     QList<int> sizes;
     split->resize(obj["size_width"].toInt(), obj["size_height"].toInt());
-    for (const QJsonValue& value : obj["sizes"].toArray()) {
+    for (const auto& value : obj["sizes"].toArray()) {
         sizes.append(value.toInt());
     }
     split->setSizes(sizes);

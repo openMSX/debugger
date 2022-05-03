@@ -153,7 +153,7 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
     } else {
         //add a new splitter orthogonal to the current one
         Qt::Orientation newOrientation{parentSplitter->orientation() == Qt::Horizontal ? Qt::Vertical : Qt::Horizontal};
-        auto* newSplitter = new BlendSplitter{parentSplitter->defaultWidget, newOrientation};
+        auto* newSplitter = new BlendSplitter{newOrientation, parentSplitter->defaultWidget};
         QList<int> sizes{parentSplitter->sizes()};
         parentSplitter->insertSplitter(parentSplitter->indexOf(parentDecorator), newSplitter);
         // add a widget in current splitter but on the correct side

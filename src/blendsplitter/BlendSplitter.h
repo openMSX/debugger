@@ -44,8 +44,8 @@ public:
      * \param defaultWidget A pointer to function constructing the default widget. This function is called when a new widget is added to BlendSplitter.
      * \param orientation Orientation of the main BlendSplitter
      */
-    BlendSplitter(std::function<QWidget*()> defaultWidget = [] { return new SwitchingWidget{}; },
-                  Qt::Orientation orientation = Qt::Horizontal);
+    BlendSplitter(Qt::Orientation orientation,
+                  std::function<QWidget*()> defaultWidget = [] { return new SwitchingWidget{}; });
 
     /** \brief Add a widget to the BlendSplitter
      *
