@@ -6,6 +6,7 @@
 DebuggableViewer::DebuggableViewer(QWidget* parent)
 	: QWidget(parent)
 {
+    setObjectName("DebuggableViewer");
 	// create selection list and viewer
 	debuggableList = new QComboBox();
 	debuggableList->setEditable(false);

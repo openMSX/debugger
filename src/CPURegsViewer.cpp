@@ -10,6 +10,7 @@
 CPURegsViewer::CPURegsViewer(QWidget* parent)
 	: QFrame(parent)
 {
+    setObjectName("CPURegsViewer");
 	// avoid UMR
 	memset(&regs,         0, sizeof(regs));
 	memset(&regsChanged,  0, sizeof(regsChanged));

@@ -41,6 +41,7 @@ StackViewer::StackViewer(QWidget* parent)
 	: QFrame(parent)
 	, wheelRemainder(0)
 {
+    setObjectName("StackViewer");
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
