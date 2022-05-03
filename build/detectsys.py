@@ -65,7 +65,7 @@ def detectOS():
 		# Python couldn't figure it out.
 		raise ValueError('Unable to detect OS')
 	else:
-		raise ValueError('Unsupported or unrecognised OS "%s"' % os)
+		return os
 
 if __name__ == '__main__':
 	try:
