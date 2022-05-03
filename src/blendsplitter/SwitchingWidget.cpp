@@ -43,7 +43,9 @@ void SwitchingWidget::setCurrentWidget(RegistryItem *item)
         insertWidget(widgetIndex(), wrapInScrollArea((item->widget)()));
         bar->reconstruct(item->populateBar, widget(widgetIndex()));
         bar->combo->setCurrentIndex(bar->combo->findText(item->name));
-        widget(widgetIndex())->setEnabled(widgetEnabled);
+//        widget(widgetIndex())->setEnabled(widgetEnabled);
+        setEnableWidget(widgetEnabled);
+        qDebug() << widget(widgetIndex());
     }
     //hack to have manual always enabled
     //qDebug() << "WidgetRegistry::getRegistry()->indexOf(item) " << registry->indexOf(item);
@@ -103,7 +105,7 @@ void SwitchingWidget::setEnableWidget(bool enable)
 
     if (wdgt != nullptr) {
         bool finalstatus = enable || isWidgetAlwaysEnabled;
-        //qDebug() << "wdgt->setEnabled(" << enable << "||" << isWidgetAlwaysEnabled << "= " << finalstatus << " )  ";
+        qDebug() << "wdgt->setEnabled(" << enable << "||" << isWidgetAlwaysEnabled << "= " << finalstatus << " )  " << wdgt->objectName();
         wdgt->setEnabled(finalstatus);
         wdgt->update();
     }

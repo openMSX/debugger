@@ -767,6 +767,11 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         wdgt = new StackViewer();
         static_cast<StackViewer*>(wdgt)->setData(SignalDispatcher::getDispatcher()->getMainMemory(), 65536);
         connect(SignalDispatcher::getDispatcher(), SIGNAL(spChanged(quint16)), wdgt, SLOT(setStackPointer(quint16)));
+    {
+        static int c=1;
+        wdgt->setObjectName(QString("stackViewer_%1").arg(c++));
+    }
+        qDebug()<<"case stackViewer wdgt->objectName() "<<wdgt->objectName();
         break;
     case slotViewer:
         wdgt = new SlotViewer();

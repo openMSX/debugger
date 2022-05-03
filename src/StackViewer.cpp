@@ -167,6 +167,7 @@ void StackViewer::setData(unsigned char* memPtr, int memLength)
 
 void StackViewer::setLocation(int addr)
 {
+    qDebug()<<"StackViewer::setLocation(int "<< addr<<")     wdgt->objectName() "<< objectName();
 	if (waitingForData) {
 		return; // ignore
 	}
@@ -183,6 +184,7 @@ void StackViewer::setLocation(int addr)
 
 void StackViewer::setStackPointer(quint16 addr)
 {
+    qDebug()<<"StackViewer::setStackPointer(quint16 "<< addr<<")     wdgt->objectName() "<< objectName();
 	stackPointer = addr;
 	setScrollBarValues();
 	vertScrollBar->setValue(addr);
@@ -191,6 +193,8 @@ void StackViewer::setStackPointer(quint16 addr)
 
 void StackViewer::memdataTransfered(StackRequest* r)
 {
+    qDebug()<<"StackViewer::memdataTransfered()     wdgt->objectName() "<< objectName();
+
 	topAddress = r->offset;
 	update();
 
