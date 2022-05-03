@@ -20,8 +20,8 @@ protected:
     ~Expander();
 
 protected slots:
-    //void enterEvent(QEvent* event) override final;
-    //void leaveEvent(QEvent* event) override final;
+    //void enterEvent(QEvent* event) final;
+    //void leaveEvent(QEvent* event) final;
     //void mousePressEvent(QMouseEvent* event) override;
     //void mouseMoveEvent(QMouseEvent* event) override = 0;
     //void mouseReleaseEvent(QMouseEvent* event) override;

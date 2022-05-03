@@ -590,7 +590,6 @@ void DebuggerForm::tabCloseRequest(int index)
     }
 }
 
-
 void DebuggerForm::addInfoWorkspace()
 {
     auto* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);

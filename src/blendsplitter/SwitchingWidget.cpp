@@ -32,7 +32,7 @@ SwitchingWidget::SwitchingWidget(RegistryItem* item, QWidget* parent, bool menuA
     setCurrentWidget(item);
 }
 
-void SwitchingWidget::setCurrentWidget(RegistryItem *item)
+void SwitchingWidget::setCurrentWidget(RegistryItem* item)
 {
     auto& registry = WidgetRegistry::instance();
     if (item == nullptr) {

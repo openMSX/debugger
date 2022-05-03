@@ -20,8 +20,8 @@ public:
 
 protected slots:
     void mouseMoveEvent(QMouseEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override final;
-    void mouseReleaseEvent(QMouseEvent* event) override final;
+    void mousePressEvent(QMouseEvent* event) final;
+    void mouseReleaseEvent(QMouseEvent* event) final;
 
 private:
     void decideDragAction(QMouseEvent* event, WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter);
@@ -53,7 +53,7 @@ private:
     Qt::ArrowType joinarrow;
 
 protected slots:
-    void enterEvent(QEvent* event) override final;
+    void enterEvent(QEvent* event) final;
 };
 
 #endif
