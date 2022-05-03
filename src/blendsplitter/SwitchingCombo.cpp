@@ -5,24 +5,21 @@
 
 SwitchingCombo::SwitchingCombo()
 {
-    connect(WidgetRegistry::getRegistry(), &WidgetRegistry::registryChanged, this, &SwitchingCombo::repopulate);
+    connect(&WidgetRegistry::instance(), &WidgetRegistry::registryChanged, this, &SwitchingCombo::repopulate);
     repopulate();
 }
 
 void SwitchingCombo::repopulate()
 {
-    RegistryItem* current{WidgetRegistry::getRegistry()->item(currentIndex())};
+    auto& registry = WidgetRegistry::instance();
+    auto* current = registry.item(currentIndex());
     clear();
-    for(int i{0}; i < WidgetRegistry::getRegistry()->size(); i++)
-    {
-        QComboBox::addItem(WidgetRegistry::getRegistry()->item(i)->name);
+    for (int i = 0; i < registry.size(); ++i) {
+        QComboBox::addItem(registry.item(i)->name);
     }
-    if(current != 0)
-    {
+    if (current) {
         setCurrentIndex(findText(current->name));
-    }
-    else
-    {
-        setCurrentIndex(findText(WidgetRegistry::getRegistry()->getDefault()->name));
+    } else {
+        setCurrentIndex(findText(registry.getDefault()->name));
     }
 }

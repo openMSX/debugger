@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EXPANDER_H
+#define EXPANDER_H
 
 #include "Global.h"
 
@@ -8,18 +9,26 @@ class WidgetDecorator;
 class Expander : public QLabel
 {
     Q_OBJECT
-    Q_DISABLE_COPY(Expander)
+
+public:
+    Expander(const Expander&) = delete;
+    Expander& operator=(const Expander&) = delete;
+
+protected:
+    explicit Expander(WidgetDecorator* parent);
+    virtual void reposition(); //= 0;
+    ~Expander();
+
+protected slots:
+    //void enterEvent(QEvent* event) override final;
+    //void leaveEvent(QEvent* event) override final;
+    //void mousePressEvent(QMouseEvent* event) override;
+    //void mouseMoveEvent(QMouseEvent* event) override = 0;
+    //void mouseReleaseEvent(QMouseEvent* event) override;
+
 protected:
     QPixmap* pixmap;
     Overlay* overlay;
-    Expander() = delete;
-    explicit Expander(WidgetDecorator* parent);
-    virtual void reposition() ; //= 0 ;
-    ~Expander();
-protected slots:
-//    virtual void enterEvent(QEvent* event) override final;
-//    virtual void leaveEvent(QEvent* event) override final;
-//    virtual void mousePressEvent(QMouseEvent* event) override;
-//    virtual void mouseMoveEvent(QMouseEvent* event) override = 0;
-//    virtual void mouseReleaseEvent(QMouseEvent* event) override;
 };
+
+#endif

@@ -43,7 +43,7 @@ SymbolTable& DebugSession::symbolTable()
 
 DebugSession *DebugSession::getDebugSession()
 {
-    if(theDebugSession == nullptr){
+    if (theDebugSession == nullptr) {
         theDebugSession = new DebugSession{};
     }
     return theDebugSession;

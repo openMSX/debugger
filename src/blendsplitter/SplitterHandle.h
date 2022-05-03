@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SPLITTERHANDLE_H
+#define SPLITTERHANDLE_H
 
 #include "Global.h"
 
@@ -9,9 +10,10 @@ class QMenu;
 class SplitterHandle final : public QSplitterHandle
 {
     Q_OBJECT
-    Q_DISABLE_COPY(SplitterHandle)
+
 public:
-    SplitterHandle() = delete;
+    SplitterHandle(const SplitterHandle&) = delete;
+    SplitterHandle& operator=(const SplitterHandle&) = delete;
     SplitterHandle(Qt::Orientation orientation, QSplitter* parent);
     ~SplitterHandle();
 
@@ -19,15 +21,12 @@ protected:
     void createPopupMenu();
     void destroyPopupMenu();
 
-    void removeFromSplitter(int toKeepIndex,int toRemoveIndex);
+    void removeFromSplitter(int toKeepIndex, int toRemoveIndex);
 
 protected slots:
-    virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual bool event(QEvent *event) override;
-
-
-
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    bool event(QEvent* event) override;
 
 private:
     QMenu* popupmenu;
@@ -38,3 +37,5 @@ private:
     QAction* splitVertBeforeAction;
     QAction* splitVertAfterAction;
 };
+
+#endif

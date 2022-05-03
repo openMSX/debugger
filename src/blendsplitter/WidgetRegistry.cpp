@@ -2,15 +2,15 @@
 
 #include "RegistryItem.h"
 
-WidgetRegistry* WidgetRegistry::theRegistry;
-
-WidgetRegistry* WidgetRegistry::getRegistry()
+WidgetRegistry::WidgetRegistry()
+    : defaultItem{nullptr}
 {
-    if(theRegistry == nullptr)
-    {
-        theRegistry = new WidgetRegistry{};
-    }
-    return theRegistry;
+}
+
+WidgetRegistry& WidgetRegistry::instance()
+{
+    static WidgetRegistry oneInstance;
+    return oneInstance;
 }
 
 RegistryItem* WidgetRegistry::item(int i) const
@@ -25,11 +25,10 @@ int WidgetRegistry::indexOf(RegistryItem* item) const
 
 RegistryItem* WidgetRegistry::getDefault()
 {
-    if(defaultItem == nullptr)
-    {
-        if(list.size() == 0)
-        {
-            addItem();
+    if (defaultItem == nullptr) {
+        if (list.size() == 0) {
+            addItem(new RegistryItem{"Default",
+                                     []()->QWidget* { return new QLabel{"Default widget"}; }});
         }
         defaultItem = item(0);
     }
@@ -38,8 +37,7 @@ RegistryItem* WidgetRegistry::getDefault()
 
 void WidgetRegistry::setDefault(RegistryItem* item)
 {
-    if(!list.contains(item))
-    {
+    if (!list.contains(item)) {
         addItem(item);
     }
     defaultItem = item;
@@ -47,8 +45,7 @@ void WidgetRegistry::setDefault(RegistryItem* item)
 
 void WidgetRegistry::setDefault(int index)
 {
-    if(index < size())
-    {
+    if (index < size()) {
         setDefault(item(index));
     }
 }
@@ -59,20 +56,10 @@ void WidgetRegistry::addItem(RegistryItem* item)
     emit registryChanged();
 }
 
-void WidgetRegistry::addItem(QString name, QWidget* (*widget) (), void (*populateBar) (SwitchingBar*, QWidget*))
-{
-    addItem(new RegistryItem{name, widget, populateBar});
-}
-
 void WidgetRegistry::insertItem(int index, RegistryItem* item)
 {
     list.insert(index, item);
     emit registryChanged();
-}
-
-void WidgetRegistry::insertItem(int index, QString name, QWidget* (*widget) (), void (*populateBar) (SwitchingBar*, QWidget*))
-{
-    insertItem(index, new RegistryItem{name, widget, populateBar});
 }
 
 void WidgetRegistry::removeItem(RegistryItem* item)
@@ -90,5 +77,3 @@ int WidgetRegistry::size() const
 {
     return list.size();
 }
-
-WidgetRegistry::WidgetRegistry() : list{}, defaultItem{nullptr} {}

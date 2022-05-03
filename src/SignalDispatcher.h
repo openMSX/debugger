@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIGNALDISPATCHER_H
+#define SIGNALDISPATCHER_H
 
 #include "CPURegs.h"
 #include "DebuggerData.h"
@@ -8,14 +9,17 @@
 
 /** \brief A singleton signal dispatcher
  *
- * Several debugger widgets like 
+ * Several debugger widgets like
  * This signal dispatcher also does the CPU registers tracking since multi widgets need those even if there wouldn't be a CPURegsViewer
  */
 class SignalDispatcher : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(SignalDispatcher)
+
 public:
+    SignalDispatcher(const SignalDispatcher&) = delete;
+    SignalDispatcher& operator=(const SignalDispatcher&) = delete;
+
     /** \brief Dispatcher getter
      *
      * This is a singleton class, i. e. you can't construct any object yourself. To get the one-and-only instance of this class, you need to call SignalDispatcher::getDispatcher(). The function will create the object if neccessary (= when called for the first time) and return a pointer to it.
@@ -37,19 +41,10 @@ public slots:
     void setEnableWidget(bool value);
 
 private:
-    static SignalDispatcher* theDispatcher;
     SignalDispatcher();
 
-    //buffers to handle tracking of the CPU registers
-    int regs[16], regsCopy[16];
-    bool regsModified[16];
-    bool regsChanged[16];
     void setRegister(int id, int value);
     void getRegister(int id, unsigned char* data);
-
-    //main 64K used by disasmview and stack
-    unsigned char* mainMemory;
-    MemoryLayout memLayout;
 
 signals:
     void enableWidget(bool enable);
@@ -76,5 +71,18 @@ signals:
     void setCursorAddress(uint16_t addr, int infoLine, int method);
 
 private:
+    static SignalDispatcher* theDispatcher;
+
+    //main 64K used by disasmview and stack
+    unsigned char* mainMemory;
+    MemoryLayout memLayout;
+
+    //buffers to handle tracking of the CPU registers
+    int regs[16], regsCopy[16];
+    bool regsModified[16];
+    bool regsChanged[16];
+
     bool isEnableWidget;
 };
+
+#endif

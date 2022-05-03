@@ -442,141 +442,119 @@ void DebuggerForm::createStatusbar()
 
 void DebuggerForm::createWidgetRegistry()
 {
+    auto& registry = WidgetRegistry::instance();
+
     //0: register the disasm viewer widget
-	RegistryItem *item = new RegistryItem{
-			tr("Code view"),
-            []()->QWidget* {return widgetFactory(disasmViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Code view"),
+	[] { return widgetFactory( disasmViewer); }});
 
     //1: register the memory view widget
-	item  = new RegistryItem{
-			tr("Main memory"),
-            []()->QWidget* {return widgetFactory(mainMemoryViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Main memory"),
+	[] { return widgetFactory( mainMemoryViewer); }});
 
     //2: register the register viewer
-	item  = new RegistryItem{
-			tr("CPU registers"),
-            []()->QWidget* {return widgetFactory(cpuRegsViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("CPU registers"),
+        [] { return widgetFactory(cpuRegsViewer); }});
 
     //3: register the flags viewer
-	item  = new RegistryItem{
-			tr("Flags"),
-            []()->QWidget* {return widgetFactory(flagsViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Flags"),
+        [] { return widgetFactory(flagsViewer); }});
 
     //4: register the stack viewer
-	item  = new RegistryItem{
-			tr("Stack"),
-            []()->QWidget* {return widgetFactory(stackViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Stack"),
+        [] { return widgetFactory(stackViewer); }});
 
     //5: register the slot viewer
-	item  = new RegistryItem{
-			tr("Memory layout"),
-            []()->QWidget* {return widgetFactory(slotViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Memory layout"),
+        [] { return widgetFactory(slotViewer); }});
 
     //6: register the breakpoints viewer
-	item  = new RegistryItem{
-			tr("Debug list"),
-            []()->QWidget* {return widgetFactory(breakpointViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Debug list"),
+        [] { return widgetFactory(breakpointViewer); }});
 
     //7: register the debuggable viewer
-	item  = new RegistryItem{
-			tr("Debuggable hex view"),
-            []()->QWidget* {return widgetFactory(debuggableViewer);}
-			};
-    WidgetRegistry::getRegistry()->addItem(item);
-    //WidgetRegistry::getRegistry()->setDefault(item);
+    registry.addItem(new RegistryItem{
+	tr("Debuggable hex view"),
+        [] { return widgetFactory(debuggableViewer); }});
+    //registry.setDefault(item);
 
     //8: register the VDP Status Registers
-	item  = new RegistryItem{
-			tr("VDP status registers"),
-            []()->QWidget* {return widgetFactory(vdpStatusRegViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("VDP status registers"),
+        [] { return widgetFactory(vdpStatusRegViewer); }});
 
     //9: register the VDP command registers view
-	item  = new RegistryItem{
-			tr("VDP command registers "),
-            []()->QWidget* {return widgetFactory(vdpCommandRegViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("VDP command registers "),
+        [] { return widgetFactory(vdpCommandRegViewer); }});
 
     //10: register the Bitmapped VRAM View
-	item  = new RegistryItem{
-			tr("VRAM as bitmap"),
-            []()->QWidget* {return widgetFactory(bitMapViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("VRAM as bitmap"),
+        [] { return widgetFactory(bitMapViewer); }});
 
     //11: register the Tile VRAM View
-	item  = new RegistryItem{
-			tr("VRAM as tiles"),
-            []()->QWidget* {return widgetFactory(tileViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("VRAM as tiles"),
+        [] { return widgetFactory(tileViewer); }});
 
     //12: register the Sprites View
-	item  = new RegistryItem{
-			tr("Sprites View"),
-            []()->QWidget* {return widgetFactory(spriteViewer);}
-			};
-	WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+	tr("Sprites View"),
+        [] { return widgetFactory(spriteViewer); }});
 
     //13: register the general VDP registers
-    item  = new RegistryItem{
-            tr("VDP registers"),
-            []()->QWidget* {return widgetFactory(vdpRegisters);}
-            };
-    WidgetRegistry::getRegistry()->addItem(item);
+    registry.addItem(new RegistryItem{
+        tr("VDP registers"),
+        [] { return widgetFactory(vdpRegisters); }});
+
     //14: register the quick guide manuel
-    item  = new RegistryItem{
-            tr("Quick Guide"),
-            []()->QWidget* {return widgetFactory(quickguide);}
-            };
-    //WidgetRegistry::getRegistry()->addItem(item);
-    WidgetRegistry::getRegistry()->setDefault(item);
+    auto* item  = new RegistryItem{
+        tr("Quick Guide"),
+        [] { return widgetFactory(quickguide); }};
+    registry.addItem(item);
+    registry.setDefault(item);
 }
 
 BlendSplitter* DebuggerForm::createWorkspaceCPU()
 {
-    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split->addWidget(WidgetRegistry::getRegistry()->item(2)); //2: the register viewer
-    split->addWidget(WidgetRegistry::getRegistry()->item(3)); //3: the flags viewer
-    split->addWidget(WidgetRegistry::getRegistry()->item(5)); //5: the slot viewer
+    auto& registry = WidgetRegistry::instance();
 
-    BlendSplitter* split2 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Vertical);
+    auto* split = new BlendSplitter({}, Qt::Horizontal);
+    split->addWidget(registry.item(2)); //2: the register viewer
+    split->addWidget(registry.item(3)); //3: the flags viewer
+    split->addWidget(registry.item(5)); //5: the slot viewer
+
+    auto* split2 = new BlendSplitter({}, Qt::Vertical);
     split2->addSplitter(split);
-    split2->addWidget(WidgetRegistry::getRegistry()->item(1)); //1: the memory view widget
-    split2->addWidget(WidgetRegistry::getRegistry()->item(6)); //6: the breakpoints viewer
+    split2->addWidget(registry.item(1)); //1: the memory view widget
+    split2->addWidget(registry.item(6)); //6: the breakpoints viewer
 
-    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split3->addWidget(WidgetRegistry::getRegistry()->item(0)); //0: the disasm viewer
+    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    split3->addWidget(registry.item(0)); //0: the disasm viewer
     split3->addSplitter(split2);
-    split3->addWidget(WidgetRegistry::getRegistry()->item(4)); //4: the stack viewer
+    split3->addWidget(registry.item(4)); //4: the stack viewer
 
     return split3;
 }
 
 BlendSplitter* DebuggerForm::createWorkspaceVDPRegs()
 {
-    BlendSplitter* split2 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Vertical);
-    split2->addWidget(WidgetRegistry::getRegistry()->item(8)); //8: the VDP Status Registers
-    split2->addWidget(WidgetRegistry::getRegistry()->item(9)); //9: the VDP command registers view
+    auto& registry = WidgetRegistry::instance();
 
-    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split3->addWidget(WidgetRegistry::getRegistry()->item(13)); //13: the general VDP registers
+    auto* split2 = new BlendSplitter({}, Qt::Vertical);
+    split2->addWidget(registry.item(8)); //8: the VDP Status Registers
+    split2->addWidget(registry.item(9)); //9: the VDP command registers view
+
+    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    split3->addWidget(registry.item(13)); //13: the general VDP registers
     split3->addSplitter(split2);
 
     return split3;
@@ -584,29 +562,28 @@ BlendSplitter* DebuggerForm::createWorkspaceVDPRegs()
 
 BlendSplitter *DebuggerForm::createWorkspaceVDPTiles()
 {
-    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split3->addWidget(WidgetRegistry::getRegistry()->item(11)); //11: the Tile VRAM View
-    split3->addWidget(WidgetRegistry::getRegistry()->item(12)); //12: the Sprites View
-
+    auto& registry = WidgetRegistry::instance();
+    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    split3->addWidget(registry.item(11)); //11: the Tile VRAM View
+    split3->addWidget(registry.item(12)); //12: the Sprites View
     return split3;
 }
 
 BlendSplitter *DebuggerForm::createWorkspaceVDPBitmap()
 {
-    BlendSplitter* split3 = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split3->addWidget(WidgetRegistry::getRegistry()->item(10)); //10: the Bitmapped VRAM View
-    split3->addWidget(WidgetRegistry::getRegistry()->item(12)); //12: the Sprites View
-
+    auto& registry = WidgetRegistry::instance();
+    auto* split3 = new BlendSplitter({}, Qt::Horizontal);
+    split3->addWidget(registry.item(10)); //10: the Bitmapped VRAM View
+    split3->addWidget(registry.item(12)); //12: the Sprites View
     return split3;
 }
 
 void DebuggerForm::tabCloseRequest(int index)
 {
-    if((index < 0) || (index >= workspaces->count())){
+    if ((index < 0) || (index >= workspaces->count())) {
         return;
-    };
-
-    if (workspaces->count() > 1){
+    }
+    if (workspaces->count() > 1) {
         QWidget *splitter=workspaces->widget(index);
         workspaces->removeTab(index);
         delete splitter;
@@ -614,29 +591,37 @@ void DebuggerForm::tabCloseRequest(int index)
 }
 
 
-void DebuggerForm::addInfoWorkspace(){
-    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
-    split->addWidget(WidgetRegistry::getRegistry()->item(14)); //14: the quick guide manuel
-    workspaces->addTab(split,"Welcome new user");
+void DebuggerForm::addInfoWorkspace()
+{
+    auto* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    split->addWidget(WidgetRegistry::instance().item(14)); //14: the quick guide manuel
+    workspaces->addTab(split, "Welcome new user");
 }
-void DebuggerForm::addCPUWorkspace(){
-    workspaces->addTab(createWorkspaceCPU(),"CPU");
+
+void DebuggerForm::addCPUWorkspace()
+{
+    workspaces->addTab(createWorkspaceCPU(), "CPU");
 }
-void DebuggerForm::addVDPRegsWorkspace(){
-    workspaces->addTab(createWorkspaceVDPRegs(),"VDP Registers");
+
+void DebuggerForm::addVDPRegsWorkspace()
+{
+    workspaces->addTab(createWorkspaceVDPRegs(), "VDP Registers");
 }
-void DebuggerForm::addVDPTilesWorkspace(){
-    workspaces->addTab(createWorkspaceVDPTiles(),"VDP tiles");
+
+void DebuggerForm::addVDPTilesWorkspace()
+{
+    workspaces->addTab(createWorkspaceVDPTiles(), "VDP tiles");
 }
+
 void DebuggerForm::addVDPBitmapWorkspace(){
-    workspaces->addTab(createWorkspaceVDPBitmap(),"VDP bitmap");
+    workspaces->addTab(createWorkspaceVDPBitmap(), "VDP bitmap");
 }
 
 void DebuggerForm::addEmptyWorkspace()
 {
-    BlendSplitter* split = new BlendSplitter([]()->QWidget* {return new SwitchingWidget{};},Qt::Horizontal);
+    auto* split = new BlendSplitter({}, Qt::Horizontal);
     split->addWidget();
-    workspaces->addTab(split,"custom");
+    workspaces->addTab(split, "custom");
 }
 
 void DebuggerForm::addFloatingSwitchingWidget()
@@ -677,8 +662,8 @@ void DebuggerForm::createForm()
 	btn->setIcon(icon);
     btn->setMenu(workspacemenu);
     btn->setPopupMode(QToolButton::InstantPopup);
-	workspaces->setCornerWidget(btn, Qt::TopRightCorner);
-    connect(workspaces,&QTabWidget::tabCloseRequested,this,&DebuggerForm::tabCloseRequest);
+    workspaces->setCornerWidget(btn, Qt::TopRightCorner);
+    connect(workspaces, &QTabWidget::tabCloseRequested, this, &DebuggerForm::tabCloseRequest);
     QWidget *window = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(workspaces);
@@ -686,7 +671,7 @@ void DebuggerForm::createForm()
 
     Settings& s = Settings::get();
 
-    int workspacetype =s.value("creatingWorkspaceType",0).toInt();
+    int workspacetype =s.value("creatingWorkspaceType", 0).toInt();
     switch (workspacetype) {
     case 0:
         addInfoWorkspace();
@@ -695,7 +680,7 @@ void DebuggerForm::createForm()
         addDefaultWorkspaces();
         break;
     default:
-        if (!loadWorkspaces(s.value("creatingWorkspaceFile",0).toString())){
+        if (!loadWorkspaces(s.value("creatingWorkspaceFile", 0).toString())){
             addDefaultWorkspaces();
         }
         break;
@@ -709,8 +694,8 @@ void DebuggerForm::createForm()
     //and have it propagate the signals
     connect(this, SIGNAL(connected()), SignalDispatcher::getDispatcher(), SIGNAL(connected()));
     connect(this, SIGNAL(breakStateEntered()), SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()));
-    connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-            SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString,int>&)) );
+    connect(this, SIGNAL(debuggablesChanged(const QMap<QString, int>&)),
+            SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString, int>&)) );
     connect(this, &DebuggerForm::breakpointsUpdated, SignalDispatcher::getDispatcher(), &SignalDispatcher::breakpointsUpdated);
 
 
@@ -732,7 +717,7 @@ void DebuggerForm::addDefaultWorkspaces()
     addVDPBitmapWorkspace();
 }
 
-QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
+QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
 {
     QWidget* wdgt;
     switch (fctwidget) {
@@ -744,8 +729,8 @@ QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()), wdgt, SLOT(refresh()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()), wdgt, SLOT(updateLayout()));
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(setCursorAddress(uint16_t,int,int)), wdgt, SLOT(setCursorAddress(uint16_t,int,int)));
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(setProgramCounter(uint16_t,bool)), wdgt, SLOT(setProgramCounter(uint16_t,bool)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(setCursorAddress(uint16_t, int, int)), wdgt, SLOT(setCursorAddress(uint16_t, int, int)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(setProgramCounter(uint16_t, bool)), wdgt, SLOT(setProgramCounter(uint16_t, bool)));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointsUpdated()), wdgt, SLOT(update()));
         static_cast<DisasmViewer*>(wdgt)->setMemory(SignalDispatcher::getDispatcher()->getMainMemory());
         static_cast<DisasmViewer*>(wdgt)->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
@@ -759,7 +744,7 @@ QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
         // Main memory viewer
         connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(registerChanged(int,int)), wdgt, SLOT(registerChanged(int,int)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(registerChanged(int, int)), wdgt, SLOT(registerChanged(int, int)));
         //mainMemoryView->setRegsView(regsView);
         static_cast<MainMemoryViewer*>(wdgt)->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
         static_cast<MainMemoryViewer*>(wdgt)->setDebuggable("memory", 65536);
@@ -800,8 +785,8 @@ QWidget *DebuggerForm::widgetFactory(factoryclasses fctwidget)
     case debuggableViewer:
         wdgt = new DebuggableViewer();
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-                wdgt, SLOT(setDebuggables(const QMap<QString,int>&)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(debuggablesChanged(const QMap<QString, int>&)),
+                wdgt, SLOT(setDebuggables(const QMap<QString, int>&)));
         static_cast<DebuggableViewer*>(wdgt)->setDebuggables(debuggables);
         if (!debuggables.isEmpty()){
             static_cast<DebuggableViewer*>(wdgt)->debuggableSelected(0);
@@ -1241,7 +1226,7 @@ void DebuggerForm::searchGoto()
 		int addr = gtd.address();
 		if (addr >= 0) {
             //disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
-            SignalDispatcher::getDispatcher()->setCursorAddress(addr,0,DisasmViewer::MiddleAlways);
+            SignalDispatcher::getDispatcher()->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
 		}
 	}
 }
@@ -1424,7 +1409,7 @@ bool DebuggerForm::loadWorkspaces(const QString &filename)
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         QMessageBox::warning(nullptr, tr("Loading workspaces ..."),
                              tr("Cannot read file %1:\n%2.")
-                                .arg(filename,file.errorString()));
+                                .arg(filename, file.errorString()));
         return false;
     };
     //Now try to parse the json file
@@ -1446,7 +1431,7 @@ bool DebuggerForm::loadWorkspaces(const QString &filename)
     foreach (const QJsonValue & value, obj["workspaces"].toArray()) {
         QJsonObject obj = value.toObject();
         BlendSplitter* splitter=BlendSplitter::createFromJson(obj["workspace"].toObject());
-        workspaces->addTab(splitter,obj["name"].toString());
+        workspaces->addTab(splitter, obj["name"].toString());
     };
     return true;
 }

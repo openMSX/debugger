@@ -1,23 +1,38 @@
-#pragma once
+#ifndef EXPANDERCORNER_H
+#define EXPANDERCORNER_H
 
 #include "Global.h"
 
 #include "Expander.h"
+
 class WidgetDecorator;
 class BlendSplitter;
 
 class ExpanderCorner final : public Expander
 {
     Q_OBJECT
-    Q_DISABLE_COPY(ExpanderCorner)
+
 public:
-    ExpanderCorner() = delete;
-    explicit ExpanderCorner(WidgetDecorator* parent,Qt::Corner location);
-    virtual void reposition() override;
+    ExpanderCorner(const ExpanderCorner&) = delete;
+    ExpanderCorner& operator=(const ExpanderCorner&) = delete;
+    explicit ExpanderCorner(WidgetDecorator* parent, Qt::Corner location);
+    void reposition() override;
+
 protected slots:
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void mousePressEvent(QMouseEvent* event) override final;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override final;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override final;
+    void mouseReleaseEvent(QMouseEvent* event) override final;
+
+private:
+    void decideDragAction(QMouseEvent* event, WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter);
+    void performInnerSplit(WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter, Qt::Orientation splitorientation);
+    void setupJoiners(WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter, int x, int y, Qt::Orientation splitorientation);
+    void followDragJoiners(WidgetDecorator* parentDecorator, BlendSplitter* parentSplitter, int x, int y, Qt::Orientation splitorientation);
+    bool isInContinuationOfSplitter(BlendSplitter* parentSplitter, int x, int y);
+    bool isOnTrailingHandler(BlendSplitter* parentSplitter);
+
+    int pickCoordinate(int x, int y, Qt::Orientation orient);
+    int pickSize(const QSize &size, Qt::Orientation orient);
 
 private:
     Qt::Corner corner;
@@ -33,19 +48,12 @@ private:
     } dragaction;
     Qt::Orientation dragorientation;
 
-    void decideDragAction(QMouseEvent *event, WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter);
-    void performInnerSplit(WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter, Qt::Orientation splitorientation);
-    void setupJoiners(WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter, int x, int y, Qt::Orientation splitorientation);
-    void followDragJoiners(WidgetDecorator *parentDecorator, BlendSplitter *parentSplitter, int x, int y, Qt::Orientation splitorientation);
-    bool isInContinuationOfSplitter(BlendSplitter *parentSplitter, int x, int y);
-    bool isOnTrailingHandler(BlendSplitter *parentSplitter);
-
     Overlay* internalOverlay;
     Overlay* externalOverlay;
     Qt::ArrowType joinarrow;
-    int pickCoordinate(int x,int y,Qt::Orientation orient);
-    int pickSize(const QSize &size, Qt::Orientation orient);
 
 protected slots:
-    virtual void enterEvent(QEvent* event) override final;
+    void enterEvent(QEvent* event) override final;
 };
+
+#endif

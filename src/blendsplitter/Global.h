@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #include <QApplication>
 #include <QSplitter>
@@ -6,3 +7,5 @@
 #include <QComboBox>
 #include <QMouseEvent>
 #include <QHBoxLayout>
+
+#endif

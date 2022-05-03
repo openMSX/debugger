@@ -6,7 +6,7 @@
 
 void SwitchingBar::addMenu(QMenu* menu)
 {
-    QMenuBar* menuBar{new QMenuBar};
+    auto* menuBar = new QMenuBar;
     menuBar->setDefaultUp(true);
     layout->insertWidget(layout->count() - 1, menuBar);
     layout->setAlignment(menuBar, Qt::AlignVCenter);
@@ -19,29 +19,33 @@ void SwitchingBar::addWidget(QWidget* widget)
     layout->insertWidget(layout->count() - 1, widget);
 }
 
-SwitchingBar::SwitchingBar(QWidget* parent) : QWidget(parent), layout{new QHBoxLayout{}}, combo{new SwitchingCombo{}}
+SwitchingBar::SwitchingBar(QWidget* parent)
+    : QWidget(parent)
+    , layout{new QHBoxLayout{}}
+    , combo{new SwitchingCombo{}}
 {
     layout->setContentsMargins(BlendSplitter::expanderSize * 3 / 4, 0, BlendSplitter::expanderSize * 3 / 4, 0);
     setLayout(layout);
-//    setMinimumHeight(BlendSplitter::switchingBarHeight);
+    //setMinimumHeight(BlendSplitter::switchingBarHeight);
     setMaximumHeight(BlendSplitter::switchingBarHeight);
     setMinimumHeight(combo->minimumHeight());
-//    setMaximumHeight(combo->maximumHeight());
-//    setMaximumHeight(combo->minimumHeight());
+    //setMaximumHeight(combo->maximumHeight());
+    //setMaximumHeight(combo->minimumHeight());
     layout->addWidget(combo);
     layout->addStretch();
 }
 
-void SwitchingBar::reconstruct(void (*populateBar) (SwitchingBar*, QWidget*), QWidget* widget)
+void SwitchingBar::reconstruct(std::function<void(SwitchingBar*, QWidget*)> populateBar, QWidget* widget)
 {
     int count{layout->count() - 1};
-    for(int i = 1; i < count; i++)
-    {
-        QLayoutItem* it{layout->takeAt(1)};
+    for (int i = 1; i < count; i++) {
+        auto* it = layout->takeAt(1);
         delete it->widget();
         delete it;
     }
-    (*populateBar) (this, widget);
+    if (populateBar) {
+        populateBar(this, widget);
+    }
 }
 
 SwitchingBar::~SwitchingBar()

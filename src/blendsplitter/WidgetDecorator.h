@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WIDGETDECORATOR_H
+#define WIDGETDECORATOR_H
 
 #include "Global.h"
 
@@ -8,11 +9,16 @@ class ExpanderCorner;
 class WidgetDecorator final : public QWidget
 {
     Q_OBJECT
-    Q_DISABLE_COPY(WidgetDecorator)
+
 public:
-    WidgetDecorator() = delete;
+    WidgetDecorator(const WidgetDecorator&) = delete;
+    WidgetDecorator& operator=(const WidgetDecorator&) = delete;
     explicit WidgetDecorator(QWidget* widget);
     ~WidgetDecorator();
+
+private:
+    void determineDropZone(QPoint pos);
+
 private:
     QWidget* widget;
     ExpanderCorner* expanderCorner1;
@@ -21,20 +27,18 @@ private:
     ExpanderCorner* expanderCorner4;
 
     enum class dropregions {
-        top=0,
-        left=1,
-        right=2,
-        bottom=3,
-        center=4
+        top = 0,
+        left = 1,
+        right = 2,
+        bottom = 3,
+        center = 4
     };
-
     dropregions dropzone;
 
-    void determineDropZone(QPoint pos);
-
 protected slots:
-    virtual void resizeEvent(QResizeEvent*) override;
-//    virtual void mouseMoveEvent(QMouseEvent* event) override;
-//    virtual void paintEvent(QPaintEvent* event) override;
-
+    void resizeEvent(QResizeEvent*) override;
+    //void mouseMoveEvent(QMouseEvent* event) override;
+    //void paintEvent(QPaintEvent* event) override;
 };
+
+#endif

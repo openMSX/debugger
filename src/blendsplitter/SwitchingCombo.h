@@ -1,15 +1,19 @@
-#pragma once
+#ifndef SWITCHINGCOMBO_H
+#define SWITCHINGCOMBO_H
 
 #include "Global.h"
-
-class SwitchingBar;
 
 class SwitchingCombo : public QComboBox
 {
     Q_OBJECT
-    Q_DISABLE_COPY(SwitchingCombo)
+
 public:
+    SwitchingCombo(const SwitchingCombo&) = delete;
+    SwitchingCombo& operator=(const SwitchingCombo&) = delete;
     SwitchingCombo();
+
 public slots:
     void repopulate();
 };
+
+#endif

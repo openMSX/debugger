@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SWITCHINGWIDGET_H
+#define SWITCHINGWIDGET_H
 
 #include <QSplitter>
 
@@ -15,15 +16,19 @@ class QJsonObject;
 class SwitchingWidget : public QSplitter
 {
     Q_OBJECT
-    Q_DISABLE_COPY(SwitchingWidget)
+
 public:
+    SwitchingWidget(const SwitchingWidget&) = delete;
+    SwitchingWidget& operator=(const SwitchingWidget&) = delete;
+
     /** \brief A default constructor similar to that of QWidget
      *
-     * Creates a SwitchingWidget containg the default widget specified in WidgetRegistry
+     * Creates a SwitchingWidget containing the default widget specified in WidgetRegistry
      * \param item A RegistryItem to display in the widget. If nullptr, then WidgetRegistry::getDefault() is used.
      * \param parent A parent widget
      */
-    SwitchingWidget(RegistryItem* item = nullptr, QWidget* parent = nullptr,bool menuAtTop=true);
+    SwitchingWidget(RegistryItem* item = nullptr, QWidget* parent = nullptr, bool menuAtTop = true);
+
     /** \brief Set the current Widget displayed.
      *
      * Sets the current widget to be the item
@@ -37,20 +42,24 @@ public:
     QJsonObject save2json();
     static SwitchingWidget* createFromJson(const QJsonObject& obj);
 
-
 public slots:
     void setEnableWidget(bool enable = true);
     void setWidgetAlwaysEnabled(bool enable = true);
 
 private slots:
     void changeCurrentWidget(int index);
+
 private:
-    QWidget* wrapInScrollArea(QWidget* wdgt, bool dowrap=true);
+    QWidget* wrapInScrollArea(QWidget* wdgt, bool dowrap = true);
     int barIndex();
     int widgetIndex();
+
+private:
     SwitchingBar* bar;
     bool widgetEnabled;
     bool isWidgetAlwaysEnabled; //some widgets need to be always enabled even if disconnect from openMSX
     bool barAtTop;
     bool isWrappedInScrollArea;
 };
+
+#endif

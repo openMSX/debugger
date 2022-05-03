@@ -4,7 +4,10 @@
 #include "Overlay.h"
 #include "WidgetDecorator.h"
 
-Expander::Expander(WidgetDecorator* parent) : QLabel(parent), pixmap{new QPixmap{BlendSplitter::expanderImage}}, overlay{nullptr}
+Expander::Expander(WidgetDecorator* parent)
+    : QLabel(parent)
+    , pixmap{new QPixmap{BlendSplitter::expanderImage}}
+    , overlay{nullptr}
 {
     *pixmap = pixmap->scaledToHeight(BlendSplitter::expanderSize, Qt::FastTransformation);
     setPixmap(*pixmap);
@@ -19,12 +22,9 @@ void Expander::reposition()
 
 //void Expander::mousePressEvent(QMouseEvent* event)
 //{
-//    if(event->button() == Qt::LeftButton)
-//    {
+//    if (event->button() == Qt::LeftButton) {
 //        event->accept();    // No-op
-//    }
-//    else
-//    {
+//    } else {
 //        releaseMouse();
 //        event->ignore();    // Propagate event
 //    }
@@ -32,17 +32,14 @@ void Expander::reposition()
 
 //void Expander::mouseReleaseEvent(QMouseEvent* event)
 //{
-//    if(event->button() == Qt::LeftButton and overlay != nullptr)
-//    {
-//        WidgetDecorator* parentDecorator{qobject_cast<WidgetDecorator*>(parentWidget())};
-//        if(parentDecorator == 0)
-//        {
+//    if (event->button() == Qt::LeftButton && overlay != nullptr) {
+//        auto* parentDecorator = qobject_cast<WidgetDecorator*>(parentWidget());
+//        if (!parentDecorator) {
 //            qCritical("A BlendSplitter library error occurred. Error code: 1");
 //            return;
 //        }
-//        BlendSplitter* parentSplitter{qobject_cast<BlendSplitter*>(overlay->parentWidget()->parentWidget())};
-//        if(parentSplitter == 0)
-//        {
+//        auto* parentSplitter = qobject_cast<BlendSplitter*>(overlay->parentWidget()->parentWidget());
+//        if (!parentSplitter) {
 //            qCritical("A BlendSplitter library error occurred. Error code: 2");
 //            return;
 //        }
@@ -52,11 +49,9 @@ void Expander::reposition()
 //        sizes[parentIndex] += sizes[overlayIndex] + 1;
 //        sizes.removeAt(overlayIndex);
 //        delete parentSplitter->widget(overlayIndex);
-//        if(parentSplitter->count() == 1 and parentSplitter->parentWidget()->inherits("SplitterDecorator"))
-//        {
-//            BlendSplitter* newParent{qobject_cast<BlendSplitter*>(parentSplitter->parentWidget()->parentWidget())};
-//            if(newParent == 0)
-//            {
+//        if (parentSplitter->count() == 1 && parentSplitter->parentWidget()->inherits("SplitterDecorator")) {
+//            auto* newParent = qobject_cast<BlendSplitter*>(parentSplitter->parentWidget()->parentWidget());
+//            if (!newParent) {
 //                qCritical("A BlendSplitter library error occurred. Error code: 3");
 //                return;
 //            }
@@ -64,9 +59,7 @@ void Expander::reposition()
 //            newParent->insertDecoratedWidget(newParent->indexOf(parentSplitter->parentWidget()), parentDecorator);
 //            delete parentSplitter->parentWidget();
 //            newParent->setSizes(sizes2);
-//        }
-//        else
-//        {
+//        } else {
 //            parentSplitter->setSizes(sizes);
 //        }
 //        overlay = nullptr;
@@ -78,13 +71,12 @@ Expander::~Expander()
     delete pixmap;
 }
 
-
-//void Expander::enterEvent(QEvent *event)
+//void Expander::enterEvent(QEvent* event)
 //{
 //    setCursor(Qt::SizeAllCursor);
 //}
 
-//void Expander::leaveEvent(QEvent *event)
+//void Expander::leaveEvent(QEvent* event)
 //{
 //    setCursor(Qt::ArrowCursor);
 //}
