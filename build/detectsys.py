@@ -41,7 +41,7 @@ def detectCPU():
 		if os == 'windows':
 			# Relatively safe bet.
 			return 'x86'
-		raise ValueError('Unable to detect CPU')
+		return 'unknown'
 	else:
 		return cpu
 
@@ -63,7 +63,7 @@ def detectOS():
 		return 'solaris'
 	elif os == '':
 		# Python couldn't figure it out.
-		raise ValueError('Unable to detect OS')
+		return 'unknown'
 	else:
 		return os
 
