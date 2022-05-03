@@ -23,16 +23,8 @@ def detectCPU():
 		return 'ppc64' if cpu.endswith('64') else 'ppc'
 	elif cpu.startswith('arm'):
 		return 'arm'
-	elif cpu == 'aarch64':
-		return 'aarch64'
-	elif cpu == 'aarch64_be':
-		return 'aarch64_be'
 	elif cpu.startswith('mips') or cpu == 'sgi':
 		return 'mipsel' if cpu.endswith('el') else 'mips'
-	elif cpu == 'm68k':
-		return 'm68k'
-	elif cpu == 'ia64':
-		return 'ia64'
 	elif cpu.startswith('alpha'):
 		return 'alpha'
 	elif cpu.startswith('hppa') or cpu.startswith('parisc'):
@@ -43,8 +35,6 @@ def detectCPU():
 		return 'sparc'
 	elif cpu.startswith('sh'):
 		return 'sheb' if cpu.endswith('eb') else 'sh'
-	elif cpu == 'avr32':
-		return 'avr32'
 	elif cpu == '':
 		# Python couldn't figure it out.
 		os = system().lower()
@@ -53,7 +43,7 @@ def detectCPU():
 			return 'x86'
 		raise ValueError('Unable to detect CPU')
 	else:
-		raise ValueError('Unsupported or unrecognised CPU "%s"' % cpu)
+		return cpu
 
 def detectOS():
 	'''Detects the operating system of the machine were are running on.
