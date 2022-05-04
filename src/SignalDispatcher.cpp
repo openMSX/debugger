@@ -1,6 +1,7 @@
 #include "SignalDispatcher.h"
 #include "OpenMSXConnection.h"
 #include "CommClient.h"
+#include "VDPDataStore.h"
 
 class DispatchDebugMemMapperHandler : public SimpleCommand
 {
@@ -88,6 +89,7 @@ bool SignalDispatcher::getEnableWidget()
 void SignalDispatcher::refresh()
 {
     CommClient::instance().sendCommand(new DispatchDebugMemMapperHandler(*this));
+    VDPDataStore::instance().refresh();
 
 }
 
