@@ -1,5 +1,7 @@
 #include "PreferencesDialog.h"
 #include "Settings.h"
+#include "DebuggerForm.h"
+
 #include <QListWidgetItem>
 #include <QFontDialog>
 #include <QColorDialog>
@@ -172,6 +174,31 @@ void PreferencesDialog::on_btnBrowseLayout_clicked()
 void PreferencesDialog::on_leFileName_textChanged(const QString &arg1)
 {
     if (updating) return;
+    Settings& s = Settings::get();
+    s.setValue("creatingWorkspaceFile",arg1);
+
     rbLayoutFromFile->setChecked(true);
+}
+
+
+void PreferencesDialog::on_btnSaveLayout_clicked()
+{
+    Settings& s = Settings::get();
+
+    QString savefilename=leFileName->text();
+    if (savefilename.isEmpty()){
+        //maybe the user cleared the lineEdit or first time launch or something went wrong :-)
+         savefilename=s.value("creatingWorkspaceFile","").toString();
+    }
+    if (savefilename.isEmpty()) {
+        savefilename=static_cast<DebuggerForm*>(parent())->fileSaveWorkspaceAs();
+    } else {
+        static_cast<DebuggerForm*>(parent())->saveWorkspacesAs(savefilename);
+    }
+    //update filename in case of fileSaveWorkspaceAs
+    if (!savefilename.isEmpty()) {
+       leFileName->setText(savefilename);
+       s.setValue("creatingWorkspaceFile",savefilename);
+    }
 }
 

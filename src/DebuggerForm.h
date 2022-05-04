@@ -53,6 +53,10 @@ public:
         quickguide
     };
 
+    bool saveWorkspacesAs(const QString& newFileName);
+    bool loadWorkspaces(const QString& filename);
+    QString fileSaveWorkspaceAs();
+
 private:
 	void closeEvent(QCloseEvent* e) override;
 
@@ -152,8 +156,6 @@ private:
 	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
 	uint16_t disasmAddress;
 
-    bool saveWorkspacesAs(const QString& newFileName);
-    bool loadWorkspaces(const QString& filename);
 
 	void fileNewSession();
 	void fileOpenSession();
@@ -162,7 +164,7 @@ private:
 	void fileRecentOpen();
     void fileOpenWorkspace();
     void fileSaveWorkspace();
-    void fileSaveWorkspaceAs();
+
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();

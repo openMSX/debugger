@@ -26,6 +26,7 @@ private slots:
     void on_btnBrowseLayout_clicked();
 
     void on_leFileName_textChanged(const QString &arg1);
+    void on_btnSaveLayout_clicked();
 };
 
 #endif // PREFERENCESDIALOG_OPENMSX_H

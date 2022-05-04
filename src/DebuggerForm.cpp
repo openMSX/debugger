@@ -679,7 +679,8 @@ void DebuggerForm::createForm()
         addDefaultWorkspaces();
         break;
     default:
-        if (!loadWorkspaces(s.value("creatingWorkspaceFile", 0).toString())){
+        if (s.value("creatingWorkspaceFile", "").toString().isEmpty()
+            || !loadWorkspaces(s.value("creatingWorkspaceFile", "").toString())) {
             addDefaultWorkspaces();
         }
         break;
@@ -1156,7 +1157,7 @@ void DebuggerForm::fileSaveWorkspace()
 
 }
 
-void DebuggerForm::fileSaveWorkspaceAs()
+QString DebuggerForm::fileSaveWorkspaceAs()
 {
     QFileDialog d(this, tr("Save workspace layout"));
     d.setNameFilter(tr("Debug Workspace Layout Files (*.omdl)"));
@@ -1164,15 +1165,18 @@ void DebuggerForm::fileSaveWorkspaceAs()
     d.setDirectory(QDir::currentPath());
     d.setAcceptMode(QFileDialog::AcceptSave);
     d.setFileMode(QFileDialog::AnyFile);
+    QString filename;
     if (d.exec()) {
 //        session->saveAs(d.selectedFiles().at(0));
-        saveWorkspacesAs(d.selectedFiles().at(0));
+        filename=d.selectedFiles().at(0);
+        saveWorkspacesAs(filename);
         // update recent
 //        if (session->existsAsFile()) {
 //            addRecentFile(session->filename());
 //		}
     }
     updateWindowTitle();
+    return filename;
 }
 
 void DebuggerForm::systemConnect()

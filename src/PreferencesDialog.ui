@@ -227,7 +227,7 @@
             <item>
              <widget class="QPushButton" name="btnSaveLayout">
               <property name="text">
-               <string>Save current layout...</string>
+               <string>Overwrite with current layout...</string>
               </property>
              </widget>
             </item>
