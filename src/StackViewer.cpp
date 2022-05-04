@@ -41,7 +41,8 @@ StackViewer::StackViewer(QWidget* parent)
 	: QFrame(parent)
 	, wheelRemainder(0)
 {
-    setObjectName("StackViewer");
+	static int count=0;
+	setObjectName(QString("StackViewer_%1").arg(count++));
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
@@ -178,9 +179,12 @@ void StackViewer::setLocation(int addr)
 	if (start + size >= memoryLength) {
 		size = memoryLength - start;
 	}
-	auto* req = new StackRequest(start, size, &memory[start], *this);
-	CommClient::instance().sendCommand(req);
-	waitingForData = true;
+    qDebug()<<"StackViewer::setLocation isEnabled() "<< isEnabled();
+    if (isEnabled()) { //only request data when enabled
+        auto* req = new StackRequest(start, size, &memory[start], *this);
+        CommClient::instance().sendCommand(req);
+        waitingForData = true;
+    }
 }
 
 void StackViewer::setStackPointer(quint16 addr)
@@ -189,6 +193,7 @@ void StackViewer::setStackPointer(quint16 addr)
 	stackPointer = addr;
 	setScrollBarValues();
 	vertScrollBar->setValue(addr);
+    qDebug()<<"StackViewer::setStackPointer is now calling ";
 	setLocation(addr);
 }
 
