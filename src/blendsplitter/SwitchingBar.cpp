@@ -50,5 +50,5 @@ void SwitchingBar::reconstruct(std::function<void(SwitchingBar*, QWidget*)> popu
 
 SwitchingBar::~SwitchingBar()
 {
-    delete layout;
+    //delete layout;
 }

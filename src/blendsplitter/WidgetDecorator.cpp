@@ -25,7 +25,7 @@ WidgetDecorator::WidgetDecorator(QWidget* widget)
 
 WidgetDecorator::~WidgetDecorator()
 {
-    delete layout();
+    //delete layout();
 }
 
 void WidgetDecorator::resizeEvent(QResizeEvent*)

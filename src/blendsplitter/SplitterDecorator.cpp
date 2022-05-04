@@ -13,5 +13,5 @@ SplitterDecorator::SplitterDecorator(BlendSplitter* splitter)
 
 SplitterDecorator::~SplitterDecorator()
 {
-    delete layout();
+    //delete layout();
 }
