@@ -12,25 +12,6 @@ namespace Ui {
     class PaletteDialog;
 }
 
-class PalettePatch: public QPushButton
-{
-    Q_OBJECT
-public:
-    explicit PalettePatch(QWidget* parent = nullptr, int palNr = 0);
-    //void setColor(QRgb c);
-public slots:
-    void updatePaletteChanged(const uint8_t* pal);
-    void setHighlightTest(int colorNr);
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-private:
-    QRgb myColor = Qt::green;
-    bool isSelected = false;
-    int msxPalNr;
-};
-
 
 class PaletteDialog : public QDialog
 {
@@ -45,7 +26,7 @@ public:
     void setAutoSync(bool value);
 
 signals:
-    void paletteChanged(uint8_t* pal);
+    void paletteChanged(const uint8_t* pal);
     void paletteSynced();
 
 private slots:

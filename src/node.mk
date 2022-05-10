@@ -18,7 +18,8 @@ MOC_SRC_HDR:= \
 	blendsplitter/WidgetRegistry blendsplitter/ExpanderCorner \
 	blendsplitter/RegistryItem \
 	blendsplitter/SplitterHandle blendsplitter/SwitchingCombo \
-	blendsplitter/WidgetDecorator QuickGuide TabRenamerHelper
+	blendsplitter/WidgetDecorator QuickGuide TabRenamerHelper \
+	PaletteView PalettePatch MSXPalette
 
 
 
@@ -33,6 +34,6 @@ UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
 	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters \
 	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer \
-	QuickGuide
+	QuickGuide PaletteView
 
 include build/node-end.mk

@@ -50,7 +50,8 @@ public:
         tileViewer,
         spriteViewer,
         vdpRegisters,
-        quickguide
+        quickguide,
+        paletteViewer
     };
 
     bool saveWorkspacesAs(const QString& newFileName);

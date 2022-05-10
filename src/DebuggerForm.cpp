@@ -25,6 +25,7 @@
 #include "blendsplitter/BlendSplitter.h"
 #include "blendsplitter/WidgetRegistry.h"
 #include "QuickGuide.h"
+#include "PaletteView.h"
 #include "TabRenamerHelper.h"
 #include <QAction>
 #include <QMessageBox>
@@ -521,6 +522,12 @@ void DebuggerForm::createWidgetRegistry()
         [] { return widgetFactory(quickguide); }};
     registry.addItem(item);
     registry.setDefault(item);
+    //15: register the palette editor
+    registry.addItem(new RegistryItem{
+        tr("Palette editor"),
+        [] { return widgetFactory(paletteViewer); }});
+
+
 }
 
 BlendSplitter* DebuggerForm::createWorkspaceCPU()
@@ -816,6 +823,11 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         break;
     case quickguide:
         wdgt = new QuickGuide();
+        break;
+    case paletteViewer:
+        wdgt = new PaletteView();
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
         break;
     default:
         wdgt = new QLabel("Not yet implemented in widgetFactory!");

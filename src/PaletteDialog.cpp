@@ -3,49 +3,9 @@
 #include <QGridLayout>
 #include <QPainter>
 #include "PaletteDialog.h"
+#include "PalettePatch.h"
 #include "Convert.h"
 #include "ranges.h"
-
-
-PalettePatch::PalettePatch(QWidget* parent, int palNr)
-    : QPushButton(parent), msxPalNr(palNr)
-{
-}
-
-//void PalettePatch::setColor(QRgb c)
-//{
-//    myColor = c;
-//    update();
-//}
-
-void PalettePatch::updatePaletteChanged(const uint8_t* pal)
-{
-    int r = (pal[2 * msxPalNr + 0] & 0xf0) >> 4;
-    int b = (pal[2 * msxPalNr + 0] & 0x0f);
-    int g = (pal[2 * msxPalNr + 1] & 0x0f);
-    auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-    myColor = qRgb(scale(r), scale(g), scale(b));
-    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    update();
-    //printf("PalettePatch::updatePaletteChanged %i\n", msxPalNr);
-}
-
-void PalettePatch::setHighlightTest(int colorNr)
-{
-    bool s = colorNr == msxPalNr;
-    if (isSelected == s) return;
-    isSelected = s;
-    update();
-}
-
-void PalettePatch::paintEvent(QPaintEvent* /*event*/)
-{
-	QPainter painter(this);
-	painter.setPen(isSelected ? Qt::white : QColor(myColor));
-	painter.setBrush(QBrush(myColor));
-	painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
-}
-
 
 
 PaletteDialog::PaletteDialog(QWidget* parent)
@@ -68,8 +28,8 @@ PaletteDialog::PaletteDialog(QWidget* parent)
         connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
         signalMapper->setMapping(button, i);
         gridLayout->addWidget(button, i / 8, i % 8);
-        connect(this, SIGNAL(paletteChanged(uint8_t*)),
-                button, SLOT(updatePaletteChanged(uint8_t*)));
+        connect(this, SIGNAL(paletteChanged(const uint8_t*)),
+                button, SLOT(updatePaletteChanged(const uint8_t*)));
         connect(signalMapper, SIGNAL(mapped(int)),
                 button, SLOT(setHighlightTest(int)));
     }
