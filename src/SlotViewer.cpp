@@ -9,27 +9,6 @@
 
 
 
-class DebugMemMapperHandler : public SimpleCommand
-{
-public:
-	DebugMemMapperHandler(SlotViewer& viewer_)
-		: SimpleCommand("debug_memmapper")
-		, viewer(viewer_)
-	{
-	}
-
-	void replyOk(const QString& message) override
-	{
-		viewer.updateSlots(message);
-        SignalDispatcher::getDispatcher()->updateSlots(message);
-		delete this;
-	}
-
-private:
-	SlotViewer& viewer;
-};
-
-
 SlotViewer::SlotViewer(QWidget* parent)
 	: QFrame(parent)
 {
@@ -189,7 +168,8 @@ QSize SlotViewer::sizeHint() const
 
 void SlotViewer::refresh()
 {
-	CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
+    //CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
+    update();
 }
 
 void SlotViewer::setMemoryLayout(MemoryLayout* ml)
@@ -197,43 +177,4 @@ void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 	memLayout = ml;
 }
 
-void SlotViewer::updateSlots(const QString& message)
-{
-	QStringList lines = message.split('\n');
-	bool changed = false;
 
-	// parse page slots and segments
-	for (int p = 0; p < 4; ++p) {
-		bool subSlotted = (lines[p * 2][1] != 'X');
-		slotsChanged[p] = (memLayout->primarySlot  [p] != lines[p * 2][0].toLatin1()-'0') ||
-		                  (memLayout->secondarySlot[p] != (subSlotted ? lines[p * 2][1].toLatin1() - '0' : -1));
-		changed |= slotsChanged[p];
-		memLayout->primarySlot  [p] = lines[p * 2][0].toLatin1()-'0';
-		memLayout->secondarySlot[p] = subSlotted
-			? lines[p * 2][1].toLatin1() - '0' : -1;
-		segmentsChanged[p] = memLayout->mapperSegment[p] !=
-		                     lines[p * 2 + 1].toInt();
-		memLayout->mapperSegment[p] = lines[p * 2 + 1].toInt();
-	}
-	// parse slot layout
-	int l = 8;
-	for (int ps = 0; ps < 4; ++ps) {
-		memLayout->isSubslotted[ps] = lines[l++][0] == '1';
-		if (memLayout->isSubslotted[ps]) {
-			for (int ss = 0; ss < 4; ++ss) {
-				memLayout->mapperSize[ps][ss] = lines[l++].toUShort();
-			}
-		} else {
-			memLayout->mapperSize[ps][0] = lines[l++].toUShort();
-		}
-	}
-	// parse rom blocks
-	for (int i = 0; i < 8; ++i, ++l) {
-		if (lines[l][0] == 'X')
-			memLayout->romBlock[i] = -1;
-		else
-			memLayout->romBlock[i] = lines[l].toInt();
-	}
-	update();
-	emit slotsUpdated(changed);
-}

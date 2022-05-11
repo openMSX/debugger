@@ -737,7 +737,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         connect(SignalDispatcher::getDispatcher(), SIGNAL(symbolsChanged()), wdgt, SLOT(refresh()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(settingsChanged()), wdgt, SLOT(updateLayout()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(setCursorAddress(uint16_t, int, int)), wdgt, SLOT(setCursorAddress(uint16_t, int, int)));
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(setProgramCounter(uint16_t, bool)), wdgt, SLOT(setProgramCounter(uint16_t, bool)));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(setProgramCounter(uint16_t,bool)), wdgt, SLOT(setProgramCounter(uint16_t,bool)));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakpointsUpdated()), wdgt, SLOT(update()));
         static_cast<DisasmViewer*>(wdgt)->setMemory(SignalDispatcher::getDispatcher()->getMainMemory());
         static_cast<DisasmViewer*>(wdgt)->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
@@ -782,12 +782,8 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         wdgt = new SlotViewer();
         connect(SignalDispatcher::getDispatcher(), SIGNAL(connected()), wdgt, SLOT(refresh()));
         connect(SignalDispatcher::getDispatcher(), SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+        connect(SignalDispatcher::getDispatcher(), SIGNAL(slotsUpdated(bool)), wdgt, SLOT(refresh()));
         static_cast<SlotViewer*>(wdgt)->setMemoryLayout(SignalDispatcher::getDispatcher()->getMemLayout());
-        connect(SignalDispatcher::getDispatcher(), SIGNAL(updateSlots(const QString&)), wdgt, SLOT(updateSlots(const QString&)));
-        // Received status update back from widget after breakStateEntered/connected
-        //TODO  has to move to SignalDispatcher just as the register stuff!!!!
-//        connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
-
         break;
     case breakpointViewer:
         wdgt = new BreakpointViewer();
@@ -1487,26 +1483,3 @@ void DebuggerForm::processMerge(const QString& message)
 	}
 }
 
-void DebuggerForm::onSlotsUpdated(bool slotsChanged)
-{
-	if (disasmStatus == PC_CHANGED) {
-        //disasmView->setProgramCounter(disasmAddress, slotsChanged);
-        SignalDispatcher::getDispatcher()->setProgramCounter(disasmAddress, slotsChanged);
-        disasmStatus = RESET;
-	} else {
-		disasmStatus = slotsChanged ? SLOTS_CHANGED : SLOTS_CHECKED;
-	}
-}
-
-void DebuggerForm::onPCChanged(uint16_t address)
-{
-	// PC shouldn't update twice.
-	assert(disasmStatus != PC_CHANGED);
-	if (disasmStatus != RESET) {
-        //disasmView->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
-        SignalDispatcher::getDispatcher()->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
-	} else {
-		disasmStatus = PC_CHANGED;
-		disasmAddress = address;
-	}
-}

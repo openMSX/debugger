@@ -17,7 +17,7 @@ public:
 	QSize sizeHint() const override;
 
 public slots:
-    void updateSlots(const QString& message);
+//    void updateSlots(const QString& message);
 	void refresh();
 
 private:
@@ -34,7 +34,7 @@ private:
 	bool segmentsChanged[4];
 
 signals:
-	void slotsUpdated(bool slotsChanged);
+//	void slotsUpdated(bool slotsChanged);
 	void contentsChanged();
 };
 

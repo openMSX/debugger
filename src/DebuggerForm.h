@@ -33,7 +33,6 @@ public:
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
 	void onSlotsUpdated(bool slotsChanged);
-	void onPCChanged(uint16_t address);
 
     enum factoryclasses {
         disasmViewer,
@@ -154,8 +153,7 @@ private:
     static QMap<QString, int> debuggables;
 
 	static int counter;
-	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
-	uint16_t disasmAddress;
+    uint16_t disasmAddress;
 
 
 	void fileNewSession();
@@ -243,8 +241,6 @@ protected:
     void addEmptyWorkspace();
     void addFloatingSwitchingWidget();
     void addDefaultWorkspaces();
-
-
 
 protected slots:
     void tabCloseRequest(int index);

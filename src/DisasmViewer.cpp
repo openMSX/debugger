@@ -328,6 +328,7 @@ int DisasmViewer::findPosition(uint16_t addr, int infoLine, int method)
 
 void DisasmViewer::setAddress(uint16_t addr, int infoLine, int method)
 {
+    qDebug() << "void DisasmViewer::setAddress(uint16_t addr "<<addr<<", int infoLine "<<infoLine<<", int method "<<method<<" )";
 	if (method != Reload) {
 		int line = findPosition(addr, infoLine, method);
 
@@ -457,6 +458,7 @@ uint16_t DisasmViewer::programCounter() const
 
 void DisasmViewer::setProgramCounter(uint16_t pc, bool reload)
 {
+    qDebug() << "void DisasmViewer::setProgramCounter(uint16_t pc "<<pc<<", bool reload "<<reload<<")";
 	cursorAddr = pc;
 	programAddr = pc;
 	setAddress(pc, 0, reload ? Reload : MiddleAlways);

@@ -39,12 +39,14 @@ public:
 public slots:
     void refresh();
     void setEnableWidget(bool value);
+    void updateSlots(const QString& message);
 
 private:
     SignalDispatcher();
 
     void setRegister(int id, int value);
     void getRegister(int id, unsigned char* data);
+
 
 signals:
     void enableWidget(bool enable);
@@ -61,8 +63,8 @@ signals:
     void pcChanged(uint16_t);
     void flagsChanged(quint8);
     void spChanged(quint16);
-    // signals concerning slotselection
-    void updateSlots(const QString& message);
+    // signals concerning slotselection    
+    void slotsUpdated(bool slotsChanged);
     //signals from/for the diasmView
     void toggleBreakpoint(uint16_t adr);
     void breakpointToggled(uint16_t adr);
@@ -81,6 +83,12 @@ private:
     int regs[16], regsCopy[16];
     bool regsModified[16];
     bool regsChanged[16];
+
+    //buffers to handle tracking of the slots layout
+    enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
+    bool slotsChanged[4];
+    bool segmentsChanged[4];
+
 
     bool isEnableWidget;
 };

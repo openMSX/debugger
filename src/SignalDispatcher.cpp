@@ -6,19 +6,19 @@
 class DispatchDebugMemMapperHandler : public SimpleCommand
 {
 public:
-    DispatchDebugMemMapperHandler(SignalDispatcher& viewer_)
+    DispatchDebugMemMapperHandler(SignalDispatcher& dispatcher_)
         : SimpleCommand("debug_memmapper"),
-          viewer(viewer_)
+          dispatcher(dispatcher_)
     {
     }
 
     void replyOk(const QString& message) override
     {
-        emit viewer.updateSlots(message);
+        dispatcher.updateSlots(message);
         delete this;
     }
 private:
-    SignalDispatcher& viewer;
+    SignalDispatcher& dispatcher;
 };
 
 SignalDispatcher* SignalDispatcher::theDispatcher=nullptr;
@@ -79,7 +79,70 @@ void SignalDispatcher::setData(unsigned char *datPtr)
     emit spChanged(regs[CpuRegs::REG_SP]);
     emit flagsChanged(regs[CpuRegs::REG_AF] & 0xFF);
     emit registersUpdate(datPtr); // now tell all listeners the new values
+
+    //now signals for the disasmView
+    if (disasmStatus != RESET) {
+        //disasmView->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
+    } else {
+        disasmStatus = PC_CHANGED;
+    }
+    emit setProgramCounter(regs[CpuRegs::REG_PC], disasmStatus == SLOTS_CHANGED);
+
 }
+
+void SignalDispatcher::updateSlots(const QString& message)
+{
+    QStringList lines = message.split('\n');
+    bool changed = false;
+
+    // parse page slots and segments
+    for (int p = 0; p < 4; ++p) {
+        bool subSlotted = (lines[p * 2][1] != 'X');
+        slotsChanged[p] = (memLayout.primarySlot  [p] != lines[p * 2][0].toLatin1()-'0') ||
+                          (memLayout.secondarySlot[p] != (subSlotted ? lines[p * 2][1].toLatin1() - '0' : -1));
+        changed |= slotsChanged[p];
+        memLayout.primarySlot  [p] = lines[p * 2][0].toLatin1()-'0';
+        memLayout.secondarySlot[p] = subSlotted
+            ? lines[p * 2][1].toLatin1() - '0' : -1;
+        segmentsChanged[p] = memLayout.mapperSegment[p] !=
+                             lines[p * 2 + 1].toInt();
+        memLayout.mapperSegment[p] = lines[p * 2 + 1].toInt();
+    }
+    // parse slot layout
+    int l = 8;
+    for (int ps = 0; ps < 4; ++ps) {
+        memLayout.isSubslotted[ps] = lines[l++][0] == '1';
+        if (memLayout.isSubslotted[ps]) {
+            for (int ss = 0; ss < 4; ++ss) {
+                memLayout.mapperSize[ps][ss] = lines[l++].toUShort();
+            }
+        } else {
+            memLayout.mapperSize[ps][0] = lines[l++].toUShort();
+        }
+    }
+    // parse rom blocks
+    for (int i = 0; i < 8; ++i, ++l) {
+        if (lines[l][0] == 'X')
+            memLayout.romBlock[i] = -1;
+        else
+            memLayout.romBlock[i] = lines[l].toInt();
+    }
+
+    //signals to update disasmview
+    if (disasmStatus == PC_CHANGED) {
+        //disasmView->setProgramCounter(disasmAddress, slotsChanged);
+        emit setProgramCounter(regs[CpuRegs::REG_PC], changed);
+        disasmStatus = RESET;
+    } else {
+        disasmStatus = changed ? SLOTS_CHANGED : SLOTS_CHECKED;
+    }
+
+    emit slotsUpdated(changed);
+
+
+}
+
+
 
 bool SignalDispatcher::getEnableWidget()
 {
