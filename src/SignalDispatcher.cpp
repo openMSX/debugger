@@ -22,25 +22,6 @@ private:
     SignalDispatcher& dispatcher;
 };
 
-SignalDispatcher::SignalDispatcher()
-{
-    // avoid UMR
-    memset(&regs,         0, sizeof(regs));
-    memset(&regsChanged,  0, sizeof(regsChanged));
-    memset(&regsModified, 0, sizeof(regsModified));
-
-    // init main memory
-    // added four bytes as runover buffer for dasm
-    // otherwise dasm would need to check the buffer end continuously.
-    mainMemory = new uint8_t[65536 + 4];
-    memset(mainMemory, 0, 65536 + 4);
-}
-
-SignalDispatcher::~SignalDispatcher()
-{
-    delete[] mainMemory;
-}
-
 SignalDispatcher& SignalDispatcher::instance()
 {
     static SignalDispatcher oneInstance;

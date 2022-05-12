@@ -20,13 +20,7 @@ public:
     SignalDispatcher(const SignalDispatcher&) = delete;
     SignalDispatcher& operator=(const SignalDispatcher&) = delete;
 
-    /** \brief Dispatcher getter
-     *
-     * This is a singleton class, i. e. you can't construct any object yourself. To get the one-and-only instance of this class, you need to call SignalDispatcher::getDispatcher(). The function will create the object if neccessary (= when called for the first time) and return a pointer to it.
-     * \return A pointer to the one-and-only instance of SignalDispatcher
-     */
     static SignalDispatcher& instance();
-    ~SignalDispatcher();
 
     uint8_t* getMainMemory();
     MemoryLayout* getMemLayout();
@@ -42,7 +36,8 @@ public slots:
     void updateSlots(const QString& message);
 
 private:
-    SignalDispatcher();
+    SignalDispatcher() = default;
+    ~SignalDispatcher() = default;
 
     void setRegister(int id, int value);
     void getRegister(int id, uint8_t* data);
@@ -73,13 +68,14 @@ signals:
 
 private:
     //main 64K used by disasmview and stack
-    uint8_t* mainMemory;
+    uint8_t mainMemory[65536 + 4] = {}; // 4 extra to avoid bound-checks during disassembly
     MemoryLayout memLayout;
 
     //buffers to handle tracking of the CPU registers
-    int regs[16], regsCopy[16];
-    bool regsModified[16];
-    bool regsChanged[16];
+    int regs[16] = {};
+    int regsCopy[16];
+    bool regsModified[16] = {};
+    bool regsChanged[16] = {};
 
     //buffers to handle tracking of the slots layout
     enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
