@@ -175,10 +175,10 @@ void PaletteView::combineRGB()
 {
     if (isDisplayUpdating) return;
 
-    int r = ui->horizontalSlider_R->value();
-    int g = ui->horizontalSlider_G->value();
-    int b = ui->horizontalSlider_B->value();
-    myPal->setColor(currentColor,r,g,b);
+    int r = ui->horizontalSlider_R->value() & 7;
+    int g = ui->horizontalSlider_G->value() & 7;
+    int b = ui->horizontalSlider_B->value() & 7;
+    myPal->setColor(currentColor, r, g, b);
     emit paletteChanged();
     if (autoSync) {
         syncToSource();

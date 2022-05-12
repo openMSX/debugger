@@ -21,7 +21,6 @@ public:
     explicit PaletteDialog(QWidget* parent = nullptr);
 
     void setPalette(uint8_t* pal);
-    uint8_t* getPalette();
     void syncToSource();
     void setAutoSync(bool value);
 

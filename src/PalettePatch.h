@@ -10,8 +10,7 @@ class PalettePatch : public QPushButton
     Q_OBJECT
 
 public:
-    explicit PalettePatch(QWidget* parent = nullptr, int palNr = 0);
-    //void setColor(QRgb c);
+    PalettePatch(QWidget* parent, int palNr);
 
 public slots:
     void setMSXPalette(MSXPalette* pal);

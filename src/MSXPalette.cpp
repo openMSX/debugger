@@ -1,6 +1,7 @@
 #include "MSXPalette.h"
 #include "CommClient.h"
 #include <algorithm>
+#include <cassert>
 
 // default MSX palette
 static const uint8_t defaultPalette[32] = {
@@ -27,42 +28,29 @@ MSXPalette::MSXPalette(QObject* parent)
     : QObject{parent}
 {
     memcpy(myPal, defaultPalette, sizeof(myPal));
-    for (int i = 0; i < 16; ++i) {
-        setColor(i, myPal[2 * i] >> 4, myPal[2 * i + 1], myPal[2 * i] & 15);
-    }
+    emit paletteChanged();
 }
 
 void MSXPalette::copyDataFrom(const MSXPalette& source)
 {
     memcpy(myPal, source.myPal, sizeof(myPal));
-    memcpy(msxPalette, source.msxPalette, sizeof(msxPalette));
     emit paletteChanged();
 }
 
 void MSXPalette::setPalette(uint8_t* pal)
 {
-    int palchanged = memcmp(myPal, pal, sizeof(myPal));
     sourcePal = pal;
-    if (palchanged != 0) {
-        for (int i = 0; i < 16; ++i) {
-            calculateColor(i, pal[2 * i] >> 4, pal[2 * i + 1], pal[2 * i] & 15);
-        }
+    if (memcmp(myPal, pal, sizeof(myPal)) != 0) {
+        memcpy(myPal, pal, sizeof(myPal));
         emit paletteChanged();
     }
 }
 
-uint8_t* MSXPalette::getPalette()
-{
-    return myPal;
-}
-
 void MSXPalette::syncToSource()
 {
-    if (sourcePal == nullptr) {
-        return;
-    }
-    memcpy(sourcePal, myPal, sizeof(myPal));
+    if (!sourcePal) return;
 
+    memcpy(sourcePal, myPal, sizeof(myPal));
     if (syncToMSX) {
         syncToOpenMSX();
     }
@@ -71,9 +59,8 @@ void MSXPalette::syncToSource()
 
 void MSXPalette::syncToSource(int i)
 {
-    if (sourcePal == nullptr) {
-        return;
-    }
+    if (!sourcePal) return;
+
     memcpy(sourcePal + 2 * i, myPal + 2 * i, 2);
     if (syncToMSX) {
         syncColorToOpenMSX(i);
@@ -83,18 +70,23 @@ void MSXPalette::syncToSource(int i)
 
 void MSXPalette::setAutoSync(bool value)
 {
-    if (autoSync == value) {
-        return;
-    }
+    if (autoSync == value) return;
+
     autoSync = value;
     if (value) {
         syncToSource();
     }
 }
 
-void MSXPalette::setColor(int i, int r, int g, int b)
+void MSXPalette::setColor(unsigned i, unsigned r, unsigned g, unsigned b)
 {
-    calculateColor(i, r, g, b);
+    assert(i < 16);
+    assert(r < 8);
+    assert(g < 8);
+    assert(b < 8);
+    myPal[2 * i + 0] = (r << 4) | b;
+    myPal[2 * i + 1] = g;
+
     emit paletteChanged();
 
     if (autoSync) {
@@ -102,23 +94,14 @@ void MSXPalette::setColor(int i, int r, int g, int b)
     }
 }
 
-QRgb MSXPalette::color(int i)
+QRgb MSXPalette::color(unsigned i) const
 {
-    return msxPalette[std::clamp(i, 0, 15)];
-}
-
-void MSXPalette::calculateColor(int i, int r, int g, int b)
-{
-    i = std::clamp(i, 0, 15);
-    r = std::clamp(r, 0, 7);
-    g = std::clamp(g, 0, 7);
-    b = std::clamp(b, 0, 7);
-
-    myPal[2 * i + 0] = 16 * r + b;
-    myPal[2 * i + 1] = g;
-
+    assert(i < 16);
+    int r = (myPal[2 * i + 0] >> 4) & 7;
+    int g = (myPal[2 * i + 1] >> 0) & 7;
+    int b = (myPal[2 * i + 0] >> 0) & 7;
     auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-    msxPalette[i] = qRgb(scale(r), scale(g), scale(b));
+    return qRgb(scale(r), scale(g), scale(b));
 }
 
 void MSXPalette::syncToOpenMSX()

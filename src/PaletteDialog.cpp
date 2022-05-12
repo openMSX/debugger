@@ -70,9 +70,9 @@ void PaletteDialog::restoreOpeningsPalette()
 void PaletteDialog::colorSelected(int colorNumber)
 {
     currentColor = colorNumber;
-    int r = (myPal[2 * currentColor + 0] & 0xf0) >> 4;
-    int b = (myPal[2 * currentColor + 0] & 0x0f);
-    int g = (myPal[2 * currentColor + 1] & 0x0f);
+    int r = (myPal[2 * currentColor + 0] & 0x70) >> 4;
+    int b = (myPal[2 * currentColor + 0] & 0x07);
+    int g = (myPal[2 * currentColor + 1] & 0x07);
     ui->horizontalSlider_R->setValue(r);
     ui->horizontalSlider_G->setValue(g);
     ui->horizontalSlider_B->setValue(b);
@@ -85,11 +85,6 @@ void PaletteDialog::setPalette(uint8_t* pal)
     memcpy(myOriginalPal, pal, sizeof(myOriginalPal));
     memcpy(myPal, pal, sizeof(myPal));
     emit paletteChanged(myPal);
-}
-
-uint8_t* PaletteDialog::getPalette()
-{
-    return myPal;
 }
 
 //void PaletteDialog::decodepalette()
