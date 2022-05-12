@@ -10,7 +10,8 @@ class MSXPalette : public QObject
     Q_OBJECT
 public:
     explicit MSXPalette(QObject* parent = nullptr);
-    MSXPalette& operator=(const MSXPalette& source);
+
+    void copyDataFrom(const MSXPalette& source);
 
     void setPalette(uint8_t* pal);
     uint8_t* getPalette();

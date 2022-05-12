@@ -32,12 +32,11 @@ MSXPalette::MSXPalette(QObject* parent)
     }
 }
 
-MSXPalette& MSXPalette::operator=(const MSXPalette& source)
+void MSXPalette::copyDataFrom(const MSXPalette& source)
 {
     memcpy(myPal, source.myPal, sizeof(myPal));
     memcpy(msxPalette, source.msxPalette, sizeof(msxPalette));
     emit paletteChanged();
-    return *this;
 }
 
 void MSXPalette::setPalette(uint8_t* pal)

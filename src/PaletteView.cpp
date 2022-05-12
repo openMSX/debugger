@@ -55,7 +55,7 @@ void PaletteView::setPalette(MSXPalette* sourcePal)
     }
 
     myPal = sourcePal;
-    myOriginalPal = *sourcePal;
+    myOriginalPal.copyDataFrom(*sourcePal);
     connect(myPal, SIGNAL(paletteChanged()),
             this, SIGNAL(paletteChanged()));
     emit paletteReplaced(sourcePal);
@@ -69,7 +69,7 @@ MSXPalette* PaletteView::getPalette()
 void PaletteView::syncToSource()
 {
     myPal->syncToSource();
-    myOriginalPal = *myPal;
+    myOriginalPal.copyDataFrom(*myPal);
 }
 
 void PaletteView::setAutoSync(bool value)
@@ -117,11 +117,11 @@ void PaletteView::on_horizontalSlider_B_valueChanged(int value)
 void PaletteView::restorePalette()
 {
     ScopedAssign sa(isDisplayUpdating, true);
-    *myPal = myOriginalPal;
+    myPal->copyDataFrom(myOriginalPal);
     colorSelected(currentColor);
 }
 
-void PaletteView::on_buttonBox_clicked(QAbstractButton *button)
+void PaletteView::on_buttonBox_clicked(QAbstractButton* button)
 {
     if (button == ui->buttonBox->button(QDialogButtonBox::Apply) ||
         button == ui->buttonBox->button(QDialogButtonBox::Ok)) {
@@ -151,7 +151,7 @@ void PaletteView::on_cbPalette_currentIndexChanged(int index)
 void PaletteView::on_pbCopyPaletteVDP_clicked()
 {
     ScopedAssign sa(isDisplayUpdating, true);
-    *myPal = *VDPDataStore::instance().getPalette(0); // operator=() copies the byte and qRgb values
+    myPal->copyDataFrom(*VDPDataStore::instance().getPalette(0));
     emit myPal->paletteChanged();
 }
 
