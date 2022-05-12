@@ -17,17 +17,18 @@ public:
         dispatcher.updateSlots(message);
         delete this;
     }
+
 private:
     SignalDispatcher& dispatcher;
 };
 
-SignalDispatcher* SignalDispatcher::theDispatcher=nullptr;
+SignalDispatcher* SignalDispatcher::theDispatcher = nullptr;
 
 SignalDispatcher* SignalDispatcher::getDispatcher()
 {
-    if (theDispatcher==nullptr) {
+    if (theDispatcher == nullptr) {
 			theDispatcher = new SignalDispatcher{};
-	};
+	}
     return theDispatcher;
 }
 
@@ -35,9 +36,6 @@ SignalDispatcher::~SignalDispatcher()
 {
     delete[] mainMemory;
 }
-
-
-
 
 unsigned char *SignalDispatcher::getMainMemory()
 {
@@ -87,7 +85,6 @@ void SignalDispatcher::setData(unsigned char *datPtr)
         disasmStatus = PC_CHANGED;
     }
     emit setProgramCounter(regs[CpuRegs::REG_PC], disasmStatus == SLOTS_CHANGED);
-
 }
 
 void SignalDispatcher::updateSlots(const QString& message)
@@ -122,10 +119,11 @@ void SignalDispatcher::updateSlots(const QString& message)
     }
     // parse rom blocks
     for (int i = 0; i < 8; ++i, ++l) {
-        if (lines[l][0] == 'X')
+        if (lines[l][0] == 'X') {
             memLayout.romBlock[i] = -1;
-        else
+        } else {
             memLayout.romBlock[i] = lines[l].toInt();
+        }
     }
 
     //signals to update disasmview
@@ -138,11 +136,7 @@ void SignalDispatcher::updateSlots(const QString& message)
     }
 
     emit slotsUpdated(changed);
-
-
 }
-
-
 
 bool SignalDispatcher::getEnableWidget()
 {
@@ -153,13 +147,12 @@ void SignalDispatcher::refresh()
 {
     CommClient::instance().sendCommand(new DispatchDebugMemMapperHandler(*this));
     VDPDataStore::instance().refresh();
-
 }
 
 void SignalDispatcher::setEnableWidget(bool value)
 {
-    if (isEnableWidget != value){
-        isEnableWidget=value;
+    if (isEnableWidget != value) {
+        isEnableWidget = value;
         emit enableWidget(value);
     }
 }
@@ -169,7 +162,8 @@ int SignalDispatcher::readRegister(int id)
     return regs[id];
 }
 
-SignalDispatcher::SignalDispatcher(): isEnableWidget(false) {
+SignalDispatcher::SignalDispatcher()
+{
     // avoid UMR
     memset(&regs,         0, sizeof(regs));
     memset(&regsChanged,  0, sizeof(regsChanged));
@@ -177,10 +171,9 @@ SignalDispatcher::SignalDispatcher(): isEnableWidget(false) {
 
     // init main memory
     // added four bytes as runover buffer for dasm
-    // otherwise dasm would need to check the buffer end continously.
+    // otherwise dasm would need to check the buffer end continuously.
     mainMemory = new unsigned char[65536 + 4];
     memset(mainMemory, 0, 65536 + 4);
-
 }
 
 void SignalDispatcher::setRegister(int id, int value)
@@ -192,9 +185,8 @@ void SignalDispatcher::setRegister(int id, int value)
     }
 }
 
-void SignalDispatcher::getRegister(int id, unsigned char *data)
+void SignalDispatcher::getRegister(int id, unsigned char* data)
 {
     data[0] = regs[id] >> 8;
     data[1] = regs[id] & 255;
 }
-

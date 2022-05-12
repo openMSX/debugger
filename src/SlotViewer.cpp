@@ -7,8 +7,6 @@
 #include <QPaintEvent>
 #include <QStyleOptionHeader>
 
-
-
 SlotViewer::SlotViewer(QWidget* parent)
 	: QFrame(parent)
 {
@@ -163,18 +161,16 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 QSize SlotViewer::sizeHint() const
 {
 	return {headerSize1 + headerSize2 + headerSize3 + headerSize4 + frameL + frameR,
-	        headerHeight + 4*fontMetrics().height()};
+	        headerHeight + 4 * fontMetrics().height()};
 }
 
 void SlotViewer::refresh()
 {
-    //CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
-    update();
+	//CommClient::instance().sendCommand(new DebugMemMapperHandler(*this));
+	update();
 }
 
 void SlotViewer::setMemoryLayout(MemoryLayout* ml)
 {
 	memLayout = ml;
 }
-
-

@@ -47,7 +47,6 @@ private:
     void setRegister(int id, int value);
     void getRegister(int id, unsigned char* data);
 
-
 signals:
     void enableWidget(bool enable);
 	void connected();
@@ -63,9 +62,9 @@ signals:
     void pcChanged(uint16_t);
     void flagsChanged(quint8);
     void spChanged(quint16);
-    // signals concerning slotselection    
+    // signals concerning slotselection
     void slotsUpdated(bool slotsChanged);
-    //signals from/for the diasmView
+    //signals from/for the disasmView
     void toggleBreakpoint(uint16_t adr);
     void breakpointToggled(uint16_t adr);
     void setProgramCounter(uint16_t pc, bool reload = false);
@@ -89,8 +88,7 @@ private:
     bool slotsChanged[4];
     bool segmentsChanged[4];
 
-
-    bool isEnableWidget;
+    bool isEnableWidget = false;
 };
 
 #endif

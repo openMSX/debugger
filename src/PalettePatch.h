@@ -2,16 +2,15 @@
 #define PALETTEPATCH_H
 
 #include <QPushButton>
-#include <cstdint>
-
 #include "MSXPalette.h"
+#include <cstdint>
 
 class PalettePatch : public QPushButton
 {
     Q_OBJECT
 
 public:
-    explicit PalettePatch(QWidget *parent = nullptr, int palNr = 0);
+    explicit PalettePatch(QWidget* parent = nullptr, int palNr = 0);
     //void setColor(QRgb c);
 
 public slots:
@@ -27,8 +26,7 @@ private:
     QRgb myColor = Qt::green;
     bool isSelected = false;
     int msxPalNr;
-    MSXPalette* mypal;
+    MSXPalette* myPal = nullptr;
 };
-
 
 #endif // PALETTEPATCH_H

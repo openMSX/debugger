@@ -1,6 +1,7 @@
 #ifndef VDPDATASTORE_H
 #define VDPDATASTORE_H
 
+#include "MSXPalette.h"
 #include "SimpleHexRequest.h"
 #include <QObject>
 #include <cstdint>
@@ -8,15 +9,12 @@
 #include <string>
 #include <vector>
 
-#include "MSXPalette.h"
-
 /**
  * @brief The VDPDataStore class is a singleton that keeps track of all VDP related data for all the viewers
  *
  * It does keep track of the VRAM, registers, palettes and statusregisters
  * For the viewers it keeps track of 4 palettes.
- * The actual openMSX paletter, a pallete or the tileviewers, the bitmap viewers and the spriteviewers
- *
+ * The actual openMSX palette, a palette or the tileviewers, the bitmap viewers and the spriteviewers
  */
 class VDPDataStore : public QObject, public SimpleHexRequestUser
 {
@@ -30,17 +28,19 @@ public:
 	const uint8_t* getStatusRegsPointer() const;
 	const uint8_t* getVdpVramPointer() const;
 
-    MSXPalette* getPalette(int index);
+	MSXPalette* getPalette(int index);
 	size_t getVRAMSize() const;
 
 private:
-    MSXPalette palettes[4];
 	VDPDataStore();
 
 	void DataHexRequestReceived() override;
 
 	void refresh1();
 	void refresh2();
+
+private:
+	MSXPalette palettes[4];
 
 	std::vector<uint8_t> vram;
 	size_t vramSize;

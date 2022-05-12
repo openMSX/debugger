@@ -1,14 +1,14 @@
 #include "PaletteView.h"
 #include "PalettePatch.h"
 #include "VDPDataStore.h"
-
 #include "Convert.h"
+#include "ScopedAssign.h"
 #include "ui_PaletteView.h"
 #include <QPushButton>
 
-PaletteView::PaletteView(QWidget *parent) :
-    QWidget(parent),
-    ui(std::make_unique<Ui::PaletteView>()),myPal(nullptr)
+PaletteView::PaletteView(QWidget* parent)
+    : QWidget(parent)
+    , ui(std::make_unique<Ui::PaletteView>())
 {
     ui->setupUi(this);
     autoSync = ui->cb_autosync->isChecked();
@@ -17,7 +17,6 @@ PaletteView::PaletteView(QWidget *parent) :
     ui->plainTextEdit->setFont(fixedFont);
 
     setPalette(VDPDataStore::instance().getPalette(0));
-
 
     signalMapper = new QSignalMapper(this);
     auto* gridLayout = new QGridLayout;
@@ -48,22 +47,21 @@ PaletteView::PaletteView(QWidget *parent) :
     emit signalMapper->mapped(0);
 }
 
-
-void PaletteView::setPalette(MSXPalette *sourcePal)
+void PaletteView::setPalette(MSXPalette* sourcePal)
 {
-    if (myPal != nullptr){
-        connect(myPal,SIGNAL(paletteChanged()),
-                this,SIGNAL(paletteChanged()));
-    };
+    if (myPal != nullptr) {
+        connect(myPal, SIGNAL(paletteChanged()),
+                this, SIGNAL(paletteChanged()));
+    }
 
     myPal = sourcePal;
     myOriginalPal = *sourcePal;
-    connect(myPal,SIGNAL(paletteChanged()),
-            this,SIGNAL(paletteChanged()));
+    connect(myPal, SIGNAL(paletteChanged()),
+            this, SIGNAL(paletteChanged()));
     emit paletteReplaced(sourcePal);
 }
 
-MSXPalette *PaletteView::getPalette()
+MSXPalette* PaletteView::getPalette()
 {
     return myPal;
 }
@@ -71,7 +69,7 @@ MSXPalette *PaletteView::getPalette()
 void PaletteView::syncToSource()
 {
     myPal->syncToSource();
-    myOriginalPal=*myPal;
+    myOriginalPal = *myPal;
 }
 
 void PaletteView::setAutoSync(bool value)
@@ -86,16 +84,15 @@ void PaletteView::setAutoSync(bool value)
 
 void PaletteView::refresh()
 {
-
 }
 
 void PaletteView::colorSelected(int colorNumber)
 {
     currentColor = colorNumber;
     QRgb c = myPal->color(colorNumber);
-    ui->horizontalSlider_R->setValue(qRed(c)>>5);
-    ui->horizontalSlider_G->setValue(qGreen(c)>>5);
-    ui->horizontalSlider_B->setValue(qBlue(c)>>5);
+    ui->horizontalSlider_R->setValue(qRed  (c) >> 5);
+    ui->horizontalSlider_G->setValue(qGreen(c) >> 5);
+    ui->horizontalSlider_B->setValue(qBlue (c) >> 5);
     ui->label_colornr->setText(QString("Color %1").arg(colorNumber));
 }
 
@@ -119,10 +116,9 @@ void PaletteView::on_horizontalSlider_B_valueChanged(int value)
 
 void PaletteView::restorePalette()
 {
-    isDisplayUpdating=true;
-    *myPal=myOriginalPal;
+    ScopedAssign sa(isDisplayUpdating, true);
+    *myPal = myOriginalPal;
     colorSelected(currentColor);
-    isDisplayUpdating=false;
 }
 
 void PaletteView::on_buttonBox_clicked(QAbstractButton *button)
@@ -134,7 +130,6 @@ void PaletteView::on_buttonBox_clicked(QAbstractButton *button)
                button == ui->buttonBox->button(QDialogButtonBox::Cancel)) {
         restorePalette();
     }
-
 }
 
 void PaletteView::on_cb_autosync_stateChanged(int arg1)
@@ -147,19 +142,17 @@ void PaletteView::on_cb_autosync_stateChanged(int arg1)
 
 void PaletteView::on_cbPalette_currentIndexChanged(int index)
 {
-    ui->pbCopyPaletteVDP->setEnabled(index!=0);
-    isDisplayUpdating=true;
+    ui->pbCopyPaletteVDP->setEnabled(index != 0);
+    ScopedAssign sa(isDisplayUpdating, true);
     setPalette(VDPDataStore::instance().getPalette(index));
     colorSelected(currentColor);
-    isDisplayUpdating=false;
 }
 
 void PaletteView::on_pbCopyPaletteVDP_clicked()
 {
-    isDisplayUpdating=true;
-    *myPal = *VDPDataStore::instance().getPalette(0); // operator=() copies the byte and qrgb values
+    ScopedAssign sa(isDisplayUpdating, true);
+    *myPal = *VDPDataStore::instance().getPalette(0); // operator=() copies the byte and qRgb values
     emit myPal->paletteChanged();
-    isDisplayUpdating=false;
 }
 
 void PaletteView::updateText()
@@ -170,9 +163,8 @@ void PaletteView::updateText()
         for (int j = 0; j < 4; ++j) {
             QRgb c = myPal->color(j + 4 * i);
             txt.append(QString("%1,%2 ").arg(
-                           hexValue((qRed(c)>>5)*16+(qBlue(c)>>5) , 2) ,
-                           hexValue((qGreen(c)>>5) , 2))
-                       );
+                           hexValue((qRed  (c) >> 5) * 16 + (qBlue(c) >> 5), 2),
+                           hexValue((qGreen(c) >> 5), 2)));
             if (j < 3) txt.append(',');
         }
         ui->plainTextEdit->appendPlainText(txt);
@@ -181,9 +173,7 @@ void PaletteView::updateText()
 
 void PaletteView::combineRGB()
 {
-    if (isDisplayUpdating) {
-        return;
-    }
+    if (isDisplayUpdating) return;
 
     int r = ui->horizontalSlider_R->value();
     int g = ui->horizontalSlider_G->value();

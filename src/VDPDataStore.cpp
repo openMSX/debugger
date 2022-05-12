@@ -100,9 +100,9 @@ void VDPDataStore::refresh2()
 
 void VDPDataStore::DataHexRequestReceived()
 {
-    //update MSXPalette that contains VDP palette
-    palettes[0].setPalette(&vram[vramSize]);
-    palettes[0].syncToMSX = true; //NO AUTOSYNC UNTIL WE GET THE PALETTE!
+	//update MSXPalette that contains VDP palette
+	palettes[0].setPalette(&vram[vramSize]);
+	palettes[0].syncToMSX = true; //NO AUTOSYNC UNTIL WE GET THE PALETTE!
 
 	emit dataRefreshed();
 }
@@ -128,7 +128,7 @@ const uint8_t* VDPDataStore::getVdpVramPointer() const
     return &vram[vramSize + 32 + 16 + 64];
 }
 
-MSXPalette *VDPDataStore::getPalette(int index)
+MSXPalette* VDPDataStore::getPalette(int index)
 {
     return &palettes[index];
 }

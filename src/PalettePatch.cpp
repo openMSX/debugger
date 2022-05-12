@@ -3,21 +3,20 @@
 #include "MSXPalette.h"
 
 PalettePatch::PalettePatch(QWidget* parent, int palNr)
-    : QPushButton(parent), msxPalNr(palNr), mypal(nullptr)
+    : QPushButton(parent), msxPalNr(palNr)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-
 }
 
-void PalettePatch::setMSXPalette(MSXPalette *pal)
+void PalettePatch::setMSXPalette(MSXPalette* pal)
 {
-    if (mypal != nullptr){
-        disconnect(pal,SIGNAL(paletteChanged()),
-                this,SLOT(paletteChanged()));
+    if (myPal != nullptr) {
+        disconnect(pal, SIGNAL(paletteChanged()),
+                   this, SLOT(paletteChanged()));
     }
-    mypal=pal;
-    connect(pal,SIGNAL(paletteChanged()),
-            this,SLOT(paletteChanged()));
+    myPal = pal;
+    connect(pal, SIGNAL(paletteChanged()),
+            this, SLOT(paletteChanged()));
     paletteChanged();
 }
 
@@ -33,10 +32,11 @@ void PalettePatch::updatePaletteChanged(const uint8_t* pal)
     update();
     //printf("PalettePatch::updatePaletteChanged %i\n", msxPalNr);
 }
+
 //new method for PaletteView
 void PalettePatch::paletteChanged()
 {
-    myColor=mypal->color(msxPalNr);
+    myColor = myPal->color(msxPalNr);
     update();
 }
 
@@ -57,7 +57,7 @@ void PalettePatch::paintEvent(QPaintEvent* /*event*/)
     } else {
         painter.setPen(Qt::black);
         int v = qGray(myColor);
-        painter.setBrush(QBrush(QColor(v,v,v)));
+        painter.setBrush(QBrush(QColor(v, v, v)));
     }
     painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
 }

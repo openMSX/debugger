@@ -2,16 +2,16 @@
 #define PALETTEVIEW_H
 
 #include "ui_PaletteView.h"
+#include "MSXPalette.h"
 #include <QDialog>
+#include <QSignalMapper>
 #include <cstdint>
 #include <memory>
-#include <QSignalMapper>
-#include "MSXPalette.h"
 
 class QAbstractButton;
 
 namespace Ui {
-class PaletteView;
+    class PaletteView;
 }
 
 class PaletteView : public QWidget
@@ -19,7 +19,7 @@ class PaletteView : public QWidget
     Q_OBJECT
 
 public:
-    explicit PaletteView(QWidget *parent = nullptr);
+    explicit PaletteView(QWidget* parent = nullptr);
 
     void setPalette(MSXPalette* sourcePal);
     MSXPalette* getPalette();
@@ -50,21 +50,18 @@ private slots:
 
     void updateText();
 
-
-
 private:
     std::unique_ptr<Ui::PaletteView> ui;
     QSignalMapper* signalMapper;
     void combineRGB();
 
-    MSXPalette* myPal;
+    MSXPalette* myPal = nullptr;
     MSXPalette myOriginalPal;
 
     int currentColor = 0;
 
     bool autoSync = false;
-    bool isDisplayUpdating=false;
-
+    bool isDisplayUpdating = false;
 };
 
 #endif // PALETTEVIEW_H

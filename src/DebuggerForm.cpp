@@ -522,12 +522,11 @@ void DebuggerForm::createWidgetRegistry()
         [] { return widgetFactory(quickguide); }};
     registry.addItem(item);
     registry.setDefault(item);
+
     //15: register the palette editor
     registry.addItem(new RegistryItem{
         tr("Palette editor"),
         [] { return widgetFactory(paletteViewer); }});
-
-
 }
 
 BlendSplitter* DebuggerForm::createWorkspaceCPU()
@@ -828,7 +827,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
     default:
         wdgt = new QLabel("Not yet implemented in widgetFactory!");
         break;
-    };
+    }
     return wdgt;
 }
 
@@ -1482,4 +1481,3 @@ void DebuggerForm::processMerge(const QString& message)
 		processBreakpoints(message);
 	}
 }
-

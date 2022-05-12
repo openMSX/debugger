@@ -17,13 +17,14 @@ public:
 	QSize sizeHint() const override;
 
 public slots:
-//    void updateSlots(const QString& message);
+	//void updateSlots(const QString& message);
 	void refresh();
 
 private:
 	void resizeEvent(QResizeEvent* e) override;
 	void paintEvent(QPaintEvent* e) override;
 
+private:
 	int frameL, frameR, frameT, frameB;
 	int headerSize1, headerSize2, headerSize3, headerSize4;
 	int headerHeight;
