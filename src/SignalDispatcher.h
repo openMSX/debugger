@@ -3,8 +3,8 @@
 
 #include "CPURegs.h"
 #include "DebuggerData.h"
-
 #include <QLabel>
+#include <cstdint>
 
 
 /** \brief A singleton signal dispatcher
@@ -25,14 +25,14 @@ public:
      * This is a singleton class, i. e. you can't construct any object yourself. To get the one-and-only instance of this class, you need to call SignalDispatcher::getDispatcher(). The function will create the object if neccessary (= when called for the first time) and return a pointer to it.
      * \return A pointer to the one-and-only instance of SignalDispatcher
      */
-    static SignalDispatcher* getDispatcher();
+    static SignalDispatcher& instance();
     ~SignalDispatcher();
 
-    unsigned char* getMainMemory();
-    MemoryLayout*  getMemLayout();
+    uint8_t* getMainMemory();
+    MemoryLayout* getMemLayout();
 
     int readRegister(int id);
-    void setData(unsigned char* datPtr);
+    void setData(uint8_t* datPtr);
 
     bool getEnableWidget();
 
@@ -45,7 +45,7 @@ private:
     SignalDispatcher();
 
     void setRegister(int id, int value);
-    void getRegister(int id, unsigned char* data);
+    void getRegister(int id, uint8_t* data);
 
 signals:
     void enableWidget(bool enable);
@@ -57,7 +57,7 @@ signals:
 	void breakpointsUpdated();
 	void debuggablesChanged(const QMap<QString, int>& list);
     // signals concerning CPU registers
-    void registersUpdate(unsigned char* datPtr);
+    void registersUpdate(uint8_t* datPtr);
     void registerChanged(int id, int value);
     void pcChanged(uint16_t);
     void flagsChanged(quint8);
@@ -72,10 +72,8 @@ signals:
     void setCursorAddress(uint16_t addr, int infoLine, int method);
 
 private:
-    static SignalDispatcher* theDispatcher;
-
     //main 64K used by disasmview and stack
-    unsigned char* mainMemory;
+    uint8_t* mainMemory;
     MemoryLayout memLayout;
 
     //buffers to handle tracking of the CPU registers

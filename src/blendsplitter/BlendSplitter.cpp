@@ -47,9 +47,10 @@ void BlendSplitter::insertWidget(int index, QWidget* widget)
 {
     if (widget->inherits("SwitchingWidget")) {
         auto* sw = static_cast<SwitchingWidget*>(widget);
-        connect(SignalDispatcher::getDispatcher(), &SignalDispatcher::enableWidget,
+        auto& dispatcher = SignalDispatcher::instance();
+        connect(&dispatcher, &SignalDispatcher::enableWidget,
                 sw, &SwitchingWidget::setEnableWidget);
-        sw->setEnableWidget(SignalDispatcher::getDispatcher()->getEnableWidget());
+        sw->setEnableWidget(dispatcher.getEnableWidget());
     }
     auto* decorator = new WidgetDecorator{widget};
     QSplitter::insertWidget(index, decorator);

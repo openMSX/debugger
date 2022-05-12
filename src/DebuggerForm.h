@@ -34,28 +34,28 @@ public:
 	void reloadBreakpoints(bool merge = false);
 	void onSlotsUpdated(bool slotsChanged);
 
-    enum factoryclasses {
-        disasmViewer,
-        mainMemoryViewer,
-        cpuRegsViewer,
-        flagsViewer,
-        stackViewer,
-        slotViewer,
-        breakpointViewer,
-        debuggableViewer,
-        vdpStatusRegViewer,
-        vdpCommandRegViewer,
-        bitMapViewer,
-        tileViewer,
-        spriteViewer,
-        vdpRegisters,
-        quickguide,
-        paletteViewer
-    };
+	enum factoryclasses {
+		disasmViewer,
+		mainMemoryViewer,
+		cpuRegsViewer,
+		flagsViewer,
+		stackViewer,
+		slotViewer,
+		breakpointViewer,
+		debuggableViewer,
+		vdpStatusRegViewer,
+		vdpCommandRegViewer,
+		bitMapViewer,
+		tileViewer,
+		spriteViewer,
+		vdpRegisters,
+		quickguide,
+		paletteViewer
+	};
 
-    bool saveWorkspacesAs(const QString& newFileName);
-    bool loadWorkspaces(const QString& filename);
-    QString fileSaveWorkspaceAs();
+	bool saveWorkspacesAs(const QString& newFileName);
+	bool loadWorkspaces(const QString& filename);
+	QString fileSaveWorkspaceAs();
 
 private:
 	void closeEvent(QCloseEvent* e) override;
@@ -67,7 +67,7 @@ private:
 	void createStatusbar();
 	void createForm();
 
-    static QWidget* widgetFactory(factoryclasses fctwidget);
+	static QWidget* widgetFactory(factoryclasses fctwidget);
 
 	void openSession(const QString& file);
 	void updateRecentFiles();
@@ -76,7 +76,7 @@ private:
 
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
-	void breakOccured();
+	void breakOccurred();
 	void setRunMode();
 	void updateData();
 
@@ -105,13 +105,13 @@ private:
 	QAction* fileSaveSessionAction;
 	QAction* fileSaveSessionAsAction;
 
-    QAction* fileOpenWorkspaceLayoutAction;
-    QAction* fileSaveWorkspaceLayoutAction;
-    QAction* fileSaveWorkspaceLayoutAsAction;
+	QAction* fileOpenWorkspaceLayoutAction;
+	QAction* fileSaveWorkspaceLayoutAction;
+	QAction* fileSaveWorkspaceLayoutAsAction;
 
 	QAction* fileQuitAction;
 
-    static const int MaxRecentFiles = 5;
+	static const int MaxRecentFiles = 5;
 	QAction* recentFileActions[MaxRecentFiles];
 	QAction* recentFileSeparator;
 
@@ -134,35 +134,34 @@ private:
 
 	QAction* helpAboutAction;
 
-    QAction* addCPUWorkspaceAction;
-    QAction* addVDPRegsWorkspaceAction;
-    QAction* addVDPTilesWorkspaceAction;
-    QAction* addVDPBitmapWorkspaceAction;
-    QAction* addEmptyWorkspaceAction;
-    QAction* addFloatingSwitchingWidgetAction;
+	QAction* addCPUWorkspaceAction;
+	QAction* addVDPRegsWorkspaceAction;
+	QAction* addVDPTilesWorkspaceAction;
+	QAction* addVDPBitmapWorkspaceAction;
+	QAction* addEmptyWorkspaceAction;
+	QAction* addFloatingSwitchingWidgetAction;
 
 	QStringList recentFiles;
 
 	CommClient& comm;
-    DebugSession* session;
+	DebugSession* session;
 
-    QTabWidget *workspaces;
-    TabRenamerHelper *tabRenamer;
+	QTabWidget *workspaces;
+	TabRenamerHelper *tabRenamer;
 
 	bool mergeBreakpoints;
-    static QMap<QString, int> debuggables;
+	static QMap<QString, int> debuggables;
 
 	static int counter;
-    uint16_t disasmAddress;
-
+	uint16_t disasmAddress;
 
 	void fileNewSession();
 	void fileOpenSession();
 	void fileSaveSession();
 	void fileSaveSessionAs();
 	void fileRecentOpen();
-    void fileOpenWorkspace();
-    void fileSaveWorkspace();
+	void fileOpenWorkspace();
+	void fileSaveWorkspace();
 
 	void systemConnect();
 	void systemDisconnect();
@@ -191,10 +190,11 @@ private:
 //	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
+
 private slots:
-    void toggleBreakpoint(uint16_t addr);
+	void toggleBreakpoint(uint16_t addr);
 private:
-    void addBreakpoint(uint16_t cursorAddress);
+	void addBreakpoint(uint16_t cursorAddress);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
 	                  const QString& message);
@@ -217,7 +217,7 @@ private:
 	friend class ListDebuggablesHandler;
 	friend class DebuggableSizeHandler;
 
-    friend class TabRenamerHelper;
+	friend class TabRenamerHelper;
 
 signals:
 	void connected();
@@ -226,25 +226,24 @@ signals:
 	void runStateEntered();
 	void breakStateEntered();
 	void breakpointsUpdated();
-    void debuggablesChanged(const QMap<QString, int>& list);
+	void debuggablesChanged(const QMap<QString, int>& list);
 
 protected:
-    BlendSplitter *createWorkspaceCPU();
-    BlendSplitter *createWorkspaceVDPRegs();
-    BlendSplitter *createWorkspaceVDPTiles();
-    BlendSplitter *createWorkspaceVDPBitmap();
-    void addInfoWorkspace();
-    void addCPUWorkspace();
-    void addVDPRegsWorkspace();
-    void addVDPTilesWorkspace();
-    void addVDPBitmapWorkspace();
-    void addEmptyWorkspace();
-    void addFloatingSwitchingWidget();
-    void addDefaultWorkspaces();
+	BlendSplitter *createWorkspaceCPU();
+	BlendSplitter *createWorkspaceVDPRegs();
+	BlendSplitter *createWorkspaceVDPTiles();
+	BlendSplitter *createWorkspaceVDPBitmap();
+	void addInfoWorkspace();
+	void addCPUWorkspace();
+	void addVDPRegsWorkspace();
+	void addVDPTilesWorkspace();
+	void addVDPBitmapWorkspace();
+	void addEmptyWorkspace();
+	void addFloatingSwitchingWidget();
+	void addDefaultWorkspaces();
 
 protected slots:
-    void tabCloseRequest(int index);
-
+	void tabCloseRequest(int index);
 };
 
 #endif // DEBUGGERFORM_H

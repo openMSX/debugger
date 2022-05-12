@@ -22,14 +22,18 @@ private:
     SignalDispatcher& dispatcher;
 };
 
-SignalDispatcher* SignalDispatcher::theDispatcher = nullptr;
-
-SignalDispatcher* SignalDispatcher::getDispatcher()
+SignalDispatcher::SignalDispatcher()
 {
-    if (theDispatcher == nullptr) {
-			theDispatcher = new SignalDispatcher{};
-	}
-    return theDispatcher;
+    // avoid UMR
+    memset(&regs,         0, sizeof(regs));
+    memset(&regsChanged,  0, sizeof(regsChanged));
+    memset(&regsModified, 0, sizeof(regsModified));
+
+    // init main memory
+    // added four bytes as runover buffer for dasm
+    // otherwise dasm would need to check the buffer end continuously.
+    mainMemory = new uint8_t[65536 + 4];
+    memset(mainMemory, 0, 65536 + 4);
 }
 
 SignalDispatcher::~SignalDispatcher()
@@ -37,7 +41,13 @@ SignalDispatcher::~SignalDispatcher()
     delete[] mainMemory;
 }
 
-unsigned char *SignalDispatcher::getMainMemory()
+SignalDispatcher& SignalDispatcher::instance()
+{
+    static SignalDispatcher oneInstance;
+    return oneInstance;
+}
+
+uint8_t* SignalDispatcher::getMainMemory()
 {
     return mainMemory;
 }
@@ -47,7 +57,7 @@ MemoryLayout* SignalDispatcher::getMemLayout()
     return &memLayout;
 }
 
-void SignalDispatcher::setData(unsigned char *datPtr)
+void SignalDispatcher::setData(uint8_t* datPtr)
 {
     setRegister(CpuRegs::REG_AF , datPtr[ 0] * 256 + datPtr[ 1]);
     setRegister(CpuRegs::REG_BC , datPtr[ 2] * 256 + datPtr[ 3]);
@@ -162,20 +172,6 @@ int SignalDispatcher::readRegister(int id)
     return regs[id];
 }
 
-SignalDispatcher::SignalDispatcher()
-{
-    // avoid UMR
-    memset(&regs,         0, sizeof(regs));
-    memset(&regsChanged,  0, sizeof(regsChanged));
-    memset(&regsModified, 0, sizeof(regsModified));
-
-    // init main memory
-    // added four bytes as runover buffer for dasm
-    // otherwise dasm would need to check the buffer end continuously.
-    mainMemory = new unsigned char[65536 + 4];
-    memset(mainMemory, 0, 65536 + 4);
-}
-
 void SignalDispatcher::setRegister(int id, int value)
 {
     regsChanged[id] = regs[id] != value;
@@ -185,7 +181,7 @@ void SignalDispatcher::setRegister(int id, int value)
     }
 }
 
-void SignalDispatcher::getRegister(int id, unsigned char* data)
+void SignalDispatcher::getRegister(int id, uint8_t* data)
 {
     data[0] = regs[id] >> 8;
     data[1] = regs[id] & 255;

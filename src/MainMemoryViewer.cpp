@@ -138,9 +138,9 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 		linkedId = linkRegisters[index - 1];
 		addressValue->setReadOnly(true);
 		hexView->setIsInteractive(false);
-//		if (regsViewer) {
-//			setLocation(regsViewer->readRegister(linkedId));
-//		}
-        setLocation(SignalDispatcher::getDispatcher()->readRegister(linkedId));
+		//if (regsViewer) {
+		//	setLocation(regsViewer->readRegister(linkedId));
+		//}
+		setLocation(SignalDispatcher::instance().readRegister(linkedId));
 	}
 }
