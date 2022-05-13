@@ -1083,8 +1083,7 @@ void DebuggerForm::searchGoto()
 {
 	GotoDialog gtd(memLayout, &session, this);
 	if (gtd.exec()) {
-		auto addr = gtd.address();
-		if (addr) {
+		if (auto addr = gtd.address()) {
 			disasmView->setCursorAddress(*addr, 0, DisasmViewer::MiddleAlways);
 		}
 	}
@@ -1152,7 +1151,7 @@ void DebuggerForm::toggleBreakpointAddress(uint16_t addr)
 		// get slot
 		auto [ps, ss, seg] = addressSlot(addr);
 		// create command
-		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, AddressRange{addr, {}},
+		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, AddressRange{addr},
 		                                    Slot{ps, ss}, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
@@ -1166,7 +1165,7 @@ void DebuggerForm::addBreakpoint()
 	uint16_t addr = disasmView->cursorAddress();
 	auto [ps, ss, seg] = addressSlot(addr);
 
-	bpd.setData(Breakpoint::BREAKPOINT, AddressRange{addr, {}}, Slot{ps, ss}, seg);
+	bpd.setData(Breakpoint::BREAKPOINT, AddressRange{addr}, Slot{ps, ss}, seg);
 
 	if (bpd.exec()) {
 		if (bpd.addressRange()) {
@@ -1487,11 +1486,11 @@ DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
 
 	std::optional<uint8_t> segment = [&] { // figure out (rom) mapper segment
 		if (ss && memLayout.mapperSize[ps][*ss] > 0) {
-			return std::optional((uint8_t) memLayout.mapperSegment[p]);
+			return std::optional(uint8_t(memLayout.mapperSegment[p]));
 		} else {
 			int q = 2 * p + ((addr & 0x2000) >> 13);
 			int b = memLayout.romBlock[q];
-			return make_if(b >= 0, (uint8_t) b);
+			return make_if(b >= 0, uint8_t(b));
 		}
 	}();
 	return {ps, ss, segment};

@@ -4,8 +4,8 @@
 #include <QString>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <list>
 #include <optional>
+#include <vector>
 
 struct MemoryLayout
 {
@@ -21,8 +21,23 @@ struct MemoryLayout
 };
 
 struct AddressRange {
-    uint16_t start;                // a single address when end is not used
-    std::optional<uint16_t> end;   // end point is inclusive
+	explicit AddressRange(uint16_t addr) : start(addr) {}
+	AddressRange(uint16_t b, std::optional<uint16_t> e) : start(b), end(e) {}
+
+	uint16_t start;                // a single address when end is not used
+	std::optional<uint16_t> end;   // end point is inclusive
+
+	[[nodiscard]] bool contains(uint16_t addr) const {
+		if (!end) return start == addr;
+		return start <= addr && addr <= *end;
+	}
+
+	constexpr bool operator==(const AddressRange &other) const
+	{
+		if (start != other.start) return false;
+		if (end != other.end) return false;
+		return true;
+	}
 };
 
 struct Slot {
@@ -35,7 +50,7 @@ struct Breakpoint {
 	            WATCHPOINT_IOREAD, WATCHPOINT_IOWRITE, CONDITION };
 	Type type;
 	QString id;
-	AddressRange range;
+	std::optional<AddressRange> range;
 	// GUI specific condition variables
 	Slot slot;
 	std::optional<uint8_t> segment; 
@@ -43,6 +58,10 @@ struct Breakpoint {
 	QString condition;
 	// compare content
 	bool operator==(const Breakpoint &bp) const;
+
+    void setAddress(uint16_t start, std::optional<uint16_t> rangeEnd = {}) {
+        range = AddressRange(start, rangeEnd);
+    }
 };
 
 class Breakpoints
@@ -54,8 +73,8 @@ public:
 	void setBreakpoints(const QString& str);
 	QString mergeBreakpoints(const QString& str);
 	int breakpointCount();
-	bool isBreakpoint(quint16 addr, QString *id = nullptr, bool checkSlot = true);
-	bool isWatchpoint(quint16 addr, QString *id = nullptr, bool checkSlot = true);
+	bool isBreakpoint(uint16_t addr, QString *id = nullptr, bool checkSlot = true);
+	bool isWatchpoint(uint16_t addr, QString *id = nullptr, bool checkSlot = true);
 
 	/* xml session file functions */
 	void saveBreakpoints(QXmlStreamWriter& xml);

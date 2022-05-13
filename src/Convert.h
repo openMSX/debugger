@@ -10,26 +10,17 @@ QString hexValue(int value, int width = 0);
 QString escapeXML(QString str);
 QString unescapeXML(QString str);
 
-template <typename T>
-std::optional<T> make_positive_optional(int value)
-{
-    return value < 0 ? std::nullopt : std::optional(value);
-}
-
 // Create optional<T> if boolean b is true.
-template <typename T, typename X>
-std::optional<T> make_if(X b, T value)
+template <typename T>
+std::optional<T> make_if(bool b, T value)
 {
-	static_assert(std::is_constructible<bool, X>::value, "X is not convertible to bool");
 	return b ? value : std::optional<T>();
 }
 
-// Create optional<T> if boolean b is true (solves implicit optional in T).
-template <typename T, typename X>
-std::optional<T> make_if(X b, std::optional<T> value)
+template <typename T>
+std::optional<T> make_positive_optional(int value)
 {
-	static_assert(std::is_constructible<bool, X>::value, "X is not convertible to bool");
-	return b ? (value ? *value : std::optional<T>()) : std::optional<T>();
+    return make_if<T>(value >= 0, T(value));
 }
 
 template <typename T>

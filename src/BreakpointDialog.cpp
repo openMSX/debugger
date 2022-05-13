@@ -38,16 +38,14 @@ Breakpoint::Type BreakpointDialog::type() const
 	return Breakpoint::Type(cmbxType->currentIndex());
 }
 
-std::optional<uint16_t> BreakpointDialog::parseInput(QLineEdit* ed, Symbol** symbol) const {
-	if (auto value = stringToValue<uint16_t>(ed->text())) {
+std::optional<uint16_t> BreakpointDialog::parseInput(const QLineEdit& ed, Symbol** symbol) const {
+	if (auto value = stringToValue<uint16_t>(ed.text())) {
 		return value;
 	}
 
 	// convert symbol to value
 	if (debugSession) {
-		Symbol* s = debugSession->symbolTable().getAddressSymbol(ed->text());
-
-		if (s) {
+		if (Symbol* s = debugSession->symbolTable().getAddressSymbol(ed.text())) {
 			if (symbol) *symbol = s;
 			return s->value();
 		}
@@ -58,12 +56,13 @@ std::optional<uint16_t> BreakpointDialog::parseInput(QLineEdit* ed, Symbol** sym
 
 std::optional<AddressRange> BreakpointDialog::addressRange(Symbol** symbol) const
 {
-	if (auto address = parseInput(edtAddress, symbol)) {
-		auto input = !edtAddressRange->text().isEmpty();
-		auto rangeEnd = parseInput(edtAddressRange);
-
-		if ((!rangeEnd && !input) || (rangeEnd && *rangeEnd >= address)) {
-			return AddressRange{*address, make_if(rangeEnd != address, rangeEnd)};
+	if (auto address = parseInput(*edtAddress, symbol)) {
+		if (edtAddressRange->text().isEmpty()) {
+			return AddressRange{*address};
+		} else if (auto endAddress = parseInput(*edtAddressRange)) {
+			if (*address <= *endAddress) {
+				return AddressRange{*address, make_if(*address != *endAddress, *endAddress)};
+			}
 		}
 	}
 	return {};
@@ -94,35 +93,35 @@ void BreakpointDialog::setData(Breakpoint::Type type, std::optional<AddressRange
 	typeChanged(cmbxType->currentIndex());
 
 	// set address
+	edtAddress->setText(range ? hexValue(range->start): "");
 	if (range) {
-		edtAddress->setText(hexValue(range->start));
 		addressChanged(edtAddress->text());
 	}
 
-	// end address
-	if (edtAddressRange->isEnabled() && range && range->end) {
-		edtAddressRange->setText(hexValue(*range->end));
+	// set end address
+	if (edtAddressRange->isEnabled()) {
+		edtAddressRange->setText(range && range->end ? hexValue(*range->end) : "");
 		addressChanged(edtAddressRange->text());
 	}
 
-	// primary slot
-	if (cmbxSlot->isEnabled() && slot.ps) {
-		cmbxSlot->setCurrentIndex(*slot.ps + 1);
+	// set primary slot
+	if (cmbxSlot->isEnabled()) {
+		cmbxSlot->setCurrentIndex(slot.ps ? *slot.ps + 1 : -1);
 		slotChanged(cmbxSlot->currentIndex());
 	}
 
-	// secondary slot
-	if (cmbxSubslot->isEnabled() && slot.ss) {
-		cmbxSubslot->setCurrentIndex(*slot.ss + 1);
+	// set secondary slot
+	if (cmbxSubslot->isEnabled()) {
+		cmbxSubslot->setCurrentIndex(slot.ss ? *slot.ss + 1 : -1);
 		subslotChanged(cmbxSubslot->currentIndex());
 	}
 
-	// segment
-	if (cmbxSegment->isEnabled() && segment) {
-		cmbxSegment->setCurrentIndex(*segment + 1);
+	// set segment
+	if (cmbxSegment->isEnabled()) {
+		cmbxSegment->setCurrentIndex(segment ? *segment + 1 : -1);
 	}
 
-	// condition
+	// set condition
 	condition = condition.trimmed();
 	if (cbCondition->isChecked() == condition.isEmpty())
 		cbCondition->setChecked(!condition.isEmpty());
@@ -171,7 +170,7 @@ void BreakpointDialog::enableSlots()
 	}
 }
 
-void BreakpointDialog::addressChanged([[maybe_unused]] const QString& text)
+void BreakpointDialog::addressChanged(const QString& /*text*/)
 {
 	// adjust controls for (in)correct values
 	auto range = addressRange(&currentSymbol);
@@ -188,7 +187,7 @@ void BreakpointDialog::addressChanged([[maybe_unused]] const QString& text)
 
 	edtAddress->setPalette(pal);
 	edtAddressRange->setPalette(pal);
-	okButton->setEnabled(range ? true : false);
+	okButton->setEnabled(range.has_value());
 }
 
 void BreakpointDialog::typeChanged(int s)
@@ -295,7 +294,7 @@ void BreakpointDialog::subslotChanged(int i)
 	if (ps >= 0 && !memLayout.isSubslotted[ps]) ss = 0;
 
 	int mapsize;
-       if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
+	if (ps < 0 || ss < 0 || memLayout.mapperSize[ps][ss] == 0) {
 		auto range = addressRange();
 
 		// no memory mapper, maybe rom mapper?

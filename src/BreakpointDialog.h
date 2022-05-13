@@ -25,7 +25,7 @@ public:
 	QString condition() const;
 
 	void setData(Breakpoint::Type type, std::optional<AddressRange> range = {}, Slot slot = {},
-	             std::optional<uint8_t> segment = {}, QString condition = QString());
+	             std::optional<uint8_t> segment = {}, QString condition = {});
 
 private:
 	const MemoryLayout& memLayout;
@@ -36,7 +36,7 @@ private:
 	int conditionHeight;
 	std::unique_ptr<QCompleter> jumpCompleter;
 	std::unique_ptr<QCompleter> allCompleter;
-	std::optional<uint16_t> parseInput(QLineEdit* ed, Symbol** symbol = nullptr) const;
+	std::optional<uint16_t> parseInput(const QLineEdit& ed, Symbol** symbol = nullptr) const;
 	void enableSlots();
 	void disableSlots();
 

@@ -55,9 +55,9 @@ bool Breakpoint::operator==(const Breakpoint &bp) const
 
 	// compare address
 	if (type != Breakpoint::CONDITION) {
-		if (bp.range.start != range.start) return false;
+		if (bp.range->start != range->start) return false;
 		if (type != Breakpoint::BREAKPOINT) {
-			if (bp.range.end != range.end) return false;
+			if (bp.range->end != range->end) return false;
 		}
 		// compare slot
 		if (bp.slot.ps != slot.ps || bp.slot.ss != slot.ss || bp.segment != segment) return false;
@@ -88,7 +88,7 @@ QString Breakpoints::createSetCommand(Breakpoint::Type type, std::optional<Addre
 		// conditions don't have an address
 		cond = QString("{%1}").arg(condition);
 	} else if (range) {
-		if (type == Breakpoint::BREAKPOINT || (range->end < range->start)) {
+		if (type == Breakpoint::BREAKPOINT || !range->end) {
 			// breakpoint (these never have a range) or watchpoint without range
 			addr = QString::number(range->start);
 		} else {
@@ -147,7 +147,6 @@ void Breakpoints::setBreakpoints(const QString& str)
 			if (auto it = ranges::find(WpTypeNames, wpType); it != std::end(WpTypeNames)) {
 				newBp.type = static_cast<Breakpoint::Type>(std::distance(WpTypeNames, it) + 1);
 			} else {
-				qWarning() << "Unknown" << wpType << "watchpoint type";
 				continue;
 			}
 		} else if (bp.startsWith("cond#")) {
@@ -163,25 +162,17 @@ void Breakpoints::setBreakpoints(const QString& str)
 				p++;
 				auto s = getNextArgument(bp, p);
 				auto start = stringToValue<uint16_t>(s);
-				if (!start) {
-					qWarning() << "watchpoint starting range invalid:" << s;
-					newBp.range = {};
-					continue;
-				}
-				newBp.range.start = *start;
+				if (!start) continue;
+				newBp.range = AddressRange(*start);
 				int q = bp.indexOf('}', p);
 				auto end = stringToValue<uint16_t>(bp.mid(p, q - p));
-				newBp.range.end = end;
+				newBp.range->end = end;
 				p = q + 1;
 			} else {
 				auto s = getNextArgument(bp, p);
 				auto start = stringToValue<uint16_t>(s);
-				if (!start) {
-					qWarning() << "breakpoint starting range invalid:" << s;
-					newBp.range = {};
-				}
-				newBp.range.start = *start;
-				newBp.range.end = {};
+				if (!start) continue;
+				newBp.range = AddressRange(*start);
 			}
 		}
 		// check and clip command (skip non-default commands)
@@ -246,13 +237,17 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 {
 	if (!memLayout) return true;
+	if (bp.type == Breakpoint::CONDITION) return true;
+	assert(bp.range);
 
-	int page = (bp.range.start & 0xC000) >> 14;
-	if (!bp.slot.ps || *bp.slot.ps == memLayout->primarySlot[page]) {
+	int page = (bp.range->start & 0xC000) >> 14;
+	if (!bp.slot.ps) return true;
+	if (*bp.slot.ps == memLayout->primarySlot[page]) {
 		if (memLayout->isSubslotted[*bp.slot.ps & 3]) {
-			if (!bp.slot.ss || *bp.slot.ss == memLayout->secondarySlot[page]) {
+			if (!bp.slot.ss) return true;
+			if (*bp.slot.ss == memLayout->secondarySlot[page]) {
 				if (memLayout->mapperSize[*bp.slot.ps & 3][*bp.slot.ss & 3] > 0) {
-					if (bp.segment || *bp.segment == memLayout->mapperSegment[page]) {
+					if (!bp.segment || *bp.segment == memLayout->mapperSegment[page]) {
 						return true;
 					}
 				} else {
@@ -274,9 +269,7 @@ bool Breakpoints::inCurrentSlot(const Breakpoint& bp)
 
 void Breakpoints::insertBreakpoint(Breakpoint& bp)
 {
-	auto it = ranges::upper_bound(breakpoints, bp.range,
-	                              [](auto& bp1, auto& bp2) { return bp1.start < bp2.start; },
-	                              &Breakpoint::range);
+	auto it = ranges::upper_bound(breakpoints, bp.range->start, {}, [](auto& bp) { return bp.range ? bp.range->start : -1; });
 	breakpoints.insert(it, bp);
 }
 
@@ -285,16 +278,16 @@ int Breakpoints::breakpointCount()
 	return breakpoints.size();
 }
 
-bool Breakpoints::isBreakpoint(quint16 addr, QString* id, bool checkSlot)
+bool Breakpoints::isBreakpoint(uint16_t addr, QString* id, bool checkSlot)
 {
 	if (std::optional<uint16_t> index = findBreakpoint(addr)) {
-		do {
-			const auto& bp = breakpoints[*index];
+		for (auto i = *index; i < breakpointCount() && breakpoints[i].range && breakpoints[i].range->start == addr; i++) {
+			const auto& bp = breakpoints[i];
 			if ((!checkSlot || inCurrentSlot(bp)) && bp.type == Breakpoint::BREAKPOINT) {
 				if (id) *id = bp.id;
 				return true;
 			}
-		} while (breakpoints[++(*index)].range.start == addr);
+		}
 	}
 	return false;
 }
@@ -303,8 +296,8 @@ bool Breakpoints::isWatchpoint(quint16 addr, QString* id, bool checkSlot)
 {
 	for (const auto& bp : breakpoints) {
 		if (bp.type == Breakpoint::WATCHPOINT_MEMREAD || bp.type == Breakpoint::WATCHPOINT_MEMWRITE) {
-			if ((bp.range.start == addr && !bp.range.end) ||
-			    (addr >= bp.range.start && addr <= bp.range.end)) {
+			assert(bp.range);
+			if (bp.range->contains(addr)) {
 				if (!checkSlot || inCurrentSlot(bp)) {
 					if (id) *id = bp.id;
 					return true;
@@ -318,9 +311,9 @@ bool Breakpoints::isWatchpoint(quint16 addr, QString* id, bool checkSlot)
 std::optional<uint16_t>
 Breakpoints::findBreakpoint(uint16_t addr)
 {
-        if (auto i = ranges::lower_bound(breakpoints, addr,
-            [](auto& bp1, auto& addr) { return bp1.start < addr; }, &Breakpoint::range);
-	    i != breakpoints.end() && i->range.start == addr) {
+	if (auto i = ranges::lower_bound(breakpoints, addr,
+			[](auto& bp, auto addr) { return bp.range ? bp.range->start < addr : true; });
+			i != breakpoints.end() && i->range && i->range->start == addr) {
 		return std::distance(breakpoints.begin(), i);
 	}
 	return {};
@@ -351,10 +344,12 @@ void Breakpoints::saveBreakpoints(QXmlStreamWriter& xml)
 
 		// address
 		if (bp.type == Breakpoint::BREAKPOINT) {
-			xml.writeTextElement("address", QString::number(bp.range.start));
+			assert(bp.range);
+			xml.writeTextElement("address", QString::number(bp.range->start));
 		} else if (bp.type != Breakpoint::CONDITION) {
-			xml.writeTextElement("regionStart", QString::number(bp.range.start));
-			if (bp.range.end) xml.writeTextElement("regionEnd", QString::number(*bp.range.end));
+			assert(bp.range);
+			xml.writeTextElement("regionStart", QString::number(bp.range->start));
+			if (bp.range->end) xml.writeTextElement("regionEnd", QString::number(*bp.range->end));
 		}
 
 		// condition
@@ -386,7 +381,6 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				if (auto it = ranges::find(TypeNames, label); it != std::end(TypeNames)) {
 					bp.type = static_cast<Breakpoint::Type>(std::distance(TypeNames, it));
 				} else {
-					qWarning() << "Unknown type" << label << "in XML";
 					bp.type = Breakpoint::BREAKPOINT;
 				}
 
@@ -405,16 +399,13 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				// read symbol name
 				auto s = xml.readElementText();
 				auto start = stringToValue<uint16_t>(s);
-				if (!start) {
-					qWarning() << "breakpoint starting range invalid:" << s;
-					continue;
-				}
-				bp.range.start = *start;
-				if (bp.type == Breakpoint::BREAKPOINT) bp.range.end = {};
-
+				if (!start) continue;
+				bp.range = AddressRange(*start);
+				if (bp.type == Breakpoint::BREAKPOINT) bp.range->end = {};
 			} else if (xml.name() == "regionEnd") {
 				// read symbol name
-				bp.range.end = stringToValue<uint16_t>(xml.readElementText());
+				assert(bp.range);
+				bp.range->end = stringToValue<uint16_t>(xml.readElementText());
 			} else if (xml.name() == "condition") {
 				bp.condition = xml.readElementText().trimmed();
 			}
