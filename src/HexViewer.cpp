@@ -16,7 +16,7 @@ class HexRequest : public ReadDebugBlockCommand
 {
 public:
 	HexRequest(const QString& debuggable, unsigned offset_, unsigned size,
-	           unsigned char* target, HexViewer& viewer_)
+	           uint8_t* target, HexViewer& viewer_)
 		: ReadDebugBlockCommand(debuggable, offset_, size, target)
 		, offset(offset_)
 		, viewer(viewer_)
@@ -43,29 +43,11 @@ private:
 
 HexViewer::HexViewer(QWidget* parent)
 	: QFrame(parent)
-	, wheelRemainder(0)
 {
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
 	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
-
-	horBytes = 16;
-	hexTopAddress = 0;
-	hexMarkAddress = 0;
-	hexData = nullptr;
-	previousHexData = nullptr;
-	debuggableSize = 0;
-	waitingForData = false;
-	displayMode = FILL_WIDTH;
-	highlitChanges = true;
-	addressLength = 4;
-	isEditable = false;
-	isInteractive = false;
-	beingEdited = false;
-	editedChars = false;
-	useMarker = false;
-	hasFocus = false;
 
 	vertScrollBar = new QScrollBar(Qt::Vertical, this);
 	vertScrollBar->setMinimum(0);
@@ -80,12 +62,6 @@ HexViewer::HexViewer(QWidget* parent)
 
 	connect(vertScrollBar, &QScrollBar::valueChanged,
 	        this, &HexViewer::scrollBarChanged);
-}
-
-HexViewer::~HexViewer()
-{
-	delete[] hexData;
-	delete[] previousHexData;
 }
 
 void HexViewer::createActions()
@@ -357,7 +333,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		x += charWidth;
 		for (int j = 0; j < horBytes; ++j) {
 			if (address + j >= debuggableSize) break;
-			unsigned char chr = hexData[address + j];
+			uint8_t chr = hexData[address + j];
 			if (chr < 32 || chr > 127) chr = '.';
 			// draw marker if needed
 			if (useMarker || beingEdited) {
@@ -397,30 +373,24 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		if (address >= debuggableSize) break;
 	}
 	// copy the new values to the old-values buffer
-	memcpy(previousHexData, hexData, debuggableSize);
+	if (debuggableSize) { // because memcpy of nullptr is undefined, even if copying zero bytes
+		memcpy(previousHexData.data(), hexData.data(), debuggableSize);
+	}
 }
 
 void HexViewer::setDebuggable(const QString& name, int size)
 {
-	delete[] hexData;
-	hexData = nullptr;
-	delete[] previousHexData;
-	previousHexData = nullptr;
-
+	debuggableSize = size;
+	hexData.assign(size, 0);
+	previousHexData.assign(size, 0);
 	if (size) {
 		debuggableName = name;
-		debuggableSize = size;
 		addressLength = 2 * int(ceil(log(double(size)) / log(2.0) / 8));
 		hexTopAddress = 0;
 		hexMarkAddress = 0;
-		hexData = new unsigned char[size];
-		memset(hexData, 0, size);
-		previousHexData = new unsigned char[size];
-		memset(previousHexData, 0, size);
 		settingsChanged();
 	} else {
 		debuggableName.clear();
-		debuggableSize = 0;
 	}
 }
 
@@ -505,7 +475,7 @@ void HexViewer::refresh()
 
 	// send data request
 	auto* req = new HexRequest(
-		debuggableName, hexTopAddress, size, hexData + hexTopAddress, *this);
+		debuggableName, hexTopAddress, size, &hexData[hexTopAddress], *this);
 	CommClient::instance().sendCommand(req);
 	waitingForData = true;
 }
@@ -600,7 +570,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		update();
 		return;
 	} else if (editedChars) {
-		editValue = static_cast<unsigned char>((e->text().toLatin1())[0]);
+		editValue = static_cast<uint8_t>((e->text().toLatin1())[0]);
 		setValue = true;
 		++newAddress;
 	} else {
@@ -614,7 +584,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 		//for now we change the value in our local buffer
 		previousHexData[hexMarkAddress] = char(editValue);
 		auto* req = new WriteDebugBlockCommand(
-			debuggableName, hexMarkAddress, 1, previousHexData);
+			debuggableName, hexMarkAddress, 1, previousHexData.data());
 		CommClient::instance().sendCommand(req);
 
 		editValue = 0;
@@ -687,7 +657,7 @@ bool HexViewer::event(QEvent* e)
 	if (offset >= 0 && (hexTopAddress + offset) < debuggableSize) {
 		// create text with binary and decimal values
 		int address = hexTopAddress + offset;
-		unsigned char chr = hexData[address];
+		uint8_t chr = hexData[address];
 		QString text = QString("Address: %1").arg(QString("%1").arg(address, addressLength, 16, QChar('0')).toUpper());
 
 		// print 8 bit values

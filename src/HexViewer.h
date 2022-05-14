@@ -2,6 +2,8 @@
 #define HEXVIEWER_H
 
 #include <QFrame>
+#include <cstdint>
+#include <vector>
 
 class HexRequest;
 class QScrollBar;
@@ -12,7 +14,6 @@ class HexViewer : public QFrame
 	Q_OBJECT
 public:
 	HexViewer(QWidget* parent = nullptr);
-	~HexViewer() override;
 
 	enum Mode { FIXED, FILL_WIDTH, FILL_WIDTH_POWEROF2 };
 
@@ -75,11 +76,11 @@ private:
 
 	// data
 	QString debuggableName;
+	std::vector<uint8_t> hexData;
+	std::vector<uint8_t> previousHexData;
 	int debuggableSize;
 	int hexTopAddress;
 	int hexMarkAddress;
-	unsigned char* hexData;
-	unsigned char* previousHexData;
 	bool waitingForData;
 	bool highlitChanges;
 	bool useMarker;
@@ -88,7 +89,7 @@ private:
 	bool beingEdited;
 	bool editedChars;
 	bool hasFocus;
-	int cursorPosition,editValue;
+	int cursorPosition, editValue;
 
 	friend class HexRequest;
 };
