@@ -37,22 +37,16 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs =  new unsigned char[64 + 16 + 2];
 	vdpId = 99; // make sure that we parse the first time the status registers are read
 	vdpId = VDP_V9958; //quick hack for now
 
 	//now hook up some signals and slots
 	connectHighLights();
 
-	//get initiale data
+	//get initial data
 	refresh();
 
 	decodeStatusVDPRegs(); // part of the quick hack :-)
-}
-
-VDPRegViewer::~VDPRegViewer()
-{
-	delete[] regs;
 }
 
 void VDPRegViewer::setRegisterVisible(int r, bool visible)
@@ -102,11 +96,11 @@ void VDPRegViewer::setRegisterVisible(int r, bool visible)
 
 void VDPRegViewer::decodeStatusVDPRegs()
 {
-	//const unsigned char* statusregs = regs + 64;
+	//const uint8_t* statusregs = regs + 64;
 	//int id = statusregs[1] & 62; // + (machine_has_TMS99x8 ? 1 : 0)
 	// test MSX1 id = 1;
-	//if (vdpid != id) {
-	//	vdpid = id;
+	//if (vdpId != id) {
+	//	vdpId = id;
 		if (vdpId == VDP_TMS99X8) {
 			// TMS9918 = MSX1 VDP
 			groupBox_V9958->setVisible(false);
@@ -456,7 +450,7 @@ void VDPRegViewer::decodeVDPRegs()
 				// This bit is cleared in the table since it isn't used in the Sprite
 				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table
-				if (r==5 && b==2 && vdpId!=VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
+				if (r == 5 && b == 2 && vdpId != VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
 					i->mustBeSet(true);
 				}
 			}
@@ -527,7 +521,7 @@ void VDPRegViewer::decodeVDPRegs()
 
 
 	// some variables used for readability of the code below
-	int row = vdpId==VDP_TMS99X8?0:1;
+	int row = vdpId == VDP_TMS99X8 ? 0 : 1;
 	QString regtexttext;
 	int must,must2;
 

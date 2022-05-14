@@ -4,6 +4,7 @@
 #include "SimpleHexRequest.h"
 #include "ui_VDPRegistersExplained.h"
 #include <QDialog>
+#include <cstdint>
 
 
 class InteractiveButton;
@@ -32,7 +33,6 @@ class VDPRegViewer : public QDialog, public SimpleHexRequestUser,
 	Q_OBJECT
 public:
 	VDPRegViewer(QWidget* parent = nullptr);
-	~VDPRegViewer() override;
 
 	void refresh();
 	void registerBitChanged(int reg, int bit, bool state);
@@ -56,7 +56,7 @@ private:
 	void DataHexRequestReceived() override;
 
 private:
-	unsigned char* regs;
+	uint8_t regs[64 + 16 + 2];
 	buttonHighlightDispatcher* modeBitsDispat;
 	int vdpId;
 };
