@@ -5,8 +5,6 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs = new unsigned char[64 + 16];
-	memset(regs, 0, 64 + 16);
 	statusregs = regs + 64;
 
 	// create the needed groups
@@ -66,11 +64,6 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 
 	//get initiale data
 	refresh();
-}
-
-VDPCommandRegViewer::~VDPCommandRegViewer()
-{
-	delete[] regs;
 }
 
 void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()

@@ -1,12 +1,10 @@
 #ifndef SPRITEVIEWER_H
 #define SPRITEVIEWER_H
 
+#include "ui_SpriteViewer.h"
 #include <QDialog>
 #include <cstdint>
-
-namespace Ui {
-    class SpriteViewer;
-}
+#include <memory>
 
 class VramSpriteView;
 
@@ -15,7 +13,6 @@ class SpriteViewer : public QDialog
     Q_OBJECT
 public:
     explicit SpriteViewer(QWidget* parent = nullptr);
-    ~SpriteViewer();
 
     void refresh();
 
@@ -49,7 +46,7 @@ private:
 private:
     static uint8_t defaultPalette[32];
 
-    Ui::SpriteViewer* ui;
+    std::unique_ptr<Ui::SpriteViewer> ui;
     VramSpriteView* imageWidget;
     VramSpriteView* imageWidgetSingle;
     VramSpriteView* imageWidgetSpat;

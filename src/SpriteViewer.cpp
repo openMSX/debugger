@@ -1,5 +1,4 @@
 #include "SpriteViewer.h"
-#include "ui_SpriteViewer.h"
 #include "VDPDataStore.h"
 #include "VramSpriteView.h"
 #include "PaletteDialog.h"
@@ -26,9 +25,9 @@ uint8_t SpriteViewer::defaultPalette[32] = {
     0x77, 7,
 };
 
-SpriteViewer::SpriteViewer(QWidget* parent) :
-    QDialog(parent),
-    ui(new Ui::SpriteViewer)
+SpriteViewer::SpriteViewer(QWidget* parent)
+    : QDialog(parent)
+    , ui(std::make_unique<Ui::SpriteViewer>())
 {
     ui->setupUi(this);
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -143,10 +142,6 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     VDPDataStore::instance().refresh();
 }
 
-SpriteViewer::~SpriteViewer()
-{
-    delete ui;
-}
 void SpriteViewer::setPaletteSource(const uint8_t* palSource, bool useVDP)
 {
     imageWidget->setPaletteSource(palSource, useVDP);

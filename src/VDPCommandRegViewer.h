@@ -5,6 +5,7 @@
 #include "ui_VDPCommandRegisters.h"
 #include "Convert.h"
 #include <QDialog>
+#include <cstdint>
 
 
 class view88to16 : public QObject
@@ -139,7 +140,6 @@ class VDPCommandRegViewer : public QDialog, public SimpleHexRequestUser,
 	Q_OBJECT
 public:
 	VDPCommandRegViewer(QWidget* parent = nullptr);
-	~VDPCommandRegViewer() override;
 
 	void refresh();
 	void R45BitChanged(int);
@@ -157,8 +157,8 @@ private:
 	void syncRegToCmd();
 
 private:
-	unsigned char* regs;
-	unsigned char* statusregs;
+	uint8_t regs[64 + 16] = {}; // stores both normal and status regs
+	uint8_t* statusregs; // points to &regs[64]
 	view88to16* grp_l_sx;
 	view88to16* grp_l_sy;
 	view88to16* grp_l_dx;
