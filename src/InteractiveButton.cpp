@@ -7,9 +7,9 @@ InteractiveButton::InteractiveButton(QWidget* parent)
 {
 	setEnabled(true);
 	setAutoFillBackground(true);
-	_mustBeSet=false;
-	_highlight=false;
-	connect(this, SIGNAL(toggled(bool)), this, SLOT(newBitValueSlot(bool)));
+	_mustBeSet = false;
+	_highlight = false;
+	connect(this, &InteractiveButton::toggled, this, &InteractiveButton::newBitValueSlot);
 }
 
 void InteractiveButton::highlight(bool state)
@@ -18,14 +18,13 @@ void InteractiveButton::highlight(bool state)
 
 	_highlight = state;
 	setColor();
-
 }
 
 void InteractiveButton::setColor()
 {
 	// No style sheet since this will not work for Mac OS X atm.
 	QPalette fiddle = QApplication::palette();
-	int colorset=(_mustBeSet?4:0)+(_highlight?2:0)+((_mustBeSet&!_state)?1:0);
+	int colorset = (_mustBeSet ? 4 : 0) + (_highlight ? 2 : 0) + ((_mustBeSet & !_state) ? 1 : 0);
 	switch (colorset) {
 		case 6:
 			fiddle.setColor(QPalette::Active, QPalette::Button, Qt::green);
@@ -44,7 +43,7 @@ void InteractiveButton::setColor()
 		case 1:
 			fiddle.setColor(QPalette::Active, QPalette::Button, Qt::darkRed);
 			break;
-	};
+	}
 	setPalette(fiddle);
 	update();
 }
@@ -74,6 +73,6 @@ void InteractiveButton::newBitValueSlot(bool state)
 void InteractiveButton::mustBeSet(bool state)
 {
 	if (state == _mustBeSet) return;
-	_mustBeSet=state;
+	_mustBeSet = state;
 	setColor();
 }

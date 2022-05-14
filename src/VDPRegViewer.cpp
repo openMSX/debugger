@@ -678,24 +678,24 @@ void VDPRegViewer::decodeVDPRegs()
 
 void VDPRegViewer::doConnect(InteractiveButton* but, buttonHighlightDispatcher* dis)
 {
-	connect(but, SIGNAL(mouseOver(bool)),
-	        dis, SLOT(receiveState(bool)));
-	connect(dis, SIGNAL(stateDispatched(bool)),
-	        but, SLOT(highlight(bool)));
+	connect(but, &InteractiveButton::mouseOver,
+	        dis, &buttonHighlightDispatcher::receiveState);
+	connect(dis, &buttonHighlightDispatcher::stateDispatched,
+	        but, &InteractiveButton::highlight);
 }
 
 void VDPRegViewer::monoGroup(InteractiveButton* but, InteractiveLabel* lab)
 {
-	connect(lab, SIGNAL(mouseOver(bool)), but, SLOT(highlight(bool)));
-	connect(but, SIGNAL(mouseOver(bool)), lab, SLOT(highlight(bool)));
-	connect(lab, SIGNAL(mouseOver(bool)), lab, SLOT(highlight(bool)));
-	connect(but, SIGNAL(mouseOver(bool)), but, SLOT(highlight(bool)));
+	connect(lab, &InteractiveLabel ::mouseOver, but, &InteractiveButton::highlight);
+	connect(but, &InteractiveButton::mouseOver, lab, &InteractiveLabel ::highlight);
+	connect(lab, &InteractiveLabel ::mouseOver, lab, &InteractiveLabel ::highlight);
+	connect(but, &InteractiveButton::mouseOver, but, &InteractiveButton::highlight);
 }
 
 void  VDPRegViewer::reGroup(InteractiveButton* item, buttonHighlightDispatcher* dispat)
 {
-	//button must rehighlight itself
-	connect(item, SIGNAL(mouseOver(bool)), item, SLOT(highlight(bool)));
+	//button must re-highlight itself
+	connect(item, &InteractiveButton::mouseOver, item, &InteractiveButton::highlight);
 	// and then talk to dispatcher
 	doConnect(item, dispat);
 }
@@ -710,10 +710,10 @@ buttonHighlightDispatcher* VDPRegViewer::makeGroup(
 
 	// Create a dispatcher and connect all to them
 	auto* dispat = new buttonHighlightDispatcher();
-	connect(explained, SIGNAL(mouseOver(bool)),
-	        dispat, SLOT(receiveState(bool)));
-	connect(dispat, SIGNAL(stateDispatched(bool)),
-	        explained, SLOT(highlight(bool)));
+	connect(explained, &InteractiveLabel::mouseOver,
+	        dispat, &buttonHighlightDispatcher::receiveState);
+	connect(dispat, &buttonHighlightDispatcher::stateDispatched,
+	        explained, &InteractiveLabel::highlight);
 	for (auto* item : list) {
 		doConnect(item, dispat);
 	}
@@ -728,8 +728,8 @@ void VDPRegViewer::connectHighLights()
 	// matters to me on my Linux environment :-)
 	QList<InteractiveButton*> list = findChildren<InteractiveButton*>();
 	for (auto* item : list) {
-		connect(item, SIGNAL(newBitValue(int,int,bool)),
-		        this, SLOT(registerBitChanged(int,int,bool)));
+		connect(item, &InteractiveButton::newBitValue,
+		        this, &VDPRegViewer::registerBitChanged);
         }
 
 	// register 0 (+M1,M2)

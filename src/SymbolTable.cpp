@@ -13,7 +13,8 @@
 
 SymbolTable::SymbolTable()
 {
-	connect(&fileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
+	connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
+	        this, &SymbolTable::fileChanged);
 }
 
 SymbolTable::~SymbolTable()

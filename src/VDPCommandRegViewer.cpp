@@ -11,29 +11,29 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 
 	// create the needed groups
 	grp_sx = new view88to16(lineEdit_r32, lineEdit_r33, lineEdit_sx);
-	connect(lineEdit_r32, SIGNAL(editingFinished()), grp_sx, SLOT(finishRL()));
-	connect(lineEdit_r33, SIGNAL(editingFinished()), grp_sx, SLOT(finishRH()));
-	connect(lineEdit_sx,  SIGNAL(editingFinished()), grp_sx, SLOT(finishRW()));
+	connect(lineEdit_r32, &QLineEdit::editingFinished, grp_sx, &view88to16::finishRL);
+	connect(lineEdit_r33, &QLineEdit::editingFinished, grp_sx, &view88to16::finishRH);
+	connect(lineEdit_sx,  &QLineEdit::editingFinished, grp_sx, &view88to16::finishRW);
 	grp_sy = new view88to16(lineEdit_r34, lineEdit_r35, lineEdit_sy);
-	connect(lineEdit_r34, SIGNAL(editingFinished()), grp_sy, SLOT(finishRL()));
-	connect(lineEdit_r35, SIGNAL(editingFinished()), grp_sy, SLOT(finishRH()));
-	connect(lineEdit_sy,  SIGNAL(editingFinished()), grp_sy, SLOT(finishRW()));
+	connect(lineEdit_r34, &QLineEdit::editingFinished, grp_sy, &view88to16::finishRL);
+	connect(lineEdit_r35, &QLineEdit::editingFinished, grp_sy, &view88to16::finishRH);
+	connect(lineEdit_sy,  &QLineEdit::editingFinished, grp_sy, &view88to16::finishRW);
 	grp_dx = new view88to16(lineEdit_r36, lineEdit_r37, lineEdit_dx);
-	connect(lineEdit_r36, SIGNAL(editingFinished()), grp_dx, SLOT(finishRL()));
-	connect(lineEdit_r37, SIGNAL(editingFinished()), grp_dx, SLOT(finishRH()));
-	connect(lineEdit_dx,  SIGNAL(editingFinished()), grp_dx, SLOT(finishRW()));
+	connect(lineEdit_r36, &QLineEdit::editingFinished, grp_dx, &view88to16::finishRL);
+	connect(lineEdit_r37, &QLineEdit::editingFinished, grp_dx, &view88to16::finishRH);
+	connect(lineEdit_dx,  &QLineEdit::editingFinished, grp_dx, &view88to16::finishRW);
 	grp_dy = new view88to16(lineEdit_r38, lineEdit_r39, lineEdit_dy);
-	connect(lineEdit_r38, SIGNAL(editingFinished()), grp_dy, SLOT(finishRL()));
-	connect(lineEdit_r39, SIGNAL(editingFinished()), grp_dy, SLOT(finishRH()));
-	connect(lineEdit_dy,  SIGNAL(editingFinished()), grp_dy, SLOT(finishRW()));
+	connect(lineEdit_r38, &QLineEdit::editingFinished, grp_dy, &view88to16::finishRL);
+	connect(lineEdit_r39, &QLineEdit::editingFinished, grp_dy, &view88to16::finishRH);
+	connect(lineEdit_dy,  &QLineEdit::editingFinished, grp_dy, &view88to16::finishRW);
 	grp_nx = new view88to16(lineEdit_r40, lineEdit_r41, lineEdit_nx);
-	connect(lineEdit_r40, SIGNAL(editingFinished()), grp_nx, SLOT(finishRL()));
-	connect(lineEdit_r41, SIGNAL(editingFinished()), grp_nx, SLOT(finishRH()));
-	connect(lineEdit_nx,  SIGNAL(editingFinished()), grp_nx, SLOT(finishRW()));
+	connect(lineEdit_r40, &QLineEdit::editingFinished, grp_nx, &view88to16::finishRL);
+	connect(lineEdit_r41, &QLineEdit::editingFinished, grp_nx, &view88to16::finishRH);
+	connect(lineEdit_nx,  &QLineEdit::editingFinished, grp_nx, &view88to16::finishRW);
 	grp_ny = new view88to16(lineEdit_r42, lineEdit_r43, lineEdit_ny);
-	connect(lineEdit_r42, SIGNAL(editingFinished()), grp_ny, SLOT(finishRL()));
-	connect(lineEdit_r43, SIGNAL(editingFinished()), grp_ny, SLOT(finishRH()));
-	connect(lineEdit_ny,  SIGNAL(editingFinished()), grp_ny, SLOT(finishRW()));
+	connect(lineEdit_r42, &QLineEdit::editingFinished, grp_ny, &view88to16::finishRL);
+	connect(lineEdit_r43, &QLineEdit::editingFinished, grp_ny, &view88to16::finishRH);
+	connect(lineEdit_ny,  &QLineEdit::editingFinished, grp_ny, &view88to16::finishRW);
 
 	grp_sx->setRW(QString("0"));
 	grp_sy->setRW(QString("0"));
@@ -52,8 +52,8 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	//Connect the checkboxes
 	QList<QCheckBox*> list = this->findChildren<QCheckBox*>();
 	for (auto* item : list) {
-		connect(item, SIGNAL(stateChanged(int)),
-		        this, SLOT(R45BitChanged(int)));
+		connect(item, &QCheckBox::stateChanged,
+		        this, &VDPCommandRegViewer::R45BitChanged);
 	}
 
 	lineEdit_r44->setText(hexValue(0, 2));

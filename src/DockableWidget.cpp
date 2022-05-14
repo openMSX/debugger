@@ -38,7 +38,7 @@ DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	closeButton->setIconSize(style()->standardIcon(
 		QStyle::SP_TitleBarCloseButton).actualSize(QSize(sz, sz)));
 	closeButton->setAutoRaise(true);
-	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+	connect(closeButton, &QToolButton::clicked, this, &DockableWidget::close);
 
 	headerLayout = new QHBoxLayout();
 	headerLayout->setMargin(0);

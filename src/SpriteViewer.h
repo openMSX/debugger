@@ -18,8 +18,10 @@ public:
     explicit SpriteViewer(QWidget* parent = nullptr);
     ~SpriteViewer();
 
-private slots:
+public slots:
     void refresh();
+
+private slots:
     void VDPDataStoreDataRefreshed();
     void pgtwidget_mouseMoveEvent(int x, int y, int character);
     void pgtwidget_mouseClickedEvent(int x, int y, int character, const QString& text);

@@ -60,8 +60,8 @@ StackViewer::StackViewer(QWidget* parent)
 
 	setMinimumHeight(frameT+frameB+fontMetrics().height());
 
-	connect(vertScrollBar, SIGNAL(valueChanged(int)),
-	        this, SLOT(setLocation(int)));
+	connect(vertScrollBar, &QScrollBar::valueChanged,
+	        this, &StackViewer::setLocation);
 }
 
 QSize StackViewer::sizeHint() const

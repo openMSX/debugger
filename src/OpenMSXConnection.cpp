@@ -111,11 +111,12 @@ OpenMSXConnection::OpenMSXConnection(QAbstractSocket* socket_)
 {
 	assert(socket->isValid());
 
-	connect(socket, SIGNAL(readyRead()), this, SLOT(processData()));
-	connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-	        this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-	connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-	        this, SLOT(socketError(QAbstractSocket::SocketError)));
+	connect(socket, &QAbstractSocket::readyRead,
+	        this, &OpenMSXConnection::processData);
+	connect(socket, &QAbstractSocket::stateChanged,
+	        this, &OpenMSXConnection::socketStateChanged);
+	connect(socket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
+	        this, &OpenMSXConnection::socketError);
 
 	socket->write("<openmsx-control>\n");
 }

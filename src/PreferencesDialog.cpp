@@ -9,18 +9,18 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 {
 	setupUi(this);
 
-	connect(listFonts, SIGNAL(currentRowChanged(int)),
-	        this, SLOT(fontSelectionChange(int)));
-	connect(rbUseAppFont,    SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(rbUseFixedFont,  SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(rbUseCustomFont, SIGNAL(toggled(bool)),
-	        this, SLOT(fontTypeChanged(bool)));
-	connect(btnSelectFont, SIGNAL(clicked()),
-	        this, SLOT(fontSelectCustom()));
-	connect(btnFontColor,  SIGNAL(clicked()),
-	        this, SLOT(fontSelectColor()));
+	connect(listFonts, &QListWidget::currentRowChanged,
+	        this, &PreferencesDialog::fontSelectionChange);
+	connect(rbUseAppFont,    &QRadioButton::toggled,
+	        this, &PreferencesDialog::fontTypeChanged);
+	connect(rbUseFixedFont,  &QRadioButton::toggled,
+	        this, &PreferencesDialog::fontTypeChanged);
+	connect(rbUseCustomFont, &QRadioButton::toggled,
+	        this, &PreferencesDialog::fontTypeChanged);
+	connect(btnSelectFont, &QPushButton::clicked,
+	        this, &PreferencesDialog::fontSelectCustom);
+	connect(btnFontColor,  &QPushButton::clicked,
+	        this, &PreferencesDialog::fontSelectColor);
 
 	initFontList();
 	listFonts->setCurrentRow(0);

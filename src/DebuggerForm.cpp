@@ -1065,8 +1065,8 @@ void DebuggerForm::systemReboot()
 void DebuggerForm::systemSymbolManager()
 {
 	SymbolManager symManager(session.symbolTable(), this);
-	connect(&symManager, SIGNAL(symbolTableChanged()),
-	        &session, SLOT(sessionModified()));
+	connect(&symManager, &SymbolManager::symbolTableChanged,
+	        &session, &DebugSession::sessionModified);
 	symManager.exec();
 	emit symbolsChanged();
 	updateWindowTitle();
@@ -1225,14 +1225,14 @@ void DebuggerForm::toggleBitMappedDisplay()
 	dw->setMovable(true);
 	dw->setClosable(true);
 	/*
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
+	connect(dw, &DockableWidget::visibilityChanged,
+	        this, &DebuggerForm::dockWidgetVisibilityChanged);
+	connect(this, &DebuggerForm::debuggablesChanged,
+	        viewer, &BitMapViewer::setDebuggables);
 	*/
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
+	connect(this, &DebuggerForm::breakStateEntered, viewer, &BitMapViewer::refresh);
 
 	/*
 	viewer->setDebuggables(debuggables);
@@ -1259,7 +1259,7 @@ void DebuggerForm::toggleCharMappedDisplay()
 	//    dw->adjustSize();
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
+	connect(this, &DebuggerForm::breakStateEntered, viewer, &TileViewer::refresh);
 }
 
 void DebuggerForm::toggleSpritesDisplay()
@@ -1279,7 +1279,7 @@ void DebuggerForm::toggleSpritesDisplay()
 	dw->setClosable(true);
 
 	// TODO: refresh should be being hanled by VDPDataStore...
-	connect(this, SIGNAL(breakStateEntered()), viewer, SLOT(refresh()));
+	connect(this, &DebuggerForm::breakStateEntered, viewer, &SpriteViewer::refresh);
 }
 
 void DebuggerForm::toggleVDPCommandRegsDisplay()
@@ -1294,8 +1294,8 @@ void DebuggerForm::toggleVDPCommandRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPCommandRegView, SLOT(refresh()));
+		connect(this, &DebuggerForm::breakStateEntered,
+		        VDPCommandRegView, &VDPCommandRegViewer::refresh);
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPCommandRegView->parentWidget()));
 	}
@@ -1313,8 +1313,8 @@ void DebuggerForm::toggleVDPRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPRegView, SLOT(refresh()));
+		connect(this, &DebuggerForm::breakStateEntered,
+		        VDPRegView, &VDPRegViewer::refresh);
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPRegView->parentWidget()));
 	}
@@ -1332,8 +1332,8 @@ void DebuggerForm::toggleVDPStatusRegsDisplay()
 		dw->setDestroyable(false);
 		dw->setMovable(true);
 		dw->setClosable(true);
-		connect(this, SIGNAL(breakStateEntered()),
-		        VDPStatusRegView, SLOT(refresh()));
+		connect(this, &DebuggerForm::breakStateEntered,
+		        VDPStatusRegView, &VDPStatusRegViewer::refresh);
 	} else {
 		toggleView(qobject_cast<DockableWidget*>(VDPStatusRegView->parentWidget()));
 	}
@@ -1366,12 +1366,12 @@ void DebuggerForm::addDebuggableViewer()
 	dw->setDestroyable(true);
 	dw->setMovable(true);
 	dw->setClosable(true);
-	connect(dw, SIGNAL(visibilityChanged(DockableWidget*)),
-	        this, SLOT(dockWidgetVisibilityChanged(DockableWidget*)));
-	connect(this, SIGNAL(debuggablesChanged(const QMap<QString,int>&)),
-	        viewer, SLOT(setDebuggables(const QMap<QString,int>&)));
-	connect(this, SIGNAL(breakStateEntered()),
-	        viewer, SLOT(refresh()));
+	connect(dw, &DockableWidget::visibilityChanged,
+	        this, &DebuggerForm::dockWidgetVisibilityChanged);
+	connect(this, &DebuggerForm::debuggablesChanged,
+	        viewer, &DebuggableViewer::setDebuggables);
+	connect(this, &DebuggerForm::breakStateEntered,
+	        viewer, &DebuggableViewer::refresh);
 	viewer->setDebuggables(debuggables);
 	viewer->setEnabled(disasmView->isEnabled());
 }

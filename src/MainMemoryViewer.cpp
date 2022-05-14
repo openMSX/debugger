@@ -55,12 +55,12 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	regsViewer = nullptr;
 	symTable = nullptr;
 
-	connect(hexView, SIGNAL(locationChanged(int)),
-	        this, SLOT(hexViewChanged(int)));
-	connect(addressValue, SIGNAL(returnPressed()),
-	        this, SLOT(addressValueChanged()));
-	connect(addressSourceList, SIGNAL(currentIndexChanged(int)),
-	        this, SLOT(addressSourceListChanged(int)));
+	connect(hexView, &HexViewer::locationChanged,
+	        this, &MainMemoryViewer::hexViewChanged);
+	connect(addressValue, &QLineEdit::returnPressed,
+	        this, &MainMemoryViewer::addressValueChanged);
+	connect(addressSourceList, qOverload<int>(&QComboBox::currentIndexChanged),
+	        this, &MainMemoryViewer::addressSourceListChanged);
 }
 
 void MainMemoryViewer::settingsChanged()

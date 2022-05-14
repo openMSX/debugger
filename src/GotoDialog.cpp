@@ -15,10 +15,10 @@ GotoDialog::GotoDialog(const MemoryLayout& ml, DebugSession *session, QWidget* p
 		auto* completer = new QCompleter(session->symbolTable().labelList(true, &ml), this);
 		completer->setCaseSensitivity(Qt::CaseInsensitive);
 		edtAddress->setCompleter(completer);
-		connect(completer,  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
+		connect(completer,  qOverload<const QString&>(&QCompleter::activated), this, &GotoDialog::addressChanged);
 	}
 
-	connect(edtAddress,  SIGNAL(textEdited(const QString&)), this, SLOT(addressChanged(const QString&)));
+	connect(edtAddress, &QLineEdit::textEdited, this, &GotoDialog::addressChanged);
 }
 
 std::optional<uint16_t> GotoDialog::address()

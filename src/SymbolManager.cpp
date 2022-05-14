@@ -33,54 +33,52 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget* parent)
 	chkRegs[12] = chkRegIXL;chkRegs[13] = chkRegIXH;chkRegs[14] = chkRegIYL;chkRegs[15] = chkRegIYH;
 	chkRegs[16] = chkRegOffset; chkRegs[17] = chkRegI;
 
-	connect(treeFiles, SIGNAL(itemSelectionChanged()), this, SLOT(fileSelectionChange()));
-	connect(btnAddFile, SIGNAL(clicked()), this, SLOT(addFile()));
-	connect(btnRemoveFile, SIGNAL(clicked()), this, SLOT(removeFile()));
-	connect(btnReloadFiles, SIGNAL(clicked()), this, SLOT(reloadFiles()));
-	connect(treeLabels, SIGNAL(itemSelectionChanged()), this, SLOT(labelSelectionChanged()));
-	connect(treeLabels, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
-	        this, SLOT(labelEdit(QTreeWidgetItem*, int)));
-	connect(treeLabels, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-	        this, SLOT(labelChanged(QTreeWidgetItem*, int)));
-	connect(btnAddSymbol, SIGNAL(clicked()), this, SLOT(addLabel()));
-	connect(btnRemoveSymbol, SIGNAL(clicked()), this, SLOT(removeLabel()));
-	connect(radJump, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
-	connect(radVar, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
-	connect(radValue, SIGNAL(toggled(bool)), this, SLOT(changeType(bool)));
-	connect(chk00, SIGNAL(stateChanged(int)), this, SLOT(changeSlot00(int)));
-	connect(chk01, SIGNAL(stateChanged(int)), this, SLOT(changeSlot01(int)));
-	connect(chk02, SIGNAL(stateChanged(int)), this, SLOT(changeSlot02(int)));
-	connect(chk03, SIGNAL(stateChanged(int)), this, SLOT(changeSlot03(int)));
-	connect(chk10, SIGNAL(stateChanged(int)), this, SLOT(changeSlot10(int)));
-	connect(chk11, SIGNAL(stateChanged(int)), this, SLOT(changeSlot11(int)));
-	connect(chk12, SIGNAL(stateChanged(int)), this, SLOT(changeSlot12(int)));
-	connect(chk13, SIGNAL(stateChanged(int)), this, SLOT(changeSlot13(int)));
-	connect(chk20, SIGNAL(stateChanged(int)), this, SLOT(changeSlot20(int)));
-	connect(chk21, SIGNAL(stateChanged(int)), this, SLOT(changeSlot21(int)));
-	connect(chk22, SIGNAL(stateChanged(int)), this, SLOT(changeSlot22(int)));
-	connect(chk23, SIGNAL(stateChanged(int)), this, SLOT(changeSlot23(int)));
-	connect(chk30, SIGNAL(stateChanged(int)), this, SLOT(changeSlot30(int)));
-	connect(chk31, SIGNAL(stateChanged(int)), this, SLOT(changeSlot31(int)));
-	connect(chk32, SIGNAL(stateChanged(int)), this, SLOT(changeSlot32(int)));
-	connect(chk33, SIGNAL(stateChanged(int)), this, SLOT(changeSlot33(int)));
-	connect(chkRegA, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterA(int)));
-	connect(chkRegB, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterB(int)));
-	connect(chkRegC, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterC(int)));
-	connect(chkRegD, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterD(int)));
-	connect(chkRegE, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterE(int)));
-	connect(chkRegH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterH(int)));
-	connect(chkRegL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterL(int)));
-	connect(chkRegBC, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterBC(int)));
-	connect(chkRegDE, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterDE(int)));
-	connect(chkRegHL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterHL(int)));
-	connect(chkRegIX, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIX(int)));
-	connect(chkRegIY, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIY(int)));
-	connect(chkRegIXL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIXL(int)));
-	connect(chkRegIXH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIXH(int)));
-	connect(chkRegIYL, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIYL(int)));
-	connect(chkRegIYH, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterIYH(int)));
-	connect(chkRegOffset, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterOffset(int)));
-	connect(chkRegI, SIGNAL(stateChanged(int)), this, SLOT(changeRegisterI(int)));
+	connect(treeFiles, &QTreeWidget::itemSelectionChanged, this, &SymbolManager::fileSelectionChange);
+	connect(btnAddFile,     &QPushButton::clicked, this, &SymbolManager::addFile);
+	connect(btnRemoveFile,  &QPushButton::clicked, this, &SymbolManager::removeFile);
+	connect(btnReloadFiles, &QPushButton::clicked, this, &SymbolManager::reloadFiles);
+	connect(treeLabels, &QTreeWidget::itemSelectionChanged, this, &SymbolManager::labelSelectionChanged);
+	connect(treeLabels, &QTreeWidget::itemDoubleClicked,    this, &SymbolManager::labelEdit);
+	connect(treeLabels, &QTreeWidget::itemChanged,          this, &SymbolManager::labelChanged);
+	connect(btnAddSymbol,    &QPushButton::clicked, this, &SymbolManager::addLabel);
+	connect(btnRemoveSymbol, &QPushButton::clicked, this, &SymbolManager::removeLabel);
+	connect(radJump,  &QRadioButton::toggled, this, &SymbolManager::changeType);
+	connect(radVar,   &QRadioButton::toggled, this, &SymbolManager::changeType);
+	connect(radValue, &QRadioButton::toggled, this, &SymbolManager::changeType);
+	connect(chk00,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot00);
+	connect(chk01,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot01);
+	connect(chk02,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot02);
+	connect(chk03,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot03);
+	connect(chk10,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot10);
+	connect(chk11,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot11);
+	connect(chk12,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot12);
+	connect(chk13,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot13);
+	connect(chk20,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot20);
+	connect(chk21,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot21);
+	connect(chk22,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot22);
+	connect(chk23,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot23);
+	connect(chk30,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot30);
+	connect(chk31,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot31);
+	connect(chk32,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot32);
+	connect(chk33,        &QCheckBox::stateChanged, this, &SymbolManager::changeSlot33);
+	connect(chkRegA,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterA);
+	connect(chkRegB,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterB);
+	connect(chkRegC,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterC);
+	connect(chkRegD,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterD);
+	connect(chkRegE,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterE);
+	connect(chkRegH,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterH);
+	connect(chkRegL,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterL);
+	connect(chkRegBC,     &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterBC);
+	connect(chkRegDE,     &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterDE);
+	connect(chkRegHL,     &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterHL);
+	connect(chkRegIX,     &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIX);
+	connect(chkRegIY,     &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIY);
+	connect(chkRegIXL,    &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIXL);
+	connect(chkRegIXH,    &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIXH);
+	connect(chkRegIYL,    &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIYL);
+	connect(chkRegIYH,    &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterIYH);
+	connect(chkRegOffset, &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterOffset);
+	connect(chkRegI,      &QCheckBox::stateChanged, this, &SymbolManager::changeRegisterI);
 
 	groupSlots->setEnabled(false);
 	groupSegments->setEnabled(false);
@@ -90,7 +88,6 @@ SymbolManager::SymbolManager(SymbolTable& symtable, QWidget* parent)
 	initFileList();
 	initSymbolList();
 }
-
 
 void SymbolManager::closeEvent(QCloseEvent* e)
 {

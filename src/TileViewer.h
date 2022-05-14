@@ -26,9 +26,10 @@ private:
 
     static uint8_t defaultPalette[32];
 
-private slots:
+public slots:
     void refresh();
 
+private slots:
     void displayCharInfo(int screenX, int screenY, int character, const QString& textInfo);
 
     void on_cb_tilemapsource_currentIndexChanged(int index);

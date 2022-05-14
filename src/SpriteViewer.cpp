@@ -37,10 +37,10 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     // Now hook up some signals and slots.
     // This way we have created the VDPDataStore::instance before our imagewidget.
     // This allows the VDPDatastore to start asking for data as quickly as possible.
-    connect(ui->refreshButton, SIGNAL(clicked(bool)),
-            &VDPDataStore::instance(), SLOT(refresh()));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            this, SLOT(VDPDataStoreDataRefreshed()));
+    connect(ui->refreshButton, &QPushButton::clicked,
+            &VDPDataStore::instance(), &VDPDataStore::refresh);
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            this, &SpriteViewer::VDPDataStoreDataRefreshed);
 
     imageWidget = new VramSpriteView();
     //QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -49,8 +49,8 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     //sizePolicy1.setHeightForWidth(imageWidget->sizePolicy().hasHeightForWidth());
     //imageWidget->setSizePolicy(sizePolicy1);
     imageWidget->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            imageWidget, SLOT(refresh()));
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            imageWidget, &VramSpriteView::refresh);
     ui->spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(
         ui->spritePatternGenerator_widget, imageWidget);
 
@@ -63,8 +63,8 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     sizePolicy3.setHeightForWidth(imageWidgetSingle->sizePolicy().hasHeightForWidth());
     imageWidgetSingle->setSizePolicy(sizePolicy3);
     imageWidgetSingle->setMinimumSize(QSize(64, 64));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            imageWidgetSingle, SLOT(refresh()));
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            imageWidgetSingle, &VramSpriteView::refresh);
     ui->single_spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(
         ui->single_spritePatternGenerator_widget, imageWidgetSingle);
 
@@ -73,8 +73,8 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
 
     imageWidgetSpat = new VramSpriteView(nullptr, VramSpriteView::SpriteAttributeMode);
     imageWidgetSpat->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            imageWidgetSpat, SLOT(refresh()));
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            imageWidgetSpat, &VramSpriteView::refresh);
     ui->spriteAttributeTable_widget->parentWidget()->layout()->replaceWidget(
         ui->spriteAttributeTable_widget, imageWidgetSpat);
 
@@ -83,8 +83,8 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
 
     imageWidgetColor = new VramSpriteView(nullptr, VramSpriteView::ColorMode);
     imageWidgetColor->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            imageWidgetColor, SLOT(refresh()));
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            imageWidgetColor, &VramSpriteView::refresh);
     ui->spriteColorTable_widget->parentWidget()->layout()->replaceWidget(
         ui->spriteColorTable_widget, imageWidgetColor);
 
@@ -96,48 +96,48 @@ SpriteViewer::SpriteViewer(QWidget* parent) :
     setCorrectVDPData();
     setCorrectEnabled(ui->useVDPRegisters->isChecked());
 
-    connect(imageWidget, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(pgtwidget_mouseClickedEvent(int, int, int, const QString&)));
-    connect(imageWidget, SIGNAL(imagePosition(int, int, int)),
-            this, SLOT(pgtwidget_mouseMoveEvent(int, int, int)));
+    connect(imageWidget, &VramSpriteView::imageClicked,
+            this, &SpriteViewer::pgtwidget_mouseClickedEvent);
+    connect(imageWidget, &VramSpriteView::imagePosition,
+            this, &SpriteViewer::pgtwidget_mouseMoveEvent);
 
 
-    connect(imageWidgetSpat, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, const QString&)));
-    connect(imageWidgetSpat, SIGNAL(imagePosition(int, int, int)),
-            this, SLOT(spatwidget_mouseMoveEvent(int, int, int)));
+    connect(imageWidgetSpat, &VramSpriteView::imageClicked,
+            this, &SpriteViewer::spatwidget_mouseClickedEvent);
+    connect(imageWidgetSpat, &VramSpriteView::imagePosition,
+            this, &SpriteViewer::spatwidget_mouseMoveEvent);
 
 
     // Since imageWidgetColor and imageWidgetSpat are the same structure we reuse
     // spatwidget_mouseClickedEvent
-    connect(imageWidgetColor, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(spatwidget_mouseClickedEvent(int, int, int, const QString&)));
+    connect(imageWidgetColor, &VramSpriteView::imageClicked,
+            this, &SpriteViewer::spatwidget_mouseClickedEvent);
 
 
     // Have spat and color the same spriteselection box synced
-    connect(imageWidgetSpat, SIGNAL( spriteboxClicked(int)),
-            imageWidgetColor, SLOT(setSpriteboxClicked(int)));
+    connect(imageWidgetSpat, &VramSpriteView::spriteboxClicked,
+            imageWidgetColor, &VramSpriteView::setSpriteboxClicked);
 
-    connect(imageWidgetColor, SIGNAL( spriteboxClicked(int)),
-            imageWidgetSpat, SLOT(setSpriteboxClicked(int)));
+    connect(imageWidgetColor, &VramSpriteView::spriteboxClicked,
+            imageWidgetSpat, &VramSpriteView::setSpriteboxClicked);
 
     //clear pattern selection if spat or color selected
-    connect(imageWidgetSpat, SIGNAL( spriteboxClicked(int)),
-            imageWidget, SLOT(setCharacterClicked()));
+    connect(imageWidgetSpat, &VramSpriteView::spriteboxClicked,
+            imageWidget, &VramSpriteView::setCharacterClicked);
 
-    connect(imageWidgetColor, SIGNAL( spriteboxClicked(int)),
-            imageWidget, SLOT(setCharacterClicked()));
+    connect(imageWidgetColor, &VramSpriteView::spriteboxClicked,
+            imageWidget, &VramSpriteView::setCharacterClicked);
 
     //clear spat and color selection if imagewidget clicked
-    connect(imageWidget, SIGNAL( characterClicked(int)),
-            imageWidgetSpat, SLOT(setSpriteboxClicked()));
+    connect(imageWidget, &VramSpriteView::characterClicked,
+            imageWidgetSpat, &VramSpriteView::setSpriteboxClicked);
 
-    connect(imageWidget, SIGNAL( characterClicked(int)),
-            imageWidgetColor, SLOT(setSpriteboxClicked()));
+    connect(imageWidget, &VramSpriteView::characterClicked,
+            imageWidgetColor, &VramSpriteView::setSpriteboxClicked);
 
 
-    connect(ui->cb_displaygrid, SIGNAL(stateChanged(int)),
-            this, SLOT(setDrawGrid(int)));
+    connect(ui->cb_displaygrid, &QCheckBox::stateChanged,
+            this, &SpriteViewer::setDrawGrid);
 
     // And now go fetch the initial data
     VDPDataStore::instance().refresh();
@@ -433,9 +433,9 @@ void SpriteViewer::on_editPaletteButton_clicked(bool /*checked*/)
     auto* p = new PaletteDialog();
     p->setPalette(defaultPalette);
     p->setAutoSync(true);
-    connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
-    connect(p, SIGNAL(paletteSynced()), imageWidgetSingle, SLOT(refresh()));
-    connect(p, SIGNAL(paletteSynced()), imageWidgetSpat, SLOT(refresh()));
-    connect(p, SIGNAL(paletteSynced()), imageWidgetColor, SLOT(refresh()));
+    connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramSpriteView::refresh);
+    connect(p, &PaletteDialog::paletteSynced, imageWidgetSingle, &VramSpriteView::refresh);
+    connect(p, &PaletteDialog::paletteSynced, imageWidgetSpat, &VramSpriteView::refresh);
+    connect(p, &PaletteDialog::paletteSynced, imageWidgetColor, &VramSpriteView::refresh);
     p->show();
 }

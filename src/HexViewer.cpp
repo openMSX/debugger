@@ -78,8 +78,8 @@ HexViewer::HexViewer(QWidget* parent)
 
 	createActions();
 
-	connect(vertScrollBar, SIGNAL(valueChanged(int)),
-	        this, SLOT(scrollBarChanged(int)));
+	connect(vertScrollBar, &QScrollBar::valueChanged,
+	        this, &HexViewer::scrollBarChanged);
 }
 
 HexViewer::~HexViewer()
@@ -110,11 +110,11 @@ void HexViewer::createActions()
 	setWith32Action->setShortcut(tr("Ctrl+3"));
 	setWith32Action->setStatusTip(tr("Set width to 32 bytes."));
 
-	connect(fillWidthAction,  SIGNAL(triggered()), this, SLOT(changeWidth()));
-	connect(fillWidth2Action, SIGNAL(triggered()), this, SLOT(changeWidth()));
-	connect(setWith8Action,   SIGNAL(triggered()), this, SLOT(changeWidth()));
-	connect(setWith16Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
-	connect(setWith32Action,  SIGNAL(triggered()), this, SLOT(changeWidth()));
+	connect(fillWidthAction,  &QAction::triggered, this, &HexViewer::changeWidth);
+	connect(fillWidth2Action, &QAction::triggered, this, &HexViewer::changeWidth);
+	connect(setWith8Action,   &QAction::triggered, this, &HexViewer::changeWidth);
+	connect(setWith16Action,  &QAction::triggered, this, &HexViewer::changeWidth);
+	connect(setWith32Action,  &QAction::triggered, this, &HexViewer::changeWidth);
 
 	addAction(fillWidthAction);
 	addAction(fillWidth2Action);

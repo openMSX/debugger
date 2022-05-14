@@ -109,8 +109,10 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 
 void VDPStatusRegViewer::doConnect(InteractiveLabel* lab, highlightDispatcher* dis)
 {
-	connect(lab, SIGNAL(mouseOver(bool)),     dis, SLOT(receiveState(bool)));
-	connect(dis, SIGNAL(stateDispatched(bool)), lab, SLOT(highlight(bool)));
+	connect(lab, &InteractiveLabel::mouseOver,
+	        dis, &highlightDispatcher::receiveState);
+	connect(dis, &highlightDispatcher::stateDispatched,
+	        lab, &InteractiveLabel::highlight);
 }
 
 void VDPStatusRegViewer::makeGroup(QList<InteractiveLabel*> list, InteractiveLabel* explained)

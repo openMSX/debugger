@@ -20,9 +20,10 @@ private:
 	int screenMod;
 	bool useVDP;
 
-private slots:
+public slots:
 	void refresh();
 
+private slots:
 	void on_screenMode_currentIndexChanged(const QString& text);
 	void on_showPage_currentIndexChanged(int index);
 	void on_linesVisible_currentIndexChanged(int index);

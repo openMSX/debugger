@@ -19,9 +19,9 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
 	setLayout(vbox);
-	
-	connect(hexView, SIGNAL(locationChanged(int)),
-	        this, SLOT(locationChanged(int)));
+
+	connect(hexView, &HexViewer::locationChanged,
+	        this, &DebuggableViewer::locationChanged);
 }
 
 void DebuggableViewer::settingsChanged()
@@ -53,7 +53,7 @@ void DebuggableViewer::locationChanged(int loc)
 {
 	lastLocation = loc;
 }
-	
+
 void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 {
 	int select = -1;
@@ -76,8 +76,8 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 	}
 
 	// reconnect signal before selecting item
-	connect(debuggableList, SIGNAL(currentIndexChanged(int)),
-	        this, SLOT(debuggableSelected(int)));
+	connect(debuggableList, qOverload<int>(&QComboBox::currentIndexChanged),
+	        this, &DebuggableViewer::debuggableSelected);
 
 	if (!list.empty() && select >= 0) {
 		debuggableList->setCurrentIndex(select);

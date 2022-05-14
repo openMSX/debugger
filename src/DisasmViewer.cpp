@@ -79,10 +79,10 @@ DisasmViewer::DisasmViewer(QWidget* parent)
 	updateLayout();
 
 	// manual scrollbar handling routines (real size of the data is not known)
-	connect(scrollBar, SIGNAL(actionTriggered(int)),
-	        this, SLOT(scrollBarAction(int)));
-	connect(scrollBar, SIGNAL(valueChanged(int)),
-	        this, SLOT(scrollBarChanged(int)));
+	connect(scrollBar, &QScrollBar::actionTriggered,
+	        this, &DisasmViewer::scrollBarAction);
+	connect(scrollBar, &QScrollBar::valueChanged,
+	        this, &DisasmViewer::scrollBarChanged);
 }
 
 QSize DisasmViewer::sizeHint() const
@@ -422,11 +422,11 @@ void DisasmViewer::memoryUpdated(CommMemoryRequest* req)
 	// sync the scrollbar with the actual address reached
 	if (!waitingForData) {
 		// set the slider with without the signal
-		disconnect(scrollBar, SIGNAL(valueChanged(int)),
-		           this, SLOT(scrollBarChanged(int)));
+		disconnect(scrollBar, &QScrollBar::valueChanged,
+		           this, &DisasmViewer::scrollBarChanged);
 		scrollBar->setSliderPosition(disasmLines[disasmTopLine].addr);
-		connect   (scrollBar, SIGNAL(valueChanged(int)),
-		           this, SLOT(scrollBarChanged(int)));
+		connect(scrollBar, &QScrollBar::valueChanged,
+		        this, &DisasmViewer::scrollBarChanged);
 		// set the line
 		setAddress(disasmLines[disasmTopLine].addr,
 		           disasmLines[disasmTopLine].infoLine);

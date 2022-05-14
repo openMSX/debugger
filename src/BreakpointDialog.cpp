@@ -16,16 +16,16 @@ BreakpointDialog::BreakpointDialog(const MemoryLayout& ml, DebugSession* session
 		allCompleter = std::make_unique<QCompleter>(session->symbolTable().labelList(true), this);
 		jumpCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 		allCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-		connect(jumpCompleter.get(), SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
-		connect(allCompleter.get(),  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
+		connect(jumpCompleter.get(), qOverload<const QString&>(&QCompleter::activated), this, &BreakpointDialog::addressChanged);
+		connect(allCompleter.get(),  qOverload<const QString&>(&QCompleter::activated), this, &BreakpointDialog::addressChanged);
 	}
 
 	connect(edtAddress, &QLineEdit::textEdited, this, &BreakpointDialog::addressChanged);
 	connect(edtAddressRange, &QLineEdit::textEdited, this, &BreakpointDialog::addressChanged);
-	connect(cmbxType,    SIGNAL(activated(int)), this, SLOT(typeChanged(int)));
-	connect(cmbxSlot,    SIGNAL(activated(int)), this, SLOT(slotChanged(int)));
-	connect(cmbxSubslot, SIGNAL(activated(int)), this, SLOT(subslotChanged(int)));
-	connect(cbCondition, SIGNAL(stateChanged(int)), this, SLOT(hasCondition(int)));
+	connect(cmbxType,    qOverload<int>(&QComboBox::activated), this, &BreakpointDialog::typeChanged);
+	connect(cmbxSlot,    qOverload<int>(&QComboBox::activated), this, &BreakpointDialog::slotChanged);
+	connect(cmbxSubslot, qOverload<int>(&QComboBox::activated), this, &BreakpointDialog::subslotChanged);
+	connect(cbCondition, &QCheckBox::stateChanged, this, &BreakpointDialog::hasCondition);
 
 	typeChanged(0);
 	slotChanged(0);
