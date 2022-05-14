@@ -10,7 +10,6 @@ class VramTiledView;
 class TileViewer : public QDialog, private Ui::TileViewer
 {
     Q_OBJECT
-
 public:
     explicit TileViewer(QWidget* parent = nullptr);
 

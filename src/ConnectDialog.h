@@ -45,7 +45,7 @@ private:
 
 // Command handler to get initial info from new openMSX connections
 
-class ConnectionInfoRequest : public QObject, CommandBase
+class ConnectionInfoRequest : public QObject, private CommandBase
 {
 	Q_OBJECT
 public:

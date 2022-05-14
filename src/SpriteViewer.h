@@ -13,7 +13,6 @@ class VramSpriteView;
 class SpriteViewer : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit SpriteViewer(QWidget* parent = nullptr);
     ~SpriteViewer();

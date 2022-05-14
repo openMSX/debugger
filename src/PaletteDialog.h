@@ -12,7 +12,7 @@ namespace Ui {
     class PaletteDialog;
 }
 
-class PalettePatch: public QPushButton
+class PalettePatch : public QPushButton
 {
     Q_OBJECT
 public:
@@ -35,7 +35,6 @@ private:
 class PaletteDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit PaletteDialog(QWidget* parent = nullptr);
 

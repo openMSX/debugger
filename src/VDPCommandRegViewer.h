@@ -46,6 +46,7 @@ public:
 		updaterw();
 		updaterh();
 	}
+
 	void setRL(const QString& newval)
 	{
 		auto val = stringToValue<uint8_t>(newval);
@@ -55,6 +56,7 @@ public:
 		updaterw();
 		updaterl();
 	}
+
 	void setRW(const QString& newval)
 	{
 		//TODO: build a split-in-two method

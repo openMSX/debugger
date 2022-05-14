@@ -21,9 +21,8 @@ public:
 	virtual void cancel() = 0;
 };
 
-class SimpleCommand : public QObject, public CommandBase
+class SimpleCommand : public CommandBase
 {
-	Q_OBJECT
 public:
 	SimpleCommand(QString command_)
 		: command(std::move(command_)) {}
