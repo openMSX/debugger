@@ -40,29 +40,29 @@ public slots:
 
 	void setRH(const QString& newval)
 	{
-		int val = stringToValue(newval) & 0xFF;
-		if ((val == -1) || (val == rh)) return;
+		auto val = stringToValue<uint8_t>(newval);
+        if (!val || (*val == rh)) return;
 
-		rh = val;
+		rh = *val;
 		updaterw();
 		updaterh();
 	}
 	void setRL(const QString& newval)
 	{
-		int val = stringToValue(newval) & 0xFF;
-		if ((val == -1) || (val == rl)) return;
+		auto val = stringToValue<uint8_t>(newval);
+        if (!val || (*val == rl)) return;
 
-		rl = val;
+		rl = *val;
 		updaterw();
 		updaterl();
 	}
 	void setRW(const QString& newval)
 	{
 		//TODO: build a split-in-two method
-		int val = stringToValue(newval) & 0xFFFF;
-		if ((val == -1) || (val == rw)) return;
+		auto val = stringToValue<uint16_t>(newval);
+        if (!val || (*val == rw)) return;
 
-		rw = val;
+		rw = *val;
 		updaterl();
 		updaterh();
 		updaterw();

@@ -324,8 +324,8 @@ void SymbolManager::labelChanged(QTreeWidgetItem* item, int column)
 		if (symText.isEmpty()) symText = "[unnamed]";
 		sym->setText(symText);
 		// set value TODO: proper decoding of value
-		int value = stringToValue(item->text(2));
-		if (value >= 0 && value < 65536) sym->setValue(value);
+		auto value = stringToValue<uint16_t>(item->text(2));
+		if (value) sym->setValue(*value);
 		treeLabels->closePersistentEditor(item, column);
 		editColumn = -1;
 		// update item name and value

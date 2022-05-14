@@ -262,12 +262,12 @@ void SpriteViewer::decodeVDPregs()
 
 void SpriteViewer::on_le_patterntable_textChanged(const QString& arg1)
 {
-    if (int i = stringToValue(arg1); i != -1) {
-        spAtAddr = i;
-        imageWidget->setPatternTableAddress(i);
-        imageWidgetSingle->setPatternTableAddress(i);
-        imageWidgetSpat->setPatternTableAddress(i);
-        imageWidgetColor->setPatternTableAddress(i);
+    if (auto i = stringToValue<int>(arg1)) {
+        spAtAddr = *i;
+        imageWidget->setPatternTableAddress(*i);
+        imageWidgetSingle->setPatternTableAddress(*i);
+        imageWidgetSpat->setPatternTableAddress(*i);
+        imageWidgetColor->setPatternTableAddress(*i);
         auto font = ui->le_patterntable->font();
         font.setItalic(false);
         ui->le_patterntable->setFont(font);
@@ -280,11 +280,11 @@ void SpriteViewer::on_le_patterntable_textChanged(const QString& arg1)
 
 void SpriteViewer::on_le_attributentable_textChanged(const QString& arg1)
 {
-    if (int i = stringToValue(arg1); i != -1) {
-        imageWidget->setAttributeTableAddress(i);
-        imageWidgetSingle->setAttributeTableAddress(i);
-        imageWidgetSpat->setAttributeTableAddress(i);
-        imageWidgetColor->setAttributeTableAddress(i);
+    if (auto i = stringToValue<int>(arg1)) {
+        imageWidget->setAttributeTableAddress(*i);
+        imageWidgetSingle->setAttributeTableAddress(*i);
+        imageWidgetSpat->setAttributeTableAddress(*i);
+        imageWidgetColor->setAttributeTableAddress(*i);
         auto font = ui->le_attributentable->font();
         font.setItalic(false);
         ui->le_attributentable->setFont(font);
@@ -369,12 +369,12 @@ void SpriteViewer::on_cb_spritemode_currentIndexChanged(int index)
 
 void SpriteViewer::on_le_colortable_textChanged(const QString& arg1)
 {
-    if (int i = stringToValue(arg1); i != -1) {
-        spColAddr = i;
-        imageWidget->setColorTableAddress(i);
-        imageWidgetSingle->setColorTableAddress(i);
-        imageWidgetSpat->setColorTableAddress(i);
-        imageWidgetColor->setColorTableAddress(i);
+    if (auto i = stringToValue<int>(arg1)) {
+        spColAddr = *i;
+        imageWidget->setColorTableAddress(*i);
+        imageWidgetSingle->setColorTableAddress(*i);
+        imageWidgetSpat->setColorTableAddress(*i);
+        imageWidgetColor->setColorTableAddress(*i);
         auto font = ui->le_patterntable->font();
         font.setItalic(false);
         ui->le_patterntable->setFont(font);

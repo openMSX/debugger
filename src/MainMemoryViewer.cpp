@@ -101,17 +101,15 @@ void MainMemoryViewer::hexViewChanged(int addr)
 
 void MainMemoryViewer::addressValueChanged()
 {
-	int addr = stringToValue(addressValue->text());
-	if (addr == -1 && symTable) {
+	auto addr = stringToValue<uint16_t>(addressValue->text());
+	if (!addr && symTable) {
 		// try finding a label
 		Symbol *s = symTable->getAddressSymbol(addressValue->text());
 		if (!s) s = symTable->getAddressSymbol(addressValue->text(), Qt::CaseInsensitive);
 		if (s) addr = s->value();
 	}
 
-	if (addr >= 0) {
-		hexView->setLocation(addr);
-	}
+	if (addr) hexView->setLocation(*addr);
 }
 
 void MainMemoryViewer::registerChanged(int id, int value)
