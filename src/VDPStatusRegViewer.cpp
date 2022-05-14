@@ -32,33 +32,27 @@ VDPStatusRegViewer::VDPStatusRegViewer(QWidget* parent)
 {
 	setupUi(this);
 	//statusregs =  VDPDataStore::instance().getStatusRegsPointer();
-	statusregs = new unsigned char[16];
 
 	// now hook up some signals and slots
 	connectHighLights();
 
-	// get initiale data
+	// get initial data
 	refresh();
-}
-
-VDPStatusRegViewer::~VDPStatusRegViewer()
-{
-	delete[] statusregs;
 }
 
 void VDPStatusRegViewer::decodeVDPStatusRegs()
 {
 	// first update all hex values
-	label_val_0->setText(QString("%1").arg(statusregs[0],2,16,QChar('0')).toUpper());
-	label_val_1->setText(QString("%1").arg(statusregs[1],2,16,QChar('0')).toUpper());
-	label_val_2->setText(QString("%1").arg(statusregs[2],2,16,QChar('0')).toUpper());
-	label_val_3->setText(QString("%1").arg(statusregs[3],2,16,QChar('0')).toUpper());
-	label_val_4->setText(QString("%1").arg(statusregs[4],2,16,QChar('0')).toUpper());
-	label_val_5->setText(QString("%1").arg(statusregs[5],2,16,QChar('0')).toUpper());
-	label_val_6->setText(QString("%1").arg(statusregs[6],2,16,QChar('0')).toUpper());
-	label_val_7->setText(QString("%1").arg(statusregs[7],2,16,QChar('0')).toUpper());
-	label_val_8->setText(QString("%1").arg(statusregs[8],2,16,QChar('0')).toUpper());
-	label_val_9->setText(QString("%1").arg(statusregs[9],2,16,QChar('0')).toUpper());
+	label_val_0->setText(QString("%1").arg(statusregs[0], 2, 16, QChar('0')).toUpper());
+	label_val_1->setText(QString("%1").arg(statusregs[1], 2, 16, QChar('0')).toUpper());
+	label_val_2->setText(QString("%1").arg(statusregs[2], 2, 16, QChar('0')).toUpper());
+	label_val_3->setText(QString("%1").arg(statusregs[3], 2, 16, QChar('0')).toUpper());
+	label_val_4->setText(QString("%1").arg(statusregs[4], 2, 16, QChar('0')).toUpper());
+	label_val_5->setText(QString("%1").arg(statusregs[5], 2, 16, QChar('0')).toUpper());
+	label_val_6->setText(QString("%1").arg(statusregs[6], 2, 16, QChar('0')).toUpper());
+	label_val_7->setText(QString("%1").arg(statusregs[7], 2, 16, QChar('0')).toUpper());
+	label_val_8->setText(QString("%1").arg(statusregs[8], 2, 16, QChar('0')).toUpper());
+	label_val_9->setText(QString("%1").arg(statusregs[9], 2, 16, QChar('0')).toUpper());
 
 	// update all the individual bits
 	for (int r = 0; r <= 9; ++r) {
@@ -98,8 +92,8 @@ void VDPStatusRegViewer::decodeVDPStatusRegs()
 	label_I_2_6->setText((statusregs[2] &  64) ? "Vertical scanning" : "Not vert scan");
 	label_I_2_5->setText((statusregs[2] &  32) ? "Horizontal scanning" : "Not hor scan");
 	label_I_2_4->setText((statusregs[2] &  16) ? "Boundary color detected" : "BC not deteced");
-	label_I_2_1->setText((statusregs[2] & 2) ? "First field" : "Second field");
-	label_I_2_0->setText((statusregs[2] & 1) ? "Command execution" : "No command exec");
+	label_I_2_1->setText((statusregs[2] &   2) ? "First field" : "Second field");
+	label_I_2_0->setText((statusregs[2] &   1) ? "Command execution" : "No command exec");
 
 	label_I_3->setText(QString("Column: %1").arg(statusregs[3] | ((statusregs[4] & 1) << 8)));
 	label_I_5->setText(QString("Row: %1").arg(statusregs[5] | ((statusregs[6] & 3) << 8)));
