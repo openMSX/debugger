@@ -70,11 +70,11 @@ PaletteDialog::PaletteDialog(QWidget* parent)
         gridLayout->addWidget(button, i / 8, i % 8);
         connect(this, &PaletteDialog::paletteChanged,
                 button, &PalettePatch::updatePaletteChanged);
-        connect(signalMapper, qOverload<int>(&QSignalMapper::mapped),
+        connect(signalMapper, &QSignalMapper::mappedInt,
                 button, &PalettePatch::setHighlightTest);
     }
 
-    connect(signalMapper, qOverload<int>(&QSignalMapper::mapped),
+    connect(signalMapper, &QSignalMapper::mappedInt,
             this, &PaletteDialog::colorSelected);
 
     ui->colorsframe->setLayout(gridLayout);

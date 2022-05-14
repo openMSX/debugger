@@ -115,7 +115,7 @@ OpenMSXConnection::OpenMSXConnection(QAbstractSocket* socket_)
 	        this, &OpenMSXConnection::processData);
 	connect(socket, &QAbstractSocket::stateChanged,
 	        this, &OpenMSXConnection::socketStateChanged);
-	connect(socket, qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::error),
+	connect(socket, &QAbstractSocket::errorOccurred,
 	        this, &OpenMSXConnection::socketError);
 
 	socket->write("<openmsx-control>\n");
