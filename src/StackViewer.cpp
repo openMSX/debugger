@@ -21,7 +21,7 @@ public:
 	void replyOk(const QString& message) override
 	{
 		copyData(message);
-		viewer.memdataTransfered(this);
+		viewer.memDataTransferred(this);
 	}
 
 	void cancel() override
@@ -180,7 +180,7 @@ void StackViewer::setStackPointer(quint16 addr)
 	setLocation(addr);
 }
 
-void StackViewer::memdataTransfered(StackRequest* r)
+void StackViewer::memDataTransferred(StackRequest* r)
 {
 	topAddress = r->offset;
 	update();

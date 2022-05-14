@@ -26,12 +26,14 @@ public:
 
 	QSize sizeHint() const override;
 
-public slots:
 	void setLocation(int addr);
 	void setTopLocation(int addr);
 	void scrollBarChanged(int addr);
 	void settingsChanged();
 	void refresh();
+
+signals:
+	void locationChanged(int addr);
 
 private:
 	void wheelEvent(QWheelEvent* e) override;
@@ -50,6 +52,9 @@ private:
 	void transferCancelled(HexRequest* r);
 	int coorToOffset(int x, int y) const;
 
+	void changeWidth();
+
+private:
 	QScrollBar* vertScrollBar;
 	QAction* fillWidthAction;
 	QAction* fillWidth2Action;
@@ -86,12 +91,6 @@ private:
 	int cursorPosition,editValue;
 
 	friend class HexRequest;
-
-private slots:
-	void changeWidth();
-
-signals:
-	void locationChanged(int addr);
 };
 
 #endif // HEXVIEWER_H

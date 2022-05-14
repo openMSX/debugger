@@ -18,7 +18,7 @@ class PalettePatch: public QPushButton
 public:
     explicit PalettePatch(QWidget* parent = nullptr, int palNr = 0);
     //void setColor(QRgb c);
-public slots:
+
     void updatePaletteChanged(const uint8_t* pal);
     void setHighlightTest(int colorNr);
 
@@ -48,7 +48,7 @@ signals:
     void paletteChanged(uint8_t* pal);
     void paletteSynced();
 
-private slots:
+private:
     void colorSelected(int colorNumber);
     void on_horizontalSlider_R_valueChanged(int value);
     void on_horizontalSlider_G_valueChanged(int value);
@@ -61,11 +61,12 @@ private slots:
 
     void updateText();
 
+    void combineRGB();
+    //void decodepalette();
+
 private:
     std::unique_ptr<Ui::PaletteDialog> ui;
     QSignalMapper* signalMapper;
-    //void decodepalette();
-    void combineRGB();
 
     uint8_t* sourcePal = nullptr;
     uint8_t myPal[32];

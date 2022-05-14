@@ -16,7 +16,6 @@ class buttonHighlightDispatcher : public QObject
 public:
 	buttonHighlightDispatcher();
 
-public slots:
 	void receiveState(bool state);
 
 signals:
@@ -35,6 +34,12 @@ public:
 	VDPRegViewer(QWidget* parent = nullptr);
 	~VDPRegViewer() override;
 
+	void refresh();
+	void registerBitChanged(int reg, int bit, bool state);
+
+	//quick hack while no autodetection...
+	void on_VDPcomboBox_currentIndexChanged(int index);
+
 private:
 	void decodeVDPRegs();
 	void decodeStatusVDPRegs();
@@ -48,18 +53,12 @@ private:
 	void reGroup(InteractiveButton*, buttonHighlightDispatcher*);
 	void monoGroup(InteractiveButton*, InteractiveLabel*);
 
-        void DataHexRequestReceived() override;
+	void DataHexRequestReceived() override;
 
+private:
 	unsigned char* regs;
 	buttonHighlightDispatcher* modeBitsDispat;
-	int vdpid;
-
-public slots:
-	void refresh();
-	void registerBitChanged(int reg, int bit, bool state);
-
-	//quick hack while no autodetection...
-	void on_VDPcomboBox_currentIndexChanged(int index);
+	int vdpId;
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

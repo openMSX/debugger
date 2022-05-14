@@ -25,16 +25,16 @@ public:
 	Breakpoints& breakpoints();
 	SymbolTable& symbolTable();
 
+	void sessionModified();
+
 private:
 	void skipUnknownElement(QXmlStreamReader& ses);
 
+private:
 	Breakpoints breaks;
 	SymbolTable symTable;
 	QString fileName;
 	bool modified;
-
-public slots:
-	void sessionModified();
 };
 
 #endif // DEBUGSESSION_H

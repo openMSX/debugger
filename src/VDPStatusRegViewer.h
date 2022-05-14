@@ -25,7 +25,6 @@ class highlightDispatcher : public QObject
 public:
 	highlightDispatcher();
 
-public slots:
 	void receiveState(bool state);
 
 signals:
@@ -43,7 +42,6 @@ public:
 	VDPStatusRegViewer(QWidget* parent = nullptr);
 	~VDPStatusRegViewer() override;
 
-public slots:
 	void refresh();
 
 private:
@@ -54,6 +52,7 @@ private:
 
 	void DataHexRequestReceived() override;
 
+private:
 	unsigned char* statusregs;
 };
 

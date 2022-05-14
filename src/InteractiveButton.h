@@ -9,9 +9,8 @@ class InteractiveButton : public QPushButton
 public:
 	InteractiveButton(QWidget* parent = nullptr);
 
-protected:
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
+	void highlight(bool state);
+	void mustBeSet(bool state);
 
 signals:
 	void mouseOver(bool state);
@@ -19,16 +18,17 @@ signals:
 	// name of the button also
 	void newBitValue(int reg, int bit, bool state);
 
-public slots:
-	void highlight(bool state);
-	void mustBeSet(bool state);
+protected:
+	void enterEvent(QEvent* event) override;
+	void leaveEvent(QEvent* event) override;
 
-private slots:
+private:
 	// this one is specific for the VDPRegViewer
 	void newBitValueSlot(bool);
 
-private:
 	void setColor();
+
+private:
 	bool _mustBeSet;
 	bool _highlight;
 	bool _state;

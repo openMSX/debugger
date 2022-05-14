@@ -27,17 +27,21 @@ public:
 	BreakpointViewer(QWidget* parent = nullptr);
 	void setBreakpoints(Breakpoints* bps);
 
+	void on_btnAddBp_clicked();
+	void on_btnRemoveBp_clicked();
+	void on_btnAddWp_clicked();
+	void on_btnRemoveWp_clicked();
+	void on_btnAddCn_clicked();
+	void on_btnRemoveCn_clicked();
+
+	void setRunState();
+	void setBreakState();
+	void sync();
+
+signals:
+	void contentsUpdated(bool merge);
+
 private:
-	Ui::BreakpointViewer* ui;
-	QTableWidget* tables[BreakpointRef::ALL];
-	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
-
-	bool selfUpdating = false;
-	bool userMode = true;
-	bool runState;
-	bool conditionsMsg = false;
-	Breakpoints* breakpoints;
-
 	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value);
 	std::optional<AddressRange> parseLocationField(std::optional<int> index,
 	                                               BreakpointRef::Type type,
@@ -72,7 +76,6 @@ private:
 	BreakpointRef* findBreakpointRef(BreakpointRef::Type type, int row);
 	BreakpointRef* scanBreakpointRef(const Breakpoint& bp);
 
-private slots:
 	void changeCurrentWpType(int row, int index);
 	void disableSorting(BreakpointRef::Type type = BreakpointRef::ALL);
 	void changeBpTableItem(QTableWidgetItem* item);
@@ -81,20 +84,16 @@ private slots:
 	void on_itemPressed(QTableWidgetItem* item);
 	void on_headerClicked(int index);
 
-public slots:
-	void on_btnAddBp_clicked();
-	void on_btnRemoveBp_clicked();
-	void on_btnAddWp_clicked();
-	void on_btnRemoveWp_clicked();
-	void on_btnAddCn_clicked();
-	void on_btnRemoveCn_clicked();
+private:
+	Ui::BreakpointViewer* ui;
+	QTableWidget* tables[BreakpointRef::ALL];
+	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
 
-	void setRunState();
-	void setBreakState();
-	void sync();
-
-signals:
-	void contentsUpdated(bool merge);
+	bool selfUpdating = false;
+	bool userMode = true;
+	bool runState;
+	bool conditionsMsg = false;
+	Breakpoints* breakpoints;
 };
 
 #endif // BREAKPOINTVIEWER_H

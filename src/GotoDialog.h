@@ -19,13 +19,13 @@ public:
 	std::optional<uint16_t> address();
 
 private:
+	void addressChanged(const QString& text);
+
+private:
 	const MemoryLayout& memLayout;
 
 	DebugSession* debugSession;
 	Symbol* currentSymbol;
-
-private slots:
-	void addressChanged(const QString& text);
 };
 
 #endif // GOTODIALOG_H

@@ -17,10 +17,6 @@ class ConnectDialog : public QDialog
 public:
 	static std::unique_ptr<OpenMSXConnection> getConnection(QWidget* parent = nullptr);
 
-private slots:
-	void on_connectButton_clicked();
-	void on_rescanButton_clicked();
-
 private:
 	ConnectDialog(QWidget* parent);
 	~ConnectDialog() override;
@@ -32,6 +28,10 @@ private:
 
 	void timerEvent(QTimerEvent *event) override;
 
+	void on_connectButton_clicked();
+	void on_rescanButton_clicked();
+
+private:
 	int delay;
 	Ui::ConnectDialog ui;
 	using OpenMSXConnections = std::vector<std::unique_ptr<OpenMSXConnection>>;
@@ -57,15 +57,13 @@ public:
 	void cancel() override;
 
 private:
-	enum State { GET_MACHINE, GET_TITLE, DONE };
+	void terminate();
 
+private:
 	ConnectDialog& dialog;
 	OpenMSXConnection& connection;
-	State state;
+	enum State { GET_MACHINE, GET_TITLE, DONE } state;
 	QString title;
-
-private slots:
-	void terminate();
 };
 
 #endif

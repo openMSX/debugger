@@ -17,13 +17,17 @@ public:
 
 	QSize sizeHint() const override;
 
-public slots:
 	void refresh();
+
+signals:
+	void slotsUpdated(bool slotsChanged);
+	void contentsChanged();
 
 private:
 	void resizeEvent(QResizeEvent* e) override;
 	void paintEvent(QPaintEvent* e) override;
 
+private:
 	int frameL, frameR, frameT, frameB;
 	int headerSize1, headerSize2, headerSize3, headerSize4;
 	int headerHeight;
@@ -32,10 +36,6 @@ private:
 
 	bool slotsChanged[4];
 	bool segmentsChanged[4];
-
-signals:
-	void slotsUpdated(bool slotsChanged);
-	void contentsChanged();
 };
 
 #endif // SLOTVIEWER_H

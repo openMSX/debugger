@@ -19,7 +19,6 @@ public:
 	void setRegsView(CPURegsViewer* viewer);
 	void setSymbolTable(SymbolTable* symtable);
 
-public slots:
 	void setLocation(int addr);
 	void settingsChanged();
 	void refresh();

@@ -5,7 +5,7 @@
 #include <cstdint>
 
 namespace Ui {
-class SpriteViewer;
+    class SpriteViewer;
 }
 
 class VramSpriteView;
@@ -18,10 +18,9 @@ public:
     explicit SpriteViewer(QWidget* parent = nullptr);
     ~SpriteViewer();
 
-public slots:
     void refresh();
 
-private slots:
+private:
     void VDPDataStoreDataRefreshed();
     void pgtwidget_mouseMoveEvent(int x, int y, int character);
     void pgtwidget_mouseClickedEvent(int x, int y, int character, const QString& text);
@@ -43,11 +42,13 @@ private slots:
     void on_useVDPPalette_stateChanged(int state);
     void on_editPaletteButton_clicked(bool checked);
 
+    void setPaletteSource(const uint8_t* palSource, bool useVDP);
+    void decodeVDPregs();
+    void setCorrectEnabled(bool checked);
+    void setCorrectVDPData();
+
 private:
     static uint8_t defaultPalette[32];
-    void setPaletteSource(const uint8_t* palSource, bool useVDP);
-
-    void decodeVDPregs();
 
     Ui::SpriteViewer* ui;
     VramSpriteView* imageWidget;
@@ -62,9 +63,6 @@ private:
     int spAtAddr = 0;
     int pgtAddr = 0;
     int spColAddr = 0;
-
-    void setCorrectEnabled(bool checked);
-    void setCorrectVDPData();
 };
 
 #endif // SPRITEVIEWER_H

@@ -12,20 +12,19 @@ class DebuggableViewer : public QWidget
 public:
 	DebuggableViewer(QWidget* parent = nullptr);
 
-public slots:
 	void settingsChanged();
 	void setDebuggables(const QMap<QString, int>& list);
 	void refresh();
+
+private:
+	void debuggableSelected(int index);
+	void locationChanged(int loc);
 
 private:
 	HexViewer* hexView;
 	QComboBox* debuggableList;
 	QString lastSelected;
 	int lastLocation;
-
-private slots:
-	void debuggableSelected(int index);
-	void locationChanged(int loc);
 };
 
 #endif // DEBUGGABLEVIEWER_H

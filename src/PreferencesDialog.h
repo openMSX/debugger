@@ -14,13 +14,13 @@ private:
 	void initFontList();
 	void setFontPreviewColor(const QColor& c);
 
-	bool updating;
-
-private slots:
 	void fontSelectionChange(int row);
 	void fontTypeChanged(bool state);
 	void fontSelectCustom();
 	void fontSelectColor();
+
+private:
+	bool updating;
 };
 
 #endif // PREFERENCESDIALOG_OPENMSX_H

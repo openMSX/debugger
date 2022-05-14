@@ -33,7 +33,6 @@ public:
 	void setWidgetRH(QWidget* wdgt) { w_rh = wdgt; }
 	void setWidgetRW(QWidget* wdgt) { w_rw = wdgt; }
 
-public slots:
 	void finishRH() { setRH(getWidgetText(w_rh)); }
 	void finishRL() { setRL(getWidgetText(w_rl)); }
 	void finishRW() { setRW(getWidgetText(w_rw)); }
@@ -41,7 +40,7 @@ public slots:
 	void setRH(const QString& newval)
 	{
 		auto val = stringToValue<uint8_t>(newval);
-        if (!val || (*val == rh)) return;
+		if (!val || (*val == rh)) return;
 
 		rh = *val;
 		updaterw();
@@ -50,7 +49,7 @@ public slots:
 	void setRL(const QString& newval)
 	{
 		auto val = stringToValue<uint8_t>(newval);
-        if (!val || (*val == rl)) return;
+		if (!val || (*val == rl)) return;
 
 		rl = *val;
 		updaterw();
@@ -60,7 +59,7 @@ public slots:
 	{
 		//TODO: build a split-in-two method
 		auto val = stringToValue<uint16_t>(newval);
-        if (!val || (*val == rw)) return;
+		if (!val || (*val == rw)) return;
 
 		rw = *val;
 		updaterl();
@@ -115,12 +114,14 @@ private:
 		rw = rl + 256 * rh;
 		updateWidget(w_rw, rw, disp_rw);
 	}
+
 	void updaterl()
 	{
 		if (w_rl == nullptr) return;
 		rl = rw & 255;
 		updateWidget(w_rl, rl, disp_rl);
 	}
+
 	void updaterh()
 	{
 		if (w_rh == nullptr) return;
@@ -138,11 +139,22 @@ public:
 	VDPCommandRegViewer(QWidget* parent = nullptr);
 	~VDPCommandRegViewer() override;
 
+	void refresh();
+	void R45BitChanged(int);
+	void on_lineEdit_r44_editingFinished();
+	void on_lineEdit_r45_editingFinished();
+	void on_lineEdit_r46_editingFinished();
+	void on_comboBox_cmd_currentIndexChanged(int index);
+	void on_comboBox_operator_currentIndexChanged(int index);
+	void on_syncPushButton_clicked();
+	void on_launchPushButton_clicked();
+
 private:
 	void DataHexRequestReceived() override;
 	void decodeR46(int val);
 	void syncRegToCmd();
 
+private:
 	unsigned char* regs;
 	unsigned char* statusregs;
 	view88to16* grp_l_sx;
@@ -158,17 +170,6 @@ private:
 	view88to16* grp_nx;
 	view88to16* grp_ny;
 	int R46;
-
-public slots:
-	void refresh();
-	void R45BitChanged(int);
-	void on_lineEdit_r44_editingFinished();
-	void on_lineEdit_r45_editingFinished();
-	void on_lineEdit_r46_editingFinished();
-	void on_comboBox_cmd_currentIndexChanged(int index);
-	void on_comboBox_operator_currentIndexChanged(int index);
-	void on_syncPushButton_clicked();
-	void on_launchPushButton_clicked();
 };
 
 #endif /* VDPCOMMANDREGVIEWER_H */

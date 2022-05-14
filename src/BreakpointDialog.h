@@ -28,24 +28,24 @@ public:
 	             std::optional<uint8_t> segment = {}, QString condition = {});
 
 private:
-	const MemoryLayout& memLayout;
+	std::optional<uint16_t> parseInput(const QLineEdit& ed, Symbol** symbol = nullptr) const;
+	void enableSlots();
+	void disableSlots();
 
+	void addressChanged(const QString& text);
+	void typeChanged(int i);
+	void slotChanged(int i);
+	void subslotChanged(int i);
+	void hasCondition(int state);
+
+private:
+	const MemoryLayout& memLayout;
 	DebugSession* debugSession;
 	Symbol* currentSymbol;
 	int idxSlot, idxSubSlot;
 	int conditionHeight;
 	std::unique_ptr<QCompleter> jumpCompleter;
 	std::unique_ptr<QCompleter> allCompleter;
-	std::optional<uint16_t> parseInput(const QLineEdit& ed, Symbol** symbol = nullptr) const;
-	void enableSlots();
-	void disableSlots();
-
-private slots:
-	void addressChanged(const QString& text);
-	void typeChanged(int i);
-	void slotChanged(int i);
-	void subslotChanged(int i);
-	void hasCondition(int state);
 };
 
 #endif // BREAKPOINTDIALOG_OPENMSX_H
