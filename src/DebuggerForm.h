@@ -1,12 +1,14 @@
 #ifndef DEBUGGERFORM_H
 #define DEBUGGERFORM_H
 
+#include "DockableWidgetArea.h"
 #include "DockManager.h"
 #include "DebugSession.h"
 #include <QMainWindow>
 #include <QMap>
+#include <cstdint>
+#include <memory>
 
-class DockableWidgetArea;
 class DisasmViewer;
 class MainMemoryViewer;
 class CPURegsViewer;
@@ -27,7 +29,6 @@ class DebuggerForm : public QMainWindow
 	Q_OBJECT
 public:
 	DebuggerForm(QWidget* parent = nullptr);
-	~DebuggerForm() override;
 
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
@@ -124,7 +125,7 @@ private:
 	QAction* helpAboutAction;
 
 	DockManager dockMan;
-	DockableWidgetArea* mainArea;
+	std::unique_ptr<DockableWidgetArea> mainArea;
 	QStringList recentFiles;
 
 	DisasmViewer* disasmView;
@@ -141,7 +142,7 @@ private:
 	CommClient& comm;
 	DebugSession session;
 	MemoryLayout memLayout;
-	unsigned char* mainMemory;
+	uint8_t mainMemory[0x10000 + 4] = {}; // 4 extra to avoid wrap-check during disasm
 
 	bool mergeBreakpoints;
 	QMap<QString, int> debuggables;

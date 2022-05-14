@@ -2,7 +2,6 @@
 #include "BitMapViewer.h"
 #include "TileViewer.h"
 #include "SpriteViewer.h"
-#include "DockableWidgetArea.h"
 #include "DockableWidget.h"
 #include "DisasmViewer.h"
 #include "MainMemoryViewer.h"
@@ -100,7 +99,7 @@ public:
 
 private:
 	DebuggerForm& form;
-	unsigned char buf[28];
+	uint8_t buf[28];
 };
 
 
@@ -488,9 +487,9 @@ void DebuggerForm::createForm()
 {
 	updateWindowTitle();
 
-	mainArea = new DockableWidgetArea();
-	dockMan.addDockArea(mainArea);
-	setCentralWidget(mainArea);
+	mainArea = std::make_unique<DockableWidgetArea>();
+	dockMan.addDockArea(mainArea.get());
+	setCentralWidget(mainArea.get());
 
 	// Create main widgets and append them to the list first
 	auto* dw = new DockableWidget(dockMan);
@@ -670,27 +669,17 @@ void DebuggerForm::createForm()
 	connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
 	// init main memory
-	// added four bytes as runover buffer for dasm
-	// otherwise dasm would need to check the buffer end continously.
 	session.breakpoints().setMemoryLayout(&memLayout);
-	mainMemory = new unsigned char[65536 + 4];
-	memset(mainMemory, 0, 65536 + 4);
 	disasmView->setMemory(mainMemory);
 	disasmView->setBreakpoints(&session.breakpoints());
 	disasmView->setMemoryLayout(&memLayout);
 	disasmView->setSymbolTable(&session.symbolTable());
 	mainMemoryView->setRegsView(regsView);
 	mainMemoryView->setSymbolTable(&session.symbolTable());
-	mainMemoryView->setDebuggable("memory", 65536);
-	stackView->setData(mainMemory, 65536);
+	mainMemoryView->setDebuggable("memory", 0x10000);
+	stackView->setData(mainMemory, 0x10000);
 	slotView->setMemoryLayout(&memLayout);
 	bpView->setBreakpoints(&session.breakpoints());
-}
-
-DebuggerForm::~DebuggerForm()
-{
-	delete[] mainMemory;
-	delete mainArea;
 }
 
 void DebuggerForm::closeEvent(QCloseEvent* e)
