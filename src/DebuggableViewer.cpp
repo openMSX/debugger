@@ -59,7 +59,7 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 	int select = -1;
 
 	// disconnect signal to prevent updates
-	debuggableList->disconnect(this, SLOT(debuggableSelected(int)));
+	debuggableList->disconnect(this);
 
 	debuggableList->clear();
 	for (auto it = list.begin(); it != list.end(); ++it) {

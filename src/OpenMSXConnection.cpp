@@ -147,9 +147,7 @@ void OpenMSXConnection::cleanup()
 
 	connected = false;
 	if (socket->isValid()) {
-		socket->disconnect(this, SLOT(processData()));
-		socket->disconnect(this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-		socket->disconnect(this, SLOT(socketError(QAbstractSocket::SocketError)));
+		socket->disconnect(this);
 		socket->write("</openmsx-control>\n");
 		socket->disconnectFromHost();
 	}

@@ -25,7 +25,6 @@ void CommClient::connectToOpenMSX(std::unique_ptr<OpenMSXConnection> conn)
 void CommClient::closeConnection()
 {
 	if (connection) {
-		connection->disconnect(this, SLOT(closeConnection()));
 		connection.reset();
 		emit connectionTerminated();
 	}
