@@ -1,16 +1,20 @@
 #ifndef DEBUGGABLEVIEWER_H
 #define DEBUGGABLEVIEWER_H
 
+#include "SavesJsonInterface.h"
 #include <QWidget>
 
 class HexViewer;
 class QComboBox;
 
-class DebuggableViewer : public QWidget
+class DebuggableViewer : public QWidget , public SavesJsonInterface
 {
 	Q_OBJECT
 public:
 	DebuggableViewer(QWidget* parent = nullptr);
+
+    QJsonObject save2json() override;
+    bool loadFromJson(const QJsonObject& obj) override;
 
 public slots:
 	void settingsChanged();

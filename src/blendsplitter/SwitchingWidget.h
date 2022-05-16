@@ -42,6 +42,10 @@ public:
     QJsonObject save2json();
     static SwitchingWidget* createFromJson(const QJsonObject& obj);
 
+    QWidget* getWidget();
+    QJsonObject getWidgetSettings();
+    bool setWidgetSettings(const QJsonObject& obj);
+
 public slots:
     void setEnableWidget(bool enable = true);
     void setWidgetAlwaysEnabled(bool enable = true);

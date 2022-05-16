@@ -2,6 +2,7 @@
 #include "HexViewer.h"
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <QJsonObject>
 
 DebuggableViewer::DebuggableViewer(QWidget* parent)
 	: QWidget(parent)
@@ -22,7 +23,22 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	setLayout(vbox);
 	
 	connect(hexView, SIGNAL(locationChanged(int)),
-	        this, SLOT(locationChanged(int)));
+            this, SLOT(locationChanged(int)));
+}
+
+QJsonObject DebuggableViewer::save2json()
+{
+    QJsonObject obj;
+    obj["debuggable"]=debuggableList->currentText();
+    return obj;
+}
+
+bool DebuggableViewer::loadFromJson(const QJsonObject &obj)
+{
+    if ( obj["debuggable"] == QJsonValue::Undefined ) return false;
+
+    debuggableList->setCurrentText(obj["debuggable"].toString() );
+    return true;
 }
 
 void DebuggableViewer::settingsChanged()

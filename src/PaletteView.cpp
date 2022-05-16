@@ -5,9 +5,10 @@
 #include "ScopedAssign.h"
 #include "ui_PaletteView.h"
 #include <QPushButton>
+#include <QJsonObject>
 
 PaletteView::PaletteView(QWidget* parent)
-    : QWidget(parent)
+    : QWidget(parent),SavesJsonInterface()
     , ui(std::make_unique<Ui::PaletteView>())
 {
     ui->setupUi(this);
@@ -80,6 +81,34 @@ void PaletteView::setAutoSync(bool value)
     if (value) {
         syncToSource();
     }
+}
+
+QJsonObject PaletteView::save2json()
+{
+    QJsonObject obj;
+    obj["viewtext"]=ui->cb_viewtext->isChecked();
+    obj["autosync"]=ui->cb_autosync->isChecked();
+    obj["palette"]=ui->cbPalette->currentIndex();
+    return obj;
+}
+
+bool PaletteView::loadFromJson(const QJsonObject &obj)
+{
+    int i=0;
+    if ( obj["viewtext"] != QJsonValue::Undefined ) {
+        ui->cb_viewtext->setChecked( obj["viewtext"].toBool() );
+        i++;
+    };
+    if ( obj["autosync"] != QJsonValue::Undefined ) {
+        ui->cb_autosync->setChecked( obj["autosync"].toBool() );
+        i++;
+    };
+    if ( obj["palette"] != QJsonValue::Undefined ) {
+        ui->cbPalette->setCurrentIndex( obj["palette"].toInt() );
+        i++;
+    };
+
+    return i==3;
 }
 
 void PaletteView::refresh()

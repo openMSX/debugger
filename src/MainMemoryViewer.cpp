@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <iostream>
+#include <QJsonObject>
 
 static const int linkRegisters[] = {
 	CpuRegs::REG_BC, CpuRegs::REG_DE, CpuRegs::REG_HL,
@@ -19,7 +20,7 @@ static const int linkRegisters[] = {
 };
 
 MainMemoryViewer::MainMemoryViewer(QWidget* parent)
-	: QWidget(parent)
+    : QWidget(parent),SavesJsonInterface()
 {
     setObjectName("MainMemoryViewer");
 	// create selection list, address edit line and viewer
@@ -88,7 +89,26 @@ void MainMemoryViewer::setDebuggable(const QString& name, int size)
 
 void MainMemoryViewer::setSymbolTable(SymbolTable* symtable)
 {
-	symTable = symtable;
+    symTable = symtable;
+}
+
+QJsonObject MainMemoryViewer::save2json()
+{
+    QJsonObject obj;
+    obj["addressValue"]=addressValue->text();
+    obj["addressSourceList"]=addressSourceList->currentIndex();
+    return obj;
+}
+
+bool MainMemoryViewer::loadFromJson(const QJsonObject &obj)
+{
+    if ( obj["addressSourceList"] == QJsonValue::Undefined ||
+         obj["addressValue"] == QJsonValue::Undefined ) return false;
+
+    addressSourceList->setCurrentIndex( obj["addressSourceList"].toInt() );
+    addressValue->setText( obj["addressValue"].toString() );
+    hexView->setLocation(stringToValue(addressValue->text()));
+    return true;
 }
 
 void MainMemoryViewer::refresh()

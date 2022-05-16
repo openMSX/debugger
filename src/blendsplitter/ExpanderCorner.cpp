@@ -8,6 +8,9 @@
 #include "SignalDispatcher.h"
 #include "Settings.h"
 
+#include "SavesJsonInterface.h"
+#include <QJsonObject>
+
 #include <QDebug>
 
 ExpanderCorner::ExpanderCorner(WidgetDecorator* parent, Qt::Corner location)
@@ -179,6 +182,7 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
         auto& s = Settings::get();
         if (s.value("creatingWorkspaceType", 0).toInt()) {
             addedWidget->setCurrentIndex(switchwdg->getCurrentIndex());
+            addedWidget->setWidgetSettings(switchwdg->getWidgetSettings());
         }
    }
 

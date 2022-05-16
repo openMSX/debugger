@@ -1,6 +1,7 @@
 #ifndef MAINMEMORYVIEWER_H
 #define MAINMEMORYVIEWER_H
 
+#include "SavesJsonInterface.h"
 #include <QWidget>
 
 class HexViewer;
@@ -8,8 +9,9 @@ class CPURegsViewer;
 class SymbolTable;
 class QComboBox;
 class QLineEdit;
+class QJsonObject;
 
-class MainMemoryViewer : public QWidget
+class MainMemoryViewer : public QWidget , public SavesJsonInterface
 {
 	Q_OBJECT
 public:
@@ -18,6 +20,9 @@ public:
 	void setDebuggable(const QString& name, int size);
 //	void setRegsView(CPURegsViewer* viewer);
 	void setSymbolTable(SymbolTable* symtable);
+
+    QJsonObject save2json() final;
+    bool loadFromJson(const QJsonObject& obj) final;
 
 public slots:
 	void setLocation(int addr);

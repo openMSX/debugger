@@ -5,6 +5,8 @@
 #include "SwitchingBar.h"
 #include "SwitchingCombo.h"
 #include "qscrollarea.h"
+#include "SavesJsonInterface.h"
+
 #include <QScrollArea>
 #include <QJsonObject>
 #include <QDebug>
@@ -74,6 +76,10 @@ QJsonObject SwitchingWidget::save2json()
     obj["item"] = bar->combo->currentIndex();
     obj["size_width"] = size().width();
     obj["size_height"] = size().height();
+    QJsonObject childobj = getWidgetSettings();
+    if (!childobj.isEmpty()) {
+        obj["childwidget"] = childobj;
+    }
     return obj;
 }
 
@@ -82,7 +88,44 @@ SwitchingWidget* SwitchingWidget::createFromJson(const QJsonObject &obj)
     int i = obj["item"].toInt();
     auto* wdgt = new SwitchingWidget{WidgetRegistry::instance().item(i)};
     wdgt->resize(obj["size_width"].toInt(), obj["size_height"].toInt());
+
+
+    auto* childwdgt = dynamic_cast<SavesJsonInterface*>(wdgt->getWidget());
+    if (childwdgt && obj["childwidget"] != QJsonValue::Undefined ) {
+        childwdgt->loadFromJson(obj["childwidget"].toObject());
+    }
+
     return wdgt;
+}
+
+QWidget *SwitchingWidget::getWidget()
+{
+    auto* wdgt = widget(widgetIndex());
+
+    if (isWrappedInScrollArea) {
+        auto* sa = static_cast<QScrollArea*>(wdgt);
+        wdgt = sa->widget();
+    };
+    return wdgt;
+}
+
+QJsonObject SwitchingWidget::getWidgetSettings()
+{
+    QJsonObject obj;
+    auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget());
+    if (wd) {
+        obj=wd->save2json();
+    }
+    return obj;
+}
+
+bool SwitchingWidget::setWidgetSettings(const QJsonObject &obj)
+{
+    auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget());
+    if (wd) {
+        return wd->loadFromJson(obj);
+    }
+    return false;
 }
 
 void SwitchingWidget::setEnableWidget(bool enable)

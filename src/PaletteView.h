@@ -3,18 +3,21 @@
 
 #include "ui_PaletteView.h"
 #include "MSXPalette.h"
+#include "SavesJsonInterface.h"
 #include <QDialog>
 #include <QSignalMapper>
 #include <cstdint>
 #include <memory>
 
 class QAbstractButton;
+class QJsonObject;
+
 
 namespace Ui {
     class PaletteView;
 }
 
-class PaletteView : public QWidget
+class PaletteView : public QWidget , public SavesJsonInterface
 {
     Q_OBJECT
 
@@ -26,6 +29,9 @@ public:
 
     void syncToSource();
     void setAutoSync(bool value);
+
+    QJsonObject save2json() final;
+    bool loadFromJson(const QJsonObject& obj) final;
 
 public slots:
     void refresh();
