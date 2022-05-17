@@ -263,8 +263,7 @@ void SymbolManager::closeEditor()
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
-	auto* sym = new Symbol(tr("New symbol"), 0);
-	symTable.add(sym);
+	auto* sym = symTable.add(std::make_unique<Symbol>(tr("New symbol"), 0));
 
 	beginTreeLabelsUpdate();
 	auto* item = new QTreeWidgetItem(treeLabels);
