@@ -7,27 +7,16 @@
 
 class VramTiledView;
 
-class TileViewer : public QDialog,private Ui::TileViewer
+class TileViewer : public QDialog, private Ui::TileViewer
 {
     Q_OBJECT
-
 public:
     explicit TileViewer(QWidget* parent = nullptr);
 
+    void refresh();
+
 private:
     void decodeVDPregs();
-
-    VramTiledView* imageWidget;
-    QImage image4label;
-
-    int mouseOverX = 0;
-    int mouseOverY = 0;
-    int mouseOverChar = 0;
-
-    static uint8_t defaultPalette[32];
-
-private slots:
-    void refresh();
 
     void displayCharInfo(int screenX, int screenY, int character, const QString& textInfo);
 
@@ -55,6 +44,16 @@ private slots:
 
     void on_cb_blinkcolors_stateChanged(int arg1);
     void on_cb_screenrows_currentIndexChanged(int index);
+
+private:
+    VramTiledView* imageWidget;
+    QImage image4label;
+
+    int mouseOverX = 0;
+    int mouseOverY = 0;
+    int mouseOverChar = 0;
+
+    static uint8_t defaultPalette[32];
 };
 
 #endif // TILEVIEWER_H

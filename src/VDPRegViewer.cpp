@@ -37,22 +37,16 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs =  new unsigned char[64 + 16 + 2];
-	vdpid = 99; // make sure that we parse the first time the status registers are read
-	vdpid = VDP_V9958; //quick hack for now
+	vdpId = 99; // make sure that we parse the first time the status registers are read
+	vdpId = VDP_V9958; //quick hack for now
 
 	//now hook up some signals and slots
 	connectHighLights();
 
-	//get initiale data
+	//get initial data
 	refresh();
 
 	decodeStatusVDPRegs(); // part of the quick hack :-)
-}
-
-VDPRegViewer::~VDPRegViewer()
-{
-	delete[] regs;
 }
 
 void VDPRegViewer::setRegisterVisible(int r, bool visible)
@@ -102,12 +96,12 @@ void VDPRegViewer::setRegisterVisible(int r, bool visible)
 
 void VDPRegViewer::decodeStatusVDPRegs()
 {
-	//const unsigned char* statusregs = regs + 64;
+	//const uint8_t* statusregs = regs + 64;
 	//int id = statusregs[1] & 62; // + (machine_has_TMS99x8 ? 1 : 0)
 	// test MSX1 id = 1;
-	//if (vdpid != id) {
-	//	vdpid = id;
-		if (vdpid == VDP_TMS99X8) {
+	//if (vdpId != id) {
+	//	vdpId = id;
+		if (vdpId == VDP_TMS99X8) {
 			// TMS9918 = MSX1 VDP
 			groupBox_V9958->setVisible(false);
 			groupBox_TableBase->setVisible(true);
@@ -267,7 +261,7 @@ void VDPRegViewer::decodeStatusVDPRegs()
 			monoGroup(pushButton_0_5, label_dec_ie2);
 			monoGroup(pushButton_0_6, label_dec_dg);
 
-			if (vdpid == VDP_V9938) {
+			if (vdpId == VDP_V9938) {
 				groupBox_V9958->setVisible(false);
 				groupBox_dec_V9958->setVisible(false);
 				label_dec_ie2->setVisible(true);
@@ -326,7 +320,7 @@ void VDPRegViewer::decodeVDPRegs()
 	label_val_7->setText(hex2(regs[7]));
 
 	// Only on V9938 and V9958 this makes sence
-	if (vdpid != VDP_TMS99X8) {
+	if (vdpId != VDP_TMS99X8) {
 		label_val_8 ->setText(hex2(regs[ 8]));
 		label_val_9 ->setText(hex2(regs[ 9]));
 		label_val_10->setText(hex2(regs[10]));
@@ -345,7 +339,7 @@ void VDPRegViewer::decodeVDPRegs()
 		label_val_23->setText(hex2(regs[23]));
 	}
 	// Only on V9958 this makes sence
-	if (vdpid == VDP_V9958) {
+	if (vdpId == VDP_V9958) {
 		label_val_25->setText(hex2(regs[25]));
 		label_val_26->setText(hex2(regs[26]));
 		label_val_27->setText(hex2(regs[27]));
@@ -443,7 +437,7 @@ void VDPRegViewer::decodeVDPRegs()
 	};
 
 	// update all the individual bits
-	int upper_r = (vdpid == VDP_TMS99X8) ? 7 : (vdpid == VDP_V9938) ? 23 : 27;
+	int upper_r = (vdpId == VDP_TMS99X8) ? 7 : (vdpId == VDP_V9938) ? 23 : 27;
 	for (int r = 0; r <= upper_r; ++r) {
 		if (r == 24) continue;
 		for (int b = 7; b >= 0; --b) {
@@ -451,12 +445,12 @@ void VDPRegViewer::decodeVDPRegs()
 			auto* i = findChild<InteractiveButton*>(name);
 			i->setChecked(regs[r] & (1 << b));
 			if (r < 12) {
-				i->mustBeSet(mustbeone[(vdpid == VDP_TMS99X8) ? 0 : 1][basicscreen][r] & (1 << b));
+				i->mustBeSet(mustbeone[(vdpId == VDP_TMS99X8) ? 0 : 1][basicscreen][r] & (1 << b));
 				// if A8 of R5 is a 'must-be-one' then we indicate this for A9 also
 				// This bit is cleared in the table since it isn't used in the Sprite
 				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table
-				if (r==5 && b==2 && vdpid!=VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
+				if (r == 5 && b == 2 && vdpId != VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
 					i->mustBeSet(true);
 				}
 			}
@@ -471,7 +465,7 @@ void VDPRegViewer::decodeVDPRegs()
 		? "Reg 19 scanline interrupt enabled"
 		: "Reg 19 scanline interrupt disabled");
 
-	if (vdpid != VDP_TMS99X8) {
+	if (vdpId != VDP_TMS99X8) {
 		if (m == 20 || m == 28) {
 			pushButton_2_6->setText("0");
 			pushButton_2_5->setText("A16");
@@ -491,7 +485,7 @@ void VDPRegViewer::decodeVDPRegs()
 		}
 	}
 
-	if (m == 28 && vdpid == VDP_V9958) {
+	if (m == 28 && vdpId == VDP_V9958) {
 		bool yjk = (regs[25] &  8);
 		bool yae = (regs[25] & 16);
 		int scr = yjk ? (yae ? 10 : 12) : 8;
@@ -527,14 +521,14 @@ void VDPRegViewer::decodeVDPRegs()
 
 
 	// some variables used for readability of the code below
-	int row = vdpid==VDP_TMS99X8?0:1;
+	int row = vdpId == VDP_TMS99X8 ? 0 : 1;
 	QString regtexttext;
 	int must,must2;
 
 	// the pattern name table address
 	must=mustbeone[row][basicscreen][2] ;
 	long nameTable = ((255^must) & bitsused[row][basicscreen][2] & regs[2]) << 10;
-	if ((m == 20 || m == 28) && vdpid != VDP_TMS99X8)
+	if ((m == 20 || m == 28) && vdpId != VDP_TMS99X8)
 		nameTable = ((nameTable & 0xffff) << 1) | ((nameTable & 0x10000) >> 16);
 	regtexttext = hex5(nameTable);
 
@@ -609,7 +603,7 @@ void VDPRegViewer::decodeVDPRegs()
 	label_dec_tc->setText(dec2((regs[7] >> 4) & 15));
 	label_dec_bd->setText(dec2((regs[7] >> 0) & 15));
 
-	if (vdpid != VDP_TMS99X8) {
+	if (vdpId != VDP_TMS99X8) {
 		label_dec_dg->setText((regs[0] & 64)
 			? "Color bus set for input"
 			: "Color bus set for output");
@@ -646,7 +640,7 @@ void VDPRegViewer::decodeVDPRegs()
 	}
 
 	//V9958 registers
-	if (vdpid == VDP_V9958) {
+	if (vdpId == VDP_V9958) {
 		label_dec_r26->setText(QString("horizontal scroll %1")
 			.arg((regs[26] & 63) * 8 - (7 & regs[27])));
 		label_dec_sp2->setText((regs[25] & 1)
@@ -678,24 +672,24 @@ void VDPRegViewer::decodeVDPRegs()
 
 void VDPRegViewer::doConnect(InteractiveButton* but, buttonHighlightDispatcher* dis)
 {
-	connect(but, SIGNAL(mouseOver(bool)),
-	        dis, SLOT(receiveState(bool)));
-	connect(dis, SIGNAL(stateDispatched(bool)),
-	        but, SLOT(highlight(bool)));
+	connect(but, &InteractiveButton::mouseOver,
+	        dis, &buttonHighlightDispatcher::receiveState);
+	connect(dis, &buttonHighlightDispatcher::stateDispatched,
+	        but, &InteractiveButton::highlight);
 }
 
 void VDPRegViewer::monoGroup(InteractiveButton* but, InteractiveLabel* lab)
 {
-	connect(lab, SIGNAL(mouseOver(bool)), but, SLOT(highlight(bool)));
-	connect(but, SIGNAL(mouseOver(bool)), lab, SLOT(highlight(bool)));
-	connect(lab, SIGNAL(mouseOver(bool)), lab, SLOT(highlight(bool)));
-	connect(but, SIGNAL(mouseOver(bool)), but, SLOT(highlight(bool)));
+	connect(lab, &InteractiveLabel ::mouseOver, but, &InteractiveButton::highlight);
+	connect(but, &InteractiveButton::mouseOver, lab, &InteractiveLabel ::highlight);
+	connect(lab, &InteractiveLabel ::mouseOver, lab, &InteractiveLabel ::highlight);
+	connect(but, &InteractiveButton::mouseOver, but, &InteractiveButton::highlight);
 }
 
 void  VDPRegViewer::reGroup(InteractiveButton* item, buttonHighlightDispatcher* dispat)
 {
-	//button must rehighlight itself
-	connect(item, SIGNAL(mouseOver(bool)), item, SLOT(highlight(bool)));
+	//button must re-highlight itself
+	connect(item, &InteractiveButton::mouseOver, item, &InteractiveButton::highlight);
 	// and then talk to dispatcher
 	doConnect(item, dispat);
 }
@@ -710,10 +704,10 @@ buttonHighlightDispatcher* VDPRegViewer::makeGroup(
 
 	// Create a dispatcher and connect all to them
 	auto* dispat = new buttonHighlightDispatcher();
-	connect(explained, SIGNAL(mouseOver(bool)),
-	        dispat, SLOT(receiveState(bool)));
-	connect(dispat, SIGNAL(stateDispatched(bool)),
-	        explained, SLOT(highlight(bool)));
+	connect(explained, &InteractiveLabel::mouseOver,
+	        dispat, &buttonHighlightDispatcher::receiveState);
+	connect(dispat, &buttonHighlightDispatcher::stateDispatched,
+	        explained, &InteractiveLabel::highlight);
 	for (auto* item : list) {
 		doConnect(item, dispat);
 	}
@@ -728,8 +722,8 @@ void VDPRegViewer::connectHighLights()
 	// matters to me on my Linux environment :-)
 	QList<InteractiveButton*> list = findChildren<InteractiveButton*>();
 	for (auto* item : list) {
-		connect(item, SIGNAL(newBitValue(int,int,bool)),
-		        this, SLOT(registerBitChanged(int,int,bool)));
+		connect(item, &InteractiveButton::newBitValue,
+		        this, &VDPRegViewer::registerBitChanged);
         }
 
 	// register 0 (+M1,M2)
@@ -959,13 +953,13 @@ void VDPRegViewer::on_VDPcomboBox_currentIndexChanged(int index)
 {
 	switch (index) {
 	case 0:
-		vdpid = VDP_V9958;
+		vdpId = VDP_V9958;
 		break;
 	case 1:
-		vdpid = VDP_V9938;
+		vdpId = VDP_V9938;
 		break;
 	case 2:
-		vdpid = VDP_TMS99X8;
+		vdpId = VDP_TMS99X8;
 		break;
 	}
 	decodeStatusVDPRegs();

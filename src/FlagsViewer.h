@@ -16,7 +16,6 @@ public:
 
 	QSize sizeHint() const override;
 
-public slots:
 	void setFlags(quint8 newFlags);
 
 private:
@@ -26,6 +25,7 @@ private:
 	void drawValue(QPainter& p, int x, int y, const QString& str,
 	               bool changed);
 
+private:
 	int frameL, frameR, frameT, frameB;
 	unsigned char flags;
 	unsigned char flagsChanged;

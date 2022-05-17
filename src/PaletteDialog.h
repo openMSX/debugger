@@ -12,11 +12,9 @@ namespace Ui {
     class PaletteDialog;
 }
 
-
 class PaletteDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit PaletteDialog(QWidget* parent = nullptr);
 
@@ -28,7 +26,7 @@ signals:
     void paletteChanged(const uint8_t* pal);
     void paletteSynced();
 
-private slots:
+private:
     void colorSelected(int colorNumber);
     void on_horizontalSlider_R_valueChanged(int value);
     void on_horizontalSlider_G_valueChanged(int value);
@@ -41,11 +39,12 @@ private slots:
 
     void updateText();
 
+    void combineRGB();
+    //void decodepalette();
+
 private:
     std::unique_ptr<Ui::PaletteDialog> ui;
     QSignalMapper* signalMapper;
-    //void decodepalette();
-    void combineRGB();
 
     uint8_t* sourcePal = nullptr;
     uint8_t myPal[32];

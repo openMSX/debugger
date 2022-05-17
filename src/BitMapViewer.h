@@ -11,17 +11,11 @@ class BitMapViewer : public QDialog, private Ui::BitMapViewer
 	Q_OBJECT
 public:
 	BitMapViewer(QWidget* parent = nullptr);
+	void refresh();
 
 private:
 	void decodeVDPregs();
 	void setPages();
-
-	VramBitMappedView* imageWidget;
-	int screenMod;
-	bool useVDP;
-
-private slots:
-	void refresh();
 
 	void on_screenMode_currentIndexChanged(const QString& text);
 	void on_showPage_currentIndexChanged(int index);
@@ -38,6 +32,11 @@ private slots:
 	void updateImagePosition(int x, int y, int color, unsigned addr, int byteValue);
 
 	void VDPDataStoreDataRefreshed();
+
+private:
+	VramBitMappedView* imageWidget;
+	int screenMod;
+	bool useVDP;
 };
 
 #endif /* BITMAPVIEWER_OPENMSX_H */

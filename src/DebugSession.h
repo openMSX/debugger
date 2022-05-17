@@ -29,7 +29,7 @@ public:
 	Breakpoints& breakpoints();
 	SymbolTable& symbolTable();
 
-public slots:
+// slots:
 	void sessionModified();
 
 private:

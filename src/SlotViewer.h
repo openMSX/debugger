@@ -16,9 +16,11 @@ public:
 
 	QSize sizeHint() const override;
 
-public slots:
-	//void updateSlots(const QString& message);
 	void refresh();
+
+signals:
+	void slotsUpdated(bool slotsChanged);
+	void contentsChanged();
 
 private:
 	void resizeEvent(QResizeEvent* e) override;
@@ -36,7 +38,7 @@ private:
 
 signals:
 //	void slotsUpdated(bool slotsChanged);
-	void contentsChanged();
+//	void contentsChanged();
 };
 
 #endif // SLOTVIEWER_H

@@ -4,6 +4,8 @@
 #include "DebugSession.h"
 #include <QMainWindow>
 #include <QMap>
+#include <cstdint>
+#include <memory>
 
 class DisasmViewer;
 class MainMemoryViewer;
@@ -28,7 +30,6 @@ class DebuggerForm : public QMainWindow
 	Q_OBJECT
 public:
 	DebuggerForm(QWidget* parent = nullptr);
-	~DebuggerForm() override;
 
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
@@ -83,9 +84,9 @@ private:
 	void refreshBreakpoints();
 
 	struct AddressSlotResult {
-		qint8 ps;
-		qint8 ss;
-		int segment;
+		uint8_t ps;
+		std::optional<uint8_t> ss;
+		std::optional<uint8_t> segment;
 	};
 	AddressSlotResult addressSlot(int addr) const;
 

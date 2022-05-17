@@ -19,34 +19,33 @@ public:
 	BreakpointDialog(const MemoryLayout& ml, DebugSession *session = nullptr, QWidget* parent = nullptr);
 
 	Breakpoint::Type type() const;
-	int address() const;
-	int addressEndRange() const;
-	int slot() const;
-	int subslot() const;
-	int segment() const;
+	std::optional<AddressRange> addressRange(Symbol** symbol = nullptr) const;
+	Slot slot() const;
+	std::optional<uint8_t> segment() const;
 	QString condition() const;
 
-	void setData(Breakpoint::Type type, int address = -1,
-	             qint8 ps = -1, qint8 ss = -1, qint16 segment = -1,
-	             int addressEnd = -1, QString condition = QString());
+	void setData(Breakpoint::Type type, std::optional<AddressRange> range = {}, Slot slot = {},
+	             std::optional<uint8_t> segment = {}, QString condition = {});
 
 private:
-	const MemoryLayout& memLayout;
+	std::optional<uint16_t> parseInput(const QLineEdit& ed, Symbol** symbol = nullptr) const;
+	void enableSlots();
+	void disableSlots();
 
-	DebugSession *debugSession;
-	Symbol *currentSymbol;
-	int idxSlot, idxSubSlot;
-	int value, valueEnd;
-	int conditionHeight;
-	std::unique_ptr<QCompleter> jumpCompleter;
-	std::unique_ptr<QCompleter> allCompleter;
-
-private slots:
 	void addressChanged(const QString& text);
 	void typeChanged(int i);
 	void slotChanged(int i);
 	void subslotChanged(int i);
 	void hasCondition(int state);
+
+private:
+	const MemoryLayout& memLayout;
+	DebugSession* debugSession;
+	Symbol* currentSymbol;
+	int idxSlot, idxSubSlot;
+	int conditionHeight;
+	std::unique_ptr<QCompleter> jumpCompleter;
+	std::unique_ptr<QCompleter> allCompleter;
 };
 
 #endif // BREAKPOINTDIALOG_OPENMSX_H

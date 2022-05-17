@@ -45,7 +45,6 @@ public:
     void calculateImageSize();
     void recalcSpriteLayout(int width);
 
-public slots:
     void refresh();
     void setZoom(float zoom);
     void setDrawgrid(bool value);
@@ -80,6 +79,21 @@ private:
     void setSpritePixel(int x, int y, QRgb c);
     QRgb getColor(int c);
 
+    void drawMonochromeSpriteAt(int character, int spriteBox, int xOffset, int yOffset, QRgb fg, QRgb bg, bool ec = false);
+    void drawLineColoredSpriteAt(int character, int spriteBox, int xOffset, int yOffset, int rowOffset, QRgb bg);
+    void drawGrid();
+    void drawColSprite(int entry, QColor& bgColor);
+    void drawSpatSprite(int entry, QColor& bgColor);
+
+    struct MouseEventInfo {
+        int spriteBox;
+        int character;
+    };
+    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
+    void calculateSizeOfSprites();
+    [[nodiscard]] QString colorInfo(uint8_t color) const;
+
+private:
     QRgb msxPalette[16];
     QImage image;
     QPixmap pixImage;
@@ -109,20 +123,6 @@ private:
     bool useMagnification = false; // only used when useECbit is true! if not this simply acts as zoomfactor...
     int charToDisplay = 0;
     int currentSpriteboxSelected = -1;
-
-    void drawMonochromeSpriteAt(int character, int spriteBox, int xOffset, int yOffset, QRgb fg, QRgb bg, bool ec = false);
-    void drawLineColoredSpriteAt(int character, int spriteBox, int xOffset, int yOffset, int rowOffset, QRgb bg);
-    void drawGrid();
-    void drawColSprite(int entry, QColor& bgColor);
-    void drawSpatSprite(int entry, QColor& bgColor);
-
-    struct MouseEventInfo {
-        int spriteBox;
-        int character;
-    };
-    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
-    void calculateSizeOfSprites();
-    [[nodiscard]] QString colorInfo(uint8_t color) const;
 };
 
 #endif // VRAMSPRITEVIEW_H

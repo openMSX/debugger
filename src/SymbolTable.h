@@ -120,6 +120,9 @@ public:
 	void reloadFiles();
 	void unloadFile(const QString& file, bool keepSymbols = false);
 
+signals:
+	void symbolFileChanged();
+
 private:
 	void appendFile(const QString& file, FileType type);
 	bool readSymbolFile(
@@ -136,6 +139,9 @@ private:
 	void mapSymbol(Symbol* symbol);
 	void unmapSymbol(Symbol* symbol);
 
+	void fileChanged(const QString & path);
+
+private:
 	QList<Symbol*> symbols;
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
@@ -148,12 +154,6 @@ private:
 	};
 	QList<SymbolFileRecord> symbolFiles;
 	QFileSystemWatcher fileWatcher;
-
-private slots:
-	void fileChanged(const QString & path);
-
-signals:
-	void symbolFileChanged();
 };
 
 #endif // SYMBOLTABLE_H

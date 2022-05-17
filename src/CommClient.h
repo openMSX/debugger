@@ -17,13 +17,11 @@ public:
 	void sendCommand(CommandBase* command);
 	void connectToOpenMSX(std::unique_ptr<OpenMSXConnection> conn);
 
-public slots:
 	void closeConnection();
 
 signals:
 	void connectionReady();
 	void connectionTerminated();
-
 	void logParsed(const QString& level, const QString& message);
 	void updateParsed(const QString& type, const QString& name, const QString& message);
 
@@ -31,6 +29,7 @@ private:
 	CommClient() = default;
 	~CommClient() override;
 
+private:
 	std::unique_ptr<OpenMSXConnection> connection;
 };
 

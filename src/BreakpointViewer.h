@@ -11,16 +11,6 @@
 class QPaintEvent;
 class Breakpoints;
 
-struct AddressRange {
-	int start; // a single address is represented by end <= start
-	int end;   // end point is inclusive
-};
-
-struct Slot {
-    int8_t ps; // primary slot, always 0..3
-    int8_t ss; // secundary slot, 0..3 or -1 when the primary slot is not expanded
-};
-
 struct BreakpointRef {
 	enum Type { BREAKPOINT, WATCHPOINT, CONDITION, ALL } type;
 
@@ -37,22 +27,28 @@ public:
 	BreakpointViewer(QWidget* parent = nullptr);
 	void setBreakpoints(Breakpoints* bps);
 
+	void on_btnAddBp_clicked();
+	void on_btnRemoveBp_clicked();
+	void on_btnAddWp_clicked();
+	void on_btnRemoveWp_clicked();
+	void on_btnAddCn_clicked();
+	void on_btnRemoveCn_clicked();
+
+	void setRunState();
+	void setBreakState();
+	void sync();
+
+signals:
+	void contentsUpdated(bool merge);
+
 private:
-	Ui::BreakpointViewer* ui;
-	QTableWidget* tables[BreakpointRef::ALL];
-	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
-
-	bool selfUpdating = false;
-	bool userMode = true;
-	bool runState;
-	bool conditionsMsg = false;
-	Breakpoints* breakpoints;
-
 	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value);
-	std::optional<AddressRange> parseLocationField(int index, BreakpointRef::Type type, const QString& field,
+	std::optional<AddressRange> parseLocationField(std::optional<int> index,
+	                                               BreakpointRef::Type type,
+	                                               const QString& field,
 	                                               const QString& combo = {});
-	std::optional<Slot> parseSlotField(int index, const QString& field);
-	std::optional<qint16> parseSegmentField(int index, const QString& field);
+	Slot parseSlotField(std::optional<int> index, const QString& field);
+	std::optional<uint8_t> parseSegmentField(std::optional<int> index, const QString& field);
 	void changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);
@@ -80,7 +76,6 @@ private:
 	BreakpointRef* findBreakpointRef(BreakpointRef::Type type, int row);
 	BreakpointRef* scanBreakpointRef(const Breakpoint& bp);
 
-private slots:
 	void changeCurrentWpType(int row, int index);
 	void disableSorting(BreakpointRef::Type type = BreakpointRef::ALL);
 	void changeBpTableItem(QTableWidgetItem* item);
@@ -89,20 +84,16 @@ private slots:
 	void on_itemPressed(QTableWidgetItem* item);
 	void on_headerClicked(int index);
 
-public slots:
-	void on_btnAddBp_clicked();
-	void on_btnRemoveBp_clicked();
-	void on_btnAddWp_clicked();
-	void on_btnRemoveWp_clicked();
-	void on_btnAddCn_clicked();
-	void on_btnRemoveCn_clicked();
+private:
+	Ui::BreakpointViewer* ui;
+	QTableWidget* tables[BreakpointRef::ALL];
+	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
 
-	void setRunState();
-	void setBreakState();
-	void sync();
-
-signals:
-	void contentsUpdated(bool merge);
+	bool selfUpdating = false;
+	bool userMode = true;
+	bool runState;
+	bool conditionsMsg = false;
+	Breakpoints* breakpoints;
 };
 
 #endif // BREAKPOINTVIEWER_H

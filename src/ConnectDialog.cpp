@@ -217,8 +217,8 @@ void ConnectionInfoRequest::replyOk(const QString& message)
 		}
 		dialog.connectionOk(connection, title);
 		state = DONE;
-		connect(&connection, SIGNAL(disconnected()),
-		        this, SLOT(terminate()));
+		connect(&connection, &OpenMSXConnection::disconnected,
+		        this, &ConnectionInfoRequest::terminate);
 		break;
 	}
 	default:

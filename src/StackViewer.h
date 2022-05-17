@@ -16,7 +16,6 @@ public:
 	void setData(unsigned char* memPtr, int memLength);
 	QSize sizeHint() const override;
 
-public slots:
 	void setLocation(int addr);
 	void setStackPointer(quint16 addr);
 
@@ -26,9 +25,10 @@ private:
 	void paintEvent(QPaintEvent* e) override;
 
 	void setScrollBarValues();
-	void memdataTransfered(StackRequest* r);
+	void memDataTransferred(StackRequest* r);
 	void transferCancelled(StackRequest* r);
 
+private:
 	QScrollBar* vertScrollBar;
 
 	int wheelRemainder;

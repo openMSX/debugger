@@ -31,26 +31,6 @@ public:
 	MSXPalette* getPalette(int index);
 	size_t getVRAMSize() const;
 
-private:
-	VDPDataStore();
-
-	void DataHexRequestReceived() override;
-
-	void refresh1();
-	void refresh2();
-
-private:
-	MSXPalette palettes[4];
-
-	std::vector<uint8_t> vram;
-	size_t vramSize;
-
-	std::optional<std::string> debuggableNameVRAM; // VRAM debuggable name
-
-	friend class VDPDataStoreVersionCheck;
-	friend class VDPDataStoreVRAMSizeCheck;
-
-public slots:
 	void refresh();
 
 signals:
@@ -64,6 +44,24 @@ signals:
 	void regsChanged(); //only the regs changed
 	void statusRegsChanged(); //only the regs changed
 	*/
+
+private:
+	VDPDataStore();
+
+	void DataHexRequestReceived() override;
+
+	void refresh1();
+	void refresh2();
+
+private:
+	MSXPalette palettes[4];
+	std::vector<uint8_t> vram;
+	size_t vramSize;
+
+	std::optional<std::string> debuggableNameVRAM; // VRAM debuggable name
+
+	friend class VDPDataStoreVersionCheck;
+	friend class VDPDataStoreVRAMSizeCheck;
 };
 
 #endif // VDPDATASTORE_H

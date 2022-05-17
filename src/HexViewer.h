@@ -2,6 +2,8 @@
 #define HEXVIEWER_H
 
 #include <QFrame>
+#include <cstdint>
+#include <vector>
 
 class HexRequest;
 class QScrollBar;
@@ -12,7 +14,6 @@ class HexViewer : public QFrame
 	Q_OBJECT
 public:
 	HexViewer(QWidget* parent = nullptr);
-	~HexViewer() override;
 
 	enum Mode { FIXED, FILL_WIDTH, FILL_WIDTH_POWEROF2 };
 
@@ -26,12 +27,14 @@ public:
 
 	QSize sizeHint() const override;
 
-public slots:
 	void setLocation(int addr);
 	void setTopLocation(int addr);
 	void scrollBarChanged(int addr);
 	void settingsChanged();
 	void refresh();
+
+signals:
+	void locationChanged(int addr);
 
 private:
 	void wheelEvent(QWheelEvent* e) override;
@@ -50,6 +53,9 @@ private:
 	void transferCancelled(HexRequest* r);
 	int coorToOffset(int x, int y) const;
 
+	void changeWidth();
+
+private:
 	QScrollBar* vertScrollBar;
 	QAction* fillWidthAction;
 	QAction* fillWidth2Action;
@@ -57,41 +63,35 @@ private:
 	QAction* setWith16Action;
 	QAction* setWith32Action;
 
-	int wheelRemainder;
+	int wheelRemainder = 0;
 
 	// layout
 	int frameL, frameR, frameT, frameB;
 	int leftCharPos, leftValuePos, rightValuePos, rightCharPos;
-	Mode displayMode;
-	short horBytes;
+	Mode displayMode = FILL_WIDTH;
+	short horBytes = 16;
 	int visibleLines, partialBottomLine;
 	int lineHeight, xAddr, xData, xChar, dataWidth, charWidth, hexCharWidth;
-	int addressLength;
+	int addressLength = 4;
 
 	// data
 	QString debuggableName;
-	int debuggableSize;
-	int hexTopAddress;
-	int hexMarkAddress;
-	unsigned char* hexData;
-	unsigned char* previousHexData;
-	bool waitingForData;
-	bool highlitChanges;
-	bool useMarker;
-	bool isInteractive;
-	bool isEditable;
-	bool beingEdited;
-	bool editedChars;
-	bool hasFocus;
-	int cursorPosition,editValue;
+	std::vector<uint8_t> hexData;
+	std::vector<uint8_t> previousHexData;
+	int debuggableSize = 0;
+	int hexTopAddress = 0;
+	int hexMarkAddress = 0;
+	bool waitingForData = false;
+	bool highlitChanges = true;
+	bool useMarker = false;
+	bool isInteractive = false;
+	bool isEditable = false;
+	bool beingEdited = false;
+	bool editedChars = false;
+	bool hasFocus = false;
+	int cursorPosition, editValue;
 
 	friend class HexRequest;
-
-private slots:
-	void changeWidth();
-
-signals:
-	void locationChanged(int addr);
 };
 
 #endif // HEXVIEWER_H

@@ -5,6 +5,7 @@
 #include "ui_VDPCommandRegisters.h"
 #include "Convert.h"
 #include <QDialog>
+#include <cstdint>
 
 
 class view88to16 : public QObject
@@ -33,36 +34,37 @@ public:
 	void setWidgetRH(QWidget* wdgt) { w_rh = wdgt; }
 	void setWidgetRW(QWidget* wdgt) { w_rw = wdgt; }
 
-public slots:
 	void finishRH() { setRH(getWidgetText(w_rh)); }
 	void finishRL() { setRL(getWidgetText(w_rl)); }
 	void finishRW() { setRW(getWidgetText(w_rw)); }
 
 	void setRH(const QString& newval)
 	{
-		int val = stringToValue(newval) & 0xFF;
-		if ((val == -1) || (val == rh)) return;
+		auto val = stringToValue<uint8_t>(newval);
+		if (!val || (*val == rh)) return;
 
-		rh = val;
+		rh = *val;
 		updaterw();
 		updaterh();
 	}
+
 	void setRL(const QString& newval)
 	{
-		int val = stringToValue(newval) & 0xFF;
-		if ((val == -1) || (val == rl)) return;
+		auto val = stringToValue<uint8_t>(newval);
+		if (!val || (*val == rl)) return;
 
-		rl = val;
+		rl = *val;
 		updaterw();
 		updaterl();
 	}
+
 	void setRW(const QString& newval)
 	{
 		//TODO: build a split-in-two method
-		int val = stringToValue(newval) & 0xFFFF;
-		if ((val == -1) || (val == rw)) return;
+		auto val = stringToValue<uint16_t>(newval);
+		if (!val || (*val == rw)) return;
 
-		rw = val;
+		rw = *val;
 		updaterl();
 		updaterh();
 		updaterw();
@@ -115,12 +117,14 @@ private:
 		rw = rl + 256 * rh;
 		updateWidget(w_rw, rw, disp_rw);
 	}
+
 	void updaterl()
 	{
 		if (w_rl == nullptr) return;
 		rl = rw & 255;
 		updateWidget(w_rl, rl, disp_rl);
 	}
+
 	void updaterh()
 	{
 		if (w_rh == nullptr) return;
@@ -136,15 +140,25 @@ class VDPCommandRegViewer : public QDialog, public SimpleHexRequestUser,
 	Q_OBJECT
 public:
 	VDPCommandRegViewer(QWidget* parent = nullptr);
-	~VDPCommandRegViewer() override;
+
+	void refresh();
+	void R45BitChanged(int);
+	void on_lineEdit_r44_editingFinished();
+	void on_lineEdit_r45_editingFinished();
+	void on_lineEdit_r46_editingFinished();
+	void on_comboBox_cmd_currentIndexChanged(int index);
+	void on_comboBox_operator_currentIndexChanged(int index);
+	void on_syncPushButton_clicked();
+	void on_launchPushButton_clicked();
 
 private:
 	void DataHexRequestReceived() override;
 	void decodeR46(int val);
 	void syncRegToCmd();
 
-	unsigned char* regs;
-	unsigned char* statusregs;
+private:
+	uint8_t regs[64 + 16] = {}; // stores both normal and status regs
+	uint8_t* statusregs; // points to &regs[64]
 	view88to16* grp_l_sx;
 	view88to16* grp_l_sy;
 	view88to16* grp_l_dx;
@@ -158,17 +172,6 @@ private:
 	view88to16* grp_nx;
 	view88to16* grp_ny;
 	int R46;
-
-public slots:
-	void refresh();
-	void R45BitChanged(int);
-	void on_lineEdit_r44_editingFinished();
-	void on_lineEdit_r45_editingFinished();
-	void on_lineEdit_r46_editingFinished();
-	void on_comboBox_cmd_currentIndexChanged(int index);
-	void on_comboBox_operator_currentIndexChanged(int index);
-	void on_syncPushButton_clicked();
-	void on_launchPushButton_clicked();
 };
 
 #endif /* VDPCOMMANDREGVIEWER_H */

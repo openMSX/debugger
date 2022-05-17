@@ -22,8 +22,8 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	vbox->addWidget(hexView);
 	setLayout(vbox);
 	
-	connect(hexView, SIGNAL(locationChanged(int)),
-            this, SLOT(locationChanged(int)));
+	connect(hexView, &HexViewer::locationChanged,
+	        this, &DebuggableViewer::locationChanged);
 }
 
 QJsonObject DebuggableViewer::save2json()
@@ -70,13 +70,13 @@ void DebuggableViewer::locationChanged(int loc)
 {
 	lastLocation = loc;
 }
-	
+
 void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 {
 	int select = -1;
 
 	// disconnect signal to prevent updates
-	debuggableList->disconnect(this, SLOT(debuggableSelected(int)));
+	debuggableList->disconnect(this);
 
 	debuggableList->clear();
 	for (auto it = list.begin(); it != list.end(); ++it) {
@@ -93,8 +93,8 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 	}
 
 	// reconnect signal before selecting item
-	connect(debuggableList, SIGNAL(currentIndexChanged(int)),
-	        this, SLOT(debuggableSelected(int)));
+	connect(debuggableList, qOverload<int>(&QComboBox::currentIndexChanged),
+	        this, &DebuggableViewer::debuggableSelected);
 
 	if (!list.empty() && select >= 0) {
 		debuggableList->setCurrentIndex(select);

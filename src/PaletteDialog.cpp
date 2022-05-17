@@ -25,21 +25,21 @@ PaletteDialog::PaletteDialog(QWidget* parent)
     gridLayout->setSpacing(0);
     for (int i = 0; i < 16; ++i) {
         auto* button = new PalettePatch(nullptr, i);
-        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+        connect(button, &PalettePatch::clicked, signalMapper, qOverload<>(&QSignalMapper::map));
         signalMapper->setMapping(button, i);
         gridLayout->addWidget(button, i / 8, i % 8);
-        connect(this, SIGNAL(paletteChanged(const uint8_t*)),
-                button, SLOT(updatePaletteChanged(const uint8_t*)));
-        connect(signalMapper, SIGNAL(mapped(int)),
-                button, SLOT(setHighlightTest(int)));
+        connect(this, &PaletteDialog::paletteChanged,
+                button, &PalettePatch::updatePaletteChanged);
+        connect(signalMapper, &QSignalMapper::mappedInt,
+                button, &PalettePatch::setHighlightTest);
     }
 
-    connect(signalMapper, SIGNAL(mapped(int)),
-            this, SLOT(colorSelected(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt,
+            this, &PaletteDialog::colorSelected);
 
     ui->colorsframe->setLayout(gridLayout);
-    connect(this, SIGNAL(paletteChanged(uint8_t*)),
-            this, SLOT(updateText()));
+    connect(this, &PaletteDialog::paletteChanged,
+            this, &PaletteDialog::updateText);
 }
 
 void PaletteDialog::updateText()

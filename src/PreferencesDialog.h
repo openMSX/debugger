@@ -14,9 +14,6 @@ private:
 	void initFontList();
 	void setFontPreviewColor(const QColor& c);
 
-	bool updating;
-
-private slots:
 	void fontSelectionChange(int row);
 	void fontTypeChanged(bool state);
 	void fontSelectCustom();
@@ -27,6 +24,8 @@ private slots:
 
     void on_leFileName_textChanged(const QString &arg1);
     void on_btnSaveLayout_clicked();
+
+    bool updating;
 };
 
 #endif // PREFERENCESDIALOG_OPENMSX_H

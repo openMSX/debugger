@@ -23,16 +23,8 @@ def detectCPU():
 		return 'ppc64' if cpu.endswith('64') else 'ppc'
 	elif cpu.startswith('arm'):
 		return 'arm'
-	elif cpu == 'aarch64':
-		return 'aarch64'
-	elif cpu == 'aarch64_be':
-		return 'aarch64_be'
 	elif cpu.startswith('mips') or cpu == 'sgi':
 		return 'mipsel' if cpu.endswith('el') else 'mips'
-	elif cpu == 'm68k':
-		return 'm68k'
-	elif cpu == 'ia64':
-		return 'ia64'
 	elif cpu.startswith('alpha'):
 		return 'alpha'
 	elif cpu.startswith('hppa') or cpu.startswith('parisc'):
@@ -43,17 +35,15 @@ def detectCPU():
 		return 'sparc'
 	elif cpu.startswith('sh'):
 		return 'sheb' if cpu.endswith('eb') else 'sh'
-	elif cpu == 'avr32':
-		return 'avr32'
 	elif cpu == '':
 		# Python couldn't figure it out.
 		os = system().lower()
 		if os == 'windows':
 			# Relatively safe bet.
 			return 'x86'
-		raise ValueError('Unable to detect CPU')
+		return 'unknown'
 	else:
-		raise ValueError('Unsupported or unrecognised CPU "%s"' % cpu)
+		return cpu
 
 def detectOS():
 	'''Detects the operating system of the machine were are running on.
@@ -73,9 +63,9 @@ def detectOS():
 		return 'solaris'
 	elif os == '':
 		# Python couldn't figure it out.
-		raise ValueError('Unable to detect OS')
+		return 'unknown'
 	else:
-		raise ValueError('Unsupported or unrecognised OS "%s"' % os)
+		return os
 
 if __name__ == '__main__':
 	try:
@@ -84,10 +74,6 @@ if __name__ == '__main__':
 			), file = sys.stderr)
 		hostCPU = detectCPU()
 		hostOS = detectOS()
-		if hostOS == 'mingw32' and hostCPU == 'x86_64':
-			# It is possible to run MinGW on 64-bit Windows, but producing
-			# 64-bit code is not supported yet.
-			hostCPU = 'x86'
 		print('  Detected system: %s-%s' % (hostCPU, hostOS), file = sys.stderr)
 		print('OPENMSX_TARGET_CPU=%s' % hostCPU)
 		print('OPENMSX_TARGET_OS=%s' % hostOS)

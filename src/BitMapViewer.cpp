@@ -54,17 +54,17 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	imageWidget->setPaletteSource(palette);
 
 	//now hook up some signals and slots
-	connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-	        this, SLOT(VDPDataStoreDataRefreshed()));
-	connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-	        imageWidget, SLOT(refresh()));
-	connect(refreshButton, SIGNAL(clicked(bool)),
-	        &VDPDataStore::instance(), SLOT(refresh()));
+	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+	        this, &BitMapViewer::VDPDataStoreDataRefreshed);
+	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+	        imageWidget, &VramBitMappedView::refresh);
+	connect(refreshButton, &QPushButton::clicked,
+	        &VDPDataStore::instance(), &VDPDataStore::refresh);
 
-	connect(imageWidget, SIGNAL(imageHovered(int, int, int, unsigned, int)),
-	        this, SLOT(updateImagePosition(int, int, int, unsigned, int)));
-	connect(imageWidget, SIGNAL(imageClicked(int, int, int, unsigned, int)),
-	        this, SLOT(updateImagePosition(int, int, int, unsigned, int)));
+	connect(imageWidget, &VramBitMappedView::imageHovered,
+	        this, &BitMapViewer::updateImagePosition);
+	connect(imageWidget, &VramBitMappedView::imageClicked,
+	        this, &BitMapViewer::updateImagePosition);
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();

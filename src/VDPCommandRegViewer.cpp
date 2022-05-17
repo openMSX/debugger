@@ -5,35 +5,33 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	regs = new unsigned char[64 + 16];
-	memset(regs, 0, 64 + 16);
 	statusregs = regs + 64;
 
 	// create the needed groups
 	grp_sx = new view88to16(lineEdit_r32, lineEdit_r33, lineEdit_sx);
-	connect(lineEdit_r32, SIGNAL(editingFinished()), grp_sx, SLOT(finishRL()));
-	connect(lineEdit_r33, SIGNAL(editingFinished()), grp_sx, SLOT(finishRH()));
-	connect(lineEdit_sx,  SIGNAL(editingFinished()), grp_sx, SLOT(finishRW()));
+	connect(lineEdit_r32, &QLineEdit::editingFinished, grp_sx, &view88to16::finishRL);
+	connect(lineEdit_r33, &QLineEdit::editingFinished, grp_sx, &view88to16::finishRH);
+	connect(lineEdit_sx,  &QLineEdit::editingFinished, grp_sx, &view88to16::finishRW);
 	grp_sy = new view88to16(lineEdit_r34, lineEdit_r35, lineEdit_sy);
-	connect(lineEdit_r34, SIGNAL(editingFinished()), grp_sy, SLOT(finishRL()));
-	connect(lineEdit_r35, SIGNAL(editingFinished()), grp_sy, SLOT(finishRH()));
-	connect(lineEdit_sy,  SIGNAL(editingFinished()), grp_sy, SLOT(finishRW()));
+	connect(lineEdit_r34, &QLineEdit::editingFinished, grp_sy, &view88to16::finishRL);
+	connect(lineEdit_r35, &QLineEdit::editingFinished, grp_sy, &view88to16::finishRH);
+	connect(lineEdit_sy,  &QLineEdit::editingFinished, grp_sy, &view88to16::finishRW);
 	grp_dx = new view88to16(lineEdit_r36, lineEdit_r37, lineEdit_dx);
-	connect(lineEdit_r36, SIGNAL(editingFinished()), grp_dx, SLOT(finishRL()));
-	connect(lineEdit_r37, SIGNAL(editingFinished()), grp_dx, SLOT(finishRH()));
-	connect(lineEdit_dx,  SIGNAL(editingFinished()), grp_dx, SLOT(finishRW()));
+	connect(lineEdit_r36, &QLineEdit::editingFinished, grp_dx, &view88to16::finishRL);
+	connect(lineEdit_r37, &QLineEdit::editingFinished, grp_dx, &view88to16::finishRH);
+	connect(lineEdit_dx,  &QLineEdit::editingFinished, grp_dx, &view88to16::finishRW);
 	grp_dy = new view88to16(lineEdit_r38, lineEdit_r39, lineEdit_dy);
-	connect(lineEdit_r38, SIGNAL(editingFinished()), grp_dy, SLOT(finishRL()));
-	connect(lineEdit_r39, SIGNAL(editingFinished()), grp_dy, SLOT(finishRH()));
-	connect(lineEdit_dy,  SIGNAL(editingFinished()), grp_dy, SLOT(finishRW()));
+	connect(lineEdit_r38, &QLineEdit::editingFinished, grp_dy, &view88to16::finishRL);
+	connect(lineEdit_r39, &QLineEdit::editingFinished, grp_dy, &view88to16::finishRH);
+	connect(lineEdit_dy,  &QLineEdit::editingFinished, grp_dy, &view88to16::finishRW);
 	grp_nx = new view88to16(lineEdit_r40, lineEdit_r41, lineEdit_nx);
-	connect(lineEdit_r40, SIGNAL(editingFinished()), grp_nx, SLOT(finishRL()));
-	connect(lineEdit_r41, SIGNAL(editingFinished()), grp_nx, SLOT(finishRH()));
-	connect(lineEdit_nx,  SIGNAL(editingFinished()), grp_nx, SLOT(finishRW()));
+	connect(lineEdit_r40, &QLineEdit::editingFinished, grp_nx, &view88to16::finishRL);
+	connect(lineEdit_r41, &QLineEdit::editingFinished, grp_nx, &view88to16::finishRH);
+	connect(lineEdit_nx,  &QLineEdit::editingFinished, grp_nx, &view88to16::finishRW);
 	grp_ny = new view88to16(lineEdit_r42, lineEdit_r43, lineEdit_ny);
-	connect(lineEdit_r42, SIGNAL(editingFinished()), grp_ny, SLOT(finishRL()));
-	connect(lineEdit_r43, SIGNAL(editingFinished()), grp_ny, SLOT(finishRH()));
-	connect(lineEdit_ny,  SIGNAL(editingFinished()), grp_ny, SLOT(finishRW()));
+	connect(lineEdit_r42, &QLineEdit::editingFinished, grp_ny, &view88to16::finishRL);
+	connect(lineEdit_r43, &QLineEdit::editingFinished, grp_ny, &view88to16::finishRH);
+	connect(lineEdit_ny,  &QLineEdit::editingFinished, grp_ny, &view88to16::finishRW);
 
 	grp_sx->setRW(QString("0"));
 	grp_sy->setRW(QString("0"));
@@ -52,8 +50,8 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	//Connect the checkboxes
 	QList<QCheckBox*> list = this->findChildren<QCheckBox*>();
 	for (auto* item : list) {
-		connect(item, SIGNAL(stateChanged(int)),
-		        this, SLOT(R45BitChanged(int)));
+		connect(item, &QCheckBox::stateChanged,
+		        this, &VDPCommandRegViewer::R45BitChanged);
 	}
 
 	lineEdit_r44->setText(hexValue(0, 2));
@@ -68,19 +66,14 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	refresh();
 }
 
-VDPCommandRegViewer::~VDPCommandRegViewer()
-{
-	delete[] regs;
-}
-
 void VDPCommandRegViewer::on_lineEdit_r45_editingFinished()
 {
 	//for now simply recheck all the checkBoxes and recreate R45
-	int val = stringToValue(lineEdit_r45->text());
+	auto val = stringToValue<int>(lineEdit_r45->text());
 	int r45 = 0;
 	for (auto* item : findChildren<QCheckBox*>()) {
 	        int order = QString(item->objectName().right(1)).toInt();
-		if (val & (1 << order)) {
+		if (val && *val & (1 << order)) {
 			r45 = r45 | (1 << order);
 			item->setChecked(true);
 		} else {
@@ -193,23 +186,22 @@ void VDPCommandRegViewer::on_syncPushButton_clicked()
 
 void VDPCommandRegViewer::on_launchPushButton_clicked()
 {
-	unsigned char newregs[64];
-	memset(newregs, 0, 64);
-	newregs[32] = stringToValue(lineEdit_r32->text());
-	newregs[33] = stringToValue(lineEdit_r33->text());
-	newregs[34] = stringToValue(lineEdit_r34->text());
-	newregs[35] = stringToValue(lineEdit_r35->text());
-	newregs[36] = stringToValue(lineEdit_r36->text());
-	newregs[37] = stringToValue(lineEdit_r37->text());
-	newregs[38] = stringToValue(lineEdit_r38->text());
-	newregs[39] = stringToValue(lineEdit_r39->text());
-	newregs[40] = stringToValue(lineEdit_r40->text());
-	newregs[41] = stringToValue(lineEdit_r41->text());
-	newregs[42] = stringToValue(lineEdit_r42->text());
-	newregs[43] = stringToValue(lineEdit_r43->text());
-	newregs[44] = stringToValue(lineEdit_r44->text());
-	newregs[45] = stringToValue(lineEdit_r45->text());
-	newregs[46] = stringToValue(lineEdit_r46->text());
+	uint8_t newregs[64] = {};
+	newregs[32] = stringToValue<uint8_t>(lineEdit_r32->text()).value_or(255);
+	newregs[33] = stringToValue<uint8_t>(lineEdit_r33->text()).value_or(255);
+	newregs[34] = stringToValue<uint8_t>(lineEdit_r34->text()).value_or(255);
+	newregs[35] = stringToValue<uint8_t>(lineEdit_r35->text()).value_or(255);
+	newregs[36] = stringToValue<uint8_t>(lineEdit_r36->text()).value_or(255);
+	newregs[37] = stringToValue<uint8_t>(lineEdit_r37->text()).value_or(255);
+	newregs[38] = stringToValue<uint8_t>(lineEdit_r38->text()).value_or(255);
+	newregs[39] = stringToValue<uint8_t>(lineEdit_r39->text()).value_or(255);
+	newregs[40] = stringToValue<uint8_t>(lineEdit_r40->text()).value_or(255);
+	newregs[41] = stringToValue<uint8_t>(lineEdit_r41->text()).value_or(255);
+	newregs[42] = stringToValue<uint8_t>(lineEdit_r42->text()).value_or(255);
+	newregs[43] = stringToValue<uint8_t>(lineEdit_r43->text()).value_or(255);
+	newregs[44] = stringToValue<uint8_t>(lineEdit_r44->text()).value_or(255);
+	newregs[45] = stringToValue<uint8_t>(lineEdit_r45->text()).value_or(255);
+	newregs[46] = stringToValue<uint8_t>(lineEdit_r46->text()).value_or(255);
 
 	auto* req = new WriteDebugBlockCommand("{VDP regs}", 32, 15, newregs);
 	CommClient::instance().sendCommand(req);
@@ -217,10 +209,10 @@ void VDPCommandRegViewer::on_launchPushButton_clicked()
 
 void VDPCommandRegViewer::on_lineEdit_r44_editingFinished()
 {
-	int val = stringToValue(lineEdit_r44->text());
+	auto val = stringToValue<int>(lineEdit_r44->text());
 	label_color->setText(QString("%1 %2").
-			arg((val >> 4) & 15, 4, 2, QChar('0')).
-			arg((val >> 0) & 15, 4, 2, QChar('0')));
+			arg((val.value_or(-1) >> 4) & 15, 4, 2, QChar('0')).
+			arg((val.value_or(-1) >> 0) & 15, 4, 2, QChar('0')));
 }
 
 void VDPCommandRegViewer::R45BitChanged(int /*state*/)
@@ -239,12 +231,13 @@ void VDPCommandRegViewer::R45BitChanged(int /*state*/)
 
 void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 {
-	int val = stringToValue(lineEdit_r46->text()) & 0xFF;
-	lineEdit_r46->setText(hexValue(val, 2));
-	R46 = val;
-	decodeR46(R46);
-	comboBox_operator->setCurrentIndex(R46 & 15);
-	comboBox_cmd->setCurrentIndex((R46 >> 4) & 15); // this might hide the operator again :-)
+	if (auto val = stringToValue<uint8_t>(lineEdit_r46->text())) {
+		lineEdit_r46->setText(hexValue(*val, 2));
+		R46 = *val;
+		decodeR46(R46);
+		comboBox_operator->setCurrentIndex(R46 & 15);
+		comboBox_cmd->setCurrentIndex((R46 >> 4) & 15); // this might hide the operator again :-)
+	}
 }
 
 void VDPCommandRegViewer::refresh()

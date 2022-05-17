@@ -21,9 +21,8 @@ public:
 	virtual void cancel() = 0;
 };
 
-class SimpleCommand : public QObject, public CommandBase
+class SimpleCommand : public CommandBase
 {
-	Q_OBJECT
 public:
 	SimpleCommand(QString command_)
 		: command(std::move(command_)) {}
@@ -62,8 +61,10 @@ public:
 	                      unsigned char* target);
 	ReadDebugBlockCommand(const QString& debuggable, unsigned offset, unsigned size,
 	                      unsigned char* target);
+
 protected:
 	void copyData(const QString& message);
+
 private:
 	unsigned size;
 	unsigned char* target;
@@ -91,12 +92,11 @@ signals:
 	void logParsed(const QString& level, const QString& message);
 	void updateParsed(const QString& type, const QString& name, const QString& message);
 
-private slots:
+private:
 	void processData();
 	void socketStateChanged(QAbstractSocket::SocketState state);
 	void socketError(QAbstractSocket::SocketError state);
 
-private:
 	void cleanup();
 	void cancelPending();
 
@@ -104,6 +104,7 @@ private:
 	bool endElement(const QStringRef& qName);
 	bool characters(const QStringRef& ch);
 
+private:
 	//std::unique_ptr<QAbstractSocket> socket;
 	QAbstractSocket* socket;
 	std::unique_ptr<QXmlStreamReader> reader;

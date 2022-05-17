@@ -112,7 +112,7 @@ public:
 
 private:
 	//DebuggerForm& form;
-	unsigned char buf[28];
+	uint8_t buf[28];
 };
 
 
@@ -830,11 +830,6 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
     return wdgt;
 }
 
-DebuggerForm::~DebuggerForm()
-{
-//	delete mainArea;
-}
-
 void DebuggerForm::closeEvent(QCloseEvent* e)
 {
 	// handle unsaved session
@@ -1216,9 +1211,9 @@ void DebuggerForm::systemReboot()
 
 void DebuggerForm::systemSymbolManager()
 {
-    SymbolManager symManager(session->symbolTable(), this);
-	connect(&symManager, SIGNAL(symbolTableChanged()),
-            session, SLOT(sessionModified()));
+	SymbolManager symManager(session->symbolTable(), this);
+	connect(&symManager, &SymbolManager::symbolTableChanged,
+	        session, &DebugSession::sessionModified);
 	symManager.exec();
 	emit symbolsChanged();
 	updateWindowTitle();
@@ -1236,9 +1231,11 @@ void DebuggerForm::searchGoto()
 	auto& dispatcher = SignalDispatcher::instance();
 	GotoDialog gtd(*dispatcher.getMemLayout(), session, this);
 	if (gtd.exec()) {
-		if (int addr = gtd.address(); addr >= 0) {
+		if (auto addr = gtd.address() ){
+				if (addr.has_value()) {
 			//disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
-			dispatcher.setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
+			dispatcher.setCursorAddress(addr.value(), 0, DisasmViewer::MiddleAlways);
+				}
 		}
 	}
 }
@@ -1282,6 +1279,7 @@ void DebuggerForm::executeStepBack()
 	setRunMode();
 }
 
+//void DebuggerForm::toggleBreakpointAddress(uint16_t addr)
 void DebuggerForm::toggleBreakpoint(uint16_t addr)
 {
 	QString cmd;
@@ -1292,7 +1290,8 @@ void DebuggerForm::toggleBreakpoint(uint16_t addr)
 		// get slot
 		auto [ps, ss, seg] = addressSlot(addr);
 		// create command
-		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
+		cmd = Breakpoints::createSetCommand(Breakpoint::BREAKPOINT, AddressRange{addr},
+		                                    Slot{ps, ss}, seg);
 	}
 	comm.sendCommand(new SimpleCommand(cmd));
 	// Get results from command above
@@ -1302,14 +1301,15 @@ void DebuggerForm::toggleBreakpoint(uint16_t addr)
 void DebuggerForm::addBreakpoint(uint16_t cursorAddress)
 {
 	BreakpointDialog bpd(*SignalDispatcher::instance().getMemLayout(), session, this);
-	int addr = cursorAddress;
+	uint16_t addr = cursorAddress;
 	auto [ps, ss, seg] = addressSlot(addr);
-	bpd.setData(Breakpoint::BREAKPOINT, addr, ps, ss, seg);
+
+	bpd.setData(Breakpoint::BREAKPOINT, AddressRange{addr}, Slot{ps, ss}, seg);
+
 	if (bpd.exec()) {
-		if (bpd.address() >= 0) {
+		if (bpd.addressRange()) {
 			QString cmd = Breakpoints::createSetCommand(
-				bpd.type(), bpd.address(), bpd.slot(), bpd.subslot(), bpd.segment(),
-				bpd.addressEndRange(), bpd.condition());
+				bpd.type(), bpd.addressRange(), bpd.slot(), bpd.segment(), bpd.condition());
 			comm.sendCommand(new SimpleCommand(cmd));
 			// Get results of command above
 			reloadBreakpoints();
@@ -1375,14 +1375,18 @@ DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
 {
 	auto& dispatcher = SignalDispatcher::instance();
 	int p = (addr & 0xC000) >> 14;
-	auto ps = qint8(dispatcher.getMemLayout()->primarySlot[p]);
-	auto ss = qint8(dispatcher.getMemLayout()->secondarySlot[p]);
-	int segment = [&] { // figure out (rom) mapper segment
-		if (dispatcher.getMemLayout()->mapperSize[ps][ss == -1 ? 0 : ss] > 0) {
+	uint8_t ps = dispatcher.getMemLayout()->primarySlot[p];
+	int8_t ss_ = dispatcher.getMemLayout()->secondarySlot[p];
+	auto ss = make_positive_optional<uint8_t>(ss_);
+
+	std::optional<uint8_t> segment = [&] { // figure out (rom) mapper segment
+		//if (dispatcher.getMemLayout()->mapperSize[ps][ss == -1 ? 0 : ss] > 0) {
+		if (ss && dispatcher.getMemLayout()->mapperSize[ps][*ss] > 0) {
 			return dispatcher.getMemLayout()->mapperSegment[p];
 		} else {
 			int q = 2 * p + ((addr & 0x2000) >> 13);
 			int b = dispatcher.getMemLayout()->romBlock[q];
+			//return make_if(b >= 0, uint8_t(b));
 			return (b >= 0) ? b : -1;
 		}
 	}();

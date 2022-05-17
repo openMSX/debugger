@@ -5,6 +5,7 @@
 #include "ui_VDPStatusRegisters.h"
 #include <QList>
 #include <QDialog>
+#include <cstdint>
 
 /** The highlightDispatcher serves 2 purposes for the InteractiveLabel widgets
   * a) keep a correct state: Assume widget A and B are related (both are
@@ -25,7 +26,6 @@ class highlightDispatcher : public QObject
 public:
 	highlightDispatcher();
 
-public slots:
 	void receiveState(bool state);
 
 signals:
@@ -41,9 +41,7 @@ class VDPStatusRegViewer : public QDialog, public SimpleHexRequestUser,
 	Q_OBJECT
 public:
 	VDPStatusRegViewer(QWidget* parent = nullptr);
-	~VDPStatusRegViewer() override;
 
-public slots:
 	void refresh();
 
 private:
@@ -54,7 +52,8 @@ private:
 
 	void DataHexRequestReceived() override;
 
-	unsigned char* statusregs;
+private:
+	uint8_t statusregs[16];
 };
 
 #endif // VDPSTATUSREGVIEWER_H

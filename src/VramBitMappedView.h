@@ -26,7 +26,6 @@ public:
 	void mousePressEvent(QMouseEvent* e) override;
 	void mouseMoveEvent (QMouseEvent* e) override;
 
-public slots:
 	void refresh();
 
 signals:
@@ -51,6 +50,7 @@ private:
 	void setPixel1x2(int x, int y, QRgb c);
 	QRgb getColor(int c);
 
+private:
 	QRgb msxPalette[16];
 	QImage image;
 	QPixmap pixImage;

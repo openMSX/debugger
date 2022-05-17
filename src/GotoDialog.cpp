@@ -15,22 +15,23 @@ GotoDialog::GotoDialog(const MemoryLayout& ml, DebugSession *session, QWidget* p
 		auto* completer = new QCompleter(session->symbolTable().labelList(true, &ml), this);
 		completer->setCaseSensitivity(Qt::CaseInsensitive);
 		edtAddress->setCompleter(completer);
-		connect(completer,  SIGNAL(activated(const QString&)), this, SLOT(addressChanged(const QString&)));
+		connect(completer,  qOverload<const QString&>(&QCompleter::activated), this, &GotoDialog::addressChanged);
 	}
 
-	connect(edtAddress,  SIGNAL(textEdited(const QString&)), this, SLOT(addressChanged(const QString&)));
+	connect(edtAddress, &QLineEdit::textEdited, this, &GotoDialog::addressChanged);
 }
 
-int GotoDialog::address()
+std::optional<uint16_t> GotoDialog::address()
 {
 	return currentSymbol ? currentSymbol->value()
-	                     : stringToValue(edtAddress->text());
+	                     : stringToValue<int>(edtAddress->text());
 }
 
 void GotoDialog::addressChanged(const QString& text)
 {
-	int addr = stringToValue(text);
-	if (addr == -1 && debugSession) {
+	auto addr = stringToValue<uint16_t>(text);
+
+	if (addr && debugSession) {
 		// try finding a label
 		currentSymbol = debugSession->symbolTable().getAddressSymbol(text);
 		if (!currentSymbol) currentSymbol = debugSession->symbolTable().getAddressSymbol(text, Qt::CaseInsensitive);
@@ -38,6 +39,6 @@ void GotoDialog::addressChanged(const QString& text)
 	}
 
 	QPalette pal;
-	pal.setColor(QPalette::Text, addr==-1 ? Qt::red : Qt::black);
+	pal.setColor(QPalette::Text, addr ? Qt::black : Qt::red);
 	edtAddress->setPalette(pal);
 }

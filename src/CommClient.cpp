@@ -17,20 +17,15 @@ void CommClient::connectToOpenMSX(std::unique_ptr<OpenMSXConnection> conn)
 {
 	closeConnection();
 	connection = std::move(conn);
-	connect(connection.get(), SIGNAL(disconnected()), SLOT(closeConnection()));
-	connect(connection.get(),
-	        SIGNAL(logParsed(const QString&, const QString&)),
-	        SIGNAL(logParsed(const QString&, const QString&)));
-	connect(connection.get(),
-	        SIGNAL(updateParsed(const QString&, const QString&, const QString&)),
-	        SIGNAL(updateParsed(const QString&, const QString&, const QString&)));
+	connect(connection.get(), &OpenMSXConnection::disconnected, this, &CommClient::closeConnection);
+	connect(connection.get(), &OpenMSXConnection::logParsed,    this, &CommClient::logParsed);
+	connect(connection.get(), &OpenMSXConnection::updateParsed, this, &CommClient::updateParsed);
 	emit connectionReady();
 }
 
 void CommClient::closeConnection()
 {
 	if (connection) {
-		connection->disconnect(this, SLOT(closeConnection()));
 		connection.reset();
 		emit connectionTerminated();
 	}

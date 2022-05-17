@@ -30,7 +30,6 @@ public:
 
 	enum {Top, Middle, Bottom, Closest, TopAlways, MiddleAlways, BottomAlways, Reload};
 
-public slots:
 	void setAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setCursorAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setProgramCounter(uint16_t pc, bool reload = false);
@@ -49,6 +48,10 @@ private:
 	void mousePressEvent(QMouseEvent* e) override;
 	void wheelEvent(QWheelEvent* e) override;
 
+	int findDisasmLine(uint16_t lineAddr, int infoLine = 0);
+	int lineAtPos(const QPoint& pos);
+
+private:
 	QScrollBar* scrollBar;
 
 	QPixmap breakMarker;
@@ -79,9 +82,6 @@ private:
 	Breakpoints* breakpoints;
 	MemoryLayout* memLayout;
 	SymbolTable* symTable;
-
-	int findDisasmLine(uint16_t lineAddr, int infoLine = 0);
-	int lineAtPos(const QPoint& pos);
 
 signals:
     void breakpointToggled(uint16_t addr);

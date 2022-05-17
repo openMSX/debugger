@@ -45,7 +45,7 @@ PaletteView::PaletteView(QWidget* parent)
     updateText();
 
     //select color 0
-    emit signalMapper->mapped(0);
+    emit signalMapper->mappedInt(0);
 }
 
 void PaletteView::setPalette(MSXPalette* sourcePal)

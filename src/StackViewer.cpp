@@ -21,7 +21,7 @@ public:
 	void replyOk(const QString& message) override
 	{
 		copyData(message);
-		viewer.memdataTransfered(this);
+		viewer.memDataTransferred(this);
 	}
 
 	void cancel() override
@@ -62,8 +62,8 @@ StackViewer::StackViewer(QWidget* parent)
 
 	setMinimumHeight(frameT+frameB+fontMetrics().height());
 
-	connect(vertScrollBar, SIGNAL(valueChanged(int)),
-	        this, SLOT(setLocation(int)));
+	connect(vertScrollBar, &QScrollBar::valueChanged,
+	        this, &StackViewer::setLocation);
 }
 
 QSize StackViewer::sizeHint() const
@@ -197,7 +197,7 @@ void StackViewer::setStackPointer(quint16 addr)
 	setLocation(addr);
 }
 
-void StackViewer::memdataTransfered(StackRequest* r)
+void StackViewer::memDataTransferred(StackRequest* r)
 {
     qDebug()<<"StackViewer::memdataTransfered()     wdgt->objectName() "<< objectName();
 

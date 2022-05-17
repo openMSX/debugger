@@ -9,15 +9,15 @@ class InteractiveLabel : public QLabel
 public:
 	InteractiveLabel(QWidget* parent = nullptr);
 
-protected:
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
+	void highlight(bool state);
 
 signals:
 	void mouseOver(bool state);
 
-public slots:
-	void highlight(bool state);
+protected:
+	void enterEvent(QEvent* event) override;
+	void leaveEvent(QEvent* event) override;
+
 };
 
 #endif // INTERACTIVELABEL

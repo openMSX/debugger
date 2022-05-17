@@ -41,10 +41,10 @@ TileViewer::TileViewer(QWidget* parent)
     // Now hook up some signals and slots.
     // This way we have created the VDPDataStore::instance before our imagewidget.
     // This allows the VDPDatastore to start asking for data as quickly as possible.
-    connect(refreshButton, SIGNAL(clicked(bool)),
-            &VDPDataStore::instance(), SLOT(refresh()));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            this, SLOT(VDPDataStoreDataRefreshed()));
+    connect(refreshButton, &QPushButton::clicked,
+            &VDPDataStore::instance(), &VDPDataStore::refresh);
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            this, &TileViewer::VDPDataStoreDataRefreshed);
 
     imageWidget = new VramTiledView();
     QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -53,8 +53,8 @@ TileViewer::TileViewer(QWidget* parent)
     sizePolicy1.setHeightForWidth(imageWidget->sizePolicy().hasHeightForWidth());
     imageWidget->setSizePolicy(sizePolicy1);
     imageWidget->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), SIGNAL(dataRefreshed()),
-            imageWidget, SLOT(refresh()));
+    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
+            imageWidget, &VramTiledView::refresh);
 
     scrollArea->setWidget(imageWidget);
 
@@ -68,14 +68,12 @@ TileViewer::TileViewer(QWidget* parent)
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
     imageWidget->setDrawGrid(cb_drawgrid->isChecked());
 
-    connect(imageWidget, SIGNAL(highlightCount(uint8_t, int)),
-            this, SLOT(highlightInfo(uint8_t, int)));
-
-    connect(imageWidget, SIGNAL(imageHovered(int, int, int)),
-            this, SLOT(imageMouseOver(int, int, int)));
-
-    connect(imageWidget, SIGNAL(imageClicked(int, int, int, QString)),
-            this, SLOT(displayCharInfo(int, int, int, const QString&)));
+    connect(imageWidget, &VramTiledView::highlightCount,
+            this, &TileViewer::highlightInfo);
+    connect(imageWidget, &VramTiledView::imageHovered,
+            this, &TileViewer::imageMouseOver);
+    connect(imageWidget, &VramTiledView::imageClicked,
+            this, &TileViewer::displayCharInfo);
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
@@ -259,8 +257,8 @@ void TileViewer::on_cb_screen_currentIndexChanged(int index)
 void TileViewer::on_le_nametable_textChanged(const QString& text)
 {
     auto font = le_nametable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setNameTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setNameTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);
@@ -271,8 +269,8 @@ void TileViewer::on_le_nametable_textChanged(const QString& text)
 void TileViewer::on_le_colortable_textChanged(const QString& text)
 {
     auto font = le_colortable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setColorTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setColorTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);
@@ -283,8 +281,8 @@ void TileViewer::on_le_colortable_textChanged(const QString& text)
 void TileViewer::on_le_patterntable_textChanged(const QString& text)
 {
     auto font = le_patterntable->font();
-    if (int i = stringToValue(text); i != -1) {
-        imageWidget->setPatternTableAddress(i);
+    if (auto i = stringToValue<int>(text)) {
+        imageWidget->setPatternTableAddress(*i);
         font.setItalic(false);
     } else {
         font.setItalic(true);
@@ -319,8 +317,8 @@ void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
     auto* p = new PaletteDialog();
     p->setPalette(defaultPalette);
     p->setAutoSync(true);
-    connect(p, SIGNAL(paletteSynced()), imageWidget, SLOT(refresh()));
-    connect(p, SIGNAL(paletteSynced()), this, SLOT(update_label_characterimage()));
+    connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramTiledView::refresh);
+    connect(p, &PaletteDialog::paletteSynced, this, &TileViewer::update_label_characterimage);
     p->show();
     //useVDPPalette->setChecked(false);
     //QMessageBox::information(

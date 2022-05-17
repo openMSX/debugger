@@ -48,7 +48,6 @@ public:
 
     [[nodiscard]] const uint8_t* getPaletteSource() const;
 
-public slots:
     void refresh();
 
 signals:
@@ -68,6 +67,22 @@ private:
     void setPixel2x2(int x, int y, QRgb c);
 	QRgb getColor(int c);
 
+    void decodePatternTableRegularChars();
+    void decodePatternTableMultiColor();
+    void decodeNameTableRegularChars();
+    void decodeNameTableMultiColor();
+    uint8_t getCharColorByte(int character, int x, int y, int row);
+    void drawCharAt(int character, int x, int y); // Draw 8x8 character on given location in image
+
+    struct MouseEventInfo {
+        int x, y;
+        int character;
+    };
+    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
+
+    QString byteAsPattern(uint8_t byte);
+
+private:
 	QRgb msxPalette[16];
 	QImage image;
 	QPixmap pixImage;
@@ -93,21 +108,6 @@ private:
     int highlightChar = -1; // anything outside 0-255 will do
     bool useBlink = false;
     bool tpBit = false;
-
-    void decodePatternTableRegularChars();
-    void decodePatternTableMultiColor();
-    void decodeNameTableRegularChars();
-    void decodeNameTableMultiColor();
-    uint8_t getCharColorByte(int character, int x, int y, int row);
-    void drawCharAt(int character, int x, int y); // Draw 8x8 character on given location in image
-
-    struct MouseEventInfo {
-        int x, y;
-        int character;
-    };
-    std::optional<MouseEventInfo> infoFromMouseEvent(QMouseEvent* e);
-
-    QString byteAsPattern(uint8_t byte);
 };
 
 #endif // VRAMBITMAPPEDVIEW

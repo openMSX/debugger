@@ -3,6 +3,7 @@
 
 #include "ui_GotoDialog.h"
 #include <QDialog>
+#include <optional>
 
 struct MemoryLayout;
 
@@ -15,16 +16,16 @@ class GotoDialog : public QDialog, private Ui::GotoDialog
 public:
 	GotoDialog(const MemoryLayout& ml, DebugSession* session = nullptr, QWidget* parent = nullptr);
 
-	int address();
+	std::optional<uint16_t> address();
+
+private:
+	void addressChanged(const QString& text);
 
 private:
 	const MemoryLayout& memLayout;
 
 	DebugSession* debugSession;
 	Symbol* currentSymbol;
-
-private slots:
-	void addressChanged(const QString& text);
 };
 
 #endif // GOTODIALOG_H

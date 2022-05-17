@@ -12,6 +12,9 @@ class SymbolManager : public QDialog, private Ui::SymbolManager
 public:
 	SymbolManager(SymbolTable& symtable, QWidget* parent = nullptr);
 
+signals:
+	void symbolTableChanged();
+
 private:
 	void closeEvent(QCloseEvent* e) override;
 
@@ -31,14 +34,6 @@ private:
 	void beginTreeLabelsUpdate();
 	void endTreeLabelsUpdate();
 
-	SymbolTable& symTable;
-	int treeLabelsUpdateCount;
-	QCheckBox* chkSlots[16];
-	QCheckBox* chkRegs[18];
-	QTreeWidgetItem* editItem;
-	int editColumn;
-
-private slots:
 	void fileSelectionChange();
 	void addFile();
 	void removeFile();
@@ -86,8 +81,13 @@ private slots:
 	void changeRegisterOffset(int state);
 	void changeRegisterI(int state);
 
-signals:
-	void symbolTableChanged();
+private:
+	SymbolTable& symTable;
+	int treeLabelsUpdateCount;
+	QCheckBox* chkSlots[16];
+	QCheckBox* chkRegs[18];
+	QTreeWidgetItem* editItem;
+	int editColumn;
 };
 
 #endif // SYMBOLMANAGER_OPENMSX_H
