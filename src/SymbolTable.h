@@ -9,6 +9,7 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QFileSystemWatcher>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -18,7 +19,7 @@ class SymbolTable;
 class Symbol
 {
 public:
-	Symbol(QString str, int addr, int val = 0xFFFF);
+	Symbol(QString str, int addr, const QString* source = nullptr);
 	Symbol(const Symbol& symbol);
 	Symbol& operator=(const Symbol&) = default;
 
@@ -41,34 +42,34 @@ public:
 	                REG_ALL16 = REG_BC | REG_DE | REG_HL | REG_IX | REG_IY,
 	                REG_ALL = REG_ALL8 | REG_ALL16 };
 
-	[[nodiscard]] const QString& text() const;
-	void setText(const QString& str);
-	[[nodiscard]] int value() const;
+	[[nodiscard]] const QString& text() const { return symText; }
+	void setText(const QString& str) { symText = str; }
+	[[nodiscard]] int value() const { return symValue; }
 	void setValue(int addr);
-	[[nodiscard]] int validSlots() const;
-	void setValidSlots(int val);
-	[[nodiscard]] int validRegisters() const;
+	[[nodiscard]] uint16_t validSlots() const { return symSlots; }
+	void setValidSlots(uint16_t val) { symSlots = val; }
+	[[nodiscard]] int validRegisters() const { return symRegisters; }
 	void setValidRegisters(int regs);
-	[[nodiscard]] const QString* source() const;
-	void setSource(const QString* name);
-	[[nodiscard]] SymbolStatus status() const;
-	void setStatus(SymbolStatus s);
-	[[nodiscard]] SymbolType type() const;
+	[[nodiscard]] const QString* source() const { return symSource; }
+	void setSource(const QString* name) { symSource = name; }
+	[[nodiscard]] SymbolStatus status() const { return symStatus; }
+	void setStatus(SymbolStatus s) { symStatus = s; }
+	[[nodiscard]] SymbolType type() const { return symType; }
 	void setType(SymbolType t);
 
 	bool isSlotValid(const MemoryLayout* ml = nullptr) const;
 
 private:
-	SymbolTable* table;
+	SymbolTable* table = nullptr;
 
 	QString symText;
 	int symValue;
-	int symSlots;
-	QList<unsigned char> symSegments;
+	uint16_t symSlots = 0xffff;
+	//QList<uint8_t> symSegments;
 	int symRegisters;
-	const QString* symSource;
-	SymbolStatus symStatus;
-	SymbolType symType;
+	const QString* symSource = nullptr;
+	SymbolStatus symStatus = ACTIVE;
+	SymbolType symType = JUMPLABEL;
 
 	friend class SymbolTable;
 };

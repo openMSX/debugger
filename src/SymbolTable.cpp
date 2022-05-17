@@ -287,14 +287,15 @@ bool SymbolTable::readSymbolFile(
 	}
 
 	appendFile(filename, type);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList l = line.split(equ, Qt::SplitBehaviorFlags::KeepEmptyParts, Qt::CaseInsensitive);
 		if (l.size() != 2) continue;
 		if (auto value = parseValue(l.at(1))) {
-			auto* sym = add(std::make_unique<Symbol>(l.at(0), *value));
-			sym->setSource(&symbolFiles.back().fileName);
+			add(std::make_unique<Symbol>(l.at(0), *value, source));
 		}
 	}
 	return true;
@@ -320,6 +321,8 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 	}
 
 	appendFile(filename, ASMSX_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	int filePart = 0;
 	while (!in.atEnd()) {
@@ -337,15 +340,13 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 					QStringList l = line.split(" ");
 					std::unique_ptr<Symbol> sym;
 					if (line[0] == '$') {
-						sym = std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).right(4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).right(4).toInt(nullptr, 16), source));
 					} else if ((line[4] == 'h') || (line[5] == 'h')) {
-						sym = std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16), source));
 					} else {
 						QStringList n = l.at(0).split(":"); // n.at(0) = MegaROM page
-						sym = std::make_unique<Symbol>(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16), source));
 					}
-					sym->setSource(&symbolFiles.back().fileName);
-					add(std::move(sym));
 				} else if (filePart == 2) {
 					//
 				}
@@ -362,16 +363,16 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 		return false;
 	}
 	appendFile(filename, PASMO_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line;
 		QStringList l;
-		Symbol* sym;
 		line = in.readLine();
 		l = line.split(QRegExp("(\t+)|( +)"));
 		if (l.size() == 3) {
-			sym = add(std::make_unique<Symbol>(l.at(0), l.at(2).left(5).toInt(nullptr, 16)));
-			sym->setSource(&symbolFiles.back().fileName);
+			add(std::make_unique<Symbol>(l.at(0), l.at(2).left(5).toInt(nullptr, 16), source));
 		}
 	}
 	return true;
@@ -385,14 +386,15 @@ bool SymbolTable::readHTCFile(const QString& filename)
 	}
 
 	appendFile(filename, HTC_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList l = line.split(' ');
 		if (l.size() != 3) continue;
 		if (auto value = parseValue("0x" + l.at(1))) {
-			auto* sym = add(std::make_unique<Symbol>(l.at(0), *value));
-			sym->setSource(&symbolFiles.back().fileName);
+			add(std::make_unique<Symbol>(l.at(0), *value, source));
 		}
 	}
 	return true;
@@ -406,6 +408,8 @@ bool SymbolTable::readNoICEFile(const QString& filename)
 	}
 
 	appendFile(filename, NOICE_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
@@ -413,8 +417,7 @@ bool SymbolTable::readNoICEFile(const QString& filename)
 		if (l.size() != 3) continue;
 		if (l.at(0).toLower() != "def") continue;
 		if (auto value = parseValue(l.at(2))) {
-			auto* sym = add(std::make_unique<Symbol>(l.at(1), *value));
-			sym->setSource(&symbolFiles.back().fileName);
+			add(std::make_unique<Symbol>(l.at(1), *value, source));
 		}
 	}
 	return true;
@@ -433,6 +436,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 		return false;
 	}
 	appendFile(filename, LINKMAP_FILE);
+	const auto* source = &symbolFiles.back().fileName;
 
 	QTextStream in(&file);
 	if (in.atEnd()) return false;
@@ -475,8 +479,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 			QString part = line.mid(pos, l);
 			if (rp.indexIn(part) == 0) {
 				QStringList l = rp.capturedTexts();
-				auto* sym = add(std::make_unique<Symbol>(l.at(1), l.last().toInt(nullptr, 16)));
-				sym->setSource(&symbolFiles.back().fileName);
+				add(std::make_unique<Symbol>(l.at(1), l.last().toInt(nullptr, 16), source));
 			}
 		}
 	}
@@ -725,18 +728,10 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 
 // class Symbol
 
-Symbol::Symbol(QString str, int addr, int val)
-	: symText(std::move(str)), symValue(addr), symSlots(val)
+Symbol::Symbol(QString str, int addr, const QString* source)
+	: symText(std::move(str)), symValue(addr), symSource(source)
 {
-	symStatus = ACTIVE;
-	symType = JUMPLABEL;
-	symSource = nullptr;
-	if (addr & 0xFF00) {
-		symRegisters = REG_ALL16;
-	} else {
-		symRegisters = REG_ALL;
-	}
-	table = nullptr;
+	symRegisters = (addr & 0xFF00) ? REG_ALL16 : REG_ALL;
 }
 
 Symbol::Symbol(const Symbol& symbol)
@@ -746,25 +741,10 @@ Symbol::Symbol(const Symbol& symbol)
 	symText      = symbol.symText;
 	symValue     = symbol.symValue;
 	symSlots     = symbol.symSlots;
-	symSegments  = symbol.symSegments;
+	//symSegments  = symbol.symSegments;
 	symRegisters = symbol.symRegisters;
 	symSource    = symbol.symSource;
 	symType      = symbol.symType;
-}
-
-const QString& Symbol::text() const
-{
-	return symText;
-}
-
-void Symbol::setText(const QString& str)
-{
-	symText = str;
-}
-
-int Symbol::value() const
-{
-	return symValue;
 }
 
 void Symbol::setValue(int addr)
@@ -775,52 +755,12 @@ void Symbol::setValue(int addr)
 	if (table) table->symbolValueChanged(this);
 }
 
-int Symbol::validSlots() const
-{
-	return symSlots;
-}
-
-void Symbol::setValidSlots(int val)
-{
-	symSlots = val & 0xFFFF;
-}
-
-int Symbol::validRegisters() const
-{
-	return symRegisters;
-}
-
 void Symbol::setValidRegisters(int regs)
 {
 	symRegisters = regs;
 	if (symValue & 0xFF00) {
 		symRegisters &= REG_ALL16;
 	}
-}
-
-const QString* Symbol::source() const
-{
-	return symSource;
-}
-
-void Symbol::setSource(const QString* name)
-{
-	symSource = name;
-}
-
-Symbol::SymbolStatus Symbol::status() const
-{
-	return symStatus;
-}
-
-void Symbol::setStatus(SymbolStatus s)
-{
-	symStatus = s;
-}
-
-Symbol::SymbolType Symbol::type() const
-{
-	return symType;
 }
 
 void Symbol::setType(SymbolType t)
@@ -839,12 +779,13 @@ bool Symbol::isSlotValid(const MemoryLayout* ml) const
 	int ss = 0;
 	if (ml->isSubslotted[page]) ss = ml->secondarySlot[page] & 3;
 	if (symSlots & (1 << (4 * ps + ss))) {
-		if (symSegments.empty()) return true;
-		for (const auto& seg : symSegments) {
-			if (ml->mapperSegment[page] == seg) {
-				return true;
-			}
-		}
+		return true;
+		//if (symSegments.empty()) return true;
+		//for (const auto& seg : symSegments) {
+		//	if (ml->mapperSegment[page] == seg) {
+		//		return true;
+		//	}
+		//}
 	}
 	return false;
 }
