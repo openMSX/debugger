@@ -732,123 +732,104 @@ void DebuggerForm::addDefaultWorkspaces()
     addVDPBitmapWorkspace();
 }
 
-QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
+QWidget* DebuggerForm::widgetFactory(factoryclasses fctWidget)
 {
     auto& dispatcher = SignalDispatcher::instance();
 
-    QWidget* retwdgt;
-    switch (fctwidget) {
+    switch (fctWidget) {
     case disasmViewer: {
-        DisasmViewer* wdgt = new DisasmViewer();
-        connect(wdgt, &DisasmViewer::breakpointToggled, &dispatcher, &SignalDispatcher::breakpointToggled);
-        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &DisasmViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &DisasmViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::symbolsChanged, wdgt, &DisasmViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::settingsChanged, wdgt, &DisasmViewer::updateLayout);
-        connect(&dispatcher, &SignalDispatcher::setCursorAddress, wdgt, &DisasmViewer::setCursorAddress);
-        connect(&dispatcher, &SignalDispatcher::setProgramCounter, wdgt, &DisasmViewer::setProgramCounter);
-        connect(&dispatcher, &SignalDispatcher::breakpointsUpdated, wdgt, &DisasmViewer::update);
-        wdgt->setMemory(dispatcher.getMainMemory());
-        wdgt->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
-        wdgt->setMemoryLayout(dispatcher.getMemLayout());
-        wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-        retwdgt = wdgt;
-        break;
+        DisasmViewer* dv = new DisasmViewer();
+        connect(dv, &DisasmViewer::breakpointToggled, &dispatcher, &SignalDispatcher::breakpointToggled);
+        connect(&dispatcher, &SignalDispatcher::connected, dv, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, dv, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::symbolsChanged, dv, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::settingsChanged, dv, &DisasmViewer::updateLayout);
+        connect(&dispatcher, &SignalDispatcher::setCursorAddress, dv, &DisasmViewer::setCursorAddress);
+        connect(&dispatcher, &SignalDispatcher::setProgramCounter, dv, &DisasmViewer::setProgramCounter);
+        connect(&dispatcher, &SignalDispatcher::breakpointsUpdated, dv, &DisasmViewer::update);
+        dv->setMemory(dispatcher.getMainMemory());
+        dv->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
+        dv->setMemoryLayout(dispatcher.getMemLayout());
+        dv->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+        return dv;
     }
     case mainMemoryViewer: {
-        MainMemoryViewer* wdgt = new MainMemoryViewer();
+        MainMemoryViewer* mmv = new MainMemoryViewer();
         // Main memory viewer
-        connect(&dispatcher, &SignalDispatcher::connected,  wdgt, &MainMemoryViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &MainMemoryViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::registerChanged, wdgt, &MainMemoryViewer::registerChanged);
+        connect(&dispatcher, &SignalDispatcher::connected,  mmv, &MainMemoryViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, mmv, &MainMemoryViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::registerChanged, mmv, &MainMemoryViewer::registerChanged);
         //mainMemoryView->setRegsView(regsView);
-        wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-        wdgt->setDebuggable("memory", 65536);
-        retwdgt = wdgt;
-        break;
+        mmv->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+        mmv->setDebuggable("memory", 65536);
+        return mmv;
     }
     case cpuRegsViewer: {
-        CPURegsViewer* wdgt = new CPURegsViewer();
+        CPURegsViewer* crv = new CPURegsViewer();
         //copy current registers to new widget
         for (int id = 0; id < 15; ++id) { // CpuRegs::REG_AF up to CpuRegs::REG_IFF
-            static_cast<CPURegsViewer*>(wdgt)->setRegister(id, dispatcher.readRegister(id));
+            crv->setRegister(id, dispatcher.readRegister(id));
         }
-        connect(&dispatcher, &SignalDispatcher::registersUpdate, wdgt, &CPURegsViewer::setData);
-        retwdgt = wdgt;
-        break;
+        connect(&dispatcher, &SignalDispatcher::registersUpdate, crv, &CPURegsViewer::setData);
+        return crv;
     }
     case flagsViewer: {
-        FlagsViewer* wdgt = new FlagsViewer();
-        wdgt->setFlags(dispatcher.readRegister(CpuRegs::REG_AF) & 0xFF);
-        connect(&dispatcher, &SignalDispatcher::flagsChanged, wdgt, &FlagsViewer::setFlags);
-        retwdgt = wdgt;
-    	break;
+        FlagsViewer* fv = new FlagsViewer();
+        fv->setFlags(dispatcher.readRegister(CpuRegs::REG_AF) & 0xFF);
+        connect(&dispatcher, &SignalDispatcher::flagsChanged, fv, &FlagsViewer::setFlags);
+        return fv;
     }
     case stackViewer: {
-        StackViewer* wdgt = new StackViewer();
-        wdgt->setData(dispatcher.getMainMemory(), 65536);
-        wdgt->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
-        connect(&dispatcher, &SignalDispatcher::spChanged, wdgt, &StackViewer::setStackPointer);
-        retwdgt = wdgt;
-        break;
+        StackViewer* sv = new StackViewer();
+        sv->setData(dispatcher.getMainMemory(), 65536);
+        sv->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
+        connect(&dispatcher, &SignalDispatcher::spChanged, sv, &StackViewer::setStackPointer);
+        return sv;
     }
     case slotViewer: {
-        SlotViewer* wdgt = new SlotViewer();
-        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &SlotViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &SlotViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::slotsUpdated, wdgt, &SlotViewer::refresh);
-        wdgt->setMemoryLayout(dispatcher.getMemLayout());
-        retwdgt = wdgt;
-        break;
+        SlotViewer* sv = new SlotViewer();
+        connect(&dispatcher, &SignalDispatcher::connected, sv, &SlotViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, sv, &SlotViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::slotsUpdated, sv, &SlotViewer::refresh);
+        sv->setMemoryLayout(dispatcher.getMemLayout());
+        return sv;
     }
     case breakpointViewer:
-        retwdgt = new BreakpointViewer();
-        break;
+        return new BreakpointViewer();
     case debuggableViewer: {
-        DebuggableViewer* wdgt = new DebuggableViewer();
-        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &DebuggableViewer::refresh);
-        connect(&dispatcher, &SignalDispatcher::debuggablesChanged, wdgt, &DebuggableViewer::setDebuggables);
-        wdgt->setDebuggables(debuggables);
+        DebuggableViewer* dv = new DebuggableViewer();
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, dv, &DebuggableViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::debuggablesChanged, dv, &DebuggableViewer::setDebuggables);
+        dv->setDebuggables(debuggables);
         if (!debuggables.isEmpty()) {
-            wdgt->debuggableSelected(0);
-            wdgt->refresh();
+            dv->debuggableSelected(0);
+            dv->refresh();
         }
-        retwdgt = wdgt;
-        break;
+        return dv;
     }
     case vdpStatusRegViewer:
-        retwdgt = new VDPStatusRegViewer();
-        break;
+        return new VDPStatusRegViewer();
     case vdpCommandRegViewer:
-        retwdgt = new VDPCommandRegViewer();
-        break;
+        return new VDPCommandRegViewer();
     case bitMapViewer:
-        retwdgt = new BitMapViewer();
-        break;
+        return new BitMapViewer();
     case tileViewer:
-        retwdgt = new TileViewer();
-        break;
+        return new TileViewer();
     case spriteViewer:
-        retwdgt = new SpriteViewer();
-        break;
+        return new SpriteViewer();
     case vdpRegisters:
-        retwdgt = new VDPRegViewer();
-        break;
+        return new VDPRegViewer();
     case quickguide:
-        retwdgt = new QuickGuide();
-        break;
+        return new QuickGuide();
     case paletteViewer: {
-        PaletteView* wdgt = new PaletteView();
-        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &PaletteView::refresh);
-        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &PaletteView::refresh);
-        retwdgt = wdgt;
-        break;
+        PaletteView* pv = new PaletteView();
+        connect(&dispatcher, &SignalDispatcher::connected, pv, &PaletteView::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, pv, &PaletteView::refresh);
+        return pv;
     }
     default:
-        retwdgt = new QLabel("Not yet implemented in widgetFactory!");
-        break;
+        return new QLabel("Not yet implemented in widgetFactory!");
     }
-    return retwdgt;
 }
 
 void DebuggerForm::closeEvent(QCloseEvent* e)
