@@ -157,7 +157,12 @@ void DisasmViewer::refresh()
 	int end = disasmLines.back().addr + disasmLines.back().numBytes;
 	int infoLine = disasmLines[disasmTopLine].infoLine;
 
-	requestMemory(start, end, disasmLines[disasmTopLine].addr, infoLine, TopAlways);
+    requestMemory(start, end, disasmLines[disasmTopLine].addr, infoLine, TopAlways);
+}
+
+void DisasmViewer::update()
+{
+    QFrame::update();
 }
 
 void DisasmViewer::paintEvent(QPaintEvent* e)

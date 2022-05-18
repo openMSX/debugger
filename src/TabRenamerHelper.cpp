@@ -32,8 +32,7 @@ void TabRenamerHelper::tabBarDoubleClicked(int index)
     tabLineEdit->selectAll();
     tabLineEdit->setFocus();
     tabLineEdit->installEventFilter(this);
-    connect(tabLineEdit,SIGNAL(editingFinished()),
-            this,SLOT(tabNameEditingFinished()));
+    connect(tabLineEdit,&QLineEdit::editingFinished, this, &TabRenamerHelper::tabNameEditingFinished);
 
 }
 
@@ -79,8 +78,7 @@ bool TabRenamerHelper::eventFilter(QObject *obj, QEvent *event)
     if (obj == tabLineEdit && event->type() == QEvent::KeyPress) {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_Escape) {
-                disconnect(tabLineEdit,SIGNAL(editingFinished()),
-                        this,SLOT(tabNameEditingFinished()));
+                disconnect(tabLineEdit,&QLineEdit::editingFinished, this, &TabRenamerHelper::tabNameEditingFinished);
                 tabLineEdit->deleteLater();
                 tabLineEdit=nullptr;
                 return true; //no further handling of this event is required

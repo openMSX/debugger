@@ -25,23 +25,18 @@ PaletteView::PaletteView(QWidget* parent)
     for (int i = 0; i < 16; ++i) {
         auto* button = new PalettePatch(nullptr, i);
         button->setMSXPalette(myPal);
-        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+        connect(button, &PalettePatch::clicked, signalMapper, qOverload<>(&QSignalMapper::map));
         signalMapper->setMapping(button, i);
         gridLayout->addWidget(button, i / 8, i % 8);
-        connect(this, SIGNAL(paletteReplaced(MSXPalette*)),
-                button, SLOT(setMSXPalette(MSXPalette*)));
-        connect(this, SIGNAL(paletteChanged()),
-                button, SLOT(paletteChanged()));
-        connect(signalMapper, SIGNAL(mapped(int)),
-                button, SLOT(setHighlightTest(int)));
+        connect(this, &PaletteView::paletteReplaced, button, &PalettePatch::setMSXPalette);
+        connect(this, &PaletteView::paletteChanged, button, &PalettePatch::paletteChanged);
+        connect(signalMapper, &QSignalMapper::mappedInt, button, &PalettePatch::setHighlightTest);
     }
 
-    connect(signalMapper, SIGNAL(mapped(int)),
-            this, SLOT(colorSelected(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &PaletteView::colorSelected);
 
     ui->colorsframe->setLayout(gridLayout);
-    connect(this, SIGNAL(paletteChanged()),
-            this, SLOT(updateText()));
+    connect(this, &PaletteView::paletteChanged, this, &PaletteView::updateText);
     updateText();
 
     //select color 0
@@ -51,14 +46,12 @@ PaletteView::PaletteView(QWidget* parent)
 void PaletteView::setPalette(MSXPalette* sourcePal)
 {
     if (myPal != nullptr) {
-        connect(myPal, SIGNAL(paletteChanged()),
-                this, SIGNAL(paletteChanged()));
+        disconnect(myPal, &MSXPalette::paletteChanged, this, &PaletteView::paletteChanged);
     }
 
     myPal = sourcePal;
     myOriginalPal.copyDataFrom(*sourcePal);
-    connect(myPal, SIGNAL(paletteChanged()),
-            this, SIGNAL(paletteChanged()));
+    connect(myPal, &MSXPalette::paletteChanged, this, &PaletteView::paletteChanged);
     emit paletteReplaced(sourcePal);
 }
 

@@ -11,12 +11,10 @@ PalettePatch::PalettePatch(QWidget* parent, int palNr)
 void PalettePatch::setMSXPalette(MSXPalette* pal)
 {
     if (myPal != nullptr) {
-        disconnect(pal, SIGNAL(paletteChanged()),
-                   this, SLOT(paletteChanged()));
+        disconnect(myPal, &MSXPalette::paletteChanged, this, &PalettePatch::paletteChanged);
     }
     myPal = pal;
-    connect(pal, SIGNAL(paletteChanged()),
-            this, SLOT(paletteChanged()));
+    connect(myPal, &MSXPalette::paletteChanged, this, &PalettePatch::paletteChanged);
     paletteChanged();
 }
 

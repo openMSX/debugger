@@ -38,6 +38,7 @@ public:
 	void updateLayout();
 	void refresh();
 
+    void update(); //connect in DebuggerForm::widgetFactory coudln't directly connect to update of QWidget ??
 private:
 	void requestMemory(uint16_t start, uint16_t end, uint16_t addr, int infoLine, int method);
 	int findPosition(uint16_t addr, int infoLine, int method);

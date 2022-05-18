@@ -633,7 +633,7 @@ void DebuggerForm::addFloatingSwitchingWidget()
 {
     auto& dispatcher = SignalDispatcher::instance();
     auto* wdg = new SwitchingWidget();
-    connect(&dispatcher, SIGNAL(enableWidget(bool)), wdg, SLOT(setEnableWidget(bool)));
+    connect(&dispatcher, &SignalDispatcher::enableWidget, wdg, &SwitchingWidget::setEnableWidget);
     wdg->setEnableWidget(dispatcher.getEnableWidget());
     wdg->show();
 }
@@ -696,13 +696,12 @@ void DebuggerForm::createForm()
 
     // Have the SignalDispatcher refresh it data for the widgets in the blendsplitter
     auto& dispatcher = SignalDispatcher::instance();
-    connect(this, SIGNAL(connected()), &dispatcher, SLOT(refresh()));
-    connect(this, SIGNAL(breakStateEntered()), &dispatcher, SLOT(refresh()));
+    connect(this, &DebuggerForm::connected, &dispatcher, &SignalDispatcher::refresh);
+    connect(this, &DebuggerForm::breakStateEntered, &dispatcher, &SignalDispatcher::refresh);
     //and have it propagate the signals
-    connect(this, SIGNAL(connected()), &dispatcher, SIGNAL(connected()));
-    connect(this, SIGNAL(breakStateEntered()), &dispatcher, SIGNAL(breakStateEntered()));
-    connect(this, SIGNAL(debuggablesChanged(const QMap<QString, int>&)),
-            &dispatcher, SIGNAL(debuggablesChanged(const QMap<QString, int>&)) );
+    connect(this, &DebuggerForm::connected, &dispatcher, &SignalDispatcher::connected);
+    connect(this, &DebuggerForm::breakStateEntered, &dispatcher, &SignalDispatcher::breakStateEntered);
+    connect(this, &DebuggerForm::debuggablesChanged, &dispatcher, &SignalDispatcher::debuggablesChanged);
     connect(this, &DebuggerForm::breakpointsUpdated, &dispatcher, &SignalDispatcher::breakpointsUpdated);
 
     // disable all widgets
@@ -727,107 +726,127 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
 {
     auto& dispatcher = SignalDispatcher::instance();
 
-    QWidget* wdgt;
+    QWidget* retwdgt;
     switch (fctwidget) {
     case disasmViewer:
     {
-        wdgt = new DisasmViewer();
-        connect(wdgt, SIGNAL(breakpointToggled(uint16_t)), &dispatcher, SIGNAL(breakpointToggled(uint16_t)));
-        connect(&dispatcher, SIGNAL(connected()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(symbolsChanged()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(settingsChanged()), wdgt, SLOT(updateLayout()));
-        connect(&dispatcher, SIGNAL(setCursorAddress(uint16_t, int, int)), wdgt, SLOT(setCursorAddress(uint16_t, int, int)));
-        connect(&dispatcher, SIGNAL(setProgramCounter(uint16_t,bool)), wdgt, SLOT(setProgramCounter(uint16_t,bool)));
-        connect(&dispatcher, SIGNAL(breakpointsUpdated()), wdgt, SLOT(update()));
-        static_cast<DisasmViewer*>(wdgt)->setMemory(dispatcher.getMainMemory());
-        static_cast<DisasmViewer*>(wdgt)->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
-        static_cast<DisasmViewer*>(wdgt)->setMemoryLayout(dispatcher.getMemLayout());
-        static_cast<DisasmViewer*>(wdgt)->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-
+        DisasmViewer* wdgt = new DisasmViewer();
+        connect(wdgt, &DisasmViewer::breakpointToggled, &dispatcher, &SignalDispatcher::breakpointToggled);
+        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::symbolsChanged, wdgt, &DisasmViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::settingsChanged, wdgt, &DisasmViewer::updateLayout);
+        connect(&dispatcher, &SignalDispatcher::setCursorAddress, wdgt, &DisasmViewer::setCursorAddress);
+        connect(&dispatcher, &SignalDispatcher::setProgramCounter, wdgt, &DisasmViewer::setProgramCounter);
+        connect(&dispatcher, &SignalDispatcher::breakpointsUpdated, wdgt, &DisasmViewer::update);
+        wdgt->setMemory(dispatcher.getMainMemory());
+        wdgt->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
+        wdgt->setMemoryLayout(dispatcher.getMemLayout());
+        wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+        retwdgt=wdgt;
     };
         break;
     case mainMemoryViewer:
-        wdgt = new MainMemoryViewer();
+    {
+        MainMemoryViewer* wdgt = new MainMemoryViewer();
         // Main memory viewer
-        connect(&dispatcher, SIGNAL(connected()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(registerChanged(int, int)), wdgt, SLOT(registerChanged(int, int)));
+        connect(&dispatcher, &SignalDispatcher::connected,  wdgt, &MainMemoryViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &MainMemoryViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::registerChanged, wdgt, &MainMemoryViewer::registerChanged);
         //mainMemoryView->setRegsView(regsView);
-        static_cast<MainMemoryViewer*>(wdgt)->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-        static_cast<MainMemoryViewer*>(wdgt)->setDebuggable("memory", 65536);
+        wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
+        wdgt->setDebuggable("memory", 65536);
+        retwdgt=wdgt;
+    }
         break;
     case cpuRegsViewer:
-        wdgt = new CPURegsViewer();
+    {
+        CPURegsViewer* wdgt = new CPURegsViewer();
         //copy current registers to new widget
         for (int id = 0; id < 15; ++id) { // CpuRegs::REG_AF up to CpuRegs::REG_IFF
             static_cast<CPURegsViewer*>(wdgt)->setRegister(id, dispatcher.readRegister(id));
         }
-        connect(&dispatcher, SIGNAL(registersUpdate(unsigned char*)), wdgt, SLOT(setData(unsigned char*)));
+        connect(&dispatcher, &SignalDispatcher::registersUpdate, wdgt, &CPURegsViewer::setData);
+        retwdgt=wdgt;
+    }
         break;
     case flagsViewer:
-        wdgt = new FlagsViewer();
-        static_cast<FlagsViewer*>(wdgt)->setFlags(dispatcher.readRegister(CpuRegs::REG_AF) & 0xFF);
-        connect(&dispatcher, SIGNAL(flagsChanged(quint8)), wdgt, SLOT(setFlags(quint8)));
-        break;
+    {
+        FlagsViewer* wdgt = new FlagsViewer();
+        wdgt->setFlags(dispatcher.readRegister(CpuRegs::REG_AF) & 0xFF);
+        connect(&dispatcher, &SignalDispatcher::flagsChanged, wdgt, &FlagsViewer::setFlags);
+        retwdgt=wdgt;
+    }
+    break;
     case stackViewer:
-        wdgt = new StackViewer();
-        static_cast<StackViewer*>(wdgt)->setData(dispatcher.getMainMemory(), 65536);
-        static_cast<StackViewer*>(wdgt)->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
-        connect(&dispatcher, SIGNAL(spChanged(quint16)), wdgt, SLOT(setStackPointer(quint16)));
+    {
+        StackViewer* wdgt = new StackViewer();
+        wdgt->setData(dispatcher.getMainMemory(), 65536);
+        wdgt->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
+        connect(&dispatcher, &SignalDispatcher::spChanged, wdgt, &StackViewer::setStackPointer);
+        retwdgt=wdgt;
+    }
         break;
     case slotViewer:
-        wdgt = new SlotViewer();
-        connect(&dispatcher, SIGNAL(connected()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(slotsUpdated(bool)), wdgt, SLOT(refresh()));
-        static_cast<SlotViewer*>(wdgt)->setMemoryLayout(dispatcher.getMemLayout());
+    {
+        SlotViewer* wdgt = new SlotViewer();
+        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &SlotViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &SlotViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::slotsUpdated, wdgt, &SlotViewer::refresh);
+        wdgt->setMemoryLayout(dispatcher.getMemLayout());
+        retwdgt=wdgt;
+    }
         break;
     case breakpointViewer:
-        wdgt = new BreakpointViewer();
+        retwdgt = new BreakpointViewer();
         break;
     case debuggableViewer:
-        wdgt = new DebuggableViewer();
-        connect(&dispatcher, SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(debuggablesChanged(const QMap<QString, int>&)),
-                wdgt, SLOT(setDebuggables(const QMap<QString, int>&)));
-        static_cast<DebuggableViewer*>(wdgt)->setDebuggables(debuggables);
+    {
+        DebuggableViewer* wdgt = new DebuggableViewer();
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &DebuggableViewer::refresh);
+        connect(&dispatcher, &SignalDispatcher::debuggablesChanged, wdgt, &DebuggableViewer::setDebuggables);
+        wdgt->setDebuggables(debuggables);
         if (!debuggables.isEmpty()) {
-            static_cast<DebuggableViewer*>(wdgt)->debuggableSelected(0);
-            static_cast<DebuggableViewer*>(wdgt)->refresh();
+            wdgt->debuggableSelected(0);
+            wdgt->refresh();
         }
+        retwdgt=wdgt;
+    }
         break;
     case vdpStatusRegViewer:
-        wdgt = new VDPStatusRegViewer();
+        retwdgt = new VDPStatusRegViewer();
         break;
     case vdpCommandRegViewer:
-        wdgt = new VDPCommandRegViewer();
+        retwdgt = new VDPCommandRegViewer();
         break;
     case bitMapViewer:
-        wdgt = new BitMapViewer();
+        retwdgt = new BitMapViewer();
         break;
     case tileViewer:
-        wdgt = new TileViewer();
+        retwdgt = new TileViewer();
         break;
     case spriteViewer:
-        wdgt = new SpriteViewer();
+        retwdgt = new SpriteViewer();
         break;
     case vdpRegisters:
-        wdgt = new VDPRegViewer();
+        retwdgt = new VDPRegViewer();
         break;
     case quickguide:
-        wdgt = new QuickGuide();
+        retwdgt = new QuickGuide();
         break;
     case paletteViewer:
-        wdgt = new PaletteView();
-        connect(&dispatcher, SIGNAL(connected()), wdgt, SLOT(refresh()));
-        connect(&dispatcher, SIGNAL(breakStateEntered()), wdgt, SLOT(refresh()));
+    {
+        PaletteView* wdgt = new PaletteView();
+        connect(&dispatcher, &SignalDispatcher::connected, wdgt, &PaletteView::refresh);
+        connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &PaletteView::refresh);
+        retwdgt=wdgt;
+    }
         break;
     default:
-        wdgt = new QLabel("Not yet implemented in widgetFactory!");
+        retwdgt = new QLabel("Not yet implemented in widgetFactory!");
         break;
     }
-    return wdgt;
+    return retwdgt;
 }
 
 void DebuggerForm::closeEvent(QCloseEvent* e)
