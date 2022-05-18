@@ -4,7 +4,7 @@
 #include "Convert.h"
 #include <QMessageBox>
 
-static const unsigned char defaultPalette[32] = {
+static const uint8_t defaultPalette[32] = {
 //        RB  G
 	0x00, 0,
 	0x00, 0,
@@ -47,7 +47,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	// imageWidget and the QScrollArea so the scrollbars are not correctly
 	// handled when the image is resized. (since the intermediate widget
 	// stays the same size). I did not try to have this intermediate widget
-	// resize and all, since it was superflous anyway.
+	// resize and all, since it was superfluous anyway.
 	imageWidget = new VramBitMappedView();
 	QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	sizePolicy1.setHorizontalStretch(0);
@@ -60,8 +60,8 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 	useVDP = useVDPRegisters->isChecked();
 
-	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
-	const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
+	const uint8_t* vram    = VDPDataStore::instance().getVramPointer();
+	const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
 	imageWidget->setPaletteSource(palette);
@@ -85,17 +85,17 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 void BitMapViewer::decodeVDPregs()
 {
-	const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+	const uint8_t* regs = VDPDataStore::instance().getRegsPointer();
 
 	// Get the number of lines
 	int v1 = (regs[9] & 128) ? 212 : 192;
-	printf("\nlines acording to the bits %i,: %i\n", (regs[9] & 128), v1);
+	printf("\nlines according to the bits %i,: %i\n", (regs[9] & 128), v1);
 	linesLabel->setText(QString("%1").arg(v1, 0, 10));
 	if (useVDP) linesVisible->setCurrentIndex((regs[9] & 128) ? 1 : 0);
 
 	// Get the border color
 	int v2 = regs[7] & 15;
-	printf("\nborder acording to the regs %i,: %i\n", regs[7], v2);
+	printf("\nborder according to the regs %i,: %i\n", regs[7], v2);
 	if (regs[8] & 32) v2 = 0;
 	printf("\ncolor 0 is pallet regs %i,: %i\n", (regs[8] & 32), v2);
 	borderLabel->setText(QString("%1").arg(v2, 0, 10));
@@ -259,7 +259,7 @@ void BitMapViewer::on_editPaletteButton_clicked(bool /*checked*/)
 void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
 	if (state) {
-		const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
+		const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
 		imageWidget->setPaletteSource(palette);
 	} else {
 		imageWidget->setPaletteSource(defaultPalette);

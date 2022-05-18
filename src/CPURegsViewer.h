@@ -15,7 +15,7 @@ public:
 	QSize sizeHint() const override;
 
 public slots:
-    void setData(unsigned char* datPtr);
+    void setData(uint8_t* datPtr);
     void setRegister(int id, int value);
 
 private:
@@ -39,7 +39,7 @@ private:
 	int cursorLoc;
 
 	void drawValue(QPainter& p, int id, int x, int y);
-	void getRegister(int id, unsigned char* data);
+	void getRegister(int id, uint8_t* data);
 	void applyModifications();
 	void cancelModifications();
 

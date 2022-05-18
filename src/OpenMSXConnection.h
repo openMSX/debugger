@@ -58,23 +58,23 @@ class ReadDebugBlockCommand : public SimpleCommand
 {
 public:
 	ReadDebugBlockCommand(const QString& commandString, unsigned size,
-	                      unsigned char* target);
+	                      uint8_t* target);
 	ReadDebugBlockCommand(const QString& debuggable, unsigned offset, unsigned size,
-	                      unsigned char* target);
+	                      uint8_t* target);
 
 protected:
 	void copyData(const QString& message);
 
 private:
 	unsigned size;
-	unsigned char* target;
+	uint8_t* target;
 };
 
 class WriteDebugBlockCommand : public SimpleCommand
 {
 public:
 	WriteDebugBlockCommand(const QString& debuggable, unsigned offset, unsigned size,
-	                      unsigned char* source);
+	                      uint8_t* source);
 };
 
 class OpenMSXConnection : public QObject

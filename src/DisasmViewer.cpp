@@ -18,7 +18,7 @@
 class CommMemoryRequest : public ReadDebugBlockCommand
 {
 public:
-	CommMemoryRequest(uint16_t offset_, uint16_t size_, unsigned char* target,
+	CommMemoryRequest(uint16_t offset_, uint16_t size_, uint8_t* target,
 	                  DisasmViewer& viewer_)
 		: ReadDebugBlockCommand("memory", offset_, size_, target)
 		, offset(offset_), size(size_)
@@ -534,7 +534,7 @@ void DisasmViewer::scrollBarChanged(int value)
 	setAddress(value, FIRST_INFO_LINE, TopAlways);
 }
 
-void DisasmViewer::setMemory(unsigned char* memPtr)
+void DisasmViewer::setMemory(uint8_t* memPtr)
 {
 	memory = memPtr;
 	// init disasmLines

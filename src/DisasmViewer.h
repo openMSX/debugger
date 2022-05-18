@@ -17,7 +17,7 @@ class DisasmViewer : public QFrame
 public:
 	DisasmViewer(QWidget* parent = nullptr);
 
-	void setMemory(unsigned char* memPtr);
+	void setMemory(uint8_t* memPtr);
 	void setBreakpoints(Breakpoints* bps);
 	void setMemoryLayout(MemoryLayout* ml);
 	void setSymbolTable(SymbolTable* st);
@@ -81,7 +81,7 @@ private:
 	DisasmLines disasmLines;
 
 	// display data
-	unsigned char* memory;
+	uint8_t* memory;
 	bool waitingForData;
 	CommMemoryRequest* nextRequest;
 	Breakpoints* breakpoints;

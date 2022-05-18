@@ -60,7 +60,7 @@ private:
 	QString symText;
 	int symValue;
 	int symSlots;
-	QList<unsigned char> symSegments;
+	QList<uint8_t> symSegments;
 	int symRegisters;
 	const QString* symSource;
 	SymbolStatus symStatus;

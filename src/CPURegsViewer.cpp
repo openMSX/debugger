@@ -150,7 +150,7 @@ void CPURegsViewer::setRegister(int id, int value)
 	}
 }
 
-void CPURegsViewer::setData(unsigned char* datPtr)
+void CPURegsViewer::setData(uint8_t* datPtr)
 {
 	setRegister(CpuRegs::REG_AF , datPtr[ 0] * 256 + datPtr[ 1]);
 	setRegister(CpuRegs::REG_BC , datPtr[ 2] * 256 + datPtr[ 3]);
@@ -312,7 +312,7 @@ int CPURegsViewer::readRegister(int id)
 	return regs[id];
 }
 
-void CPURegsViewer::getRegister(int id, unsigned char* data)
+void CPURegsViewer::getRegister(int id, uint8_t* data)
 {
 	data[0] = regs[id] >> 8;
 	data[1] = regs[id] & 255;
@@ -320,7 +320,7 @@ void CPURegsViewer::getRegister(int id, unsigned char* data)
 
 void CPURegsViewer::applyModifications()
 {
-	unsigned char data[26];
+	uint8_t data[26];
 	getRegister(CpuRegs::REG_AF,  &data[ 0]);
 	getRegister(CpuRegs::REG_BC,  &data[ 2]);
 	getRegister(CpuRegs::REG_DE,  &data[ 4]);

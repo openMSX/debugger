@@ -59,21 +59,21 @@ static QString createDebugCommand(const QString& debuggable,
 }
 
 ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& commandString,
-		unsigned size_, unsigned char* target_)
+		unsigned size_, uint8_t* target_)
 	: SimpleCommand(commandString)
 	, size(size_), target(target_)
 {
 }
 
 ReadDebugBlockCommand::ReadDebugBlockCommand(const QString& debuggable,
-		unsigned offset, unsigned size_, unsigned char* target_)
+		unsigned offset, unsigned size_, uint8_t* target_)
 	: SimpleCommand(createDebugCommand(debuggable, offset, size_))
 	, size(size_), target(target_)
 {
 }
 
 static QString createDebugWriteCommand(const QString& debuggable,
-		unsigned offset, unsigned size, unsigned char *data)
+		unsigned offset, unsigned size, uint8_t *data)
 {
 	QString cmd = QString("debug write_block %1 %2 [ debug_hex2bin \"")
 	                  .arg(debuggable).arg(offset);
@@ -84,13 +84,13 @@ static QString createDebugWriteCommand(const QString& debuggable,
 	return cmd;
 }
 WriteDebugBlockCommand::WriteDebugBlockCommand(const QString& debuggable,
-		unsigned offset, unsigned size_, unsigned char* source_)
+		unsigned offset, unsigned size_, uint8_t* source_)
 	: SimpleCommand(createDebugWriteCommand(debuggable, offset, size_, source_))
 {
 }
 
 
-static unsigned char hex2val(char c)
+static uint8_t hex2val(char c)
 {
 	return (c <= '9') ? (c - '0') : (c - 'A' + 10);
 }

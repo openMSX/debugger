@@ -6,7 +6,7 @@
 
 SimpleHexRequest::SimpleHexRequest(
 		const QString& debuggable,  unsigned size,
-		unsigned char* target, SimpleHexRequestUser& user_)
+		uint8_t* target, SimpleHexRequestUser& user_)
 	: ReadDebugBlockCommand(debuggable, size, target)
 	, offset(0)
 	, user(user_)
@@ -16,7 +16,7 @@ SimpleHexRequest::SimpleHexRequest(
 
 SimpleHexRequest::SimpleHexRequest(
 		const QString& debuggable, unsigned offset_, unsigned size,
-		unsigned char* target, SimpleHexRequestUser& user_)
+		uint8_t* target, SimpleHexRequestUser& user_)
 	: ReadDebugBlockCommand(debuggable, offset_, size, target)
 	, offset(offset_)
 	, user(user_)

@@ -11,7 +11,7 @@ class StackRequest : public ReadDebugBlockCommand
 {
 public:
 	StackRequest(unsigned offset_, unsigned size,
-	           unsigned char* target, StackViewer& viewer_)
+	           uint8_t* target, StackViewer& viewer_)
 		: ReadDebugBlockCommand("memory", offset_, size, target)
 		, offset(offset_)
 		, viewer(viewer_)
@@ -159,7 +159,7 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	}
 }
 
-void StackViewer::setData(unsigned char* memPtr, int memLength)
+void StackViewer::setData(uint8_t* memPtr, int memLength)
 {
 	memory = memPtr;
 	memoryLength = memLength;

@@ -52,7 +52,7 @@ signals:
 	void breakpointsUpdated();
 	void debuggablesChanged(const QMap<QString, int>& list);
     // signals concerning CPU registers
-    void registersUpdate(unsigned char* datPtr);
+    void registersUpdate(uint8_t* datPtr);
     void registerChanged(int id, int value);
     void pcChanged(uint16_t);
     void flagsChanged(quint8);
