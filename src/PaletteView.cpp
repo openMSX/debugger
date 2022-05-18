@@ -8,7 +8,7 @@
 #include <QJsonObject>
 
 PaletteView::PaletteView(QWidget* parent)
-    : QWidget(parent), SavesJsonInterface()
+    : QWidget(parent)
     , ui(std::make_unique<Ui::PaletteView>())
 {
     ui->setupUi(this);

@@ -20,9 +20,9 @@ static const int linkRegisters[] = {
 };
 
 MainMemoryViewer::MainMemoryViewer(QWidget* parent)
-	: QWidget(parent), SavesJsonInterface()
+	: QWidget(parent)
 {
-    setObjectName("MainMemoryViewer");
+	setObjectName("MainMemoryViewer");
 	// create selection list, address edit line and viewer
 	addressSourceList = new QComboBox();
 	addressSourceList->setEditable(false);

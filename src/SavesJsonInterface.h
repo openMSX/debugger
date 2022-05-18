@@ -6,7 +6,6 @@ class QJsonObject;
 class SavesJsonInterface
 {
 public:
-    SavesJsonInterface();
     virtual QJsonObject save2json() = 0;
     virtual bool loadFromJson(const QJsonObject& obj) = 0;
 };

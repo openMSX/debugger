@@ -25,7 +25,7 @@ MOC_SRC_HDR:= \
 
 SRC_HDR:= \
 	Dasm DasmTables DebuggerData SymbolTable Convert Version \
-	CPURegs SimpleHexRequest SavesJsonInterface
+	CPURegs SimpleHexRequest
 
 SRC_ONLY:= \
 	main
