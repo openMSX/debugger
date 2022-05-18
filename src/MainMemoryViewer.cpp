@@ -100,13 +100,16 @@ QJsonObject MainMemoryViewer::save2json()
 	return obj;
 }
 
-bool MainMemoryViewer::loadFromJson(const QJsonObject &obj)
+bool MainMemoryViewer::loadFromJson(const QJsonObject& obj)
 {
-	if (obj["addressSourceList"] == QJsonValue::Undefined ||
-	    obj["addressValue"] == QJsonValue::Undefined) return false;
+	auto asl = obj["addressSourceList"];
+	auto av  = obj["addressValue"];
+	if (asl == QJsonValue::Undefined || av  == QJsonValue::Undefined) {
+		return false;
+	}
 
-	addressSourceList->setCurrentIndex(obj["addressSourceList"].toInt());
-	addressValue->setText(obj["addressValue"].toString());
+	addressSourceList->setCurrentIndex(asl.toInt());
+	addressValue->setText(av.toString());
 	hexView->setLocation(addressValue->text().toInt());
 	return true;
 }

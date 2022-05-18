@@ -33,11 +33,11 @@ QJsonObject DebuggableViewer::save2json()
 	return obj;
 }
 
-bool DebuggableViewer::loadFromJson(const QJsonObject &obj)
+bool DebuggableViewer::loadFromJson(const QJsonObject& obj)
 {
-	if (obj["debuggable"] == QJsonValue::Undefined) return false;
-
-	debuggableList->setCurrentText(obj["debuggable"].toString());
+	auto d = obj["debuggable"];
+	if (d == QJsonValue::Undefined) return false;
+	debuggableList->setCurrentText(d.toString());
 	return true;
 }
 
@@ -56,8 +56,9 @@ void DebuggableViewer::debuggableSelected(int index)
 	QString name = debuggableList->itemText(index);
 	int size = debuggableList->itemData(index).toInt();
 
-	if (index >= 0)
+	if (index >= 0) {
 		lastSelected = name;
+	}
 	// add braces when the name contains a space
 	if (name.contains(QChar(' '))) {
 		name.append(QChar('}'));

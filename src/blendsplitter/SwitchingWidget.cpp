@@ -89,9 +89,10 @@ SwitchingWidget* SwitchingWidget::createFromJson(const QJsonObject &obj)
     auto* wdgt = new SwitchingWidget{WidgetRegistry::instance().item(i)};
     wdgt->resize(obj["size_width"].toInt(), obj["size_height"].toInt());
 
-    auto* childwdgt = dynamic_cast<SavesJsonInterface*>(wdgt->getWidget());
-    if (childwdgt && obj["childwidget"] != QJsonValue::Undefined) {
-        childwdgt->loadFromJson(obj["childwidget"].toObject());
+    if (auto* childWdgt = dynamic_cast<SavesJsonInterface*>(wdgt->getWidget())) {
+        if (auto cw = obj["childwidget"]; cw != QJsonValue::Undefined) {
+            childWdgt->loadFromJson(cw.toObject());
+        }
     }
 
     return wdgt;
@@ -111,8 +112,7 @@ QWidget *SwitchingWidget::getWidget()
 QJsonObject SwitchingWidget::getWidgetSettings()
 {
     QJsonObject obj;
-    auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget());
-    if (wd) {
+    if (auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget())) {
         obj = wd->save2json();
     }
     return obj;
@@ -120,8 +120,7 @@ QJsonObject SwitchingWidget::getWidgetSettings()
 
 bool SwitchingWidget::setWidgetSettings(const QJsonObject &obj)
 {
-    auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget());
-    if (wd) {
+    if (auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget())) {
         return wd->loadFromJson(obj);
     }
     return false;

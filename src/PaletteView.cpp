@@ -85,23 +85,21 @@ QJsonObject PaletteView::save2json()
     return obj;
 }
 
-bool PaletteView::loadFromJson(const QJsonObject &obj)
+bool PaletteView::loadFromJson(const QJsonObject& obj)
 {
-    int i = 0;
-    if (obj["viewtext"] != QJsonValue::Undefined) {
-        ui->cb_viewtext->setChecked(obj["viewtext"].toBool());
-        i++;
-    }
-    if (obj["autosync"] != QJsonValue::Undefined) {
-        ui->cb_autosync->setChecked(obj["autosync"].toBool());
-        i++;
-    }
-    if (obj["palette"] != QJsonValue::Undefined) {
-        ui->cbPalette->setCurrentIndex(obj["palette"].toInt());
-        i++;
+    auto vt = obj["viewtext"];
+    auto as = obj["autosync"];
+    auto pa = obj["palette"];
+    if (vt == QJsonValue::Undefined ||
+        as == QJsonValue::Undefined ||
+        pa == QJsonValue::Undefined) {
+            return false;
     }
 
-    return i == 3;
+    ui->cb_viewtext->setChecked(vt.toBool());
+    ui->cb_autosync->setChecked(as.toBool());
+    ui->cbPalette->setCurrentIndex(pa.toInt());
+    return true;
 }
 
 void PaletteView::refresh()
