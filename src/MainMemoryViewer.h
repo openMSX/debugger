@@ -19,7 +19,7 @@ public:
 
 	void setDebuggable(const QString& name, int size);
 //	void setRegsView(CPURegsViewer* viewer);
-	void setSymbolTable(SymbolTable* symtable);
+	void setSymbolTable(SymbolTable* newtable);
 
     QJsonObject save2json() final;
     bool loadFromJson(const QJsonObject& obj) final;

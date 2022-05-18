@@ -87,9 +87,9 @@ void MainMemoryViewer::setDebuggable(const QString& name, int size)
 //	regsViewer = viewer;
 //}
 
-void MainMemoryViewer::setSymbolTable(SymbolTable* symtable)
+void MainMemoryViewer::setSymbolTable(SymbolTable* newTable)
 {
-	symTable = symtable;
+	symTable = newTable;
 }
 
 QJsonObject MainMemoryViewer::save2json()
