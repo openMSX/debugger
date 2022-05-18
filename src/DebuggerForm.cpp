@@ -746,7 +746,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctWidget)
         connect(&dispatcher, &SignalDispatcher::settingsChanged, dv, &DisasmViewer::updateLayout);
         connect(&dispatcher, &SignalDispatcher::setCursorAddress, dv, &DisasmViewer::setCursorAddress);
         connect(&dispatcher, &SignalDispatcher::setProgramCounter, dv, &DisasmViewer::setProgramCounter);
-        connect(&dispatcher, &SignalDispatcher::breakpointsUpdated, dv, &DisasmViewer::update);
+        connect(&dispatcher, &SignalDispatcher::breakpointsUpdated, dv, qOverload<>(&DisasmViewer::update));
         dv->setMemory(dispatcher.getMainMemory());
         dv->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
         dv->setMemoryLayout(dispatcher.getMemLayout());
@@ -761,7 +761,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctWidget)
         connect(&dispatcher, &SignalDispatcher::registerChanged, mmv, &MainMemoryViewer::registerChanged);
         //mainMemoryView->setRegsView(regsView);
         mmv->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-        mmv->setDebuggable("memory", 65536);
+        mmv->setDebuggable("memory", 0x10000);
         return mmv;
     }
     case cpuRegsViewer: {
@@ -781,7 +781,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctWidget)
     }
     case stackViewer: {
         StackViewer* sv = new StackViewer();
-        sv->setData(dispatcher.getMainMemory(), 65536);
+        sv->setData(dispatcher.getMainMemory(), 0x10000);
         sv->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
         connect(&dispatcher, &SignalDispatcher::spChanged, sv, &StackViewer::setStackPointer);
         return sv;

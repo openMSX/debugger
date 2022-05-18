@@ -160,11 +160,6 @@ void DisasmViewer::refresh()
     requestMemory(start, end, disasmLines[disasmTopLine].addr, infoLine, TopAlways);
 }
 
-void DisasmViewer::update()
-{
-    QFrame::update();
-}
-
 void DisasmViewer::paintEvent(QPaintEvent* e)
 {
 	// call parent for drawing the actual frame

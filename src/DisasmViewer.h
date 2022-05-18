@@ -38,8 +38,6 @@ public:
 	void updateLayout();
 	void refresh();
 
-	void update(); //connect in DebuggerForm::widgetFactory couldn't directly connect to update of QWidget ??
-
 signals:
 	void breakpointToggled(uint16_t addr);
 
