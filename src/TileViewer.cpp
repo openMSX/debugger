@@ -231,7 +231,7 @@ void TileViewer::decodeVDPregs()
         le_patterntable->setText(hexValue(patternTable, 4));
         le_colortable->setText(hexValue(colorTable, 4));
         cb_blinkcolors->setChecked(usesBlink ? regs[13] & 0xf0 : false);
-        cb_screenrows->setCurrentIndex((regs[9] & 128) ? 1 : 0 );
+        cb_screenrows->setCurrentIndex((regs[9] & 128) ? 1 : 0);
         sp_bordercolor->setValue(regs[7] & 15);
         cb_color0->setChecked(regs[8] & 32);
     }

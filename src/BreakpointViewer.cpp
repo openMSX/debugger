@@ -315,7 +315,7 @@ std::optional<AddressRange> BreakpointViewer::parseLocationField(
 
 	QStringList s = field.simplified().split(":", Qt::SplitBehaviorFlags::SkipEmptyParts);
 	auto begin = s.size() >= 1 ? stringToValue<uint16_t>(s[0]) : std::nullopt;
-	auto end = s.size() == 2 ? stringToValue<uint16_t>(s[1]) : std::nullopt; 
+	auto end = s.size() == 2 ? stringToValue<uint16_t>(s[1]) : std::nullopt;
 	auto it = ranges::find(ComboTypeNames, comboTxt);
 	auto wType = static_cast<Breakpoint::Type>(std::distance(ComboTypeNames, it) + 1);
 	if ((wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
@@ -430,16 +430,16 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 
 void BreakpointViewer::disableSorting(BreakpointRef::Type type)
 {
-	auto unsort = [](auto* table) {
+	auto unSort = [](auto* table) {
 		table->sortByColumn(-1, Qt::AscendingOrder);
 	};
 
 	if (type == BreakpointRef::ALL) {
 		for (auto* table : tables) {
-			unsort(table);
+			unSort(table);
 		}
 	} else {
-		unsort(tables[type]);
+		unSort(tables[type]);
 	}
 }
 

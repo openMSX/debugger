@@ -145,10 +145,12 @@ Symbol* SymbolTable::getAddressSymbol(int addr, MemoryLayout* ml)
 Symbol* SymbolTable::getAddressSymbol(const QString& label, bool case_sensitive)
 {
 	for (auto it = addressSymbols.begin(); it != addressSymbols.end(); ++it) {
-		if (it.value()->text().compare(label, Qt::CaseSensitive)==0)
+		if (it.value()->text().compare(label, Qt::CaseSensitive) == 0) {
 			return it.value();
-		if (!case_sensitive && it.value()->text().compare(label, Qt::CaseInsensitive)==0)
+		}
+		if (!case_sensitive && it.value()->text().compare(label, Qt::CaseInsensitive) == 0) {
 			return it.value();
+		}
 	}
 	return nullptr;
 }
@@ -606,16 +608,16 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 		xml.writeStartElement("SymbolFile");
 		switch (symbolFiles[i].fileType) {
 		case TNIASM0_FILE:
-			xml.writeAttribute("type","tniasm0");
+			xml.writeAttribute("type", "tniasm0");
 			break;
 		case TNIASM1_FILE:
-			xml.writeAttribute("type","tniasm1");
+			xml.writeAttribute("type", "tniasm1");
 			break;
 		case ASMSX_FILE:
-			xml.writeAttribute("type","asmsx");
+			xml.writeAttribute("type", "asmsx");
 			break;
 		case LINKMAP_FILE:
-			xml.writeAttribute("type","linkmap");
+			xml.writeAttribute("type", "linkmap");
 			break;
 		default:
 			break;

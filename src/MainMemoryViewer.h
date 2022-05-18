@@ -11,7 +11,7 @@ class QComboBox;
 class QLineEdit;
 class QJsonObject;
 
-class MainMemoryViewer : public QWidget , public SavesJsonInterface
+class MainMemoryViewer : public QWidget, public SavesJsonInterface
 {
 	Q_OBJECT
 public:

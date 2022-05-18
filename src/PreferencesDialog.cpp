@@ -15,59 +15,59 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-    // Since there is no 'slots' definition in the header anymore we can not use the QMetaObject::connectSlotsByName() in setupUi anymore
-    // So now we do it explicitely here
-    connect(leFileName, &QLineEdit::textChanged, this, &PreferencesDialog::on_leFileName_textChanged);
-    connect(btnSaveLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnSaveLayout_clicked);
-    connect(btnBrowseLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnBrowseLayout_clicked);
+	// Since there is no 'slots' definition in the header anymore we can not use the QMetaObject::connectSlotsByName() in setupUi anymore
+	// So now we do it explicitely here
+	connect(leFileName, &QLineEdit::textChanged, this, &PreferencesDialog::on_leFileName_textChanged);
+	connect(btnSaveLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnSaveLayout_clicked);
+	connect(btnBrowseLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnBrowseLayout_clicked);
 
 
-    //openMSX connection stuff
-    connect(cbAutoconnect, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
-    connect(cbStartIfNoConnection, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
-    connect(leOpenMSXbin, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
-    connect(leOpenMSXargs, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
-    connect(pbTestCLI, &QPushButton::clicked, this, &PreferencesDialog::testOpenMSXCommandLine);
+	//openMSX connection stuff
+	connect(cbAutoconnect, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
+	connect(cbStartIfNoConnection, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
+	connect(leOpenMSXbin, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
+	connect(leOpenMSXargs, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
+	connect(pbTestCLI, &QPushButton::clicked, this, &PreferencesDialog::testOpenMSXCommandLine);
 
 
-    //font stuff
+	//font stuff
 	connect(listFonts, &QListWidget::currentRowChanged,
-	        this, &PreferencesDialog::fontSelectionChange);
-	connect(rbUseAppFont,    &QRadioButton::toggled,
-	        this, &PreferencesDialog::fontTypeChanged);
+			this, &PreferencesDialog::fontSelectionChange);
+	connect(rbUseAppFont,	&QRadioButton::toggled,
+			this, &PreferencesDialog::fontTypeChanged);
 	connect(rbUseFixedFont,  &QRadioButton::toggled,
-	        this, &PreferencesDialog::fontTypeChanged);
+			this, &PreferencesDialog::fontTypeChanged);
 	connect(rbUseCustomFont, &QRadioButton::toggled,
-	        this, &PreferencesDialog::fontTypeChanged);
+			this, &PreferencesDialog::fontTypeChanged);
 	connect(btnSelectFont, &QPushButton::clicked,
-	        this, &PreferencesDialog::fontSelectCustom);
+			this, &PreferencesDialog::fontSelectCustom);
 	connect(btnFontColor,  &QPushButton::clicked,
-	        this, &PreferencesDialog::fontSelectColor);
+			this, &PreferencesDialog::fontSelectColor);
 	initFontList();
 	listFonts->setCurrentRow(0);
 
-    //layout stuff
-    QList<QRadioButton*> rblayouttypes;
-    rblayouttypes << rbFirstTimeUser << rbDefaultWorkspaces << rbLayoutFromFile;
-    foreach(auto rb, rblayouttypes){
-        connect(rb, &QRadioButton::toggled,
-                this, &PreferencesDialog::layoutTypeChanged);
-    };
+	//layout stuff
+	QList<QRadioButton*> rblayouttypes;
+	rblayouttypes << rbFirstTimeUser << rbDefaultWorkspaces << rbLayoutFromFile;
+	foreach(auto rb, rblayouttypes){
+		connect(rb, &QRadioButton::toggled,
+				this, &PreferencesDialog::layoutTypeChanged);
+	};
 
-    //update ui with saved settings
-    updating=true;
-    Settings& s = Settings::get();
-    rblayouttypes.at(s.value("creatingWorkspaceType",0).toInt())->setChecked(true);
-    leFileName->setText(s.value("creatingWorkspaceFile","").toString());
+	//update ui with saved settings
+	updating=true;
+	Settings& s = Settings::get();
+	rblayouttypes.at(s.value("creatingWorkspaceType",0).toInt())->setChecked(true);
+	leFileName->setText(s.value("creatingWorkspaceFile","").toString());
 
-    cbAutoconnect->setChecked(s.value("autoconnect",true).toBool());
-    cbStartIfNoConnection->setChecked(s.value("startOpenMSX",false).toBool());
-    leOpenMSXbin->setText(s.value("openMSXbin","").toString());
-    leOpenMSXargs->setText(s.value("openMSXargs","").toString());
+	cbAutoconnect->setChecked(s.value("autoconnect",true).toBool());
+	cbStartIfNoConnection->setChecked(s.value("startOpenMSX",false).toBool());
+	leOpenMSXbin->setText(s.value("openMSXbin","").toString());
+	leOpenMSXargs->setText(s.value("openMSXargs","").toString());
 
-    createCLI();
+	createCLI();
 
-    updating=false;
+	updating=false;
 }
 
 /*
@@ -150,24 +150,24 @@ void PreferencesDialog::fontSelectColor()
 	if (newColor.isValid()) {
 		Settings::get().setFontColor(f, newColor);
 		setFontPreviewColor(newColor);
-    }
+	}
 }
 
 void PreferencesDialog::layoutTypeChanged(bool state)
 {
-    if (!state || updating) return;
+	if (!state || updating) return;
 
-    Settings& s = Settings::get();
+	Settings& s = Settings::get();
 
-    int wst=2;
-    if (rbFirstTimeUser->isChecked()){
-        wst=0;
-    } else if (rbDefaultWorkspaces->isChecked()){
-        wst=1;
-    } else {
-        s.setValue("creatingWorkspaceFile",leFileName->text());
-    }
-    s.setValue("creatingWorkspaceType",wst);
+	int wst = 2;
+	if (rbFirstTimeUser->isChecked()) {
+		wst = 0;
+	} else if (rbDefaultWorkspaces->isChecked()) {
+		wst = 1;
+	} else {
+		s.setValue("creatingWorkspaceFile", leFileName->text());
+	}
+	s.setValue("creatingWorkspaceType", wst);
 }
 
 void PreferencesDialog::setFontPreviewColor(const QColor& c)
@@ -183,64 +183,63 @@ void PreferencesDialog::setFontPreviewColor(const QColor& c)
 
 void PreferencesDialog::on_btnBrowseLayout_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(
-        this, tr("Select workspace layout"),
-        QDir::currentPath(), tr("Debug Workspace Layout Files (*.omdl)"));
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Select workspace layout"),
+		QDir::currentPath(), tr("Debug Workspace Layout Files (*.omdl)"));
 
-    if (!fileName.isEmpty()){
-        leFileName->setText(fileName);
-        rbLayoutFromFile->setChecked(true); //not sure if setText with already string in lineEdit will trigger the on_leFileName_textChanged
-    }
+	if (!fileName.isEmpty()) {
+		leFileName->setText(fileName);
+		rbLayoutFromFile->setChecked(true); //not sure if setText with already string in lineEdit will trigger the on_leFileName_textChanged
+	}
 }
 
 void PreferencesDialog::openMSXConnectionChanged()
 {
-    if (updating) return;
+	if (updating) return;
 
-    createCLI();
-    Settings& s = Settings::get();
-    s.setValue("autoconnect",cbAutoconnect->isChecked());
-    s.setValue("startOpenMSX",cbStartIfNoConnection->isChecked());
-    s.setValue("openMSXbin",leOpenMSXbin->text());
-    s.setValue("openMSXargs",leOpenMSXargs->text());
+	createCLI();
+	Settings& s = Settings::get();
+	s.setValue("autoconnect",cbAutoconnect->isChecked());
+	s.setValue("startOpenMSX",cbStartIfNoConnection->isChecked());
+	s.setValue("openMSXbin",leOpenMSXbin->text());
+	s.setValue("openMSXargs",leOpenMSXargs->text());
 }
 
 void PreferencesDialog::on_leFileName_textChanged(const QString &arg1)
 {
-    if (updating) return;
-    Settings& s = Settings::get();
-    s.setValue("creatingWorkspaceFile",arg1);
+	if (updating) return;
+	Settings& s = Settings::get();
+	s.setValue("creatingWorkspaceFile", arg1);
 
-    rbLayoutFromFile->setChecked(true);
+	rbLayoutFromFile->setChecked(true);
 }
 
 
 void PreferencesDialog::on_btnSaveLayout_clicked()
 {
-    Settings& s = Settings::get();
-
-    QString savefilename=leFileName->text();
-    if (savefilename.isEmpty()){
-        //maybe the user cleared the lineEdit or first time launch or something went wrong :-)
-         savefilename=s.value("creatingWorkspaceFile","").toString();
-    }
-    if (savefilename.isEmpty()) {
-        savefilename=static_cast<DebuggerForm*>(parent())->fileSaveWorkspaceAs();
-    } else {
-        static_cast<DebuggerForm*>(parent())->saveWorkspacesAs(savefilename);
-    }
-    //update filename in case of fileSaveWorkspaceAs
-    if (!savefilename.isEmpty()) {
-       leFileName->setText(savefilename);
-       s.setValue("creatingWorkspaceFile",savefilename);
-    }
+	Settings& s = Settings::get();
+	QString savefilename = leFileName->text();
+	if (savefilename.isEmpty()) {
+		// maybe the user cleared the lineEdit or first time launch or something went wrong :-)
+		savefilename = s.value("creatingWorkspaceFile", "").toString();
+	}
+	if (savefilename.isEmpty()) {
+		savefilename = static_cast<DebuggerForm*>(parent())->fileSaveWorkspaceAs();
+	} else {
+		static_cast<DebuggerForm*>(parent())->saveWorkspacesAs(savefilename);
+	}
+	// update filename in case of fileSaveWorkspaceAs
+	if (!savefilename.isEmpty()) {
+		leFileName->setText(savefilename);
+		s.setValue("creatingWorkspaceFile", savefilename);
+	}
 }
 
 void PreferencesDialog::createCLI()
 {
-    labelCLI->setText(QString("%1 %2")
-                      .arg(leOpenMSXbin->text(),leOpenMSXargs->text())
-                      );
+	labelCLI->setText(QString("%1 %2")
+					.arg(leOpenMSXbin->text(),leOpenMSXargs->text())
+					);
 }
 
 void PreferencesDialog::testOpenMSXCommandLine()
@@ -258,4 +257,3 @@ void PreferencesDialog::testOpenMSXCommandLine()
                               );
     }
 }
-

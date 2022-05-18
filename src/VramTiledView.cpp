@@ -463,7 +463,7 @@ QString VramTiledView::textInfo(int x, int y, int character)
 	} else if (screenMode == 1) {
 		colordata = QString("- %1: %2").arg(
 			hexValue(colorTableAddress + (character >> 3), 4),
-			hexValue(vramBase[colorTableAddress+(character >> 3)], 2));
+			hexValue(vramBase[colorTableAddress + (character >> 3)], 2));
 	} else if (screenMode == 3) {
 		colordata = QString("- not used");
 	}
@@ -506,17 +506,17 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 	if (!vramBase) return {};
 
 	// I see negative y-coords sometimes, so for safety clip the coords
-    int x = std::clamp(int(float(e->x()) / zoomFactor),     0, 511) / horiStep;
-    int y = std::clamp(int(float(e->y()) / zoomFactor) / 2, 0, 255) / 8;
+	int x = std::clamp(int(float(e->x()) / zoomFactor),     0, 511) / horiStep;
+	int y = std::clamp(int(float(e->y()) / zoomFactor) / 2, 0, 255) / 8;
 
-    if (x >= screenWidth) return {};
-    if (y >= screenHeight) return {};
+	if (x >= screenWidth) return {};
+	if (y >= screenHeight) return {};
 
 	int character = 0;
 
 	switch (tableToShow) {
 		case 0:
-            character = x + y * screenWidth;
+			character = x + y * screenWidth;
 			if (!(screenMode == 2 || screenMode == 4)) {
 				character &= 255;
 			}
@@ -525,11 +525,11 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 		case 2:
 			character = vramBase[nameTableAddress + x + y * screenWidth];
 			if (screenMode == 2 || screenMode == 4) {
-                character += 256 * int(y / 8);
+				character += 256 * int(y / 8);
 			}
 			break;
 	}
-    return MouseEventInfo{x, y, character};
+	return MouseEventInfo{x, y, character};
 }
 
 void VramTiledView::setBorderColor(int value)

@@ -89,9 +89,8 @@ SwitchingWidget* SwitchingWidget::createFromJson(const QJsonObject &obj)
     auto* wdgt = new SwitchingWidget{WidgetRegistry::instance().item(i)};
     wdgt->resize(obj["size_width"].toInt(), obj["size_height"].toInt());
 
-
     auto* childwdgt = dynamic_cast<SavesJsonInterface*>(wdgt->getWidget());
-    if (childwdgt && obj["childwidget"] != QJsonValue::Undefined ) {
+    if (childwdgt && obj["childwidget"] != QJsonValue::Undefined) {
         childwdgt->loadFromJson(obj["childwidget"].toObject());
     }
 
@@ -105,7 +104,7 @@ QWidget *SwitchingWidget::getWidget()
     if (isWrappedInScrollArea) {
         auto* sa = static_cast<QScrollArea*>(wdgt);
         wdgt = sa->widget();
-    };
+    }
     return wdgt;
 }
 
@@ -114,7 +113,7 @@ QJsonObject SwitchingWidget::getWidgetSettings()
     QJsonObject obj;
     auto* wd = dynamic_cast<SavesJsonInterface*>(getWidget());
     if (wd) {
-        obj=wd->save2json();
+        obj = wd->save2json();
     }
     return obj;
 }
@@ -177,7 +176,7 @@ QWidget* SwitchingWidget::wrapInScrollArea(QWidget* wdgt, bool dowrap)
 
     auto* scrollArea = new QScrollArea;
     //scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     scrollArea->setContentsMargins(0, 0, 0, 0);
     scrollArea->setWidget(wdgt);
     scrollArea->setWidgetResizable(true);

@@ -17,7 +17,7 @@ namespace Ui {
     class PaletteView;
 }
 
-class PaletteView : public QWidget , public SavesJsonInterface
+class PaletteView : public QWidget, public SavesJsonInterface
 {
     Q_OBJECT
 

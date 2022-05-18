@@ -21,24 +21,24 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
 	setLayout(vbox);
-	
+
 	connect(hexView, &HexViewer::locationChanged,
 	        this, &DebuggableViewer::locationChanged);
 }
 
 QJsonObject DebuggableViewer::save2json()
 {
-    QJsonObject obj;
-    obj["debuggable"]=debuggableList->currentText();
-    return obj;
+	QJsonObject obj;
+	obj["debuggable"] = debuggableList->currentText();
+	return obj;
 }
 
 bool DebuggableViewer::loadFromJson(const QJsonObject &obj)
 {
-    if ( obj["debuggable"] == QJsonValue::Undefined ) return false;
+	if (obj["debuggable"] == QJsonValue::Undefined) return false;
 
-    debuggableList->setCurrentText(obj["debuggable"].toString() );
-    return true;
+	debuggableList->setCurrentText(obj["debuggable"].toString());
+	return true;
 }
 
 void DebuggableViewer::settingsChanged()

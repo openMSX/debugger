@@ -38,7 +38,11 @@ public:
 	void updateLayout();
 	void refresh();
 
-    void update(); //connect in DebuggerForm::widgetFactory coudln't directly connect to update of QWidget ??
+	void update(); //connect in DebuggerForm::widgetFactory couldn't directly connect to update of QWidget ??
+
+signals:
+	void breakpointToggled(uint16_t addr);
+
 private:
 	void requestMemory(uint16_t start, uint16_t end, uint16_t addr, int infoLine, int method);
 	int findPosition(uint16_t addr, int infoLine, int method);
@@ -83,9 +87,6 @@ private:
 	Breakpoints* breakpoints;
 	MemoryLayout* memLayout;
 	SymbolTable* symTable;
-
-signals:
-    void breakpointToggled(uint16_t addr);
 };
 
 #endif // DISASMVIEWER_H

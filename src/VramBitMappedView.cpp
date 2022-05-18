@@ -189,7 +189,7 @@ void VramBitMappedView::paintEvent(QPaintEvent* /*event*/)
 	QRect srcRect(0, 0, 512, 2 * lines);
 	QRect dstRect(0, 0, int(512.0f * zoomFactor), int(2.0f * float(lines) * zoomFactor));
 	QPainter qp(this);
-	//qp.drawImage(rect(),image,srcRect);
+	//qp.drawImage(rect(), image, srcRect);
 	qp.drawPixmap(dstRect, pixImage, srcRect);
 }
 

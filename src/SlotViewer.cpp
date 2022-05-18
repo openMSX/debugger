@@ -135,10 +135,10 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 			if (ms > 0) {
 				str = QString("%1").arg(memLayout->mapperSegment[i]);
 			} else if (memLayout->romBlock[2*i] >= 0) {
-				if (memLayout->romBlock[2*i] == memLayout->romBlock[2*i+1]) {
-					str = QString("R%1").arg(memLayout->romBlock[2*i]);
+				if (memLayout->romBlock[2*i] == memLayout->romBlock[2 * i + 1]) {
+					str = QString("R%1").arg(memLayout->romBlock[2 * i]);
 				} else {
-					str = QString("R%1/%2").arg(memLayout->romBlock[2*i]).arg(memLayout->romBlock[2*i+1]);
+					str = QString("R%1/%2").arg(memLayout->romBlock[2 * i]).arg(memLayout->romBlock[2 * i + 1]);
 				}
 			} else {
 				str = "-";

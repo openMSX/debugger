@@ -7,16 +7,15 @@
 class HexViewer;
 class QComboBox;
 
-class DebuggableViewer : public QWidget , public SavesJsonInterface
+class DebuggableViewer : public QWidget, public SavesJsonInterface
 {
 	Q_OBJECT
 public:
 	DebuggableViewer(QWidget* parent = nullptr);
 
-    QJsonObject save2json() override;
-    bool loadFromJson(const QJsonObject& obj) override;
+	QJsonObject save2json() override;
+	bool loadFromJson(const QJsonObject& obj) override;
 
-//slots
 	void settingsChanged();
 	void setDebuggables(const QMap<QString, int>& list);
 	void refresh();
@@ -30,7 +29,7 @@ private:
 	QString lastSelected;
 	int lastLocation;
 
-friend class DebuggerForm; // to get to  debuggableSelected  from the widgetFactory
+	friend class DebuggerForm; // to get to debuggableSelected from the widgetFactory
 };
 
 #endif // DEBUGGABLEVIEWER_H

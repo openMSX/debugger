@@ -160,9 +160,9 @@ int DebuggerForm::counter = 0;
 
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
-    , comm(CommClient::instance())
+	, comm(CommClient::instance())
 {
-    session = DebugSession::getDebugSession();
+	session = DebugSession::getDebugSession();
 
 	createActions();
 	createMenus();
@@ -173,9 +173,9 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
 
-    connect(&(session->symbolTable()), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
+	connect(&(session->symbolTable()), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
 
-    autoConnectToOpenMSX();
+	autoConnectToOpenMSX();
 
 }
 
@@ -190,21 +190,19 @@ void DebuggerForm::createActions()
 
 	fileSaveSessionAction = new QAction(tr("&Save Session"), this);
 	fileSaveSessionAction->setShortcut(tr("Ctrl+S"));
-    fileSaveSessionAction->setStatusTip(tr("Save the current debug session"));
+	fileSaveSessionAction->setStatusTip(tr("Save the current debug session"));
 
 	fileSaveSessionAsAction = new QAction(tr("Save Session &As"), this);
 	fileSaveSessionAsAction->setStatusTip(tr("Save the debug session in a selected file"));
 
-    fileOpenWorkspaceLayoutAction = new QAction(tr("&Open workspaces"), this);
-    fileOpenWorkspaceLayoutAction->setStatusTip(tr("Load a workspace layout."));
+	fileOpenWorkspaceLayoutAction = new QAction(tr("&Open workspaces"), this);
+	fileOpenWorkspaceLayoutAction->setStatusTip(tr("Load a workspace layout."));
 
-    fileSaveWorkspaceLayoutAction = new QAction(tr("&Save workspaces"), this);
-    fileSaveWorkspaceLayoutAction->setStatusTip(tr("Save the current workspaces and splitters layout"));
+	fileSaveWorkspaceLayoutAction = new QAction(tr("&Save workspaces"), this);
+	fileSaveWorkspaceLayoutAction->setStatusTip(tr("Save the current workspaces and splitters layout"));
 
-    fileSaveWorkspaceLayoutAsAction = new QAction(tr("Save workspaces &As"), this);
-    fileSaveWorkspaceLayoutAsAction->setStatusTip(tr("Save the current workspaces and splitters in a selected file"));
-
-
+	fileSaveWorkspaceLayoutAsAction = new QAction(tr("Save workspaces &As"), this);
+	fileSaveWorkspaceLayoutAsAction->setStatusTip(tr("Save the current workspaces and splitters in a selected file"));
 
 
 	fileQuitAction = new QAction(tr("&Quit"), this);
@@ -249,7 +247,7 @@ void DebuggerForm::createActions()
 	searchGotoAction->setStatusTip(tr("Jump to a specific address or label in the disassembly view"));
 	searchGotoAction->setShortcut(tr("Ctrl+G"));
 
-    executeBreakAction = new QAction(tr("Break"), this);
+	executeBreakAction = new QAction(tr("Break"), this);
 	executeBreakAction->setShortcut(tr("CRTL+B"));
 	executeBreakAction->setStatusTip(tr("Halt the execution and enter debug mode"));
 	executeBreakAction->setIcon(QIcon(":/icons/break.png"));
@@ -298,30 +296,30 @@ void DebuggerForm::createActions()
 	connect(this, &DebuggerForm::breakStateEntered, [this]{ executeStepBackAction->setEnabled(true); });
 
 	breakpointAddAction = new QAction(tr("Add ..."), this);
-    //now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
-//	breakpointAddAction->setShortcut(tr("CTRL+B"));
-//	breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
-//	breakpointAddAction->setEnabled(false);
+	// now that we have possible multiple disasmviewers the disasmview->getCursorAddr() will not work anymore
+	//breakpointAddAction->setShortcut(tr("CTRL+B"));
+	//breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
+	//breakpointAddAction->setEnabled(false);
 
 	helpAboutAction = new QAction(tr("&About"), this);
 
-    addCPUWorkspaceAction = new QAction(tr("&Code debugger"), this);
-    addCPUWorkspaceAction->setStatusTip(tr("The default way of debugging CPU code"));
+	addCPUWorkspaceAction = new QAction(tr("&Code debugger"), this);
+	addCPUWorkspaceAction->setStatusTip(tr("The default way of debugging CPU code"));
 
-    addVDPRegsWorkspaceAction = new QAction(tr("VDP &Regs"), this);
-    addVDPRegsWorkspaceAction->setStatusTip(tr("Show the regular VDP registers"));
+	addVDPRegsWorkspaceAction = new QAction(tr("VDP &Regs"), this);
+	addVDPRegsWorkspaceAction->setStatusTip(tr("Show the regular VDP registers"));
 
-    addVDPTilesWorkspaceAction = new QAction(tr("VDP &Tiles"), this);
-    addVDPTilesWorkspaceAction->setStatusTip(tr("Show the VRAM in tiles"));
+	addVDPTilesWorkspaceAction = new QAction(tr("VDP &Tiles"), this);
+	addVDPTilesWorkspaceAction->setStatusTip(tr("Show the VRAM in tiles"));
 
-    addVDPBitmapWorkspaceAction = new QAction(tr("VDP &Bitmap"), this);
-    addVDPBitmapWorkspaceAction->setStatusTip(tr("Show the VRAM in bitmap mode"));
+	addVDPBitmapWorkspaceAction = new QAction(tr("VDP &Bitmap"), this);
+	addVDPBitmapWorkspaceAction->setStatusTip(tr("Show the VRAM in bitmap mode"));
 
-    addEmptyWorkspaceAction = new QAction(tr("&Empty workspace"), this);
-    addEmptyWorkspaceAction->setStatusTip(tr("create an almost empty workspace"));
+	addEmptyWorkspaceAction = new QAction(tr("&Empty workspace"), this);
+	addEmptyWorkspaceAction->setStatusTip(tr("create an almost empty workspace"));
 
-    addFloatingSwitchingWidgetAction = new QAction(tr("&Create floating item"), this);
-    addFloatingSwitchingWidgetAction->setStatusTip(tr("Create item in seperate window"));
+	addFloatingSwitchingWidgetAction = new QAction(tr("&Create floating item"), this);
+	addFloatingSwitchingWidgetAction->setStatusTip(tr("Create item in seperate window"));
 
 
 	connect(fileNewSessionAction, &QAction::triggered, this, &DebuggerForm::fileNewSession);
@@ -329,9 +327,9 @@ void DebuggerForm::createActions()
 	connect(fileSaveSessionAction, &QAction::triggered, this, &DebuggerForm::fileSaveSession);
 	connect(fileSaveSessionAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveSessionAs);
 
-    connect(fileOpenWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileOpenWorkspace);
-    connect(fileSaveWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspace);
-    connect(fileSaveWorkspaceLayoutAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspaceAs);
+	connect(fileOpenWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileOpenWorkspace);
+	connect(fileSaveWorkspaceLayoutAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspace);
+	connect(fileSaveWorkspaceLayoutAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveWorkspaceAs);
 
 	connect(fileQuitAction, &QAction::triggered, this, &DebuggerForm::close);
 	connect(systemConnectAction, &QAction::triggered, this, &DebuggerForm::systemConnect);
@@ -342,19 +340,19 @@ void DebuggerForm::createActions()
 	connect(systemPreferencesAction, &QAction::triggered, this, &DebuggerForm::systemPreferences);
 	connect(searchGotoAction, &QAction::triggered, this, &DebuggerForm::searchGoto);
 
-    connect(executeBreakAction, &QAction::triggered, this, &DebuggerForm::executeBreak);
+	connect(executeBreakAction, &QAction::triggered, this, &DebuggerForm::executeBreak);
 	connect(executeRunAction, &QAction::triggered, this, &DebuggerForm::executeRun);
 	connect(executeStepAction, &QAction::triggered, this, &DebuggerForm::executeStep);
 	connect(executeStepOverAction, &QAction::triggered, this, &DebuggerForm::executeStepOver);
 	connect(executeStepOutAction, &QAction::triggered, this, &DebuggerForm::executeStepOut);
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
 	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
-    connect(addCPUWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addCPUWorkspace);
-    connect(addVDPRegsWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPRegsWorkspace);
-    connect(addVDPTilesWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPTilesWorkspace);
-    connect(addVDPBitmapWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPBitmapWorkspace);
-    connect(addEmptyWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addEmptyWorkspace);
-    connect(addFloatingSwitchingWidgetAction, &QAction::triggered, this, &DebuggerForm::addFloatingSwitchingWidget);
+	connect(addCPUWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addCPUWorkspace);
+	connect(addVDPRegsWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPRegsWorkspace);
+	connect(addVDPTilesWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPTilesWorkspace);
+	connect(addVDPBitmapWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addVDPBitmapWorkspace);
+	connect(addEmptyWorkspaceAction, &QAction::triggered, this, &DebuggerForm::addEmptyWorkspace);
+	connect(addFloatingSwitchingWidgetAction, &QAction::triggered, this, &DebuggerForm::addFloatingSwitchingWidget);
 }
 
 void DebuggerForm::createMenus()
@@ -365,16 +363,16 @@ void DebuggerForm::createMenus()
 	fileMenu->addAction(fileOpenSessionAction);
 	fileMenu->addAction(fileSaveSessionAction);
 	fileMenu->addAction(fileSaveSessionAsAction);
-    fileMenu->addSeparator();
-    fileMenu->addAction(fileOpenWorkspaceLayoutAction);
-//    fileMenu->addAction(fileSaveWorkspaceLayoutAction);
-    fileMenu->addAction(fileSaveWorkspaceLayoutAsAction);
-    fileMenu->addSeparator();
+	fileMenu->addSeparator();
+	fileMenu->addAction(fileOpenWorkspaceLayoutAction);
+	//fileMenu->addAction(fileSaveWorkspaceLayoutAction);
+	fileMenu->addAction(fileSaveWorkspaceLayoutAsAction);
+	fileMenu->addSeparator();
 
 	recentFileSeparator = fileMenu->addSeparator();
-	for (auto* rfa : recentFileActions)
+	for (auto* rfa : recentFileActions) {
 		fileMenu->addAction(rfa);
-
+	}
 	fileMenu->addSeparator();
 	fileMenu->addAction(fileQuitAction);
 
@@ -407,7 +405,7 @@ void DebuggerForm::createMenus()
 
 	// create breakpoint menu
 	breakpointMenu = menuBar()->addMenu(tr("&Breakpoint"));
-    //breakpointMenu->addAction(breakpointToggleAction);
+	//breakpointMenu->addAction(breakpointToggleAction);
 	breakpointMenu->addAction(breakpointAddAction);
 
 	// create help menu
@@ -435,7 +433,7 @@ void DebuggerForm::createToolbars()
 	executeToolbar->addAction(executeStepOverAction);
 	executeToolbar->addAction(executeStepOutAction);
 	executeToolbar->addAction(executeStepBackAction);
-    //executeToolbar->addAction(executeRunToAction);
+	//executeToolbar->addAction(executeRunToAction);
 }
 
 void DebuggerForm::createStatusbar()
@@ -451,12 +449,12 @@ void DebuggerForm::createWidgetRegistry()
     //0: register the disasm viewer widget
     registry.addItem(new RegistryItem{
 	tr("Code view"),
-	[] { return widgetFactory( disasmViewer); }});
+	[] { return widgetFactory(disasmViewer); }});
 
     //1: register the memory view widget
     registry.addItem(new RegistryItem{
 	tr("Main memory"),
-	[] { return widgetFactory( mainMemoryViewer); }});
+	[] { return widgetFactory(mainMemoryViewer); }});
 
     //2: register the register viewer
     registry.addItem(new RegistryItem{
@@ -593,7 +591,7 @@ void DebuggerForm::tabCloseRequest(int index)
         return;
     }
     if (workspaces->count() > 1) {
-        QWidget *splitter=workspaces->widget(index);
+        QWidget* splitter = workspaces->widget(index);
         workspaces->removeTab(index);
         delete splitter;
     }
@@ -653,8 +651,8 @@ void DebuggerForm::createForm()
     workspaces->setMinimumHeight(500);
     workspaces->setTabsClosable(true);
     workspaces->setMovable(true);
-    QMenu *workspacemenu=new QMenu();
-    QMenu *workspacesubmenu=new QMenu("Predefined layouts");
+    QMenu* workspacemenu = new QMenu();
+    QMenu* workspacesubmenu = new QMenu("Predefined layouts");
     workspacesubmenu->addAction(addCPUWorkspaceAction);
     workspacesubmenu->addAction(addVDPRegsWorkspaceAction);
     workspacesubmenu->addAction(addVDPTilesWorkspaceAction);
@@ -666,20 +664,20 @@ void DebuggerForm::createForm()
     workspacemenu->addAction(addFloatingSwitchingWidgetAction);
 
     QIcon icon = QIcon::fromTheme(QLatin1String("window-new"));
-    QToolButton *btn = new QToolButton();
+    QToolButton* btn = new QToolButton();
 	btn->setIcon(icon);
     btn->setMenu(workspacemenu);
     btn->setPopupMode(QToolButton::InstantPopup);
     workspaces->setCornerWidget(btn, Qt::TopRightCorner);
     connect(workspaces, &QTabWidget::tabCloseRequested, this, &DebuggerForm::tabCloseRequest);
-    QWidget *window = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout;
+    QWidget* window = new QWidget;
+    QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(workspaces);
     window->setLayout(layout);
 
     Settings& s = Settings::get();
 
-    int workspacetype =s.value("creatingWorkspaceType", 0).toInt();
+    int workspacetype = s.value("creatingWorkspaceType", 0).toInt();
     switch (workspacetype) {
     case 0:
         addInfoWorkspace();
@@ -740,8 +738,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
 
     QWidget* retwdgt;
     switch (fctwidget) {
-    case disasmViewer:
-    {
+    case disasmViewer: {
         DisasmViewer* wdgt = new DisasmViewer();
         connect(wdgt, &DisasmViewer::breakpointToggled, &dispatcher, &SignalDispatcher::breakpointToggled);
         connect(&dispatcher, &SignalDispatcher::connected, wdgt, &DisasmViewer::refresh);
@@ -755,11 +752,10 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         wdgt->setBreakpoints(&DebugSession::getDebugSession()->breakpoints());
         wdgt->setMemoryLayout(dispatcher.getMemLayout());
         wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
-        retwdgt=wdgt;
-    };
+        retwdgt = wdgt;
         break;
-    case mainMemoryViewer:
-    {
+    }
+    case mainMemoryViewer: {
         MainMemoryViewer* wdgt = new MainMemoryViewer();
         // Main memory viewer
         connect(&dispatcher, &SignalDispatcher::connected,  wdgt, &MainMemoryViewer::refresh);
@@ -768,52 +764,47 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
         //mainMemoryView->setRegsView(regsView);
         wdgt->setSymbolTable(&DebugSession::getDebugSession()->symbolTable());
         wdgt->setDebuggable("memory", 65536);
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
-    case cpuRegsViewer:
-    {
+    }
+    case cpuRegsViewer: {
         CPURegsViewer* wdgt = new CPURegsViewer();
         //copy current registers to new widget
         for (int id = 0; id < 15; ++id) { // CpuRegs::REG_AF up to CpuRegs::REG_IFF
             static_cast<CPURegsViewer*>(wdgt)->setRegister(id, dispatcher.readRegister(id));
         }
         connect(&dispatcher, &SignalDispatcher::registersUpdate, wdgt, &CPURegsViewer::setData);
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
-    case flagsViewer:
-    {
+    }
+    case flagsViewer: {
         FlagsViewer* wdgt = new FlagsViewer();
         wdgt->setFlags(dispatcher.readRegister(CpuRegs::REG_AF) & 0xFF);
         connect(&dispatcher, &SignalDispatcher::flagsChanged, wdgt, &FlagsViewer::setFlags);
-        retwdgt=wdgt;
+        retwdgt = wdgt;
+    	break;
     }
-    break;
-    case stackViewer:
-    {
+    case stackViewer: {
         StackViewer* wdgt = new StackViewer();
         wdgt->setData(dispatcher.getMainMemory(), 65536);
         wdgt->setStackPointer(dispatcher.readRegister(CpuRegs::REG_SP));
         connect(&dispatcher, &SignalDispatcher::spChanged, wdgt, &StackViewer::setStackPointer);
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
-    case slotViewer:
-    {
+    }
+    case slotViewer: {
         SlotViewer* wdgt = new SlotViewer();
         connect(&dispatcher, &SignalDispatcher::connected, wdgt, &SlotViewer::refresh);
         connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &SlotViewer::refresh);
         connect(&dispatcher, &SignalDispatcher::slotsUpdated, wdgt, &SlotViewer::refresh);
         wdgt->setMemoryLayout(dispatcher.getMemLayout());
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
+    }
     case breakpointViewer:
         retwdgt = new BreakpointViewer();
         break;
-    case debuggableViewer:
-    {
+    case debuggableViewer: {
         DebuggableViewer* wdgt = new DebuggableViewer();
         connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &DebuggableViewer::refresh);
         connect(&dispatcher, &SignalDispatcher::debuggablesChanged, wdgt, &DebuggableViewer::setDebuggables);
@@ -822,9 +813,9 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
             wdgt->debuggableSelected(0);
             wdgt->refresh();
         }
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
+    }
     case vdpStatusRegViewer:
         retwdgt = new VDPStatusRegViewer();
         break;
@@ -846,14 +837,13 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctwidget)
     case quickguide:
         retwdgt = new QuickGuide();
         break;
-    case paletteViewer:
-    {
+    case paletteViewer: {
         PaletteView* wdgt = new PaletteView();
         connect(&dispatcher, &SignalDispatcher::connected, wdgt, &PaletteView::refresh);
         connect(&dispatcher, &SignalDispatcher::breakStateEntered, wdgt, &PaletteView::refresh);
-        retwdgt=wdgt;
-    }
+        retwdgt = wdgt;
         break;
+    }
     default:
         retwdgt = new QLabel("Not yet implemented in widgetFactory!");
         break;
@@ -1191,24 +1181,24 @@ void DebuggerForm::fileSaveWorkspace()
 
 QString DebuggerForm::fileSaveWorkspaceAs()
 {
-    QFileDialog d(this, tr("Save workspace layout"));
-    d.setNameFilter(tr("Debug Workspace Layout Files (*.omdl)"));
-    d.setDefaultSuffix("omdl");
-    d.setDirectory(QDir::currentPath());
-    d.setAcceptMode(QFileDialog::AcceptSave);
-    d.setFileMode(QFileDialog::AnyFile);
-    QString filename;
-    if (d.exec()) {
-//        session->saveAs(d.selectedFiles().at(0));
-        filename=d.selectedFiles().at(0);
-        saveWorkspacesAs(filename);
-        // update recent
-//        if (session->existsAsFile()) {
-//            addRecentFile(session->filename());
-//		}
-    }
-    updateWindowTitle();
-    return filename;
+	QFileDialog d(this, tr("Save workspace layout"));
+	d.setNameFilter(tr("Debug Workspace Layout Files (*.omdl)"));
+	d.setDefaultSuffix("omdl");
+	d.setDirectory(QDir::currentPath());
+	d.setAcceptMode(QFileDialog::AcceptSave);
+	d.setFileMode(QFileDialog::AnyFile);
+	QString filename;
+	if (d.exec()) {
+		//session->saveAs(d.selectedFiles().at(0));
+		filename = d.selectedFiles().at(0);
+		saveWorkspacesAs(filename);
+		// update recent
+		//if (session->existsAsFile()) {
+		//	addRecentFile(session->filename());
+		//}
+	}
+	updateWindowTitle();
+	return filename;
 }
 
 void DebuggerForm::systemConnect()
@@ -1262,11 +1252,11 @@ void DebuggerForm::searchGoto()
 	auto& dispatcher = SignalDispatcher::instance();
 	GotoDialog gtd(*dispatcher.getMemLayout(), session, this);
 	if (gtd.exec()) {
-		if (auto addr = gtd.address() ){
-				if (addr.has_value()) {
-			//disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
-			dispatcher.setCursorAddress(addr.value(), 0, DisasmViewer::MiddleAlways);
-				}
+		if (auto addr = gtd.address()) {
+			if (addr.has_value()) {
+				//disasmView->setCursorAddress(addr, 0, DisasmViewer::MiddleAlways);
+				dispatcher.setCursorAddress(addr.value(), 0, DisasmViewer::MiddleAlways);
+			}
 		}
 	}
 }
@@ -1433,22 +1423,21 @@ bool DebuggerForm::saveWorkspacesAs(const QString &newFileName)
                              tr("Cannot write file %1:\n%2.")
                               .arg(newFileName, file.errorString()));
         return false;
-    };
+    }
     QJsonObject jsonObj;
     QJsonArray spacesArray;
     //iterate over workspaces
-    for (int i=0;i<workspaces->count();i++){
+    for (int i = 0; i < workspaces->count(); ++i) {
         QJsonObject jsonTab;
-        jsonTab["name"]=workspaces->tabText(i);
-        jsonTab["workspace"]=static_cast<BlendSplitter*>(workspaces->widget(i))->save2json();
+        jsonTab["name"] = workspaces->tabText(i);
+        jsonTab["workspace"] = static_cast<BlendSplitter*>(workspaces->widget(i))->save2json();
         spacesArray.append(jsonTab);
-    };
-    jsonObj["workspaces"]=spacesArray;
+    }
+    jsonObj["workspaces"] = spacesArray;
     QJsonDocument jsonDoc(jsonObj);
     file.write(jsonDoc.toJson());
     // file.close(); done automatically when going out of scope
     return true;
-
 }
 
 bool DebuggerForm::loadWorkspaces(const QString &filename)
@@ -1459,21 +1448,20 @@ bool DebuggerForm::loadWorkspaces(const QString &filename)
                              tr("Cannot read file %1:\n%2.")
                                 .arg(filename, file.errorString()));
         return false;
-    };
+    }
     //Now try to parse the json file
     QJsonParseError parseError;
-    QJsonDocument jsonDoc=QJsonDocument::fromJson(file.readAll(), &parseError);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         QMessageBox::warning(nullptr, tr("Open workspaces ..."),
-                             tr("Parse error at %1:%2.").arg(QString::number(parseError.offset), parseError.errorString())
-                             );
+                             tr("Parse error at %1:%2.").arg(QString::number(parseError.offset), parseError.errorString()));
         return false;
-    };
+    }
 
     // delete all the current tabs before reading the new ones
-    while(workspaces->count()) {
+    while (workspaces->count()) {
         delete workspaces->widget(0);
-    };
+    }
     //now recreate workspaces
     QJsonObject obj = jsonDoc.object();
     for (const auto& value : obj["workspaces"].toArray()) {

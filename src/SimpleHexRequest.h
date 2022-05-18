@@ -10,7 +10,7 @@
  * - Class A can reimplement the DataHexRequestReceived if it wants to react when new data has arrived
  * - Class A can reimplement the DataHexRequestCanceled if it wants to react to failures of the request
  * - to read the debuggable into the memory just create a new SimpleHexRequest, fi.
- *	new SimpleHexRequest("{VDP status regs}",0,16,statusregs, *this);
+ *	new SimpleHexRequest("{VDP status regs}", 0, 16, statusregs, *this);
  *
  */
 class SimpleHexRequestUser

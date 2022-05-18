@@ -242,8 +242,8 @@ void VDPCommandRegViewer::on_lineEdit_r46_editingFinished()
 
 void VDPCommandRegViewer::refresh()
 {
-	//new SimpleHexRequest("{VDP regs}",0,64,regs, *this);
-	//new SimpleHexRequest("{VDP status regs}",0,16,regs, *this);
+	//new SimpleHexRequest("{VDP regs}", 0, 64, regs, *this);
+	//new SimpleHexRequest("{VDP status regs}", 0, 16, regs, *this);
 	// now combined in one request:
 	new SimpleHexRequest(
 		"debug_bin2hex "

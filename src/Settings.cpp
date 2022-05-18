@@ -66,7 +66,7 @@ void Settings::getFontsFromSettings()
 	}
 
 	// read colors
-	for (int f =CODE_FONT; f < FONT_END; ++f) {
+	for (int f = CODE_FONT; f < FONT_END; ++f) {
 		fontColors[f] =
 			value(fontColorLocation((DebuggerFont)f), QColor(Qt::black))
 				.value<QColor>();

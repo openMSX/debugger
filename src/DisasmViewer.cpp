@@ -197,7 +197,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	while (y < height() - frameB) {
 		// fetch the data for this line
 		row = displayDisasm
-		    ? &disasmLines[disasmTopLine+visibleLines]
+		    ? &disasmLines[disasmTopLine + visibleLines]
 		    : &DISABLED_ROW;
 		int h, a;
 		switch (row->rowType) {
@@ -212,7 +212,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 		}
 
 		// draw cursor line
-		bool isCursorLine = cursorAddr >= row->addr && cursorAddr < row->addr+row->numBytes &&
+		bool isCursorLine = cursorAddr >= row->addr && cursorAddr < row->addr + row->numBytes &&
 		                    row->infoLine == cursorLine;
 		if (isCursorLine) {
 			cursorAddr = row->addr;
@@ -280,7 +280,7 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 		y += h;
 		++visibleLines;
 		// check for end of data
-		if (disasmTopLine+visibleLines == int(disasmLines.size())) break;
+		if (disasmTopLine + visibleLines == int(disasmLines.size())) break;
 	}
 	partialBottomLine = y > height() - frameB;
 	visibleLines -= partialBottomLine;
@@ -333,7 +333,7 @@ int DisasmViewer::findPosition(uint16_t addr, int infoLine, int method)
 
 void DisasmViewer::setAddress(uint16_t addr, int infoLine, int method)
 {
-    qDebug() << "void DisasmViewer::setAddress(uint16_t addr "<<addr<<", int infoLine "<<infoLine<<", int method "<<method<<" )";
+	qDebug() << "void DisasmViewer::setAddress(uint16_t addr " << addr << ", int infoLine " << infoLine << ", int method " << method << " )";
 	if (method != Reload) {
 		int line = findPosition(addr, infoLine, method);
 
@@ -371,13 +371,13 @@ void DisasmViewer::setAddress(uint16_t addr, int infoLine, int method)
 	}
 
 	// The requested address it outside the pre-disassembled bounds.
-	// This means that a new block of memory must be transfered from
+	// This means that a new block of memory must be transferred from
 	// openMSX and disassembled.
 
 	// determine disasm bounds
 	int disasmStart;
 	int disasmEnd;
-	int extra = 4 * (visibleLines > 9 ? visibleLines+partialBottomLine : 10);
+	int extra = 4 * (visibleLines > 9 ? visibleLines + partialBottomLine : 10);
 	switch (method) {
 	case Middle:
 	case MiddleAlways:
@@ -591,7 +591,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	}
 	case Qt::Key_PageUp: {
 		int line = findDisasmLine(cursorAddr, cursorLine);
-		if (line >= disasmTopLine && line < disasmTopLine+visibleLines) {
+		if (line >= disasmTopLine && line < disasmTopLine + visibleLines) {
 			line -= visibleLines;
 			if (line >= 0) {
 				cursorAddr = disasmLines[line].addr;
@@ -611,7 +611,7 @@ void DisasmViewer::keyPressEvent(QKeyEvent* e)
 	}
 	case Qt::Key_PageDown: {
 		int line = findDisasmLine(cursorAddr, cursorLine);
-		if (line >= disasmTopLine && line < disasmTopLine+visibleLines) {
+		if (line >= disasmTopLine && line < disasmTopLine + visibleLines) {
 			line += visibleLines;
 			if (line < int(disasmLines.size())) {
 				cursorAddr = disasmLines[line].addr;
@@ -729,7 +729,7 @@ int DisasmViewer::lineAtPos(const QPoint& pos)
 	int y = frameT;
 	do {
 		++line;
-		switch (disasmLines[disasmTopLine+line].rowType) {
+		switch (disasmLines[disasmTopLine + line].rowType) {
 		case DisasmRow::LABEL:
 			y += labelFontHeight;
 			break;

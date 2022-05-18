@@ -7,8 +7,8 @@
  *   B - Byte value
  *   R - Relative jump offset
  *   W - Word value
- *   X - Indexed address ( 3 byte )
- *   Y - Indexed address ( 4 byte )
+ *   X - Indexed address (3 byte)
+ *   Y - Indexed address (4 byte)
  *   I - IX or IY register
  *   ! - Invalid opcode
  *   @ - Invalid opcode

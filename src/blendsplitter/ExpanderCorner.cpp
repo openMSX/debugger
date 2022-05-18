@@ -146,9 +146,9 @@ void ExpanderCorner::performInnerSplit(WidgetDecorator* parentDecorator, BlendSp
             parentSplitter->insertWidget(index);
             addedWidget = dynamic_cast<SwitchingWidget*>(parentSplitter->getNestedWidget(index));
         } else {
-            sizes.insert(index +1, BlendSplitter::expanderSize);
+            sizes.insert(index + 1, BlendSplitter::expanderSize);
             sizes[index] -= BlendSplitter::expanderSize + 1;
-            parentSplitter->insertWidget(index+1);
+            parentSplitter->insertWidget(index + 1);
             addedWidget = dynamic_cast<SwitchingWidget*>(parentSplitter->getNestedWidget(index + 1));
         }
         parentSplitter->setSizes(sizes);

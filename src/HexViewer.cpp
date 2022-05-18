@@ -273,7 +273,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 
 	int y = frameT;
 	int address = hexTopAddress;
-	for (int i = 0; i < visibleLines+partialBottomLine; ++i) {
+	for (int i = 0; i < visibleLines + partialBottomLine; ++i) {
 		// print address
 		QString hexStr = QString("%1").arg(address, addressLength, 16, QChar('0'));
 		p.setPen(palette().color(QPalette::Text));
@@ -432,7 +432,7 @@ void HexViewer::setLocation(int addr)
 		}
 		hexMarkAddress = addr;
 		int size = horBytes * visibleLines;
-		if ((addr < hexTopAddress) || (addr >= (hexTopAddress+size))) {
+		if ((addr < hexTopAddress) || (addr >= (hexTopAddress + size))) {
 			setTopLocation(addr);
 		}
 		refresh();
@@ -638,7 +638,7 @@ int HexViewer::coorToOffset(int x, int y) const
 	} else if (x >= xChar && x < rightCharPos) {
 		offset = (x - xChar) / charWidth;
 	}
-	int yMaxOffset = frameT + (visibleLines+partialBottomLine) * lineHeight;
+	int yMaxOffset = frameT + (visibleLines + partialBottomLine) * lineHeight;
 	if (offset >= 0 && y < yMaxOffset) {
 		offset += horBytes * ((y - frameT) / lineHeight);
 	}
@@ -688,7 +688,7 @@ bool HexViewer::event(QEvent* e)
 void HexViewer::mousePressEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton && isInteractive) {
-		int offset=coorToOffset(e->x(), e->y());
+		int offset = coorToOffset(e->x(), e->y());
 		if (offset >= 0) {
 			int addr = hexTopAddress + offset;
 			if (useMarker && (hexMarkAddress != addr)) {
@@ -699,7 +699,7 @@ void HexViewer::mousePressEvent(QMouseEvent* e)
 				cursorPosition = 0;
 				beingEdited = isEditable;
 			}
-			editedChars = (e->x() >= xChar);
+			editedChars = e->x() >= xChar;
 		}
 		update();
 	}

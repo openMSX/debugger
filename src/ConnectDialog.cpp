@@ -149,9 +149,9 @@ static std::vector<std::unique_ptr<OpenMSXConnection>> collectServers()
 #ifdef _WIN32
 	DWORD len = GetTempPathW(0, nullptr);
 	assert(len > 0); // nothing we can do to recover this
-	//VLA(wchar_t, bufW, (len+1));
-	//wchar_t bufW[len+1];
-	auto bufW = static_cast<wchar_t*>(_alloca(sizeof(wchar_t) * (len+1)));
+	//VLA(wchar_t, bufW, (len + 1));
+	//wchar_t bufW[len + 1];
+	auto bufW = static_cast<wchar_t*>(_alloca(sizeof(wchar_t) * (len + 1)));
 
 	len = GetTempPathW(len, bufW);
 	assert(len > 0); // nothing we can do to recover this

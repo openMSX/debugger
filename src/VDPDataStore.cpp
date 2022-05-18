@@ -38,10 +38,10 @@ public:
 
 	void replyOk(const QString& message) override
 	{
-		//printf("dataStore.vramSize %i\n",dataStore.vramSize);
+		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
 		dataStore.vramSize = message.toInt();
-		//printf("dataStore.vramSize %i\n",dataStore.vramSize);
-        dataStore.refresh2();
+		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
+		dataStore.refresh2();
 		delete this;
 	}
 	void replyNok(const QString& /*message*/) override
