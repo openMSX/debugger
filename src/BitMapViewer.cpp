@@ -29,6 +29,19 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	, screenMod(0) // avoid UMR
 {
 	setupUi(this);
+    //no connect slot byname anymore
+    connect(screenMode, QOverload<const QString&>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
+    connect(showPage, QOverload<int>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_showPage_currentIndexChanged);
+    connect(linesVisible, QOverload<int>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
+    connect(bgColor,  QOverload<int>::of(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
+
+    connect(useVDPRegisters, &QCheckBox::stateChanged,this, &BitMapViewer::on_useVDPRegisters_stateChanged);
+
+    connect(saveImageButton, &QPushButton::clicked, this, &BitMapViewer::on_saveImageButton_clicked);
+    connect(editPaletteButton, &QPushButton::clicked, this, &BitMapViewer::on_editPaletteButton_clicked);
+    connect(useVDPPalette, &QCheckBox::stateChanged, this, &BitMapViewer::on_useVDPPalette_stateChanged);
+    connect(zoomLevel, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &BitMapViewer::on_zoomLevel_valueChanged);
+
 	// hand code entering the actual display widget in the scrollarea With
 	// the designer-qt4 there is an extra scrollAreaWidget between the
 	// imageWidget and the QScrollArea so the scrollbars are not correctly

@@ -33,6 +33,30 @@ TileViewer::TileViewer(QWidget* parent)
     : QDialog(parent), image4label(32, 32, QImage::Format_RGB32)
 {
     setupUi(this);
+    // No QMetaObject::connectSlotsByName available now since we dropped the slots: in the header;
+    connect(cb_tilemapsource, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_tilemapsource_currentIndexChanged);
+    connect(cb_screen, QOverload<int>::of(&QComboBox::currentIndexChanged) ,this ,&TileViewer::on_cb_screen_currentIndexChanged);
+    connect(le_nametable, &QLineEdit::textChanged, this, &TileViewer::on_le_nametable_textChanged);
+    connect(le_colortable, &QLineEdit::textChanged, this, &TileViewer::on_le_colortable_textChanged);
+    connect(le_patterntable, &QLineEdit::textChanged, this, &TileViewer::on_le_patterntable_textChanged);
+
+    connect(cb_color0, &QCheckBox::stateChanged, this, &TileViewer::on_cb_color0_stateChanged);
+    connect(useVDPRegisters, &QCheckBox::stateChanged, this, &TileViewer::on_useVDPRegisters_stateChanged);
+
+    connect(editPaletteButton, &QPushButton::clicked, this, &TileViewer::on_editPaletteButton_clicked);
+    connect(useVDPPalette, &QCheckBox::stateChanged, this, &TileViewer::on_useVDPPalette_stateChanged);
+    connect(zoomLevel, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &TileViewer::on_zoomLevel_valueChanged);
+
+    connect(cb_drawgrid, &QCheckBox::stateChanged, this, &TileViewer::on_cb_drawgrid_stateChanged);
+    connect(cb_highlight, &QCheckBox::stateChanged, this, &TileViewer::on_cb_highlight_stateChanged);
+    connect(sp_highlight, QOverload<int>::of(&QSpinBox::valueChanged), this, &TileViewer::on_sp_highlight_valueChanged);
+    connect(sp_bordercolor, QOverload<int>::of(&QSpinBox::valueChanged), this, &TileViewer::on_sp_bordercolor_valueChanged);
+
+    connect(cb_blinkcolors, &QCheckBox::stateChanged, this, &TileViewer::on_cb_blinkcolors_stateChanged);
+    connect(cb_screenrows, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_screenrows_currentIndexChanged);
+
+
+
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     plainTextEdit->setFont(fixedFont);
     label_charpat->setFont(fixedFont);
