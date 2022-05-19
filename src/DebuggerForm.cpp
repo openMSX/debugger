@@ -174,6 +174,9 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 	updateRecentFiles();
 
     connect(&(session->symbolTable()), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
+
+    autoConnectToOpenMSX();
+
 }
 
 void DebuggerForm::createActions()
@@ -712,6 +715,15 @@ void DebuggerForm::createForm()
     connect(&comm, &CommClient::connectionTerminated, this, &DebuggerForm::connectionClosed);
 
     session->breakpoints().setMemoryLayout(dispatcher.getMemLayout());
+}
+
+void DebuggerForm::autoConnectToOpenMSX()
+{
+    //TODO actually find out if there is only one connection instead of going through the dialog...
+    if (Settings::get().value("autoconnect").toBool()) {
+        systemConnect();
+    };
+
 }
 
 void DebuggerForm::addDefaultWorkspaces()

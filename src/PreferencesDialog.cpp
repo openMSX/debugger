@@ -1,17 +1,34 @@
 #include "PreferencesDialog.h"
 #include "Settings.h"
 #include "DebuggerForm.h"
+#include <QProcess>
 
 #include <QListWidgetItem>
 #include <QFontDialog>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QDebug>
 
 
 PreferencesDialog::PreferencesDialog(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
+    // Since there is no 'slots' definition in the header anymore we can not use the QMetaObject::connectSlotsByName() in setupUi anymore
+    // So now we do it explicitely here
+    connect(leFileName, &QLineEdit::textChanged, this, &PreferencesDialog::on_leFileName_textChanged);
+    connect(btnSaveLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnSaveLayout_clicked);
+    connect(btnBrowseLayout, &QPushButton::clicked, this, &PreferencesDialog::on_btnBrowseLayout_clicked);
+
+
+    //openMSX connection stuff
+    connect(cbAutoconnect, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
+    connect(cbStartIfNoConnection, &QCheckBox::toggled, this, &PreferencesDialog::openMSXConnectionChanged);
+    connect(leOpenMSXbin, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
+    connect(leOpenMSXargs, &QLineEdit::editingFinished, this, &PreferencesDialog::openMSXConnectionChanged);
+    connect(pbTestCLI, &QPushButton::clicked, this, &PreferencesDialog::testOpenMSXCommandLine);
+
 
     //font stuff
 	connect(listFonts, &QListWidget::currentRowChanged,
@@ -36,14 +53,20 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
         connect(rb, &QRadioButton::toggled,
                 this, &PreferencesDialog::layoutTypeChanged);
     };
-//    connect(rbDefaultWorkspaces, &QRadioButton::toggled,
-//            this, &PreferencesDialog::layoutTypeChanged);
-//    connect(rbLayoutFromFile, &QRadioButton::toggled,
-//            this, &PreferencesDialog::layoutTypeChanged);
+
+    //update ui with saved settings
     updating=true;
     Settings& s = Settings::get();
     rblayouttypes.at(s.value("creatingWorkspaceType",0).toInt())->setChecked(true);
     leFileName->setText(s.value("creatingWorkspaceFile","").toString());
+
+    cbAutoconnect->setChecked(s.value("autoconnect",true).toBool());
+    cbStartIfNoConnection->setChecked(s.value("startOpenMSX",false).toBool());
+    leOpenMSXbin->setText(s.value("openMSXbin","").toString());
+    leOpenMSXargs->setText(s.value("openMSXargs","").toString());
+
+    createCLI();
+
     updating=false;
 }
 
@@ -170,6 +193,18 @@ void PreferencesDialog::on_btnBrowseLayout_clicked()
     }
 }
 
+void PreferencesDialog::openMSXConnectionChanged()
+{
+    if (updating) return;
+
+    createCLI();
+    Settings& s = Settings::get();
+    s.setValue("autoconnect",cbAutoconnect->isChecked());
+    s.setValue("startOpenMSX",cbStartIfNoConnection->isChecked());
+    s.setValue("openMSXbin",leOpenMSXbin->text());
+    s.setValue("openMSXargs",leOpenMSXargs->text());
+}
+
 void PreferencesDialog::on_leFileName_textChanged(const QString &arg1)
 {
     if (updating) return;
@@ -198,6 +233,29 @@ void PreferencesDialog::on_btnSaveLayout_clicked()
     if (!savefilename.isEmpty()) {
        leFileName->setText(savefilename);
        s.setValue("creatingWorkspaceFile",savefilename);
+    }
+}
+
+void PreferencesDialog::createCLI()
+{
+    labelCLI->setText(QString("%1 %2")
+                      .arg(leOpenMSXbin->text(),leOpenMSXargs->text())
+                      );
+}
+
+void PreferencesDialog::testOpenMSXCommandLine()
+{
+    QString program = leOpenMSXbin->text();
+    QStringList arguments;
+    if (!leOpenMSXargs->text().trimmed().isEmpty()) {
+        arguments=leOpenMSXargs->text().trimmed().split(QChar(' '),Qt::SkipEmptyParts);
+    };
+    QProcess *myProcess = new QProcess(qApp);
+    myProcess->start(program, arguments);
+    if (!myProcess->waitForStarted() || myProcess->state()!=QProcess::Running) {
+        QMessageBox::critical(this,"Can not start openMSX",
+                              QString("The command line '%1' doesn't seem to work.\n\n%2").arg(program).arg(myProcess->errorString())
+                              );
     }
 }
 

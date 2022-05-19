@@ -68,6 +68,8 @@ private:
 	void createStatusbar();
 	void createForm();
 
+    void autoConnectToOpenMSX();
+
 	static QWidget* widgetFactory(factoryclasses fctwidget);
 
 	void openSession(const QString& file);
