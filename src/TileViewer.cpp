@@ -34,8 +34,8 @@ TileViewer::TileViewer(QWidget* parent)
 {
     setupUi(this);
     // No QMetaObject::connectSlotsByName available now since we dropped the slots: in the header;
-    connect(cb_tilemapsource, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_tilemapsource_currentIndexChanged);
-    connect(cb_screen, QOverload<int>::of(&QComboBox::currentIndexChanged) ,this ,&TileViewer::on_cb_screen_currentIndexChanged);
+    connect(cb_tilemapsource, qOverload<int>(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_tilemapsource_currentIndexChanged);
+    connect(cb_screen, qOverload<int>(&QComboBox::currentIndexChanged) ,this ,&TileViewer::on_cb_screen_currentIndexChanged);
     connect(le_nametable, &QLineEdit::textChanged, this, &TileViewer::on_le_nametable_textChanged);
     connect(le_colortable, &QLineEdit::textChanged, this, &TileViewer::on_le_colortable_textChanged);
     connect(le_patterntable, &QLineEdit::textChanged, this, &TileViewer::on_le_patterntable_textChanged);
@@ -45,15 +45,15 @@ TileViewer::TileViewer(QWidget* parent)
 
     connect(editPaletteButton, &QPushButton::clicked, this, &TileViewer::on_editPaletteButton_clicked);
     connect(useVDPPalette, &QCheckBox::stateChanged, this, &TileViewer::on_useVDPPalette_stateChanged);
-    connect(zoomLevel, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &TileViewer::on_zoomLevel_valueChanged);
+    connect(zoomLevel, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &TileViewer::on_zoomLevel_valueChanged);
 
     connect(cb_drawgrid, &QCheckBox::stateChanged, this, &TileViewer::on_cb_drawgrid_stateChanged);
     connect(cb_highlight, &QCheckBox::stateChanged, this, &TileViewer::on_cb_highlight_stateChanged);
-    connect(sp_highlight, QOverload<int>::of(&QSpinBox::valueChanged), this, &TileViewer::on_sp_highlight_valueChanged);
-    connect(sp_bordercolor, QOverload<int>::of(&QSpinBox::valueChanged), this, &TileViewer::on_sp_bordercolor_valueChanged);
+    connect(sp_highlight, qOverload<int>(&QSpinBox::valueChanged), this, &TileViewer::on_sp_highlight_valueChanged);
+    connect(sp_bordercolor, qOverload<int>(&QSpinBox::valueChanged), this, &TileViewer::on_sp_bordercolor_valueChanged);
 
     connect(cb_blinkcolors, &QCheckBox::stateChanged, this, &TileViewer::on_cb_blinkcolors_stateChanged);
-    connect(cb_screenrows, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_screenrows_currentIndexChanged);
+    connect(cb_screenrows, qOverload<int>(&QComboBox::currentIndexChanged), this, &TileViewer::on_cb_screenrows_currentIndexChanged);
 
 
 

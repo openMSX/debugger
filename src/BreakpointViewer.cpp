@@ -666,7 +666,7 @@ void BreakpointViewer::createComboBox(int row)
 
 	wpTableWidget->setIndexWidget(index, combo);
 
-	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+	connect(combo, qOverload<int>(&QComboBox::currentIndexChanged),
 		[this, row](int index){ changeCurrentWpType(row, index); });
 }
 
