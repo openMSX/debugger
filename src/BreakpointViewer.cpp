@@ -31,6 +31,13 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 {
 	setupUi(this);
 
+	connect(btnAddBp,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddBp_clicked);
+	connect(btnRemoveBp, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveBp_clicked);
+	connect(btnAddWp,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddWp_clicked);
+	connect(btnRemoveWp, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveWp_clicked);
+	connect(btnAddCn,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddCn_clicked);
+	connect(btnRemoveCn, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveCn_clicked);
+
 	bpTableWidget->horizontalHeader()->setHighlightSections(false);
 	bpTableWidget->sortByColumn(BP_ADDRESS, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);

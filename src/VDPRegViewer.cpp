@@ -37,6 +37,8 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 	: QDialog(parent)
 {
 	setupUi(this);
+	connect(VDPcomboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &VDPRegViewer::on_VDPcomboBox_currentIndexChanged);
+
 	vdpId = 99; // make sure that we parse the first time the status registers are read
 	vdpId = VDP_V9958; //quick hack for now
 

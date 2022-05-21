@@ -269,6 +269,8 @@ ConnectDialog::ConnectDialog(QWidget* parent)
 	, result(nullptr)
 {
 	ui.setupUi(this);
+	connect(ui.connectButton, &QPushButton::clicked, this, &ConnectDialog::on_connectButton_clicked);
+	connect(ui.rescanButton,  &QPushButton::clicked, this, &ConnectDialog::on_rescanButton_clicked);
 	on_rescanButton_clicked();
 }
 
