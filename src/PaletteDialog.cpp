@@ -52,6 +52,12 @@ PaletteDialog::PaletteDialog(QWidget* parent)
     : QDialog(parent), ui(std::make_unique<Ui::PaletteDialog>())
 {
     ui->setupUi(this);
+    connect(ui->horizontalSlider_R, &QSlider::valueChanged, this, &PaletteDialog::on_horizontalSlider_R_valueChanged);
+    connect(ui->horizontalSlider_G, &QSlider::valueChanged, this, &PaletteDialog::on_horizontalSlider_G_valueChanged);
+    connect(ui->horizontalSlider_B, &QSlider::valueChanged, this, &PaletteDialog::on_horizontalSlider_B_valueChanged);
+    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &PaletteDialog::on_buttonBox_clicked);
+    connect(ui->cb_autosync, &QCheckBox::stateChanged, this, &PaletteDialog::on_cb_autosync_stateChanged);
+
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->plainTextEdit->setFont(fixedFont);
 

@@ -37,7 +37,7 @@ public:
 	void refresh();
 	void registerBitChanged(int reg, int bit, bool state);
 
-	//quick hack while no autodetection...
+	//quick hack while no auto-detection...
 	void on_VDPcomboBox_currentIndexChanged(int index);
 
 private:

@@ -143,7 +143,7 @@ public:
 
 	void refresh();
 	void R45BitChanged(int);
-public slots: //TODO: replace this with qt5 connects
+
 	void on_lineEdit_r44_editingFinished();
 	void on_lineEdit_r45_editingFinished();
 	void on_lineEdit_r46_editingFinished();

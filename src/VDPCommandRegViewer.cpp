@@ -7,6 +7,14 @@ VDPCommandRegViewer::VDPCommandRegViewer(QWidget* parent)
 	setupUi(this);
 	statusregs = regs + 64;
 
+	connect(lineEdit_r44, &QLineEdit::editingFinished, this, &VDPCommandRegViewer::on_lineEdit_r44_editingFinished);
+	connect(lineEdit_r45, &QLineEdit::editingFinished, this, &VDPCommandRegViewer::on_lineEdit_r45_editingFinished);
+	connect(lineEdit_r46, &QLineEdit::editingFinished, this, &VDPCommandRegViewer::on_lineEdit_r46_editingFinished);
+	connect(comboBox_cmd,      qOverload<int>(&QComboBox::currentIndexChanged), this, &VDPCommandRegViewer::on_comboBox_cmd_currentIndexChanged);
+	connect(comboBox_operator, qOverload<int>(&QComboBox::currentIndexChanged), this, &VDPCommandRegViewer::on_comboBox_operator_currentIndexChanged);
+	connect(syncPushButton,   &QPushButton::clicked, this, &VDPCommandRegViewer::on_syncPushButton_clicked);
+	connect(launchPushButton, &QPushButton::clicked, this, &VDPCommandRegViewer::on_launchPushButton_clicked);
+
 	// create the needed groups
 	grp_sx = new view88to16(lineEdit_r32, lineEdit_r33, lineEdit_sx);
 	connect(lineEdit_r32, &QLineEdit::editingFinished, grp_sx, &view88to16::finishRL);

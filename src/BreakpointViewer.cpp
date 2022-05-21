@@ -31,6 +31,13 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 {
 	setupUi(this);
 
+	connect(btnAddBp,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddBp_clicked);
+	connect(btnRemoveBp, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveBp_clicked);
+	connect(btnAddWp,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddWp_clicked);
+	connect(btnRemoveWp, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveWp_clicked);
+	connect(btnAddCn,    &QPushButton::clicked, this, &BreakpointViewer::on_btnAddCn_clicked);
+	connect(btnRemoveCn, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveCn_clicked);
+
 	bpTableWidget->horizontalHeader()->setHighlightSections(false);
 	bpTableWidget->sortByColumn(BP_ADDRESS, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);
@@ -315,7 +322,7 @@ std::optional<AddressRange> BreakpointViewer::parseLocationField(
 
 	QStringList s = field.simplified().split(":", Qt::SplitBehaviorFlags::SkipEmptyParts);
 	auto begin = s.size() >= 1 ? stringToValue<uint16_t>(s[0]) : std::nullopt;
-	auto end = s.size() == 2 ? stringToValue<uint16_t>(s[1]) : std::nullopt; 
+	auto end = s.size() == 2 ? stringToValue<uint16_t>(s[1]) : std::nullopt;
 	auto it = ranges::find(ComboTypeNames, comboTxt);
 	auto wType = static_cast<Breakpoint::Type>(std::distance(ComboTypeNames, it) + 1);
 	if ((wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
