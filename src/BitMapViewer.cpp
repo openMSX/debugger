@@ -30,7 +30,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 {
 	setupUi(this);
     //no connect slot byname anymore
-    connect(screenMode, QOverload<const QString&>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
+    connect(screenMode, QOverload<int>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
     connect(showPage, QOverload<int>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_showPage_currentIndexChanged);
     connect(linesVisible, QOverload<int>::of(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
     connect(bgColor,  QOverload<int>::of(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
@@ -171,9 +171,9 @@ void BitMapViewer::refresh()
 	VDPDataStore::instance().refresh();
 }
 
-void BitMapViewer::on_screenMode_currentIndexChanged(const QString& text)
+void BitMapViewer::on_screenMode_currentIndexChanged(int index)
 {
-	screenMod = text.toInt();
+    screenMod = screenMode->itemText(index).toInt();
 	printf("\nnew screenMod: %i\n", screenMod);
 	//change then number of visibe pages when this changes
 	imageWidget->setVramAddress(0);
