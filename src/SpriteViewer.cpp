@@ -34,12 +34,12 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     connect(ui->le_patterntable, &QLineEdit::textChanged, this, &SpriteViewer::on_le_patterntable_textChanged);
     connect(ui->le_attributentable, &QLineEdit::textChanged, this, &SpriteViewer::on_le_attributentable_textChanged);
     connect(ui->useVDPRegisters, &QCheckBox::toggled, this, &SpriteViewer::on_useVDPRegisters_toggled);
-    connect(ui->cb_size, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_size_currentIndexChanged);
-    connect(ui->cb_spritemode, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_spritemode_currentIndexChanged);
+    connect(ui->cb_size, qOverload<int>(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_size_currentIndexChanged);
+    connect(ui->cb_spritemode, qOverload<int>(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_spritemode_currentIndexChanged);
     connect(ui->le_colortable, &QLineEdit::textChanged, this, &SpriteViewer::on_le_colortable_textChanged);
-    connect(ui->sp_zoom, QOverload<int>::of(&QSpinBox::valueChanged), this, &SpriteViewer::on_sp_zoom_valueChanged);
+    connect(ui->sp_zoom, qOverload<int>(&QSpinBox::valueChanged), this, &SpriteViewer::on_sp_zoom_valueChanged);
     connect(ui->cb_ecinfluence, &QCheckBox::toggled, this, &SpriteViewer::on_cb_ecinfluence_toggled);
-    connect(ui->cb_mag, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_mag_currentIndexChanged);
+    connect(ui->cb_mag, qOverload<int>(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_mag_currentIndexChanged);
     connect(ui->cb_alwaysShowColorTable, &QCheckBox::toggled, this, &SpriteViewer::on_cb_alwaysShowColorTable_toggled);
     connect(ui->useVDPPalette, &QCheckBox::stateChanged, this, &SpriteViewer::on_useVDPPalette_stateChanged);
     connect(ui->editPaletteButton, &QPushButton::clicked, this, &SpriteViewer::on_editPaletteButton_clicked);
