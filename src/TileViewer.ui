@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>911</width>
+    <width>1070</width>
     <height>756</height>
    </rect>
   </property>
@@ -50,8 +50,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>615</width>
-                <height>369</height>
+                <width>695</width>
+                <height>368</height>
                </rect>
               </property>
              </widget>
@@ -559,16 +559,6 @@ NT: $196E (base+$16E)</string>
            </item>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_5">
-             <item>
-              <widget class="QPushButton" name="editPaletteButton">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>Edit palette..</string>
-               </property>
-              </widget>
-             </item>
              <item>
               <widget class="QCheckBox" name="useVDPPalette">
                <property name="text">

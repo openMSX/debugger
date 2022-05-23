@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <optional>
 
+class MSXPalette;
+
 class VramTiledView : public QWidget
 {
 	Q_OBJECT
@@ -23,7 +25,7 @@ public:
     void setNameTableAddress(int adr);
     void setPatternTableAddress(int adr);
     void setColorTableAddress(int adr);
-    void setPaletteSource(const uint8_t *adr);
+    void setPaletteSource(MSXPalette *adr);
 	void setBorderColor(int value);
     void setDrawGrid(bool value);
     void setTpBit(bool value);
@@ -59,7 +61,6 @@ private:
 	void paintEvent(QPaintEvent* e) override;
 
 	void decode();
-	void decodePalette();
     void decodePatternTable();
     void decodeNameTable();
     void overLayNameTable();
@@ -83,10 +84,9 @@ private:
     QString byteAsPattern(uint8_t byte);
 
 private:
-	QRgb msxPalette[16];
 	QImage image;
 	QPixmap pixImage;
-    const uint8_t* palette = nullptr;
+    MSXPalette* palette = nullptr;
 	const uint8_t* vramBase = nullptr;
 	float zoomFactor;
     bool drawGrid = true;

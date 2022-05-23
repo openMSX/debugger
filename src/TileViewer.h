@@ -28,7 +28,6 @@ private:
     void on_cb_color0_stateChanged(int state);
     void on_useVDPRegisters_stateChanged(int state);
 
-    void on_editPaletteButton_clicked(bool checked);
     void on_useVDPPalette_stateChanged(int state);
     void on_zoomLevel_valueChanged(double d);
 
@@ -53,7 +52,6 @@ private:
     int mouseOverY = 0;
     int mouseOverChar = 0;
 
-    static uint8_t defaultPalette[32];
 };
 
 #endif // TILEVIEWER_H

@@ -290,6 +290,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="cb_autosync">
+       <property name="toolTip">
+        <string>autosync to openMSX</string>
+       </property>
        <property name="text">
         <string>Autosync</string>
        </property>

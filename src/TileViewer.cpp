@@ -7,26 +7,6 @@
 #include <QMessageBox>
 
 
-// static to feed to PaletteDialog and be used when VDP colors aren't selected
-uint8_t TileViewer::defaultPalette[32] = {
-//    RB  G
-    0x00, 0,
-    0x00, 0,
-    0x11, 6,
-    0x33, 7,
-    0x17, 1,
-    0x27, 3,
-    0x51, 1,
-    0x27, 6,
-    0x71, 1,
-    0x73, 3,
-    0x61, 6,
-    0x64, 6,
-    0x11, 4,
-    0x65, 2,
-    0x55, 5,
-    0x77, 7,
-};
 
 
 TileViewer::TileViewer(QWidget* parent)
@@ -43,7 +23,6 @@ TileViewer::TileViewer(QWidget* parent)
     connect(cb_color0, &QCheckBox::stateChanged, this, &TileViewer::on_cb_color0_stateChanged);
     connect(useVDPRegisters, &QCheckBox::stateChanged, this, &TileViewer::on_useVDPRegisters_stateChanged);
 
-    connect(editPaletteButton, &QPushButton::clicked, this, &TileViewer::on_editPaletteButton_clicked);
     connect(useVDPPalette, &QCheckBox::stateChanged, this, &TileViewer::on_useVDPPalette_stateChanged);
     connect(zoomLevel, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &TileViewer::on_zoomLevel_valueChanged);
 
@@ -83,7 +62,7 @@ TileViewer::TileViewer(QWidget* parent)
     scrollArea->setWidget(imageWidget);
 
 	const auto* vram    = VDPDataStore::instance().getVramPointer();
-	const auto* palette = VDPDataStore::instance().getPalettePointer();
+    auto* palette = VDPDataStore::instance().getPalette(paletteVDP);
     //imageWidget->setNameTableAddress(0);
     //imageWidget->setPatternTableAddress(0);
     //imageWidget->setColorTableAddress(0);
@@ -106,7 +85,7 @@ TileViewer::TileViewer(QWidget* parent)
 void TileViewer::VDPDataStoreDataRefreshed()
 {
     if (useVDPPalette->isChecked()) {
-        imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
     }
     decodeVDPregs();
 }
@@ -336,33 +315,14 @@ void TileViewer::on_useVDPRegisters_stateChanged(int state)
     cb_color0->setEnabled(useManual);
 }
 
-void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
-{
-    auto* p = new PaletteDialog();
-    p->setPalette(defaultPalette);
-    p->setAutoSync(true);
-    connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramTiledView::refresh);
-    connect(p, &PaletteDialog::paletteSynced, this, &TileViewer::update_label_characterimage);
-    p->show();
-    //useVDPPalette->setChecked(false);
-    //QMessageBox::information(
-    //    this,
-    //    "Not yet implemented",
-    //    "Sorry, the palette editor is not yet implemented, "
-    //    "only disabling 'Use VDP palette registers' for now");
-}
-
 void TileViewer::on_useVDPPalette_stateChanged(int state)
 {
-    const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
     if (state) {
-        imageWidget->setPaletteSource(palette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
     } else {
-        if (palette) memcpy(defaultPalette, palette, 32);
-        imageWidget->setPaletteSource(defaultPalette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteTiles));
     }
     imageWidget->refresh();
-    editPaletteButton->setEnabled(!state);
 }
 
 void TileViewer::on_zoomLevel_valueChanged(double d)
