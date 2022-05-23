@@ -10,3 +10,10 @@ moc_predefs.h
 qrc_resources.cpp
 Makefile
 .*.swp
+*.orig
+*.rej
+*.pro
+*.pro.user*
+build-*
+*.zip
+*.rom
