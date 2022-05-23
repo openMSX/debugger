@@ -14,7 +14,6 @@ public:
 
 public slots:
     void setMSXPalette(MSXPalette* pal);
-    void updatePaletteChanged(const uint8_t* pal);
     void setHighlightTest(int colorNr);
     void paletteChanged();
 

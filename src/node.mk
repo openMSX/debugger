@@ -10,7 +10,7 @@ MOC_SRC_HDR:= \
 	DebugSession MainMemoryViewer BitMapViewer VramBitMappedView \
 	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
 	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable \
-	TileViewer VramTiledView PaletteDialog VramSpriteView SpriteViewer \
+	TileViewer VramTiledView VramSpriteView SpriteViewer \
 	BreakpointViewer SignalDispatcher \
 	blendsplitter/BlendSplitter blendsplitter/Expander \
 	blendsplitter/Overlay blendsplitter/SplitterDecorator \
@@ -33,7 +33,7 @@ SRC_ONLY:= \
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
 	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters \
-	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer \
+	GotoDialog TileViewer SpriteViewer BreakpointViewer \
 	QuickGuide PaletteView
 
 include build/node-end.mk

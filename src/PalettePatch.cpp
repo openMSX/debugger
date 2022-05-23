@@ -18,20 +18,6 @@ void PalettePatch::setMSXPalette(MSXPalette* pal)
     paletteChanged();
 }
 
-//old method for PaletteDialog
-void PalettePatch::updatePaletteChanged(const uint8_t* pal)
-{
-    int r = (pal[2 * msxPalNr + 0] & 0x70) >> 4;
-    int b = (pal[2 * msxPalNr + 0] & 0x07);
-    int g = (pal[2 * msxPalNr + 1] & 0x07);
-    auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-    myColor = qRgb(scale(r), scale(g), scale(b));
-    //setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    update();
-    //printf("PalettePatch::updatePaletteChanged %i\n", msxPalNr);
-}
-
-//new method for PaletteView
 void PalettePatch::paletteChanged()
 {
     myColor = myPal->color(msxPalNr);

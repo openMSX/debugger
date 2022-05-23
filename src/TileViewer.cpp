@@ -2,12 +2,8 @@
 #include "ui_TileViewer.h"
 #include "VramTiledView.h"
 #include "VDPDataStore.h"
-#include "PaletteDialog.h"
 #include "Convert.h"
 #include <QMessageBox>
-
-
-
 
 TileViewer::TileViewer(QWidget* parent)
     : QDialog(parent), image4label(32, 32, QImage::Format_RGB32)

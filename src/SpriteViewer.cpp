@@ -1,30 +1,8 @@
 #include "SpriteViewer.h"
 #include "VDPDataStore.h"
 #include "VramSpriteView.h"
-//#include "PaletteDialog.h"
 #include "Convert.h"
 #include "MSXPalette.h"
-
-// static to feed to PaletteDialog and be used when VDP colors aren't selected
-uint8_t SpriteViewer::defaultPalette[32] = {
-//    RB  G
-    0x00, 0,
-    0x00, 0,
-    0x11, 6,
-    0x33, 7,
-    0x17, 1,
-    0x27, 3,
-    0x51, 1,
-    0x27, 6,
-    0x71, 1,
-    0x73, 3,
-    0x61, 6,
-    0x64, 6,
-    0x11, 4,
-    0x65, 2,
-    0x55, 5,
-    0x77, 7,
-};
 
 SpriteViewer::SpriteViewer(QWidget* parent)
     : QDialog(parent)
