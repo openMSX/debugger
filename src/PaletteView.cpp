@@ -17,7 +17,7 @@ PaletteView::PaletteView(QWidget* parent)
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->plainTextEdit->setFont(fixedFont);
 
-    setPalette(VDPDataStore::instance().getPalette(0));
+    setPalette(VDPDataStore::instance().getPalette(paletteVDP));
 
     signalMapper = new QSignalMapper(this);
     auto* gridLayout = new QGridLayout;
@@ -171,7 +171,7 @@ void PaletteView::on_cbPalette_currentIndexChanged(int index)
 void PaletteView::on_pbCopyPaletteVDP_clicked()
 {
     ScopedAssign sa(isDisplayUpdating, true);
-    myPal->copyDataFrom(*VDPDataStore::instance().getPalette(0));
+    myPal->copyDataFrom(*VDPDataStore::instance().getPalette(paletteVDP));
     emit myPal->paletteChanged();
 }
 

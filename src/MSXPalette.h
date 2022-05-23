@@ -5,6 +5,8 @@
 #include <QRgb>
 #include <cstdint>
 
+enum {paletteVDP,paletteTiles,paletteBitmap,paletteSprites};
+
 class MSXPalette : public QObject
 {
     Q_OBJECT

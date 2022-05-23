@@ -7,6 +7,7 @@
 #include <memory>
 
 class VramSpriteView;
+class MSXPalette;
 
 class SpriteViewer : public QDialog
 {
@@ -36,9 +37,8 @@ private:
     void on_cb_mag_currentIndexChanged(int index);
     void on_cb_alwaysShowColorTable_toggled(bool checked);
     void on_useVDPPalette_stateChanged(int state);
-    void on_editPaletteButton_clicked(bool checked);
 
-    void setPaletteSource(const uint8_t* palSource, bool useVDP);
+    void setPaletteSource(MSXPalette* palSource, bool useVDP);
     void decodeVDPregs();
     void setCorrectEnabled(bool checked);
     void setCorrectVDPData();

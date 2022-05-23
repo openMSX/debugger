@@ -210,17 +210,17 @@
        </item>
        <item>
         <property name="text">
-         <string>Sprite palette</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>Tileview palette</string>
         </property>
        </item>
        <item>
         <property name="text">
          <string>Bitmap palette</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Sprite palette</string>
         </property>
        </item>
       </widget>

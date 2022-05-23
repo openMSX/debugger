@@ -1,8 +1,9 @@
 #include "SpriteViewer.h"
 #include "VDPDataStore.h"
 #include "VramSpriteView.h"
-#include "PaletteDialog.h"
+//#include "PaletteDialog.h"
 #include "Convert.h"
+#include "MSXPalette.h"
 
 // static to feed to PaletteDialog and be used when VDP colors aren't selected
 uint8_t SpriteViewer::defaultPalette[32] = {
@@ -42,7 +43,6 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     connect(ui->cb_mag, qOverload<int>(&QComboBox::currentIndexChanged), this, &SpriteViewer::on_cb_mag_currentIndexChanged);
     connect(ui->cb_alwaysShowColorTable, &QCheckBox::toggled, this, &SpriteViewer::on_cb_alwaysShowColorTable_toggled);
     connect(ui->useVDPPalette, &QCheckBox::stateChanged, this, &SpriteViewer::on_useVDPPalette_stateChanged);
-    connect(ui->editPaletteButton, &QPushButton::clicked, this, &SpriteViewer::on_editPaletteButton_clicked);
 
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->plainTextEdit->setFont(fixedFont);
@@ -104,7 +104,7 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     imageWidgetColor->setVramSource(VDPDataStore::instance().getVramPointer());
 
 
-    setPaletteSource(VDPDataStore::instance().getPalettePointer(), true);
+    setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP), true);
 
     setCorrectVDPData();
     setCorrectEnabled(ui->useVDPRegisters->isChecked());
@@ -156,7 +156,7 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     VDPDataStore::instance().refresh();
 }
 
-void SpriteViewer::setPaletteSource(const uint8_t* palSource, bool useVDP)
+void SpriteViewer::setPaletteSource(MSXPalette* palSource, bool useVDP)
 {
     imageWidget->setPaletteSource(palSource, useVDP);
     imageWidgetSingle->setPaletteSource(palSource, useVDP);
@@ -423,28 +423,14 @@ void SpriteViewer::on_cb_alwaysShowColorTable_toggled(bool /*checked*/)
 
 void SpriteViewer::on_useVDPPalette_stateChanged(int state)
 {
-    const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
     if (state == Qt::Checked) {
-        setPaletteSource(palette, true);
+        setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP), true);
     } else {
-        if (palette != nullptr) memcpy(defaultPalette, palette, 32);
-        setPaletteSource(defaultPalette, false);
+        setPaletteSource(VDPDataStore::instance().getPalette(paletteSprites), false);
     }
     imageWidget->refresh();
     imageWidgetSingle->refresh();
     imageWidgetSpat->refresh();
     imageWidgetColor->refresh();
-    ui->editPaletteButton->setEnabled(state != Qt::Checked);
 }
 
-void SpriteViewer::on_editPaletteButton_clicked(bool /*checked*/)
-{
-    auto* p = new PaletteDialog();
-    p->setPalette(defaultPalette);
-    p->setAutoSync(true);
-    connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramSpriteView::refresh);
-    connect(p, &PaletteDialog::paletteSynced, imageWidgetSingle, &VramSpriteView::refresh);
-    connect(p, &PaletteDialog::paletteSynced, imageWidgetSpat, &VramSpriteView::refresh);
-    connect(p, &PaletteDialog::paletteSynced, imageWidgetColor, &VramSpriteView::refresh);
-    p->show();
-}

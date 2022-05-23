@@ -1,5 +1,6 @@
 #include "VramSpriteView.h"
 #include "VDPDataStore.h"
+#include "MSXPalette.h"
 #include <QPainter>
 #include <algorithm>
 #include <cstdio>
@@ -12,6 +13,10 @@ VramSpriteView::VramSpriteView(QWidget* parent, mode drawer, bool singleSprite)
 {
     // sprite size = 8x8, 16x16, 32x32 or 40x8, 48x16, 64x32 if EC bit respected
     calculateSizeOfSprites();
+
+    msxPalette = nullptr;
+    setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP), true);
+
 
     if (isSingleSpriteDrawer) {
         setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
@@ -49,8 +54,6 @@ int VramSpriteView::heightForWidth(int width) const
     // How many sprites do fit in this width?
     float x = int(width / (sizeOfSpritesHorizontal * zoomFactor)); // Does an int divided by an int gives an int that would be converted to float?
     int h = int(ceilf(float(nrOfSpritesToShow) / x)) * sizeOfSpritesVertical * zoomFactor;
-    //printf("\nheightForWidth sizeOfSpritesHorizontal %d sizeOfSpritesVertical %d  zoomFactor %d \n", sizeOfSpritesHorizontal, sizeOfSpritesVertical, zoomFactor);
-    //printf("heightForWidth w=%d => total=%d x=%f => h=%d \n", width, nr_of_sprites_to_show, x, h);
     return h;
 }
 
@@ -69,16 +72,16 @@ void VramSpriteView::setVramSource(const uint8_t* adr)
 {
     if (vramBase == adr) return;
     vramBase = adr;
-    decodePalette();
     decode();
 }
 
-void VramSpriteView::setPaletteSource(const uint8_t* adr, bool useVDP)
+void VramSpriteView::setPaletteSource(MSXPalette* pal, bool useVDP)
 {
     useVDPpalette = useVDP;
-    if (palette == adr) return;
-    palette = adr;
-    decodePalette();
+    if (msxPalette == pal) return;
+    disconnect(msxPalette, &MSXPalette::paletteChanged, this, &VramSpriteView::decode);
+    msxPalette = pal;
+    connect(msxPalette, &MSXPalette::paletteChanged, this, &VramSpriteView::decode);
     decode();
 }
 
@@ -247,20 +250,6 @@ void VramSpriteView::drawGrid()
     }
 }
 
-void VramSpriteView::decodePalette()
-{
-    if (!palette) return;
-
-    for (int i = 0; i < 16; ++i) {
-        int r = (palette[2 * i + 0] & 0xf0) >> 4;
-        int b = (palette[2 * i + 0] & 0x0f);
-        int g = (palette[2 * i + 1] & 0x0f);
-
-        auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-        msxPalette[i] = qRgb(scale(r), scale(g), scale(b));
-    }
-}
-
 void VramSpriteView::decodePgt()
 {
     image.fill(QColor(Qt::lightGray));
@@ -330,7 +319,7 @@ void VramSpriteView::drawColSprite(int entry, QColor& /*bgcolor*/)
     int z = zoomFactor * ((useMagnification && useECbit) ? 2 : 1);
     if (spriteMode == 1) {
         bool ec = color & 128;
-        QRgb fgColor = msxPalette[color & 15]; // drop EC and unused bits
+        QRgb fgColor = msxPalette->color(color & 15); // drop EC and unused bits
         qp.fillRect(x, y, sizeOfSpritesHorizontal * z, sizeOfSpritesVertical * z, fgColor);
         qp.fillRect(x, y, z, sizeOfSpritesVertical * z, ec ? QRgb(Qt::white) : QRgb(Qt::black));
     } else if (spriteMode == 2) {
@@ -339,7 +328,7 @@ void VramSpriteView::drawColSprite(int entry, QColor& /*bgcolor*/)
             bool ec = colorbyte & 128;
             bool cc = colorbyte & 64;
             bool ic = colorbyte & 32;
-            QRgb fgColor = msxPalette[colorbyte & 15]; // drop EC, CC and IC bits
+            QRgb fgColor = msxPalette->color(colorbyte & 15); // drop EC, CC and IC bits
             qp.fillRect(x,         y + charrow * z, sizeOfSpritesHorizontal * z, z, fgColor); // line with color
             qp.fillRect(x,         y + charrow * z,                           z, z, (ec ? QColor(Qt::white) : QColor(Qt::black))); // EC bit set -> white
             qp.fillRect(x +     z, y + charrow * z,                           z, z, (cc ? QColor(Qt::green) : QColor(Qt::black))); // CC bit set -> green
@@ -367,7 +356,7 @@ void VramSpriteView::drawSpatSprite(int entry, QColor &bgColor)
     // Mode 0 already tested, we will not end up here with spritemode == 0
     if (spriteMode == 1) {
         bool ec = color & 128;
-        QRgb fgColor = msxPalette[color & 15]; // drop EC and unused bits
+        QRgb fgColor = msxPalette->color(color & 15); // drop EC and unused bits
         if (attrY == 208) { // in spritemode 1 if Y is equal to 208 this and all lower priority sprites will not be displayed, so red bgcolor!
             bgColor = QColor(Qt::red);
         }
@@ -403,12 +392,6 @@ void VramSpriteView::setSpritePixel(int x, int y, QRgb c)
     QPainter qp(&image);
     qp.fillRect(x * zoomFactor, y * zoomFactor, zoomFactor, zoomFactor, c);
     //image.setPixel();
-}
-
-QRgb VramSpriteView::getColor(int c)
-{
-    // TODO do we need to look at the TP bit???
-    return msxPalette[c];
 }
 
 void VramSpriteView::setAttributeTableAddress(int value)
@@ -587,9 +570,8 @@ void VramSpriteView::refresh()
     // Reset pointers in case during boot these pointers weren't correctly set due to openMSX not having send over vram size...
     setVramSource(VDPDataStore::instance().getVramPointer());
     if (useVDPpalette) {
-        setPaletteSource(VDPDataStore::instance().getPalettePointer(), true);
+        setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP), true);
     }
-    decodePalette();
     decode();
 }
 
@@ -695,7 +677,7 @@ void VramSpriteView::drawLineColoredSpriteAt(int character, int spriteBox, int x
         bool ec = colorByte & 128;
         int ec_offset = (useECbit && !ec) ? 32 : 0; // Draw more to the right if no ec but spritebox is extra wide to display ec effect
 
-        QRgb fg = msxPalette[colorByte & 15]; // Drop EC, CC and IC bits
+        QRgb fg = msxPalette->color(colorByte & 15); // Drop EC, CC and IC bits
         for (int charCol = 0; charCol < 8; ++charCol) {
             uint8_t mask = 1 << (7 - charCol);
             if (gridEnabled && zoomFactor > 4) {
