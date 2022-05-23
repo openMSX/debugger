@@ -4,26 +4,6 @@
 #include "Convert.h"
 #include <QMessageBox>
 
-static const uint8_t defaultPalette[32] = {
-//        RB  G
-	0x00, 0,
-	0x00, 0,
-	0x11, 6,
-	0x33, 7,
-	0x17, 1,
-	0x27, 3,
-	0x51, 1,
-	0x27, 6,
-	0x71, 1,
-	0x73, 3,
-	0x61, 6,
-	0x64, 6,
-	0x11, 4,
-	0x65, 2,
-	0x55, 5,
-	0x77, 7,
-};
-
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
 	, screenMod(0) // avoid UMR
@@ -38,7 +18,6 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	connect(useVDPRegisters, &QCheckBox::stateChanged,this, &BitMapViewer::on_useVDPRegisters_stateChanged);
 
 	connect(saveImageButton, &QPushButton::clicked, this, &BitMapViewer::on_saveImageButton_clicked);
-	connect(editPaletteButton, &QPushButton::clicked, this, &BitMapViewer::on_editPaletteButton_clicked);
 	connect(useVDPPalette, &QCheckBox::stateChanged, this, &BitMapViewer::on_useVDPPalette_stateChanged);
 	connect(zoomLevel, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &BitMapViewer::on_zoomLevel_valueChanged);
 
@@ -61,10 +40,9 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	useVDP = useVDPRegisters->isChecked();
 
 	const uint8_t* vram    = VDPDataStore::instance().getVramPointer();
-	const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
-	imageWidget->setPaletteSource(palette);
+    imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
 
 	//now hook up some signals and slots
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
@@ -246,23 +224,13 @@ void BitMapViewer::on_saveImageButton_clicked(bool /*checked*/)
 		"Sorry, the save image dialog is not yet implemented");
 }
 
-void BitMapViewer::on_editPaletteButton_clicked(bool /*checked*/)
-{
-	useVDPPalette->setChecked(false);
-	QMessageBox::information(
-		this,
-		"Not yet implemented",
-		"Sorry, the palette editor is not yet implemented, "
-		"only disabling 'Use VDP palette registers' for now");
-}
 
 void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
 	if (state) {
-		const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
-		imageWidget->setPaletteSource(palette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
 	} else {
-		imageWidget->setPaletteSource(defaultPalette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteBitmap));
 	}
 	imageWidget->refresh();
 }

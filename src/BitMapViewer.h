@@ -5,6 +5,7 @@
 #include <QDialog>
 
 class VramBitMappedView;
+class MSXPalette;
 
 class BitMapViewer : public QDialog, private Ui::BitMapViewer
 {
@@ -25,7 +26,6 @@ private:
 	void on_useVDPRegisters_stateChanged(int state);
 
 	void on_saveImageButton_clicked(bool checked);
-	void on_editPaletteButton_clicked(bool checked);
 	void on_useVDPPalette_stateChanged(int state);
 	void on_zoomLevel_valueChanged(double d);
 

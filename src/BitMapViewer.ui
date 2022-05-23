@@ -1,167 +1,168 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BitMapViewer</class>
- <widget class="QDialog" name="BitMapViewer" >
-  <property name="geometry" >
+ <widget class="QDialog" name="BitMapViewer">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>604</width>
+    <width>703</width>
     <height>619</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" >
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4" >
-     <property name="spacing" >
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
       <number>0</number>
      </property>
      <item>
-      <widget class="QFrame" name="frame" >
-       <property name="frameShape" >
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="frameShadow" >
+       <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QGridLayout" name="gridLayout" >
-        <property name="horizontalSpacing" >
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="horizontalSpacing">
          <number>0</number>
         </property>
-        <property name="verticalSpacing" >
+        <property name="verticalSpacing">
          <number>2</number>
         </property>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label" >
-          <property name="text" >
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
            <string>Screen mode:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" >
-         <widget class="QComboBox" name="screenMode" >
-          <property name="enabled" >
+        <item row="1" column="1">
+         <widget class="QComboBox" name="screenMode">
+          <property name="enabled">
            <bool>false</bool>
           </property>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>5</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>6</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>7</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>8</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>10</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>11</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>12</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="2" column="1" >
-         <widget class="QComboBox" name="showPage" >
-          <property name="enabled" >
+        <item row="2" column="1">
+         <widget class="QComboBox" name="showPage">
+          <property name="enabled">
            <bool>false</bool>
           </property>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>0</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>1</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>2</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>3</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="3" column="0" >
-         <widget class="QLabel" name="label_4" >
-          <property name="text" >
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
            <string>Lines visible</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1" >
-         <widget class="QComboBox" name="linesVisible" >
-          <property name="enabled" >
+        <item row="3" column="1">
+         <widget class="QComboBox" name="linesVisible">
+          <property name="enabled">
            <bool>false</bool>
           </property>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>192</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>212</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>256</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
            <string>Show page</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0" >
-         <widget class="QLabel" name="label_5" >
-          <property name="text" >
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
            <string>Replace color 0 by</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1" >
-         <widget class="QSpinBox" name="bgColor" >
-          <property name="enabled" >
+        <item row="4" column="1">
+         <widget class="QSpinBox" name="bgColor">
+          <property name="enabled">
            <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_8" >
-          <property name="text" >
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
            <string>Displayed as:</string>
           </property>
          </widget>
@@ -170,16 +171,16 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3" >
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <spacer name="verticalSpacer_3" >
-         <property name="orientation" >
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>13</height>
@@ -188,13 +189,13 @@
         </spacer>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3" >
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <spacer name="horizontalSpacer_3" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>22</width>
              <height>17</height>
@@ -203,61 +204,61 @@
           </spacer>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2" >
+          <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <layout class="QGridLayout" name="gridLayout_2" >
-             <item row="3" column="1" >
-              <widget class="QLabel" name="borderLabel" >
-               <property name="text" >
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="3" column="1">
+              <widget class="QLabel" name="borderLabel">
+               <property name="text">
                 <string>0</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" >
-              <widget class="QLabel" name="label_11" >
-               <property name="text" >
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
                 <string>Border color</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0" >
-              <widget class="QLabel" name="label_9" >
-               <property name="text" >
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
                 <string>VDP mode:</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0" >
-              <widget class="QLabel" name="label_6" >
-               <property name="text" >
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
                 <string>Vram address start:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1" >
-              <widget class="QLabel" name="modeLabel" >
-               <property name="text" >
+             <item row="0" column="1">
+              <widget class="QLabel" name="modeLabel">
+               <property name="text">
                 <string>5</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0" >
-              <widget class="QLabel" name="label_7" >
-               <property name="text" >
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
                 <string>Lines visible</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1" >
-              <widget class="QLabel" name="addressLabel" >
-               <property name="text" >
+             <item row="1" column="1">
+              <widget class="QLabel" name="addressLabel">
+               <property name="text">
                 <string>0x00000</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1" >
-              <widget class="QLabel" name="linesLabel" >
-               <property name="text" >
+             <item row="2" column="1">
+              <widget class="QLabel" name="linesLabel">
+               <property name="text">
                 <string>212</string>
                </property>
               </widget>
@@ -265,11 +266,11 @@
             </layout>
            </item>
            <item>
-            <widget class="QCheckBox" name="useVDPRegisters" >
-             <property name="text" >
+            <widget class="QCheckBox" name="useVDPRegisters">
+             <property name="text">
               <string>Use current VDP settings</string>
              </property>
-             <property name="checked" >
+             <property name="checked">
               <bool>true</bool>
              </property>
             </widget>
@@ -277,11 +278,11 @@
           </layout>
          </item>
          <item>
-          <spacer name="horizontalSpacer_2" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>22</width>
              <height>17</height>
@@ -294,43 +295,36 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" >
-       <property name="spacing" >
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
         <number>1</number>
        </property>
        <item>
-        <widget class="QPushButton" name="saveImageButton" >
-         <property name="text" >
+        <widget class="QPushButton" name="saveImageButton">
+         <property name="text">
           <string>Save image...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="editPaletteButton" >
-         <property name="text" >
-          <string>Edit palette..</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="useVDPPalette" >
-         <property name="text" >
+        <widget class="QCheckBox" name="useVDPPalette">
+         <property name="text">
           <string>Use VDP  palette registers</string>
          </property>
-         <property name="checked" >
+         <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2" >
-         <property name="orientation" >
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Minimum</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>0</height>
@@ -339,26 +333,26 @@
         </spacer>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" >
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
+          <widget class="QLabel" name="label_3">
+           <property name="text">
             <string>Zoom</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="zoomLevel" >
-           <property name="decimals" >
+          <widget class="QDoubleSpinBox" name="zoomLevel">
+           <property name="decimals">
             <number>2</number>
            </property>
-           <property name="minimum" >
+           <property name="minimum">
             <double>1.000000000000000</double>
            </property>
-           <property name="maximum" >
+           <property name="maximum">
             <double>16.000000000000000</double>
            </property>
-           <property name="singleStep" >
+           <property name="singleStep">
             <double>0.250000000000000</double>
            </property>
           </widget>
@@ -366,8 +360,8 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="refreshButton" >
-         <property name="text" >
+        <widget class="QPushButton" name="refreshButton">
+         <property name="text">
           <string>Take VRAM snapshot</string>
          </property>
         </widget>
@@ -377,38 +371,38 @@
     </layout>
    </item>
    <item>
-    <widget class="QScrollArea" name="scrollArea" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize" >
+     <property name="minimumSize">
       <size>
        <width>0</width>
        <height>0</height>
       </size>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::Panel</enum>
      </property>
-     <property name="verticalScrollBarPolicy" >
+     <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
-     <property name="horizontalScrollBarPolicy" >
+     <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
-     <property name="widgetResizable" >
+     <property name="widgetResizable">
       <bool>false</bool>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents" >
-      <property name="geometry" >
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
        <rect>
-        <x>38</x>
+        <x>80</x>
         <y>0</y>
         <width>508</width>
         <height>420</height>
@@ -418,91 +412,91 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" >
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_10" >
-       <property name="text" >
+      <widget class="QLabel" name="label_10">
+       <property name="text">
         <string>X:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelX" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <widget class="QLabel" name="labelX">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
          <width>18</width>
          <height>0</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>000</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_13" >
-       <property name="text" >
+      <widget class="QLabel" name="label_13">
+       <property name="text">
         <string>Y:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelY" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <widget class="QLabel" name="labelY">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
          <width>18</width>
          <height>0</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>000</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_15" >
-       <property name="text" >
+      <widget class="QLabel" name="label_15">
+       <property name="text">
         <string>Color:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelColor" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <widget class="QLabel" name="labelColor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
          <width>18</width>
          <height>0</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>000</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer" >
-       <property name="orientation" >
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -511,53 +505,53 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_17" >
-       <property name="text" >
+      <widget class="QLabel" name="label_17">
+       <property name="text">
         <string>Vram address:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelVramAddr" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <widget class="QLabel" name="labelVramAddr">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
          <width>42</width>
          <height>0</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>0x00000</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_19" >
-       <property name="text" >
+      <widget class="QLabel" name="label_19">
+       <property name="text">
         <string>byte value:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelByte" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <widget class="QLabel" name="labelByte">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize" >
+       <property name="minimumSize">
         <size>
          <width>24</width>
          <height>0</height>
         </size>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>0x00</string>
        </property>
       </widget>
