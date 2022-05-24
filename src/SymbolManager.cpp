@@ -119,7 +119,7 @@ void SymbolManager::addFile()
 	// create dialog
 	auto* d = new QFileDialog(this);
 	QStringList types;
-	types << "All supported files (*.sym *.map *.symbol *.publics *.sys)"
+	types << "All supported files (*.sym *.map *.noi *.symbol *.publics *.sys)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
