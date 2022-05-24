@@ -186,11 +186,16 @@ const QDateTime& SymbolTable::symbolFileRefresh(int index) const
 
 bool SymbolTable::readFile(const QString& filename, FileType type)
 {
+	QString fname = filename.toLower();
+
 	if (type == DETECT_FILE) {
-		if (filename.toLower().endsWith(".map")) {
+		if (fname.endsWith(".noi")) {
+			// NoICE command file
+			type = NOICE_FILE;
+		} else if (fname.endsWith(".map")) {
 			// HiTech link map file
 			type = LINKMAP_FILE;
-		} else if (filename.toLower().endsWith(".sym")) {
+		} else if (fname.endsWith(".sym")) {
 			// auto detect which sym file
 			QFile file(filename);
 			if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -211,16 +216,13 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = HTC_FILE;
 				}
 			}
-		} else {
-			QString ext = filename.toLower();
+		} else if (fname.endsWith(".symbol") || fname.endsWith(".publics") || fname.endsWith(".sys")) {
 			/* They are the same type of file. For some reason the Debian
 			 * manpage uses the extension ".sys"
 			 * pasmo doc -> pasmo [options] file.asm file.bin [file.symbol [file.publics] ]
 			 * pasmo manpage in Debian -> pasmo [options]  file.asm file.bin [file.sys]
 			*/
-			if (ext.endsWith(".symbol") || ext.endsWith(".publics") || ext.endsWith(".sys")) {
-				type = PASMO_FILE;
-			}
+			type = PASMO_FILE;
 		}
 	}
 	switch (type) {
