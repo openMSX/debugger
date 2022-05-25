@@ -1530,8 +1530,6 @@ void DebuggerForm::onSlotsUpdated(bool slotsChanged)
 
 void DebuggerForm::onPCChanged(uint16_t address)
 {
-	// PC shouldn't update twice.
-	assert(disasmStatus != PC_CHANGED);
 	if (disasmStatus != RESET) {
 		disasmView->setProgramCounter(address, disasmStatus == SLOTS_CHANGED);
 	} else {

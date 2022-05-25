@@ -222,7 +222,7 @@ void CPURegsViewer::keyPressEvent(QKeyEvent* e)
 	int move = e->key();
 	if ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
 	    (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F)) {
-		// calculate numercial value
+		// calculate numerical value
 		int v = e->key() - Qt::Key_0;
 		if (v > 9) v -= Qt::Key_A - Qt::Key_0 - 10;
 		// modify value
@@ -350,6 +350,11 @@ void CPURegsViewer::applyModifications()
 	}
 	// update screen
 	update();
+
+	// update disasm window
+	if (regsChanged[CpuRegs::REG_PC]) {
+		emit pcChanged(regs[CpuRegs::REG_PC]);
+	}
 }
 
 void CPURegsViewer::cancelModifications()
