@@ -2,6 +2,7 @@
 #include "CPURegs.h"
 #include "CommClient.h"
 #include "OpenMSXConnection.h"
+#include "ranges.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMessageBox>
@@ -11,9 +12,9 @@ CPURegsViewer::CPURegsViewer(QWidget* parent)
 	: QFrame(parent)
 {
 	// avoid UMR
-	memset(&regs,         0, sizeof(regs));
-	memset(&regsChanged,  0, sizeof(regsChanged));
-	memset(&regsModified, 0, sizeof(regsModified));
+	regs.fill(0);
+	regsChanged.fill(false);
+	regsModified.fill(false);
 
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
@@ -173,8 +174,8 @@ void CPURegsViewer::setData(unsigned char* datPtr)
 
 	// reset modifications
 	cursorLoc = -1;
-	memset(&regsModified, 0, sizeof(regsModified));
-	memcpy(&regsCopy, &regs, sizeof(regs));
+	regsModified.fill(false);
+	regsCopy = regs;
 
 	update();
 
@@ -360,10 +361,8 @@ void CPURegsViewer::applyModifications()
 void CPURegsViewer::cancelModifications()
 {
 	static bool isVisible = false;
-	bool mod = false;
 
-	for (int i = 0; i < 14; ++i) mod |= regsModified[i];
-	if (!mod) return;
+	if (!ranges::contains(regsModified, true)) return;
 
 	if (!isVisible) {
 		isVisible = true;
@@ -377,8 +376,8 @@ void CPURegsViewer::cancelModifications()
 			QMessageBox::Ignore);
 		isVisible = false;
 		if (ret == QMessageBox::Ignore) {
-			memcpy(&regs, &regsCopy, sizeof(regs));
-			memset(&regsModified, 0, sizeof(regsModified));
+			regs = regsCopy;
+			regsModified.fill(false);
 		} else {
 			applyModifications();
 		}
