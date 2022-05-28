@@ -359,22 +359,29 @@ void CPURegsViewer::applyModifications()
 
 void CPURegsViewer::cancelModifications()
 {
+	static bool isVisible = false;
 	bool mod = false;
+
 	for (int i = 0; i < 14; ++i) mod |= regsModified[i];
 	if (!mod) return;
 
-	int ret = QMessageBox::warning(
-		this,
-		tr("CPU registers changes"),
-		tr("You made changes to the CPU registers.\n"
-		   "Do you want to apply your changes or ignore them?"),
-		QMessageBox::Apply | QMessageBox::Ignore,
-		QMessageBox::Ignore);
-	if (ret == QMessageBox::Ignore) {
-		memcpy(&regs, &regsCopy, sizeof(regs));
-		memset(&regsModified, 0, sizeof(regsModified));
-	} else {
-		applyModifications();
+	if (!isVisible) {
+		isVisible = true;
+		// this modal window blocks execution of next instruction
+		int ret = QMessageBox::warning(
+			this,
+			tr("CPU registers changes"),
+			tr("You made changes to the CPU registers.\n"
+			   "Do you want to apply your changes or ignore them?"),
+			QMessageBox::Apply | QMessageBox::Ignore,
+			QMessageBox::Ignore);
+		isVisible = false;
+		if (ret == QMessageBox::Ignore) {
+			memcpy(&regs, &regsCopy, sizeof(regs));
+			memset(&regsModified, 0, sizeof(regsModified));
+		} else {
+			applyModifications();
+		}
 	}
 }
 
