@@ -165,6 +165,12 @@ void PaletteView::on_cbPalette_currentIndexChanged(int index)
     ui->pbCopyPaletteVDP->setEnabled(index != 0);
     ScopedAssign sa(isDisplayUpdating, true);
     setPalette(VDPDataStore::instance().getPalette(index));
+    ui->cb_autosync->setEnabled(index==0);
+    if (index){
+        ui->buttonBox->setDisabled(true);
+    } else {
+        ui->buttonBox->setDisabled(ui->cb_autosync->isChecked());
+    }
     colorSelected(currentColor);
 }
 
