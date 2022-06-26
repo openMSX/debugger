@@ -22,6 +22,8 @@ public:
 	void setUseMarker(bool enabled);
 	void setIsEditable(bool enabled);
 
+    void setAlignAddress(bool enabled);
+    void setDisplayCharacters(bool showchars);
 	void setDisplayMode(Mode mode);
 	void setDisplayWidth(short width);
 
@@ -62,6 +64,8 @@ private:
 	QAction* setWith8Action;
 	QAction* setWith16Action;
 	QAction* setWith32Action;
+    QAction* decodeAsCharAction;
+    QAction* alignAddressAction;
 
 	int wheelRemainder = 0;
 
@@ -89,6 +93,8 @@ private:
 	bool beingEdited = false;
 	bool editedChars = false;
 	bool hasFocus = false;
+    bool decodeAsChar= true;
+    bool alignAddress= true;
 	int cursorPosition, editValue;
 
 	friend class HexRequest;
