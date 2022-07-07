@@ -856,6 +856,27 @@ std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointRef::Type ty
 	return bp;
 }
 
+
+void BreakpointViewer::onSymbolTableChanged()
+{
+	for (int row = 0; row < bpTableWidget->rowCount(); ++row) {
+		auto* item = bpTableWidget->item(row, BP_ADDRESS);
+
+		// scan tooltip validity
+		if (!item->text().isEmpty()) {
+			Symbol* s = debugSession.symbolTable().getAddressSymbol(item->text());
+			auto address = stringToValue<uint16_t>(item->text());
+			assert(address);
+
+			if (!s || *address != s->value()) {
+				setTextField(BreakpointRef::BREAKPOINT, row, LOCATION, item->text());
+				setTextField(BreakpointRef::BREAKPOINT, row, BP_ADDRESS, "");
+			}
+		}
+	}
+}
+
+
 void BreakpointViewer::onAddBtnClicked(BreakpointRef::Type type)
 {
 	auto sa = ScopedAssign(userMode, false);

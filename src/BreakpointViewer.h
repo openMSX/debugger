@@ -28,6 +28,7 @@ public:
 	BreakpointViewer(DebugSession& session, QWidget* parent = nullptr);
 	void setBreakpoints(Breakpoints* bps);
 
+	void onSymbolTableChanged();
 	void on_btnAddBp_clicked();
 	void on_btnRemoveBp_clicked();
 	void on_btnAddWp_clicked();

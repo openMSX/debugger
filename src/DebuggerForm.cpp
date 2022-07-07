@@ -1056,6 +1056,8 @@ void DebuggerForm::systemSymbolManager()
 	SymbolManager symManager(session.symbolTable(), this);
 	connect(&symManager, &SymbolManager::symbolTableChanged,
 	        &session, &DebugSession::sessionModified);
+	connect(&symManager, &SymbolManager::symbolTableChanged,
+	        bpView, &BreakpointViewer::onSymbolTableChanged);
 	symManager.exec();
 	emit symbolsChanged();
 	updateWindowTitle();
