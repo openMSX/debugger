@@ -115,6 +115,11 @@
         <string>#</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string>real_addr</string>
+       </property>
+      </column>
      </widget>
     </item>
     <item>

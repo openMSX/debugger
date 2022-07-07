@@ -566,7 +566,7 @@ void DebuggerForm::createForm()
 	connect(dw, &DockableWidget::visibilityChanged, this, &DebuggerForm::dockWidgetVisibilityChanged);
 
 	// create breakpoints viewer
-	bpView = new BreakpointViewer(this);
+	bpView = new BreakpointViewer(session, this);
 	dw = new DockableWidget(dockMan);
 	dw->setWidget(bpView);
 	dw->setTitle(tr("Debug list"));
