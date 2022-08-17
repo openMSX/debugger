@@ -9,6 +9,9 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QFileSystemWatcher>
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 struct MemoryLayout;
 class SymbolTable;
@@ -16,7 +19,7 @@ class SymbolTable;
 class Symbol
 {
 public:
-	Symbol(QString str, int addr, int val = 0xFFFF);
+	Symbol(QString str, int addr, const QString* source = nullptr);
 	Symbol(const Symbol& symbol);
 	Symbol& operator=(const Symbol&) = default;
 
@@ -28,43 +31,45 @@ public:
 	// was of a bad file (after a failed assembler run for instance).
 	enum SymbolStatus { ACTIVE, HIDDEN, LOST };
 	enum SymbolType { JUMPLABEL, VARIABLELABEL, VALUE };
-	enum Register { REG_A = 1, REG_B = 2, REG_C = 4, REG_D = 8, REG_E = 16,
-	                REG_H = 32, REG_L = 64, REG_BC = 128, REG_DE = 256,
-	                REG_HL = 512, REG_IX = 1024, REG_IY = 2048, REG_IXL = 4096,
-	                REG_IXH = 8192, REG_IYL = 16384, REG_IYH = 32768,
-	                REG_OFFSET = 65536, REG_I = 131072,
-	                REG_ALL8 = 1+2+4+8+16+32+64+4096+8192+16384+32768+65536+131072,
-	                REG_ALL16 = 128+256+512+1024+2048,
-	                REG_ALL = 0x3FFFF };
+	enum Register { REG_A = 1 << 0, REG_B = 1 << 1, REG_C = 1 << 2, REG_D = 1 << 3, REG_E = 1 << 4,
+	                REG_H = 1 << 5, REG_L = 1 << 6, REG_BC = 1 << 7, REG_DE = 1 << 8,
+	                REG_HL = 1 << 9, REG_IX = 1 << 10, REG_IY = 1 << 11, REG_IXL = 1 << 12,
+	                REG_IXH = 1 << 13, REG_IYL = 1 << 15, REG_IYH = 1 << 15,
+	                REG_OFFSET = 1 << 16, REG_I = 1 << 17,
+			REG_ALL8 = REG_A | REG_B | REG_C | REG_D | REG_E | REG_H | REG_L
+			         | REG_IXL | REG_IXH | REG_IYL | REG_IYH
+			         | REG_OFFSET | REG_I,
+	                REG_ALL16 = REG_BC | REG_DE | REG_HL | REG_IX | REG_IY,
+	                REG_ALL = REG_ALL8 | REG_ALL16 };
 
-	const QString& text() const;
-	void setText(const QString& str);
-	int value() const;
+	[[nodiscard]] const QString& text() const { return symText; }
+	void setText(const QString& str) { symText = str; }
+	[[nodiscard]] int value() const { return symValue; }
 	void setValue(int addr);
-	int validSlots() const;
-	void setValidSlots(int val);
-	int validRegisters() const;
+	[[nodiscard]] uint16_t validSlots() const { return symSlots; }
+	void setValidSlots(uint16_t val) { symSlots = val; }
+	[[nodiscard]] int validRegisters() const { return symRegisters; }
 	void setValidRegisters(int regs);
-	const QString* source() const;
-	void setSource(const QString* name);
-	SymbolStatus status() const;
-	void setStatus(SymbolStatus s);
-	SymbolType type() const;
+	[[nodiscard]] const QString* source() const { return symSource; }
+	void setSource(const QString* name) { symSource = name; }
+	[[nodiscard]] SymbolStatus status() const { return symStatus; }
+	void setStatus(SymbolStatus s) { symStatus = s; }
+	[[nodiscard]] SymbolType type() const { return symType; }
 	void setType(SymbolType t);
 
 	bool isSlotValid(const MemoryLayout* ml = nullptr) const;
 
 private:
-	SymbolTable* table;
+	SymbolTable* table = nullptr;
 
 	QString symText;
 	int symValue;
-	int symSlots;
-	QList<uint8_t> symSegments;
+	uint16_t symSlots = 0xffff;
+	//QList<uint8_t> symSegments;
 	int symRegisters;
-	const QString* symSource;
-	SymbolStatus symStatus;
-	SymbolType symType;
+	const QString* symSource = nullptr;
+	SymbolStatus symStatus = ACTIVE;
+	SymbolType symType = JUMPLABEL;
 
 	friend class SymbolTable;
 };
@@ -87,34 +92,33 @@ public:
 	};
 
 	SymbolTable();
-	~SymbolTable() override;
 
-	void add(Symbol* symbol);
-	void removeAt(int index);
-	void remove(Symbol *symbol);
+	Symbol* add(std::unique_ptr<Symbol> symbol);
+	std::unique_ptr<Symbol> removeAt(size_t index);
+	std::unique_ptr<Symbol> remove(Symbol *symbol);
 	void clear();
-	int size() const;
+	[[nodiscard]] int size() const;
 
-	/* xml session file functions */
+	// xml session file functions
 	void saveSymbols(QXmlStreamWriter& xml);
 	void loadSymbols(QXmlStreamReader& xml);
 
-	/* Symbol access functions */
-	Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = nullptr);
-	Symbol* getCurrentAddressSymbol();
-	Symbol* findNextAddressSymbol(MemoryLayout* ml = nullptr);
-	Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = nullptr);
-	Symbol* getAddressSymbol(int val, MemoryLayout* ml = nullptr);
-	Symbol* getAddressSymbol(const QString& label, bool case_sensitive = false);
+	// Symbol access functions
+	[[nodiscard]] Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = nullptr);
+	[[nodiscard]] Symbol* getCurrentAddressSymbol();
+	[[nodiscard]] Symbol* findNextAddressSymbol(MemoryLayout* ml = nullptr);
+	[[nodiscard]] Symbol* getValueSymbol(int val, Symbol::Register reg, MemoryLayout* ml = nullptr);
+	[[nodiscard]] Symbol* getAddressSymbol(int val, MemoryLayout* ml = nullptr);
+	[[nodiscard]] Symbol* getAddressSymbol(const QString& label, bool case_sensitive = false);
 
-	QStringList labelList(bool include_vars = false, const MemoryLayout* ml = nullptr) const;
+	[[nodiscard]] QStringList labelList(bool include_vars = false, const MemoryLayout* ml = nullptr) const;
 
 	void symbolTypeChanged(Symbol* symbol);
 	void symbolValueChanged(Symbol* symbol);
 
-	int symbolFilesSize() const;
-	const QString& symbolFile(int index) const;
-	const QDateTime& symbolFileRefresh(int index) const;
+	[[nodiscard]] int symbolFilesSize() const;
+	[[nodiscard]] const QString& symbolFile(int index) const;
+	[[nodiscard]] const QDateTime& symbolFileRefresh(int index) const;
 
 	bool readFile(const QString& filename, FileType type = DETECT_FILE);
 	void reloadFiles();
@@ -142,7 +146,7 @@ private:
 	void fileChanged(const QString & path);
 
 private:
-	QList<Symbol*> symbols;
+	std::vector<std::unique_ptr<Symbol>> symbols;
 	QMultiMap<int, Symbol*> addressSymbols;
 	QMultiHash<int, Symbol*> valueSymbols;
 	QMultiMap<int, Symbol*>::iterator currentAddress;

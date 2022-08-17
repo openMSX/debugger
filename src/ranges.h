@@ -61,6 +61,15 @@ template<typename ForwardRange, typename T, typename Compare = std::less<>, type
 	return std::upper_bound(std::begin(range), std::end(range), value, comp2);
 }
 
+
+// Not part of standard c++ (but has been proposed for a future version)
+// This is more convenient to use than find(), if you don't care where in the
+// range the element is located.
+template<typename ForwardRange, typename T>
+[[nodiscard]] bool contains(ForwardRange&& range, const T& value)
+{
+	return find(range, value) != std::end(range);
+}
 } // namespace ranges
 
 #endif

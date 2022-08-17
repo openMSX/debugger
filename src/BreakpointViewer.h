@@ -10,6 +10,7 @@
 
 class QPaintEvent;
 class Breakpoints;
+class DebugSession;
 
 struct BreakpointRef {
 	enum Type { BREAKPOINT, WATCHPOINT, CONDITION, ALL } type;
@@ -24,9 +25,10 @@ class BreakpointViewer : public QTabWidget, private Ui::BreakpointViewer
 {
 	Q_OBJECT
 public:
-	BreakpointViewer(QWidget* parent = nullptr);
+	BreakpointViewer(DebugSession& session, QWidget* parent = nullptr);
 	void setBreakpoints(Breakpoints* bps);
 
+	void onSymbolTableChanged();
 	void on_btnAddBp_clicked();
 	void on_btnRemoveBp_clicked();
 	void on_btnAddWp_clicked();
@@ -42,7 +44,10 @@ signals:
 	void contentsUpdated(bool merge);
 
 private:
-	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value);
+	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value, const QString& tooltip = {});
+
+	std::optional<AddressRange> parseSymbolOrValue(const QString& field) const;
+
 	std::optional<AddressRange> parseLocationField(std::optional<int> index,
 	                                               BreakpointRef::Type type,
 	                                               const QString& field,
@@ -86,6 +91,8 @@ private:
 
 private:
 	Ui::BreakpointViewer* ui;
+	DebugSession& debugSession;
+
 	QTableWidget* tables[BreakpointRef::ALL];
 	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
 

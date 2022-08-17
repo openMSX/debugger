@@ -119,7 +119,7 @@ void SymbolManager::addFile()
 	// create dialog
 	auto* d = new QFileDialog(this);
 	QStringList types;
-	types << "All supported files (*.sym *.map *.symbol *.publics *.sys)"
+	types << "All supported files (*.sym *.map *.noi *.symbol *.publics *.sys)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
@@ -263,8 +263,7 @@ void SymbolManager::closeEditor()
 void SymbolManager::addLabel()
 {
 	// create an empty symbol
-	auto* sym = new Symbol(tr("New symbol"), 0);
-	symTable.add(sym);
+	auto* sym = symTable.add(std::make_unique<Symbol>(tr("New symbol"), 0));
 
 	beginTreeLabelsUpdate();
 	auto* item = new QTreeWidgetItem(treeLabels);

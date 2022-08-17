@@ -2,6 +2,7 @@
 #define CPUREGSVIEWER_H
 
 #include <QFrame>
+#include <array>
 
 class QPaintEvent;
 
@@ -33,9 +34,10 @@ private:
 	int leftRegPos, leftValuePos, rightRegPos, rightValuePos;
 	int rowHeight;
 
-	int regs[16], regsCopy[16];
-	bool regsModified[16];
-	bool regsChanged[16];
+	std::array<int, 16> regs;
+	std::array<int, 16> regsCopy;
+	std::array<bool, 16> regsModified;
+	std::array<bool, 16> regsChanged;
 	int cursorLoc;
 
 	void drawValue(QPainter& p, int id, int x, int y);

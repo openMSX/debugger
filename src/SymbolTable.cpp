@@ -7,6 +7,9 @@
 #include <QFileInfo>
 #include <QXmlStreamWriter>
 #include <QMap>
+#include <algorithm>
+#include <cassert>
+#include <memory>
 #include <optional>
 
 // class SymbolTable
@@ -17,37 +20,37 @@ SymbolTable::SymbolTable()
 	        this, &SymbolTable::fileChanged);
 }
 
-SymbolTable::~SymbolTable()
+Symbol* SymbolTable::add(std::unique_ptr<Symbol> symbol)
 {
-	clear();
+	auto* p = symbol.get();
+	symbols.push_back(std::move(symbol));
+	p->table = this;
+	mapSymbol(p);
+	return p;
 }
 
-void SymbolTable::add(Symbol* symbol)
+std::unique_ptr<Symbol> SymbolTable::removeAt(size_t index)
 {
-	symbols.append(symbol);
-	symbol->table = this;
-	mapSymbol(symbol);
+	assert(index < symbols.size());
+	auto symbol = std::move(symbols[index]);
+	symbols.erase(symbols.begin() + index); // TODO optimize: swap with back(), then pop_back()
+	unmapSymbol(symbol.get());
+	return symbol;
 }
 
-void SymbolTable::removeAt(int index)
+std::unique_ptr<Symbol> SymbolTable::remove(Symbol* symbol)
 {
-	Symbol* symbol = symbols.takeAt(index);
-	unmapSymbol(symbol);
-	delete symbol;
-}
+	auto it = std::find_if(symbols.begin(), symbols.end(),
+	                       [&](auto& e) { return e.get() == symbol; });
+	if (it == symbols.end()) return {};
 
-void SymbolTable::remove(Symbol* symbol)
-{
-	symbols.removeAll(symbol);
-	unmapSymbol(symbol);
-	delete symbol;
+	return removeAt(std::distance(symbols.begin(), it));
 }
 
 void SymbolTable::clear()
 {
 	addressSymbols.clear();
 	valueSymbols.clear();
-	qDeleteAll(symbols);
 	symbols.clear();
 }
 
@@ -185,11 +188,16 @@ const QDateTime& SymbolTable::symbolFileRefresh(int index) const
 
 bool SymbolTable::readFile(const QString& filename, FileType type)
 {
+	QString fname = filename.toLower();
+
 	if (type == DETECT_FILE) {
-		if (filename.toLower().endsWith(".map")) {
+		if (fname.endsWith(".noi")) {
+			// NoICE command file
+			type = NOICE_FILE;
+		} else if (fname.endsWith(".map")) {
 			// HiTech link map file
 			type = LINKMAP_FILE;
-		} else if (filename.toLower().endsWith(".sym")) {
+		} else if (fname.endsWith(".sym")) {
 			// auto detect which sym file
 			QFile file(filename);
 			if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -210,16 +218,13 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = HTC_FILE;
 				}
 			}
-		} else {
-			QString ext = filename.toLower();
+		} else if (fname.endsWith(".symbol") || fname.endsWith(".publics") || fname.endsWith(".sys")) {
 			/* They are the same type of file. For some reason the Debian
 			 * manpage uses the extension ".sys"
 			 * pasmo doc -> pasmo [options] file.asm file.bin [file.symbol [file.publics] ]
 			 * pasmo manpage in Debian -> pasmo [options]  file.asm file.bin [file.sys]
 			*/
-			if (ext.endsWith(".symbol") || ext.endsWith(".publics") || ext.endsWith(".sys")) {
-				type = PASMO_FILE;
-			}
+			type = PASMO_FILE;
 		}
 	}
 	switch (type) {
@@ -286,15 +291,15 @@ bool SymbolTable::readSymbolFile(
 	}
 
 	appendFile(filename, type);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList l = line.split(equ, Qt::SplitBehaviorFlags::KeepEmptyParts, Qt::CaseInsensitive);
 		if (l.size() != 2) continue;
 		if (auto value = parseValue(l.at(1))) {
-			auto* sym = new Symbol(l.at(0), *value);
-			sym->setSource(&symbolFiles.back().fileName);
-			add(sym);
+			add(std::make_unique<Symbol>(l.at(0), *value, source));
 		}
 	}
 	return true;
@@ -320,6 +325,8 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 	}
 
 	appendFile(filename, ASMSX_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	int filePart = 0;
 	while (!in.atEnd()) {
@@ -335,17 +342,15 @@ bool SymbolTable::readASMSXFile(const QString& filename)
 			    (line[5] == 'h') || (line[8] == 'h')) {
 				if (filePart == 1) {
 					QStringList l = line.split(" ");
-					Symbol* sym;
+					std::unique_ptr<Symbol> sym;
 					if (line[0] == '$') {
-						sym = new Symbol(l.at(1).trimmed(), l.at(0).right(4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).right(4).toInt(nullptr, 16), source));
 					} else if ((line[4] == 'h') || (line[5] == 'h')) {
-						sym = new Symbol(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), l.at(0).mid(l.at(0).indexOf('h') - 4, 4).toInt(nullptr, 16), source));
 					} else {
 						QStringList n = l.at(0).split(":"); // n.at(0) = MegaROM page
-						sym = new Symbol(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16));
+						add(std::make_unique<Symbol>(l.at(1).trimmed(), n.at(1).left(4).toInt(nullptr, 16), source));
 					}
-					sym->setSource(&symbolFiles.back().fileName);
-					add(sym);
 				} else if (filePart == 2) {
 					//
 				}
@@ -362,17 +367,16 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 		return false;
 	}
 	appendFile(filename, PASMO_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line;
 		QStringList l;
-		Symbol* sym;
 		line = in.readLine();
 		l = line.split(QRegExp("(\t+)|( +)"));
 		if (l.size() == 3) {
-			sym = new Symbol(l.at(0), l.at(2).left(5).toInt(nullptr, 16));
-			sym->setSource(&symbolFiles.back().fileName);
-			add(sym);
+			add(std::make_unique<Symbol>(l.at(0), l.at(2).left(5).toInt(nullptr, 16), source));
 		}
 	}
 	return true;
@@ -386,15 +390,15 @@ bool SymbolTable::readHTCFile(const QString& filename)
 	}
 
 	appendFile(filename, HTC_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList l = line.split(' ');
 		if (l.size() != 3) continue;
 		if (auto value = parseValue("0x" + l.at(1))) {
-			auto* sym = new Symbol(l.at(0), *value);
-			sym->setSource(&symbolFiles.back().fileName);
-			add(sym);
+			add(std::make_unique<Symbol>(l.at(0), *value, source));
 		}
 	}
 	return true;
@@ -408,6 +412,8 @@ bool SymbolTable::readNoICEFile(const QString& filename)
 	}
 
 	appendFile(filename, NOICE_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
 	QTextStream in(&file);
 	while (!in.atEnd()) {
 		QString line = in.readLine();
@@ -415,9 +421,7 @@ bool SymbolTable::readNoICEFile(const QString& filename)
 		if (l.size() != 3) continue;
 		if (l.at(0).toLower() != "def") continue;
 		if (auto value = parseValue(l.at(2))) {
-			auto* sym = new Symbol(l.at(1), *value);
-			sym->setSource(&symbolFiles.back().fileName);
-			add(sym);
+			add(std::make_unique<Symbol>(l.at(1), *value, source));
 		}
 	}
 	return true;
@@ -436,6 +440,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 		return false;
 	}
 	appendFile(filename, LINKMAP_FILE);
+	const auto* source = &symbolFiles.back().fileName;
 
 	QTextStream in(&file);
 	if (in.atEnd()) return false;
@@ -478,9 +483,7 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 			QString part = line.mid(pos, l);
 			if (rp.indexIn(part) == 0) {
 				QStringList l = rp.capturedTexts();
-				auto* sym = new Symbol(l.at(1), l.last().toInt(nullptr, 16));
-				sym->setSource(&symbolFiles.back().fileName);
-				add(sym);
+				add(std::make_unique<Symbol>(l.at(1), l.last().toInt(nullptr, 16), source));
 			}
 		}
 	}
@@ -505,11 +508,9 @@ void SymbolTable::reloadFiles()
 		// symbol file is newer
 		QMap<QString, Symbol> symCopy;
 		// copy all symbols originating from this file
-		QMutableListIterator<Symbol*> si(symbols);
-		while (si.hasNext()) {
-			si.next();
-			if (si.value()->source() == &symbolFiles[i].fileName) {
-				symCopy.insert(si.value()->text(), Symbol(*si.value()));
+		for (const auto& s : symbols) {
+			if (s->source() == &symbolFiles[i].fileName) {
+				symCopy.insert(s->text(), Symbol(*s));
 			}
 		}
 		// remove existing file
@@ -517,33 +518,26 @@ void SymbolTable::reloadFiles()
 		// read the new file
 		readFile(name, type);
 		// find old symbols in newly loaded file
-		QMutableListIterator<Symbol*> ni(symbols);
 		QString* newFile = &symbolFiles.back().fileName;
-		while (ni.hasNext()) {
-			ni.next();
-			if (ni.value()->source() != newFile) continue;
+		for (auto& s : symbols) {
+			if (s->source() != newFile) continue;
 
 			// find symbol in old list
-			auto sit = symCopy.find(ni.value()->text());
+			auto sit = symCopy.find(s->text());
 			if (sit == symCopy.end()) continue;
 
 			// symbol existed before, copy settings
-			ni.value()->setValidSlots(sit->validSlots());
-			ni.value()->setValidRegisters(sit->validRegisters());
-			ni.value()->setType(sit->type());
-			if (sit->status() == Symbol::LOST) {
-				ni.value()->setStatus(Symbol::ACTIVE);
-			} else {
-				ni.value()->setStatus(sit->status());
-			}
+			s->setValidSlots(sit->validSlots());
+			s->setValidRegisters(sit->validRegisters());
+			s->setType(sit->type());
+			s->setStatus((sit->status() == Symbol::LOST) ? Symbol::ACTIVE : sit->status());
 			symCopy.erase(sit);
 		}
 		// all symbols left in map are lost
 		for (auto sit = symCopy.begin(); sit != symCopy.end(); ++sit) {
-			auto* sym = new Symbol(sit.value());
+			auto* sym = add(std::make_unique<Symbol>(sit.value()));
 			sym->setStatus(Symbol::LOST);
 			sym->setSource(newFile);
-			add(sym);
 		}
 	}
 }
@@ -575,19 +569,18 @@ void SymbolTable::unloadFile(const QString& file, bool keepSymbols)
 			}
 		}
 		// remove symbols from value hash
-		QMutableListIterator<Symbol*> i(symbols);
-		while (i.hasNext()) {
-			i.next();
-			Symbol* sym = i.value();
-			if (sym->source() == name) {
-				if (keepSymbols) {
-					sym->setSource(nullptr);
-				} else {
-					i.remove();
-					delete sym;
+		symbols.erase(std::remove_if(symbols.begin(), symbols.end(),
+			[&](auto& sym) {
+				if (sym->source() != name) {
+					return false; // keep symbols from different source
 				}
-			}
-		}
+				if (!keepSymbols) {
+					return true; // remove
+				}
+				// keep but clear source
+				sym->setSource(nullptr);
+				return false; // keep
+			}), symbols.end());
 		// remove record
 		fileWatcher.removePath(symbolFiles[index].fileName);
 		symbolFiles.removeAt(index);
@@ -628,7 +621,7 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 		xml.writeEndElement();
 	}
 	// write symbols
-	for (auto* sym : symbols) {
+	for (const auto& sym : symbols) {
 	     	xml.writeStartElement("Symbol");
 		// status
 		if (sym->status() == Symbol::HIDDEN) {
@@ -660,7 +653,7 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 
 void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 {
-	Symbol* sym;
+	Symbol* sym = nullptr;
 	while (!xml.atEnd()) {
 		xml.readNext();
 		// exit if closing of main tag
@@ -669,7 +662,6 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 		// begin tag
 		if (xml.isStartElement()) {
 			if (xml.name() == "SymbolFile") {
-
 				// read attributes and text
 				QString ftype = xml.attributes().value("type").toString().toLower();
 				QString rtime = xml.attributes().value("refreshTime").toString();
@@ -690,8 +682,7 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 
 			} else if (xml.name() == "Symbol") {
 				// add empty symbol
-				sym = new Symbol("", 0);
-				add(sym);
+				sym = add(std::make_unique<Symbol>("", 0));
 				// get status attribute
 				QString stat = xml.attributes().value("status").toString().toLower();
 				if (stat == "hidden") {
@@ -700,7 +691,7 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 					sym->setStatus(Symbol::LOST);
 				}
 
-			} else if (xml.name() == "type") {
+			} else if (sym && xml.name() == "type") {
 				// read symbol type element
 				QString type = xml.readElementText().trimmed().toLower();
 				if (type == "jump") {
@@ -711,23 +702,23 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 					sym->setType(Symbol::VALUE);
 				}
 
-			} else if (xml.name() == "name") {
+			} else if (sym && xml.name() == "name") {
 				// read symbol name
 				sym->setText(xml.readElementText());
 
-			} else if (xml.name() == "value") {
+			} else if (sym && xml.name() == "value") {
 				// read symbol value
 				sym->setValue(xml.readElementText().toInt());
 
-			} else if (xml.name() == "validSlots") {
+			} else if (sym && xml.name() == "validSlots") {
 				// read numeric valid slot mask
 				sym->setValidSlots(xml.readElementText().toInt());
 
-			} else if (xml.name() == "validRegisters") {
+			} else if (sym && xml.name() == "validRegisters") {
 				// read numeric valid registers mask
 				sym->setValidRegisters(xml.readElementText().toInt());
 
-			} else if (xml.name() == "source") {
+			} else if (sym && xml.name() == "source") {
 				// read source file id
 				int id = xml.readElementText().toInt();
 				if (id >= 0 && id < symbolFiles.size()) {
@@ -741,18 +732,10 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 
 // class Symbol
 
-Symbol::Symbol(QString str, int addr, int val)
-	: symText(std::move(str)), symValue(addr), symSlots(val)
+Symbol::Symbol(QString str, int addr, const QString* source)
+	: symText(std::move(str)), symValue(addr), symSource(source)
 {
-	symStatus = ACTIVE;
-	symType = JUMPLABEL;
-	symSource = nullptr;
-	if (addr & 0xFF00) {
-		symRegisters = REG_ALL16;
-	} else {
-		symRegisters = REG_ALL;
-	}
-	table = nullptr;
+	symRegisters = (addr & 0xFF00) ? REG_ALL16 : REG_ALL;
 }
 
 Symbol::Symbol(const Symbol& symbol)
@@ -762,25 +745,10 @@ Symbol::Symbol(const Symbol& symbol)
 	symText      = symbol.symText;
 	symValue     = symbol.symValue;
 	symSlots     = symbol.symSlots;
-	symSegments  = symbol.symSegments;
+	//symSegments  = symbol.symSegments;
 	symRegisters = symbol.symRegisters;
 	symSource    = symbol.symSource;
 	symType      = symbol.symType;
-}
-
-const QString& Symbol::text() const
-{
-	return symText;
-}
-
-void Symbol::setText(const QString& str)
-{
-	symText = str;
-}
-
-int Symbol::value() const
-{
-	return symValue;
 }
 
 void Symbol::setValue(int addr)
@@ -791,52 +759,12 @@ void Symbol::setValue(int addr)
 	if (table) table->symbolValueChanged(this);
 }
 
-int Symbol::validSlots() const
-{
-	return symSlots;
-}
-
-void Symbol::setValidSlots(int val)
-{
-	symSlots = val & 0xFFFF;
-}
-
-int Symbol::validRegisters() const
-{
-	return symRegisters;
-}
-
 void Symbol::setValidRegisters(int regs)
 {
 	symRegisters = regs;
 	if (symValue & 0xFF00) {
 		symRegisters &= REG_ALL16;
 	}
-}
-
-const QString* Symbol::source() const
-{
-	return symSource;
-}
-
-void Symbol::setSource(const QString* name)
-{
-	symSource = name;
-}
-
-Symbol::SymbolStatus Symbol::status() const
-{
-	return symStatus;
-}
-
-void Symbol::setStatus(SymbolStatus s)
-{
-	symStatus = s;
-}
-
-Symbol::SymbolType Symbol::type() const
-{
-	return symType;
 }
 
 void Symbol::setType(SymbolType t)
@@ -855,12 +783,13 @@ bool Symbol::isSlotValid(const MemoryLayout* ml) const
 	int ss = 0;
 	if (ml->isSubslotted[page]) ss = ml->secondarySlot[page] & 3;
 	if (symSlots & (1 << (4 * ps + ss))) {
-		if (symSegments.empty()) return true;
-		for (const auto& seg : symSegments) {
-			if (ml->mapperSegment[page] == seg) {
-				return true;
-			}
-		}
+		return true;
+		//if (symSegments.empty()) return true;
+		//for (const auto& seg : symSegments) {
+		//	if (ml->mapperSegment[page] == seg) {
+		//		return true;
+		//	}
+		//}
 	}
 	return false;
 }

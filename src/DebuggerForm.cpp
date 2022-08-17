@@ -795,7 +795,7 @@ QWidget* DebuggerForm::widgetFactory(factoryclasses fctWidget)
         return sv;
     }
     case breakpointViewer:
-        return new BreakpointViewer();
+        return new BreakpointViewer(*DebugSession::getDebugSession());
     case debuggableViewer: {
         DebuggableViewer* dv = new DebuggableViewer();
         connect(&dispatcher, &SignalDispatcher::breakStateEntered, dv, &DebuggableViewer::refresh);
@@ -1216,7 +1216,7 @@ void DebuggerForm::systemSymbolManager()
 	SymbolManager symManager(session->symbolTable(), this);
 	connect(&symManager, &SymbolManager::symbolTableChanged,
 	        session, &DebugSession::sessionModified);
-	symManager.exec();
+    symManager.exec();
 	emit symbolsChanged();
 	updateWindowTitle();
 }

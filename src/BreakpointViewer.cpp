@@ -1,6 +1,7 @@
 #include "BreakpointViewer.h"
 #include "Convert.h"
 #include "CommClient.h"
+#include "DebugSession.h"
 #include "OpenMSXConnection.h"
 #include "ScopedAssign.h"
 #include "ranges.h"
@@ -17,17 +18,18 @@ enum TableColumns {
 	ENABLED = 0,
 	WP_TYPE = 1,
 	LOCATION = 2,
-	BP_ADDRESS = 2,
 	WP_REGION = 2,
 	T_CONDITION = 3,
 	SLOT = 4,
 	SEGMENT = 5,
-	ID = 6
+	ID = 6,
+	REAL_ADDRESS = 7,
 };
 
-BreakpointViewer::BreakpointViewer(QWidget* parent)
-	: QTabWidget(parent),
-	  ui(new Ui::BreakpointViewer)
+BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
+	:  QTabWidget(parent),
+	  ui(new Ui::BreakpointViewer),
+	  debugSession(session)
 {
 	setupUi(this);
 
@@ -39,9 +41,10 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 	connect(btnRemoveCn, &QPushButton::clicked, this, &BreakpointViewer::on_btnRemoveCn_clicked);
 
 	bpTableWidget->horizontalHeader()->setHighlightSections(false);
-	bpTableWidget->sortByColumn(BP_ADDRESS, Qt::AscendingOrder);
+	bpTableWidget->sortByColumn(LOCATION, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);
 	bpTableWidget->setColumnHidden(ID, true);
+	bpTableWidget->setColumnHidden(REAL_ADDRESS, true);
 	bpTableWidget->resizeColumnsToContents();
 	bpTableWidget->setSortingEnabled(true);
 	connect(bpTableWidget, &QTableWidget::itemPressed, this, &BreakpointViewer::on_itemPressed);
@@ -51,6 +54,7 @@ BreakpointViewer::BreakpointViewer(QWidget* parent)
 
 	wpTableWidget->horizontalHeader()->setHighlightSections(false);
 	wpTableWidget->setColumnHidden(ID, true);
+	wpTableWidget->setColumnHidden(REAL_ADDRESS, true);
 	wpTableWidget->sortByColumn(WP_REGION, Qt::AscendingOrder);
 	wpTableWidget->resizeColumnsToContents();
 	wpTableWidget->setSortingEnabled(true);
@@ -254,7 +258,7 @@ void BreakpointViewer::setBreakpointChecked(BreakpointRef::Type type, int row, Q
 	table->setSortingEnabled(oldValue);
 }
 
-void BreakpointViewer::setTextField(BreakpointRef::Type type, int row, int column, const QString& value)
+void BreakpointViewer::setTextField(BreakpointRef::Type type, int row, int column, const QString& value, const QString& tooltip)
 {
 	auto sa = ScopedAssign(userMode, false);
 
@@ -264,6 +268,7 @@ void BreakpointViewer::setTextField(BreakpointRef::Type type, int row, int colum
 
 	table->setSortingEnabled(false);
 	item->setText(value);
+	item->setToolTip(tooltip);
 	table->setSortingEnabled(oldValue);
 }
 
@@ -309,13 +314,24 @@ std::optional<uint8_t> BreakpointViewer::parseSegmentField(std::optional<int> in
 	return {};
 }
 
+std::optional<AddressRange> BreakpointViewer::parseSymbolOrValue(const QString& field) const
+{
+	if (Symbol* s = debugSession.symbolTable().getAddressSymbol(field)) {
+		return AddressRange{uint16_t(s->value())};
+	}
+	if (auto address = stringToValue<uint16_t>(field)) {
+		return AddressRange{*address};
+	}
+	return {};
+}
+
 static const char* ComboTypeNames[] = { "read_mem", "write_mem", "read_io", "write_io" };
 
 std::optional<AddressRange> BreakpointViewer::parseLocationField(
 	std::optional<int> index, BreakpointRef::Type type, const QString& field, const QString& comboTxt)
 {
 	if (type == BreakpointRef::BREAKPOINT) {
-		auto value = stringToValue<uint16_t>(field);
+		auto value = parseSymbolOrValue(field);
 		return value ? AddressRange{*value}
 		    : (index ? breakpoints->getBreakpoint(*index).range : std::optional<AddressRange>());
 	}
@@ -367,27 +383,32 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 		case LOCATION: {
 			auto* model = table->model();
 			auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
-			int   adrLen;
+			int adrLen;
 
 			if (type == BreakpointRef::CONDITION) {
 				return;
 			} else if (type == BreakpointRef::WATCHPOINT) {
 				auto wType = static_cast<Breakpoint::Type>(combo->currentIndex() + 1);
 				adrLen = (wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
-					? 2 : 4;
+				       ? 2 : 4;
 			} else {
 				adrLen = 4;
 			}
 
 			if (auto range = parseLocationField(index, type, item->text(), combo ? combo->currentText() : "")) {
 				auto [begin, end] = *range;
-				setTextField(type, row, LOCATION, QString("%1%2%3")
-				                                  .arg(hexValue(begin, adrLen))
-				                                  .arg(end ? ":" : "")
-				                                  .arg(end ? hexValue(*end, adrLen) : ""));
+				QString address = QString("%1%2%3")
+				        .arg(hexValue(begin, adrLen))
+				        .arg(end ? ":" : "")
+				        .arg(end ? hexValue(*end, adrLen) : "");
+				// Use a symbolic address in the location field if available
+				QString location = debugSession.symbolTable().getAddressSymbol(item->text()) ? item->text() : address;
+				setTextField(type, row, LOCATION, location, location != address ? address : "");
+				setTextField(type, row, REAL_ADDRESS, address);
 			} else {
 				enabled = false;
 				setTextField(type, row, LOCATION, "");
+				setTextField(type, row, REAL_ADDRESS, "");
 				setBreakpointChecked(type, row, Qt::Unchecked);
 			}
 			if (!enabled) return;
@@ -706,7 +727,7 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 		createComboBox(row);
 	}
 
-	// address
+	// location
 	auto* item2 = new QTableWidgetItem();
 	item2->setTextAlignment(Qt::AlignCenter);
 	table->setItem(row, LOCATION, item2);
@@ -742,6 +763,12 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 	item6->setText("");
 	table->setItem(row, ID, item6);
 
+	// real_address
+	auto* item7 = new QTableWidgetItem();
+	item7->setFlags(Qt::NoItemFlags);
+	item7->setText("");
+	table->setItem(row, REAL_ADDRESS, item7);
+
 	return row;
 }
 
@@ -763,14 +790,23 @@ void BreakpointViewer::fillTableRow(int index, BreakpointRef::Type type, int row
 	}
 
 	// location
-	int locLen = (bp.type == Breakpoint::WATCHPOINT_IOREAD
-	           || bp.type == Breakpoint::WATCHPOINT_IOWRITE) ? 2 : 4;
-	QString location = QString("%1%2%3").arg(hexValue(bp.range->start, locLen))
-	                   .arg(bp.range->end ? ":" : "")
-	                   .arg(bp.range->end ? hexValue(*bp.range->end, locLen) : "");
-
-	// location
 	auto* item2 = table->item(row, LOCATION);
+	QString location;
+
+	if (bp.type == Breakpoint::BREAKPOINT) {
+		if (Symbol* s = debugSession.symbolTable().getAddressSymbol(item2->text())) {
+			if (s->value() == bp.range->start) {
+				location = s->text();
+			}
+		}
+	}
+	if (location.isEmpty()) {
+		int locLen = (bp.type == Breakpoint::WATCHPOINT_IOREAD
+		           || bp.type == Breakpoint::WATCHPOINT_IOWRITE) ? 2 : 4;
+		location = QString("%1%2%3").arg(hexValue(bp.range->start, locLen))
+		               .arg(bp.range->end ? ":" : "")
+		               .arg(bp.range->end ? hexValue(*bp.range->end, locLen) : "");
+	}
 	item2->setText(location);
 
 	auto* item3 = table->item(row, T_CONDITION);
@@ -816,6 +852,27 @@ std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointRef::Type ty
 
 	return bp;
 }
+
+
+void BreakpointViewer::onSymbolTableChanged()
+{
+	for (int row = 0; row < bpTableWidget->rowCount(); ++row) {
+		auto* item = bpTableWidget->item(row, REAL_ADDRESS);
+
+		// scan tooltip validity
+		if (!item->text().isEmpty()) {
+			Symbol* s = debugSession.symbolTable().getAddressSymbol(item->text());
+			auto address = stringToValue<uint16_t>(item->text());
+			assert(address);
+
+			if (!s || *address != s->value()) {
+				setTextField(BreakpointRef::BREAKPOINT, row, LOCATION, item->text());
+				setTextField(BreakpointRef::BREAKPOINT, row, REAL_ADDRESS, "");
+			}
+		}
+	}
+}
+
 
 void BreakpointViewer::onAddBtnClicked(BreakpointRef::Type type)
 {

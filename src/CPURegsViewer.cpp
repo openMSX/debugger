@@ -2,6 +2,7 @@
 #include "CPURegs.h"
 #include "CommClient.h"
 #include "OpenMSXConnection.h"
+#include "ranges.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMessageBox>
@@ -12,9 +13,9 @@ CPURegsViewer::CPURegsViewer(QWidget* parent)
 {
     setObjectName("CPURegsViewer");
 	// avoid UMR
-	memset(&regs,         0, sizeof(regs));
-	memset(&regsChanged,  0, sizeof(regsChanged));
-	memset(&regsModified, 0, sizeof(regsModified));
+	regs.fill(0);
+	regsChanged.fill(false);
+	regsModified.fill(false);
 
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
@@ -174,8 +175,8 @@ void CPURegsViewer::setData(uint8_t* datPtr)
 
 	// reset modifications
 	cursorLoc = -1;
-	memset(&regsModified, 0, sizeof(regsModified));
-	memcpy(&regsCopy, &regs, sizeof(regs));
+	regsModified.fill(false);
+	regsCopy = regs;
 
 	update();
 
@@ -223,7 +224,7 @@ void CPURegsViewer::keyPressEvent(QKeyEvent* e)
 	int move = e->key();
 	if ((e->key() >= Qt::Key_0 && e->key() <= Qt::Key_9) ||
 	    (e->key() >= Qt::Key_A && e->key() <= Qt::Key_F)) {
-		// calculate numercial value
+		// calculate numerical value
 		int v = e->key() - Qt::Key_0;
 		if (v > 9) v -= Qt::Key_A - Qt::Key_0 - 10;
 		// modify value
@@ -351,26 +352,36 @@ void CPURegsViewer::applyModifications()
 	}
 	// update screen
 	update();
+
+	// update disasm window
+	if (regsChanged[CpuRegs::REG_PC]) {
+		emit pcChanged(regs[CpuRegs::REG_PC]);
+	}
 }
 
 void CPURegsViewer::cancelModifications()
 {
-	bool mod = false;
-	for (int i = 0; i < 14; ++i) mod |= regsModified[i];
-	if (!mod) return;
+	static bool isVisible = false;
 
-	int ret = QMessageBox::warning(
-		this,
-		tr("CPU registers changes"),
-		tr("You made changes to the CPU registers.\n"
-		   "Do you want to apply your changes or ignore them?"),
-		QMessageBox::Apply | QMessageBox::Ignore,
-		QMessageBox::Ignore);
-	if (ret == QMessageBox::Ignore) {
-		memcpy(&regs, &regsCopy, sizeof(regs));
-		memset(&regsModified, 0, sizeof(regsModified));
-	} else {
-		applyModifications();
+	if (!ranges::contains(regsModified, true)) return;
+
+	if (!isVisible) {
+		isVisible = true;
+		// this modal window blocks execution of next instruction
+		int ret = QMessageBox::warning(
+			this,
+			tr("CPU registers changes"),
+			tr("You made changes to the CPU registers.\n"
+			   "Do you want to apply your changes or ignore them?"),
+			QMessageBox::Apply | QMessageBox::Ignore,
+			QMessageBox::Ignore);
+		isVisible = false;
+		if (ret == QMessageBox::Ignore) {
+			regs = regsCopy;
+			regsModified.fill(false);
+		} else {
+			applyModifications();
+		}
 	}
 }
 
