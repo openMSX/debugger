@@ -95,7 +95,7 @@ void HexViewer::createActions()
     alignAddressAction = new QAction(tr("&Align addresses"), this);
     alignAddressAction->setShortcut(tr("Ctrl+A"));
     alignAddressAction->setCheckable(true);
-    alignAddressAction->setChecked(decodeAsChar);
+    alignAddressAction->setChecked(alignAddress);
     alignAddressAction->setStatusTip(tr("Align adresses with width of line."));
 
 
@@ -209,10 +209,19 @@ void HexViewer::setSizes()
 		horBytes = 1;
 		int hb2 = 1;
 		w = width() - frameL - frameR - xData - dataWidth - 2 * charWidth - 8;
-		// calculate how many additional bytes can by displayed
+        // calculate how many additional bytes can be displayed
 		while (w-sbw >= dataWidth + charWidth) {
 			++horBytes;
-			if (horBytes == 2 * hb2) hb2 = horBytes;
+            if (horBytes == 2 * hb2) {
+                hb2 = horBytes;
+                if (decodeAsChar){
+                    if (hb2 == 8 ) w -= EXTRA_SPACING;
+                    if (hb2 >= 8 ){
+                        int scale = int((lineHeight+1)/8);
+                        w -= scale*8;
+                    }
+                }
+            };
 			w -= dataWidth + charWidth;
 			if ((horBytes & 3) == 0) w -= EXTRA_SPACING;
             if ((horBytes & 7) == 0) w -= EXTRA_SPACING;
@@ -411,14 +420,14 @@ void HexViewer::paintEvent(QPaintEvent* e)
 		}
 
         // if we are a multiple of 8 bytes we draw one or more decoded characters
-        if ((horBytes%8) == 0 ){
+        if ((horBytes%8) == 0 && decodeAsChar){
             x += EXTRA_SPACING;
             int scale = int((lineHeight+1)/8);
 
             for (int j = 0; j < horBytes; ++j) {
                 if (address + j >= debuggableSize) break;
                 int yy = (j%8);
-                QColor penClr = Qt::lightGray; //Qt::white;
+                QColor penClr = (hasFocus && hexMarkAddress==(address + j) )? Qt::cyan : Qt::lightGray; //Qt::white;
 //                if (hexData[address + j] != previousHexData[address + j]) {
 //                    penClr = Qt::red;
 //                }
@@ -580,11 +589,13 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 	} else if (useMarker && e->key() == Qt::Key_Right) {
 		setValue = beingEdited & !editedChars;
 		++newAddress;
+        if (!alignAddress && e->modifiers() == Qt::ShiftModifier) ++hexTopAddress;
 		cursorPosition = 0;
 	} else if (useMarker && e->key() == Qt::Key_Left) {
 		setValue = beingEdited & !editedChars;
 		--newAddress;
-		cursorPosition = 0;
+        if (!alignAddress && e->modifiers() == Qt::ShiftModifier) --hexTopAddress;
+        cursorPosition = 0;
 	} else if (useMarker && e->key() == Qt::Key_Up) {
 		setValue = beingEdited & !editedChars;
 		newAddress -= horBytes;
@@ -667,7 +678,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
 	if ((editedChars || useMarker) && (hexMarkAddress != newAddress)) {
 		if (newAddress < 0)               newAddress += debuggableSize;
 		if (newAddress >= debuggableSize) newAddress -= debuggableSize;
-		// influencing hexTopAddress during Key_PageUp/Down might need following 2 lines.
+        // influencing hexTopAddress during Key_PageUp/Down or SHIFT+left/right might need following 2 lines.
 		if (hexTopAddress < 0)               hexTopAddress += debuggableSize;
 		if (hexTopAddress >= debuggableSize) hexTopAddress -= debuggableSize;
 
