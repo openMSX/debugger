@@ -20,13 +20,13 @@ jobs:
       - name: Get variables
         id: get-targets
         run: |
-          echo "::set-output name=prerelease::${{ needs.build.outputs.prerelease }}"
-          echo "::set-output name=draft::${{ needs.build.outputs.draft }}"
-          echo "::set-output name=name::${{ needs.build.outputs.name }}"
+          echo "prerelease=${{ needs.build.outputs.prerelease }}" >> $GITHUB_OUTPUT
+          echo "draft=${{ needs.build.outputs.draft }}" >> $GITHUB_OUTPUT
+          echo "name=${{ needs.build.outputs.name }}" >> $GITHUB_OUTPUT
           debian_target=$(find . -maxdepth 1 -type d -name "*-debian-*" -printf %f)
           mingw_target=$(find . -maxdepth 1 -type d -name "*-mingw-*" -printf %f)
-          echo "::set-output name=target_debian::$target_debian"
-          echo "::set-output name=target_mingw::$target_mingw"
+          echo "target_debian=$target_debian" >> $GITHUB_OUTPUT
+          echo "target_mingw=$target_mingw" >> $GITHUB_OUTPUT
           if [ "$debian_target" = "" ]; then
             echo "Target name 'mingw_target' not defined"
             exit 1
@@ -35,8 +35,8 @@ jobs:
             echo "Target name 'debian_target' not defined"
             exit 1
           fi
-          echo "::set-output name=debian_target::$debian_target"
-          echo "::set-output name=mingw_target::$mingw_target"
+          echo "debian_target=$debian_target" >> $GITHUB_OUTPUT
+          echo "mingw_target=$mingw_target" >> $GITHUB_OUTPUT
       - name: Package binaries as zip files
         run: |
           cd ${{ steps.get-targets.outputs.debian_target }}
