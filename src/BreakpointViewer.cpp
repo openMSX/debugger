@@ -277,7 +277,7 @@ Slot BreakpointViewer::parseSlotField(std::optional<int> index, const QString& f
 	QStringList s = field.simplified().split("/", Qt::SplitBehaviorFlags::SkipEmptyParts);
 
 	std::optional<int8_t> ps;
-	if (s[0].compare("X", Qt::CaseInsensitive)) {
+	if (s.size() > 0 && s[0].compare("X", Qt::CaseInsensitive)) {
 		ps = stringToValue<int8_t>(s[0]);
 		if (!ps || !(0 <= *ps && *ps <= 3)) {
 			if (!s[0].isEmpty()) {
