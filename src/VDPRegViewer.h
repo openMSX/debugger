@@ -28,7 +28,7 @@ private:
 
 
 class VDPRegViewer : public QDialog, public SimpleHexRequestUser,
-	             private Ui::VDPRegisters
+					private Ui::VDPRegisters
 {
 	Q_OBJECT
 public:
@@ -37,8 +37,12 @@ public:
 	void refresh();
 	void registerBitChanged(int reg, int bit, bool state);
 
-	//quick hack while no auto-detection...
+	//override auto-detection or in case of older openMSX...
 	void on_VDPcomboBox_currentIndexChanged(int index);
+	void on_VDPVersionChanged(QString VDPversion);
+
+private slots:
+	void on_cb_useOpenMSXVDP_stateChanged(int arg1);
 
 private:
 	void decodeVDPRegs();
@@ -59,6 +63,8 @@ private:
 	uint8_t regs[64 + 16 + 2];
 	buttonHighlightDispatcher* modeBitsDispat;
 	int vdpId;
+	void VDPVersion_to_combobox(QString VDPversion);
+
 };
 
 #endif /* VDPSTATUSREGVIEWER_H */

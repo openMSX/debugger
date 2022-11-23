@@ -29,12 +29,14 @@ public:
 	const uint8_t* getVdpVramPointer() const;
 
 	MSXPalette* getPalette(int index);
+	std::optional<std::string> getVDPVersion() const;
 	size_t getVRAMSize() const;
 
 	void refresh();
 
 signals:
-        void dataRefreshed(); // The refresh got the new data
+		void dataRefreshed(); // The refresh got the new data
+		void VDPVersionChanged(QString VDPversion); // New VDP version received during refresh
 
 	/** This might become handy later on, for now we only need the dataRefreshed
 	 *
@@ -59,9 +61,11 @@ private:
 	size_t vramSize;
 
 	std::optional<std::string> debuggableNameVRAM; // VRAM debuggable name
+	std::optional<std::string> machineVDPVersionString; // VRAM debuggable name
 
 	friend class VDPDataStoreVersionCheck;
 	friend class VDPDataStoreVRAMSizeCheck;
+	friend class VDPDataStoreVDPVersionCheck;
 };
 
 #endif // VDPDATASTORE_H

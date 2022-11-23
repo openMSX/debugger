@@ -38,7 +38,8 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 {
 	setupUi(this);
 	connect(VDPcomboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &VDPRegViewer::on_VDPcomboBox_currentIndexChanged);
-
+	connect(cb_useOpenMSXVDP, &QCheckBox::stateChanged, this, &VDPRegViewer::on_cb_useOpenMSXVDP_stateChanged);
+	connect(&VDPDataStore::instance(),&VDPDataStore::VDPVersionChanged, this, &VDPRegViewer::on_VDPVersionChanged);
 	vdpId = 99; // make sure that we parse the first time the status registers are read
 	vdpId = VDP_V9958; //quick hack for now
 
@@ -954,17 +955,67 @@ void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
 
 void VDPRegViewer::on_VDPcomboBox_currentIndexChanged(int index)
 {
+	int newVdpId = VDP_TMS99X8;
 	switch (index) {
 	case 0:
-		vdpId = VDP_V9958;
+		newVdpId = VDP_V9958;
 		break;
 	case 1:
-		vdpId = VDP_V9938;
+		newVdpId = VDP_V9938;
 		break;
 	case 2:
-		vdpId = VDP_TMS99X8;
+		newVdpId = VDP_TMS99X8;
 		break;
-	}
+	};
+
+	// on_VDPVersionChanged might have changed vdpId already so avoid calling decode twice
+	if (newVdpId != vdpId){
+		vdpId = newVdpId;
+		decodeStatusVDPRegs();
+		decodeVDPRegs();
+	};
+
+}
+
+void VDPRegViewer::on_VDPVersionChanged(QString VDPversion)
+{
+	if (!cb_useOpenMSXVDP->isChecked()){
+		label_VDPreported->setText(VDPversion);
+		return;
+	};
+
+	if (VDPversion == label_VDPreported->text()){
+		return;
+	} else {
+		label_VDPreported->setText(VDPversion);
+	};
+	VDPVersion_to_combobox(VDPversion);
+}
+
+void VDPRegViewer::on_cb_useOpenMSXVDP_stateChanged(int arg1)
+{
+	if (arg1 == Qt::Checked){
+		QString VDPversion = label_VDPreported->text();
+		VDPVersion_to_combobox(VDPversion);
+	};
+}
+
+void VDPRegViewer::VDPVersion_to_combobox(QString VDPversion)
+{
+	if (VDPversion == "unknown"){
+		return;
+	} else if (VDPversion == "V9958"){
+		vdpId = VDP_V9958;
+		VDPcomboBox->setCurrentIndex(0);
+	} else if (VDPversion == "V9938"){
+		vdpId = VDP_V9938;
+		VDPcomboBox->setCurrentIndex(1);
+	} else {
+		vdpId = VDP_TMS99X8;
+		VDPcomboBox->setCurrentIndex(2);
+	};
 	decodeStatusVDPRegs();
 	decodeVDPRegs();
 }
+
+

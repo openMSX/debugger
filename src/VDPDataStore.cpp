@@ -54,6 +54,33 @@ private:
 };
 
 
+class VDPDataStoreVDPVersionCheck : public SimpleCommand
+{
+public:
+	VDPDataStoreVDPVersionCheck(VDPDataStore& dataStore_)
+		: SimpleCommand("dict get [machine_info device VDP] version")
+		, dataStore(dataStore_)
+	{
+	}
+
+	void replyOk(const QString& message) override
+	{
+		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
+		dataStore.machineVDPVersionString = message.toStdString();
+		emit dataStore.VDPVersionChanged(message);
+		delete this;
+	}
+	void replyNok(const QString& /*message*/) override
+	{
+		dataStore.machineVDPVersionString = "unknown";
+		delete this;
+	}
+
+private:
+	VDPDataStore& dataStore;
+};
+
+
 static constexpr unsigned MAX_VRAM_SIZE = 0x30000;
 static constexpr unsigned MAX_TOTAL_SIZE = MAX_VRAM_SIZE + 32 + 16 + 64 + 2;
 
@@ -83,6 +110,7 @@ void VDPDataStore::refresh()
 
 void VDPDataStore::refresh1()
 {
+	CommClient::instance().sendCommand(new VDPDataStoreVDPVersionCheck(*this));
 	CommClient::instance().sendCommand(new VDPDataStoreVRAMSizeCheck(*this));
 }
 
@@ -131,6 +159,11 @@ const uint8_t* VDPDataStore::getVdpVramPointer() const
 MSXPalette* VDPDataStore::getPalette(int index)
 {
     return &palettes[index];
+}
+
+std::optional<std::string> VDPDataStore::getVDPVersion() const
+{
+    return machineVDPVersionString;
 }
 
 size_t VDPDataStore::getVRAMSize() const
