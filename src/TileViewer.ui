@@ -50,8 +50,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>695</width>
-                <height>368</height>
+                <width>774</width>
+                <height>356</height>
                </rect>
               </property>
              </widget>
@@ -210,6 +210,9 @@ NT: $196E (base+$16E)</string>
              </item>
              <item>
               <widget class="QCheckBox" name="cb_highlight">
+               <property name="toolTip">
+                <string>visible when using  'Name Table + Overlay' as Tilemap Source</string>
+               </property>
                <property name="text">
                 <string>Highlight Tile</string>
                </property>
