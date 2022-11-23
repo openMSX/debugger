@@ -38,9 +38,7 @@ public:
 
 	void replyOk(const QString& message) override
 	{
-		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
 		dataStore.vramSize = message.toInt();
-		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
 		dataStore.refresh2();
 		delete this;
 	}
@@ -65,9 +63,10 @@ public:
 
 	void replyOk(const QString& message) override
 	{
-		//printf("dataStore.vramSize %i\n", dataStore.vramSize);
-		dataStore.machineVDPVersionString = message.toStdString();
-		emit dataStore.VDPVersionChanged(message);
+		if (!dataStore.machineVDPVersionString || message != QString::fromStdString(*dataStore.machineVDPVersionString)){
+			dataStore.machineVDPVersionString = message.toStdString();
+			emit dataStore.VDPVersionChanged(message);
+		};
 		delete this;
 	}
 	void replyNok(const QString& /*message*/) override
