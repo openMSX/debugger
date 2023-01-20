@@ -1,11 +1,14 @@
 #include "BitMapViewer.h"
+#include "PaletteDialog.h"
 #include "VramBitMappedView.h"
 #include "VDPDataStore.h"
 #include "Convert.h"
 #include <QMessageBox>
 
-static const unsigned char defaultPalette[32] = {
-//        RB  G
+
+// static to feed to PaletteDialog and be used when VDP colors aren't selected
+static uint8_t currentPalette[32] = {
+//    RB  G
 	0x00, 0,
 	0x00, 0,
 	0x11, 6,
@@ -248,24 +251,27 @@ void BitMapViewer::on_saveImageButton_clicked(bool /*checked*/)
 
 void BitMapViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
-	useVDPPalette->setChecked(false);
-	QMessageBox::information(
-		this,
-		"Not yet implemented",
-		"Sorry, the palette editor is not yet implemented, "
-		"only disabling 'Use VDP palette registers' for now");
+	auto* p = new PaletteDialog();
+	p->setPalette(currentPalette);
+	p->setAutoSync(true);
+	connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramBitMappedView::refresh);
+	p->show();
 }
 
 void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
+	const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
 	if (state) {
-		const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
 		imageWidget->setPaletteSource(palette);
 	} else {
-		imageWidget->setPaletteSource(defaultPalette);
+		// Copy palette from VDP to allow changes.
+		if (palette) memcpy(currentPalette, palette, 32);
+		imageWidget->setPaletteSource(currentPalette);
 	}
 	imageWidget->refresh();
+	editPaletteButton->setEnabled(!state);
 }
+
 /*
 void BitMapViewer::on_refreshButton_clicked(bool checked)
 {
