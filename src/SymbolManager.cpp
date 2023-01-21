@@ -99,6 +99,11 @@ void SymbolManager::closeEvent(QCloseEvent* e)
 	QDialog::closeEvent(e);
 }
 
+void SymbolManager::refresh()
+{
+	initSymbolList();
+}
+
 /*
  * File list support functions
  */

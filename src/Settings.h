@@ -9,6 +9,9 @@ class Settings : public QSettings
 {
 	Q_OBJECT
 public:
+	enum DebuggerConfig {
+		PRESERVE_LOST_SYMBOLS, CONFIG_END
+	};
 	enum DebuggerFont {
 		APP_FONT, FIXED_FONT, CODE_FONT, LABEL_FONT, HEX_FONT, FONT_END
 	};
@@ -26,6 +29,10 @@ public:
 	const QColor& fontColor(DebuggerFont f) const;
 	void setFontColor(DebuggerFont f, const QColor& c);
 
+	bool preserveLostSymbols() const;
+	void setPreserveLostSymbols(bool b);
+	void setConfig(DebuggerConfig c, const QVariant& v);
+
 private:
 	Settings();
 	~Settings() override = default;
@@ -34,6 +41,10 @@ private:
 	DebuggerFontType fontTypes[FONT_END];
 	QColor fontColors[FONT_END];
 
+	// bool preserveLostSymbols_;
+	QVariant config[CONFIG_END];
+
+	void getConfigFromSettings();
 	void getFontsFromSettings();
 	void updateFonts();
 };

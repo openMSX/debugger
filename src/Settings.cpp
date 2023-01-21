@@ -1,10 +1,19 @@
 #include "Settings.h"
 #include <QApplication>
 
+static const char* DebuggerConfigNames[Settings::CONFIG_END] = {
+	"Preserve Lost Symbols"
+};
+
 static const char* DebuggerFontNames[Settings::FONT_END] = {
 	"Application Font", "Default Fixed Font", "Code Font",
 	"Label Font", "Hex viewer font"
 };
+
+static QString configLocation(Settings::DebuggerConfig c)
+{
+	return QString("Config/").append(DebuggerConfigNames[c]);
+}
 
 static QString fontLocation(Settings::DebuggerFont f)
 {
@@ -19,6 +28,7 @@ static QString fontColorLocation(Settings::DebuggerFont f)
 Settings::Settings()
 	: QSettings("openMSX", "debugger")
 {
+	getConfigFromSettings();
 	getFontsFromSettings();
 }
 
@@ -26,6 +36,23 @@ Settings& Settings::get()
 {
 	static Settings instance;
 	return instance;
+}
+
+void Settings::getConfigFromSettings()
+{
+	QVariant b = value(configLocation(PRESERVE_LOST_SYMBOLS));
+	if (b.type() == QVariant::Invalid) {
+		// default value
+		config[PRESERVE_LOST_SYMBOLS] = true;
+	} else if (b.type() == QVariant::Bool) {
+		config[PRESERVE_LOST_SYMBOLS] = b.value<bool>();
+	}
+}
+
+void Settings::setConfig(DebuggerConfig c, const QVariant& v)
+{
+	config[c] = v;
+	setValue(configLocation(c), config[c]);
 }
 
 void Settings::getFontsFromSettings()
@@ -134,6 +161,17 @@ void Settings::setFontColor(DebuggerFont f, const QColor& c)
 		fontColors[f] = c;
 		setValue(fontColorLocation(f), c);
 	}
+}
+
+bool Settings::preserveLostSymbols() const
+{
+	return config[PRESERVE_LOST_SYMBOLS].value<bool>();
+}
+
+void Settings::setPreserveLostSymbols(bool b)
+{
+	config[PRESERVE_LOST_SYMBOLS] = b;
+	setValue(configLocation(PRESERVE_LOST_SYMBOLS), config[PRESERVE_LOST_SYMBOLS]);
 }
 
 void Settings::updateFonts()

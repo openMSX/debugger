@@ -12,6 +12,8 @@ class SymbolManager : public QDialog, private Ui::SymbolManager
 public:
 	SymbolManager(SymbolTable& symtable, QWidget* parent = nullptr);
 
+	void refresh();
+
 signals:
 	void symbolTableChanged();
 

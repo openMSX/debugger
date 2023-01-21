@@ -1053,12 +1053,16 @@ void DebuggerForm::systemReboot()
 
 void DebuggerForm::systemSymbolManager()
 {
-	SymbolManager symManager(session.symbolTable(), this);
-	connect(&symManager, &SymbolManager::symbolTableChanged,
+	symManager = new SymbolManager(session.symbolTable(), this);
+
+	connect(symManager, &SymbolManager::symbolTableChanged,
 	        &session, &DebugSession::sessionModified);
-	connect(&symManager, &SymbolManager::symbolTableChanged,
+	connect(symManager, &SymbolManager::symbolTableChanged,
 	        bpView, &BreakpointViewer::onSymbolTableChanged);
-	symManager.exec();
+	connect(this, &DebuggerForm::symbolFilesChanged,
+	        symManager, &SymbolManager::refresh);
+	symManager->exec();
+
 	emit symbolsChanged();
 	updateWindowTitle();
 }
@@ -1464,8 +1468,10 @@ void DebuggerForm::symbolFileChanged()
 	                   "Reload now?"),
 	                QMessageBox::Yes | QMessageBox::No);
 	shown = false;
-	if (choice == QMessageBox::Yes)
+	if (choice == QMessageBox::Yes) {
 		session.symbolTable().reloadFiles();
+		emit symbolFilesChanged();
+	}
 }
 
 DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const
