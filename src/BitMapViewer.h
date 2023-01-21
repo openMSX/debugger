@@ -18,7 +18,7 @@ private:
 	void setPages();
 
 	void on_screenMode_currentIndexChanged(int index);
-	void on_showPage_currentIndexChanged(int index);
+	void on_currentPage_currentIndexChanged(int index);
 	void on_linesVisible_currentIndexChanged(int index);
 	void on_bgColor_valueChanged(int value);
 

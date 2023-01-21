@@ -34,7 +34,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	setupUi(this);
     //no connect slot byname anymore
     connect(screenMode, qOverload<int>(&QComboBox::currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
-    connect(showPage, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_showPage_currentIndexChanged);
+    connect(currentPage, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_currentPage_currentIndexChanged);
     connect(linesVisible, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
     connect(bgColor,  qOverload<int>(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
 
@@ -164,7 +164,7 @@ void BitMapViewer::decodeVDPregs()
 	setPages();
 
 	addressLabel->setText(hexValue(p * q, 5));
-	if (useVDP) showPage->setCurrentIndex(p);
+	if (useVDP) currentPage->setCurrentIndex(p);
 }
 
 
@@ -189,23 +189,30 @@ void BitMapViewer::on_screenMode_currentIndexChanged(int index)
 
 void BitMapViewer::setPages()
 {
-	showPage->clear();
-	showPage->insertItem(0, "0");
-	showPage->insertItem(1, "1");
+	int oldIndex = currentPage->currentIndex();
+
+	currentPage->clear();
+	currentPage->insertItem(0, "0");
+	currentPage->insertItem(1, "1");
+
 	if (screenMod < 7 && VDPDataStore::instance().getVRAMSize() > 0x10000) {
-		showPage->insertItem(2, "2");
-		showPage->insertItem(3, "3");
+		currentPage->insertItem(2, "2");
+		currentPage->insertItem(3, "3");
+	}
+
+	if (!useVDP && oldIndex < currentPage->count()) {
+		currentPage->setCurrentIndex(oldIndex);
 	}
 }
 
-void BitMapViewer::on_showPage_currentIndexChanged(int index)
+void BitMapViewer::on_currentPage_currentIndexChanged(int index)
 {
 	//if this is the consequence of a .clear() in the
 	// on_screenMode_currentIndexChanged we do nothing!
 	if (index == -1) return;
 
 	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
-	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged(int %i);\n", index);
+	printf("\nvoid BitMapViewer::on_currentPage_currentIndexChanged(int %i);\n", index);
 	if (screenMod >= 7) index *= 2;
 	int vramAddress = m1[index];
 	printf("vramAddress %i\n", vramAddress);
@@ -230,7 +237,7 @@ void BitMapViewer::on_useVDPRegisters_stateChanged(int state)
 
 	screenMode->setEnabled(!state);
 	linesVisible->setEnabled(!state);
-	showPage->setEnabled(!state);
+	currentPage->setEnabled(!state);
 	bgColor->setEnabled(!state);
 	decodeVDPregs();
 	imageWidget->refresh();
