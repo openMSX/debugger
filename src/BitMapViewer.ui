@@ -36,7 +36,7 @@
         <item row="1" column="0" >
          <widget class="QLabel" name="label" >
           <property name="text" >
-           <string>Screen mode:</string>
+           <string>Screen mode</string>
           </property>
          </widget>
         </item>
@@ -83,7 +83,7 @@
          </widget>
         </item>
         <item row="2" column="1" >
-         <widget class="QComboBox" name="showPage" >
+         <widget class="QComboBox" name="currentPage" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -141,7 +141,7 @@
         <item row="2" column="0" >
          <widget class="QLabel" name="label_2" >
           <property name="text" >
-           <string>Show page</string>
+           <string>Current page</string>
           </property>
          </widget>
         </item>
