@@ -1,4 +1,5 @@
 #include "SymbolTable.h"
+#include "Settings.h"
 #include "DebuggerData.h"
 #include <QFile>
 #include <QTextStream>
@@ -531,11 +532,13 @@ void SymbolTable::reloadFiles()
 			s->setStatus((sit->status() == Symbol::LOST) ? Symbol::ACTIVE : sit->status());
 			symCopy.erase(sit);
 		}
-		// all symbols left in map are lost
-		for (auto sit = symCopy.begin(); sit != symCopy.end(); ++sit) {
-			auto* sym = add(std::make_unique<Symbol>(sit.value()));
-			sym->setStatus(Symbol::LOST);
-			sym->setSource(newFile);
+		if (Settings::get().preserveLostSymbols()) {
+			// all symbols left in map are lost
+			for (auto sit = symCopy.begin(); sit != symCopy.end(); ++sit) {
+				auto* sym = add(std::make_unique<Symbol>(sit.value()));
+				sym->setStatus(Symbol::LOST);
+				sym->setSource(newFile);
+			}
 		}
 	}
 }

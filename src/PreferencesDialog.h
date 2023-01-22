@@ -11,6 +11,7 @@ public:
 	PreferencesDialog(QWidget* parent = nullptr);
 
 private:
+	void initConfig();
 	void initFontList();
 	void setFontPreviewColor(const QColor& c);
 
@@ -18,6 +19,8 @@ private:
 	void fontTypeChanged(bool state);
 	void fontSelectCustom();
 	void fontSelectColor();
+
+	void preserveLostSymbols(int state);
 
 private:
 	bool updating;

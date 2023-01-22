@@ -22,10 +22,23 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 	connect(btnFontColor,  &QPushButton::clicked,
 	        this, &PreferencesDialog::fontSelectColor);
 
+	connect(cbPreserveLostSymbols, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::preserveLostSymbols);
+
+	initConfig();
 	initFontList();
 	listFonts->setCurrentRow(0);
 }
 
+/*
+ * Config settings
+ */
+void PreferencesDialog::initConfig()
+{
+	Settings& s = Settings::get();
+	int status = s.preserveLostSymbols() ? Qt::Checked : Qt::Unchecked;
+	cbPreserveLostSymbols->setChecked(status);
+}
 /*
  * Font settings
  */
@@ -107,6 +120,11 @@ void PreferencesDialog::fontSelectColor()
 		Settings::get().setFontColor(f, newColor);
 		setFontPreviewColor(newColor);
 	}
+}
+
+void PreferencesDialog::preserveLostSymbols(int state)
+{
+	Settings::get().setPreserveLostSymbols(state == Qt::Checked);
 }
 
 void PreferencesDialog::setFontPreviewColor(const QColor& c)

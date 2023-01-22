@@ -4,8 +4,10 @@
 #include "DockableWidgetArea.h"
 #include "DockManager.h"
 #include "DebugSession.h"
+#include "SymbolManager.h"
 #include <QMainWindow>
 #include <QMap>
+#include <QPointer>
 #include <cstdint>
 #include <memory>
 
@@ -138,6 +140,7 @@ private:
 	VDPRegViewer* VDPRegView;
 	VDPCommandRegViewer* VDPCommandRegView;
 	BreakpointViewer* bpView;
+	QPointer<SymbolManager> symManager;
 
 	CommClient& comm;
 	DebugSession session;
@@ -216,6 +219,7 @@ signals:
 	void connected();
 	void settingsChanged();
 	void symbolsChanged();
+	void symbolFilesChanged();
 	void runStateEntered();
 	void breakStateEntered();
 	void breakpointsUpdated();
