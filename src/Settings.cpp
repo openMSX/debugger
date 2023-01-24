@@ -1,8 +1,9 @@
 #include "Settings.h"
 #include <QApplication>
+#include <QDebug>
 
 static const char* DebuggerConfigNames[Settings::CONFIG_END] = {
-	"Preserve Lost Symbols"
+	"AutoReloadSymbols", "PreserveLostSymbols"
 };
 
 static const char* DebuggerFontNames[Settings::FONT_END] = {
@@ -38,15 +39,22 @@ Settings& Settings::get()
 	return instance;
 }
 
+void Settings::getBoolFromSetting(DebuggerConfig c, bool defaultValue)
+{
+	QVariant v = value(configLocation(c));
+
+	if (v.canConvert<bool>()) {
+		config[c] = v;
+	} else {
+		// default value
+		config[c] = defaultValue;
+	}
+}
+
 void Settings::getConfigFromSettings()
 {
-	QVariant b = value(configLocation(PRESERVE_LOST_SYMBOLS));
-	if (b.type() == QVariant::Invalid) {
-		// default value
-		config[PRESERVE_LOST_SYMBOLS] = true;
-	} else if (b.type() == QVariant::Bool) {
-		config[PRESERVE_LOST_SYMBOLS] = b.value<bool>();
-	}
+	getBoolFromSetting(AUTO_RELOAD_SYMBOLS, false);
+	getBoolFromSetting(PRESERVE_LOST_SYMBOLS, true);
 }
 
 void Settings::setConfig(DebuggerConfig c, const QVariant& v)
@@ -163,6 +171,16 @@ void Settings::setFontColor(DebuggerFont f, const QColor& c)
 	}
 }
 
+bool Settings::autoReloadSymbols() const
+{
+	return config[AUTO_RELOAD_SYMBOLS].value<bool>();
+}
+
+void Settings::setAutoReloadSymbols(bool b)
+{
+	setConfig(AUTO_RELOAD_SYMBOLS, b);
+}
+
 bool Settings::preserveLostSymbols() const
 {
 	return config[PRESERVE_LOST_SYMBOLS].value<bool>();
@@ -170,8 +188,7 @@ bool Settings::preserveLostSymbols() const
 
 void Settings::setPreserveLostSymbols(bool b)
 {
-	config[PRESERVE_LOST_SYMBOLS] = b;
-	setValue(configLocation(PRESERVE_LOST_SYMBOLS), config[PRESERVE_LOST_SYMBOLS]);
+	setConfig(PRESERVE_LOST_SYMBOLS, b);
 }
 
 void Settings::updateFonts()
