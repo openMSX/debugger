@@ -2,6 +2,7 @@
 #include "SymbolTable.h"
 #include "Settings.h"
 #include "Convert.h"
+#include <QComboBox>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QHeaderView>
@@ -108,15 +109,46 @@ void SymbolManager::refresh()
  * File list support functions
  */
 
+enum TableColumns {
+	FILENAME = 0,
+	DESTINATION_SLOT,
+	LAST_REFRESH,
+};
+
 void SymbolManager::initFileList()
 {
 	treeFiles->clear();
 	for (int i = 0; i < symTable.symbolFilesSize(); ++i) {
 		auto* item = new QTreeWidgetItem(treeFiles);
-		item->setText(0, symTable.symbolFile(i));
+		item->setText(FILENAME, symTable.symbolFile(i));
 		auto fmt = QLocale().dateTimeFormat(QLocale::ShortFormat);
-		item->setText(1, symTable.symbolFileRefresh(i).toString(fmt));
+		createComboBox(i);
+		item->setText(LAST_REFRESH, symTable.symbolFileRefresh(i).toString(fmt));
 	}
+}
+
+static const char* destinationLabels[] = {
+	"All",
+	"0-0", "0-1", "0-2", "0-3",
+	"1-0", "1-1", "1-2", "1-3",
+	"2-0", "2-1", "2-2", "2-3",
+	"3-0", "3-1", "3-2", "3-3",
+};
+
+void SymbolManager::createComboBox(int row)
+{
+	auto* combo = new QComboBox();
+	combo->setEditable(false);
+	combo->insertItems(0, QStringList(std::begin(destinationLabels), std::end(destinationLabels)));
+	combo->setCurrentIndex(0);
+
+	auto* model = treeFiles->model();
+	auto  index = model->index(row, DESTINATION_SLOT);
+
+	treeFiles->setIndexWidget(index, combo);
+
+	connect(combo, qOverload<int>(&QComboBox::currentIndexChanged),
+		[this, row](int index){ addSymbolFileDestination(row, index - 1); });
 }
 
 void SymbolManager::addFile()
@@ -198,6 +230,21 @@ void SymbolManager::reloadFiles()
 	emit symbolTableChanged();
 }
 
+void SymbolManager::addSymbolFileDestination(int fileIndex, int slotIndex)
+{
+	for (Symbol* sym = symTable.findFirstAddressSymbol(0);
+			sym != nullptr;
+			sym = symTable.findNextAddressSymbol()) {
+		if (sym->source() == &symTable.symbolFile(fileIndex)) {
+			sym->setValidSlots(slotIndex == -1 ? 0xFFFF : 0xFFFF & (1 << slotIndex));
+		}
+	}
+
+	refresh();
+	emit symbolTableChanged();
+	wipeSelectedItem();
+}
+
 void SymbolManager::fileSelectionChange()
 {
 	btnRemoveFile->setEnabled(!treeFiles->selectedItems().empty());
@@ -229,8 +276,8 @@ void SymbolManager::initSymbolList()
 	treeLabels->clear();
 	beginTreeLabelsUpdate();
 	for (Symbol* sym = symTable.findFirstAddressSymbol(0);
-	     sym != nullptr;
-	     sym = symTable.findNextAddressSymbol()) {
+			sym != nullptr;
+			sym = symTable.findNextAddressSymbol()) {
 		auto* item = new QTreeWidgetItem(treeLabels);
 		// attach a pointer to the symbol object to the tree item
 		item->setData(0L, Qt::UserRole, quintptr(sym));
@@ -339,6 +386,37 @@ void SymbolManager::labelChanged(QTreeWidgetItem* item, int column)
 	}
 }
 
+void SymbolManager::wipeSelectedItem()
+{
+	for (int index = 0; index < vbox0->count(); ++index) {
+		static_cast<QCheckBox*>(vbox0->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < vbox1->count(); ++index) {
+		static_cast<QCheckBox*>(vbox1->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < vbox2->count(); ++index) {
+		static_cast<QCheckBox*>(vbox2->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < vbox3->count(); ++index) {
+		static_cast<QCheckBox*>(vbox3->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < gridRegs8->count(); ++index) {
+		static_cast<QCheckBox*>(gridRegs8->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < gridRegs16->count(); ++index) {
+		static_cast<QCheckBox*>(gridRegs16->itemAt(index)->widget())->setChecked(false);
+	}
+	for (int index = 0; index < vboxSymbolType->count(); ++index) {
+		auto radio = static_cast<QRadioButton*>(vboxSymbolType->itemAt(index)->widget());
+		radio->setAutoExclusive(false);
+		radio->setChecked(false);
+		radio->setAutoExclusive(true);
+	}
+
+	txtSegments->setText("");
+	treeLabels->setCurrentItem(nullptr);
+}
+
 void SymbolManager::labelSelectionChanged()
 {
 	// remove possible editor
@@ -347,6 +425,7 @@ void SymbolManager::labelSelectionChanged()
 	QList<QTreeWidgetItem*> selection = treeLabels->selectedItems();
 	// check if is available at all
 	if (selection.empty()) {
+		wipeSelectedItem();
 		// disable everything
 		btnRemoveSymbol->setEnabled(false);
 		groupSlots->setEnabled(false);
