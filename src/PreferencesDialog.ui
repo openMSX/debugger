@@ -28,11 +28,27 @@
       <attribute name="title" >
        <string>Symbol Table</string>
       </attribute>
-      <widget class="QCheckBox" name="cbPreserveLostSymbols" >
+      <widget class="QCheckBox" name="cbAutoReloadSymbols" >
        <property name="geometry">
         <rect>
          <x>6</x>
          <y>6</y>
+         <width>342</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text" >
+        <string>Automatically reload symbol files that changed</string>
+       </property>
+       <property name="checked" >
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="cbPreserveLostSymbols" >
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>38</y>
          <width>242</width>
          <height>25</height>
         </rect>

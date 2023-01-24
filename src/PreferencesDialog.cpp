@@ -22,9 +22,6 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 	connect(btnFontColor,  &QPushButton::clicked,
 	        this, &PreferencesDialog::fontSelectColor);
 
-	connect(cbPreserveLostSymbols, &QCheckBox::stateChanged,
-			this, &PreferencesDialog::preserveLostSymbols);
-
 	initConfig();
 	initFontList();
 	listFonts->setCurrentRow(0);
@@ -36,8 +33,15 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 void PreferencesDialog::initConfig()
 {
 	Settings& s = Settings::get();
-	int status = s.preserveLostSymbols() ? Qt::Checked : Qt::Unchecked;
-	cbPreserveLostSymbols->setChecked(status);
+	int status1 = s.autoReloadSymbols() ? Qt::Checked : Qt::Unchecked;
+	cbAutoReloadSymbols->setChecked(status1);
+	connect(cbAutoReloadSymbols, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::autoReloadSymbols);
+
+	int status2 = s.preserveLostSymbols() ? Qt::Checked : Qt::Unchecked;
+	cbPreserveLostSymbols->setChecked(status2);
+	connect(cbPreserveLostSymbols, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::preserveLostSymbols);
 }
 /*
  * Font settings
@@ -120,6 +124,11 @@ void PreferencesDialog::fontSelectColor()
 		Settings::get().setFontColor(f, newColor);
 		setFontPreviewColor(newColor);
 	}
+}
+
+void PreferencesDialog::autoReloadSymbols(int state)
+{
+	Settings::get().setAutoReloadSymbols(state == Qt::Checked);
 }
 
 void PreferencesDialog::preserveLostSymbols(int state)

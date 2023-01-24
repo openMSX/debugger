@@ -20,6 +20,7 @@ private:
 	void fontSelectCustom();
 	void fontSelectColor();
 
+	void autoReloadSymbols(int state);
 	void preserveLostSymbols(int state);
 
 private:
