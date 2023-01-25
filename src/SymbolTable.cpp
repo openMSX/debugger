@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QRegExp>
 #include <QFileInfo>
+#include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QMap>
 #include <algorithm>
@@ -190,7 +191,10 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 	QString fname = filename.toLower();
 
 	if (type == DETECT_FILE) {
-		if (fname.endsWith(".noi")) {
+		if (fname.endsWith(".omds")) {
+			// OpenMSX Debugger session file
+			type = OMDS_FILE;
+		} else if (fname.endsWith(".noi")) {
 			// NoICE command file
 			type = NOICE_FILE;
 		} else if (fname.endsWith(".map")) {
@@ -227,6 +231,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 		}
 	}
 	switch (type) {
+	case OMDS_FILE:
+		return readOMDSFile(filename);
 	case TNIASM0_FILE:
 		return readTNIASM0File(filename);
 	case TNIASM1_FILE:
@@ -301,6 +307,18 @@ bool SymbolTable::readSymbolFile(
 			add(std::make_unique<Symbol>(l.at(0), *value, source));
 		}
 	}
+	return true;
+}
+bool SymbolTable::readOMDSFile(const QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QFile::ReadOnly | QFile::Text)) {
+		return false;
+	}
+
+	QXmlStreamReader ses;
+	ses.setDevice(&file);
+	loadSymbols(ses);
 	return true;
 }
 bool SymbolTable::readTNIASM0File(const QString& filename)

@@ -156,7 +156,8 @@ void SymbolManager::addFile()
 	// create dialog
 	auto* d = new QFileDialog(this);
 	QStringList types;
-	types << "All supported files (*.sym *.map *.noi *.symbol *.publics *.sys)"
+	types << "All supported files (*.omds *.sym *.map *.noi *.symbol *.publics *.sys)"
+		  << "OpenMSX Debugger session files (*.omds)"
 	      << "tniASM 0.x symbol files (*.sym)"
 	      << "tniASM 1.x symbol files (*.sym)"
 	      << "asMSX 0.x symbol files (*.sym)"
@@ -175,7 +176,9 @@ void SymbolManager::addFile()
 		QString n = d->selectedFiles().at(0);
 		// load file from the correct type
 		bool read = false;
-		if        (f.startsWith("tniASM 0")) {
+		if        (f.startsWith("OpenMSX Debugger session")) {
+			read = symTable.readFile(n, SymbolTable::OMDS_FILE);
+		} else if (f.startsWith("tniASM 0")) {
 			read = symTable.readFile(n, SymbolTable::TNIASM0_FILE);
 		} else if (f.startsWith("tniASM 1")) {
 			read = symTable.readFile(n, SymbolTable::TNIASM1_FILE);
