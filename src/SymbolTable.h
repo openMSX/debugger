@@ -81,6 +81,7 @@ class SymbolTable : public QObject
 public:
 	enum FileType {
 		DETECT_FILE,
+		OMDS_FILE,
 		TNIASM0_FILE,
 		TNIASM1_FILE,
 		SJASM_FILE,
@@ -131,6 +132,7 @@ private:
 	void appendFile(const QString& file, FileType type);
 	bool readSymbolFile(
 		const QString& filename, FileType type, const QString& equ);
+	bool readOMDSFile(const QString& filename);
 	bool readTNIASM0File(const QString& filename);
 	bool readTNIASM1File(const QString& filename);
 	bool readASMSXFile(const QString& filename);
