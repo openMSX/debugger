@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0" >
  <class>BitMapViewer</class>
  <widget class="QDialog" name="BitMapViewer" >
@@ -5,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>604</width>
+    <width>707</width>
     <height>619</height>
    </rect>
   </property>
@@ -107,6 +108,16 @@
             <string>3</string>
            </property>
           </item>
+          <item>
+           <property name="text" >
+            <string>E0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>E1</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="3" column="0" >
@@ -206,6 +217,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_2" >
            <item>
             <layout class="QGridLayout" name="gridLayout_2" >
+             <property name="horizontalSpacing" >
+              <number>12</number>
+             </property>
              <item row="3" column="1" >
               <widget class="QLabel" name="borderLabel" >
                <property name="text" >
@@ -216,7 +230,7 @@
              <item row="3" column="0" >
               <widget class="QLabel" name="label_11" >
                <property name="text" >
-                <string>Border color</string>
+                <string>Border color:</string>
                </property>
               </widget>
              </item>
@@ -244,7 +258,7 @@
              <item row="2" column="0" >
               <widget class="QLabel" name="label_7" >
                <property name="text" >
-                <string>Lines visible</string>
+                <string>Lines visible:</string>
                </property>
               </widget>
              </item>
@@ -379,7 +393,7 @@
    <item>
     <widget class="QScrollArea" name="scrollArea" >
      <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -408,7 +422,7 @@
      <widget class="QWidget" name="scrollAreaWidgetContents" >
       <property name="geometry" >
        <rect>
-        <x>38</x>
+        <x>85</x>
         <y>0</y>
         <width>508</width>
         <height>420</height>
@@ -429,7 +443,7 @@
      <item>
       <widget class="QLabel" name="labelX" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -455,7 +469,7 @@
      <item>
       <widget class="QLabel" name="labelY" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -481,7 +495,7 @@
      <item>
       <widget class="QLabel" name="labelColor" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -520,7 +534,7 @@
      <item>
       <widget class="QLabel" name="labelVramAddr" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -546,7 +560,7 @@
      <item>
       <widget class="QLabel" name="labelByte" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
