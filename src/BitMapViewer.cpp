@@ -29,7 +29,8 @@ static uint8_t currentPalette[32] = {
 
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
-	, screenMod(0) // avoid UMR
+	, pageSize(0) // avoid UMR
+	, screenMod(0)
 {
 	setupUi(this);
     //no connect slot byname anymore
@@ -68,7 +69,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
 	imageWidget->setPaletteSource(palette);
-
+	
 	//now hook up some signals and slots
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
 	        this, &BitMapViewer::VDPDataStoreDataRefreshed);
@@ -84,6 +85,12 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
+}
+
+void BitMapViewer::updateDisplayAsFrame()
+{
+	screenMod = screenMode->itemText(screenMode->currentIndex()).toInt();
+	pageSize = screenMod >= 7 ? 65536 : 32768;
 }
 
 void BitMapViewer::decodeVDPregs()
@@ -150,7 +157,11 @@ void BitMapViewer::decodeVDPregs()
 	int v3 = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3) | ((regs[25] & 0x18) << 2);
 	printf("screenMod according to the bits: %i\n", v3);
 	modeLabel->setText(QString("%1").arg(bits_modetxt[v3], 0, 10));
-	if (useVDP) screenMode->setCurrentIndex(bits_mode[v3]);
+
+	if (useVDP) {
+		screenMode->setCurrentIndex(bits_mode[v3]);
+		updateDisplayAsFrame();
+	}
 
 	// Get the current visible page
 	unsigned p = (regs[2] >> 5) & 3;
@@ -167,19 +178,19 @@ void BitMapViewer::decodeVDPregs()
 	if (useVDP) currentPage->setCurrentIndex(p);
 }
 
-
 void BitMapViewer::refresh()
 {
 	// All of the code is in the VDPDataStore;
 	VDPDataStore::instance().refresh();
 }
 
-void BitMapViewer::on_screenMode_currentIndexChanged(int index)
+void BitMapViewer::on_screenMode_currentIndexChanged(int /*index*/)
 {
-	screenMod = screenMode->itemText(index).toInt();
-	printf("\nnew screenMod: %i\n", screenMod);
-	//change then number of visibe pages when this changes
+	updateDisplayAsFrame();
+
+	// change the number of visible pages when this changes
 	imageWidget->setVramAddress(0);
+
 	// make sure that we are decoding new mode from page 0, imagine viewing
 	// page 3 of screen5 and then switching to screen 8 without changing the
 	// starting vram address....
@@ -189,15 +200,16 @@ void BitMapViewer::on_screenMode_currentIndexChanged(int index)
 
 void BitMapViewer::setPages()
 {
+	if (pageSize == 0) return;
+	static constexpr std::array pageNames = {"0", "1", "2", "3", "E0", "E1"};	
 	int oldIndex = currentPage->currentIndex();
 
 	currentPage->clear();
-	currentPage->insertItem(0, "0");
-	currentPage->insertItem(1, "1");
+	size_t pageCount = VDPDataStore::instance().getVRAMSize() / pageSize;
+	size_t pages = std::min(pageCount, pageNames.size());
 
-	if (screenMod < 7 && VDPDataStore::instance().getVRAMSize() > 0x10000) {
-		currentPage->insertItem(2, "2");
-		currentPage->insertItem(3, "3");
+	for (unsigned int p = 0; p < pages; ++p) {
+		currentPage->insertItem(p, pageNames[p]);
 	}
 
 	if (!useVDP && oldIndex < currentPage->count()) {
@@ -207,16 +219,13 @@ void BitMapViewer::setPages()
 
 void BitMapViewer::on_currentPage_currentIndexChanged(int index)
 {
-	//if this is the consequence of a .clear() in the
+	// if this is the consequence of a .clear() in the
 	// on_screenMode_currentIndexChanged we do nothing!
 	if (index == -1) return;
 
-	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
-	printf("\nvoid BitMapViewer::on_currentPage_currentIndexChanged(int %i);\n", index);
-	if (screenMod >= 7) index *= 2;
-	int vramAddress = m1[index];
-	printf("vramAddress %i\n", vramAddress);
+	int vramAddress = pageSize * index;
 	imageWidget->setVramAddress(vramAddress);
+	addressLabel->setText(hexValue(vramAddress, 5));
 }
 
 void BitMapViewer::on_linesVisible_currentIndexChanged(int index)
@@ -224,6 +233,7 @@ void BitMapViewer::on_linesVisible_currentIndexChanged(int index)
 	static const int m[3] = { 192, 212, 256 };
 	int lines = m[index];
 	imageWidget->setLines(lines);
+	linesLabel->setText(QString("%1").arg(m[index]));
 }
 
 void BitMapViewer::on_bgColor_valueChanged(int value)

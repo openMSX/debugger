@@ -16,6 +16,7 @@ public:
 private:
 	void decodeVDPregs();
 	void setPages();
+	void updateDisplayAsFrame();
 
 	void on_screenMode_currentIndexChanged(int index);
 	void on_currentPage_currentIndexChanged(int index);
@@ -35,6 +36,7 @@ private:
 
 private:
 	VramBitMappedView* imageWidget;
+	unsigned pageSize;
 	int screenMod;
 	bool useVDP;
 };
