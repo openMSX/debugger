@@ -1219,6 +1219,7 @@ void DebuggerForm::toggleBitMappedDisplay()
 	dw->setDestroyable(true);
 	dw->setMovable(true);
 	dw->setClosable(true);
+
 	/*
 	connect(dw, &DockableWidget::visibilityChanged,
 	        this, &DebuggerForm::dockWidgetVisibilityChanged);
@@ -1226,7 +1227,8 @@ void DebuggerForm::toggleBitMappedDisplay()
 	        viewer, &BitMapViewer::setDebuggables);
 	*/
 
-	// TODO: refresh should be being hanled by VDPDataStore...
+	// TODO: refresh should be handled by VDPDataStore...
+	connect(this, &DebuggerForm::connected, viewer, &BitMapViewer::refresh);
 	connect(this, &DebuggerForm::breakStateEntered, viewer, &BitMapViewer::refresh);
 
 	/*
@@ -1253,7 +1255,7 @@ void DebuggerForm::toggleCharMappedDisplay()
 	dw->setClosable(true);
 	//    dw->adjustSize();
 
-	// TODO: refresh should be being hanled by VDPDataStore...
+	// TODO: refresh should be handled by VDPDataStore...
 	connect(this, &DebuggerForm::breakStateEntered, viewer, &TileViewer::refresh);
 }
 
@@ -1273,7 +1275,7 @@ void DebuggerForm::toggleSpritesDisplay()
 	dw->setMovable(true);
 	dw->setClosable(true);
 
-	// TODO: refresh should be being hanled by VDPDataStore...
+	// TODO: refresh should be handled by VDPDataStore...
 	connect(this, &DebuggerForm::breakStateEntered, viewer, &SpriteViewer::refresh);
 }
 
