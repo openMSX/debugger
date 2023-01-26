@@ -511,6 +511,8 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 	if (x >= horiStep * screenWidth) return {};
 	if (y >= 8 * screenHeight) return {};
 
+	x = int(x / horiStep);
+	y = int(y / 8);
 	int character = 0;
 	switch (tableToShow) {
 		case 0:
