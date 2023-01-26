@@ -6,58 +6,31 @@ on:
       - master
 
 jobs:
-  build:
-    uses: ./.github/workflows/workflow-build.yaml
+  build-windows:
+    uses: ./.github/workflows/workflow-build-windows.yaml
+  build-macos:
+    uses: ./.github/workflows/workflow-build-macos.yaml
+  build-ubuntu:
+    uses: ./.github/workflows/workflow-build-ubuntu.yaml
   nightly:
-    name: Release nightly packages
+    name: Release packages automatically on push
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-windows, build-macos, build-ubuntu]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
-      - name: Get variables
-        id: get-targets
-        run: |
-          echo "prerelease=${{ needs.build.outputs.prerelease }}" >> $GITHUB_OUTPUT
-          echo "draft=${{ needs.build.outputs.draft }}" >> $GITHUB_OUTPUT
-          echo "name=${{ needs.build.outputs.name }}" >> $GITHUB_OUTPUT
-          debian_target=$(find . -maxdepth 1 -type d -name "*-debian-*" -printf %f)
-          mingw_target=$(find . -maxdepth 1 -type d -name "*-mingw-*" -printf %f)
-          echo "target_debian=$target_debian" >> $GITHUB_OUTPUT
-          echo "target_mingw=$target_mingw" >> $GITHUB_OUTPUT
-          if [ "$debian_target" = "" ]; then
-            echo "Target name 'mingw_target' not defined"
-            exit 1
-          fi
-          if [ "$mingw_target" = "" ]; then
-            echo "Target name 'debian_target' not defined"
-            exit 1
-          fi
-          echo "debian_target=$debian_target" >> $GITHUB_OUTPUT
-          echo "mingw_target=$mingw_target" >> $GITHUB_OUTPUT
-      - name: Package binaries as zip files
-        run: |
-          cd ${{ steps.get-targets.outputs.debian_target }}
-          zip "${{ steps.get-targets.outputs.debian_target }}.zip" -r .
-          cd ..
-          cd ${{ steps.get-targets.outputs.mingw_target }}
-          zip "${{ steps.get-targets.outputs.mingw_target }}.zip" -r .
-          cd ..
-          mv ${{ steps.get-targets.outputs.debian_target }}/${{ steps.get-targets.outputs.debian_target }}.zip .
-          mv ${{ steps.get-targets.outputs.mingw_target }}/${{ steps.get-targets.outputs.mingw_target }}.zip .
-
       - name: Create info file
         run: |
-           echo "ref: ${GITHUB_REF}" > info.txt
-           echo "commit: ${GITHUB_SHA}" >> info.txt
-           echo "build: $(date +"%Y-%m-%dT%H:%M:%SZ")" >> info.txt
-
-      - name: Update nightly release
-        uses: eine/tip@master
+          echo "ref: ${GITHUB_REF}" > info.txt
+          echo "commit: ${GITHUB_SHA}" >> info.txt
+          echo "build: $(date +"%Y-%m-%dT%H:%M:%SZ")" >> info.txt
+      - name: Publish nightly builds
+        uses: ncipollo/release-action@v1
         with:
-          tag: nightly
-          rm: true
+          artifacts: info.txt, ubuntu/openmsx-debugger-ubuntu-gh.tbz, macos/openmsx-debugger-macos-gh.tbz, mingw32/openmsx-debugger-mingw32-gh.zip
+          body: "Build number ${{ github.run_number }}\n${{ github.event.head_commit.message }}\n\nTo run the Debugger on Mac OS or GNU/Linux, qt5 should be installed."
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: info.txt *.zip
+          tag: nightly
+          allowUpdates: true

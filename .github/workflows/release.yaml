@@ -17,39 +17,16 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
-      - name: Get variables
-        id: get-targets
+      - name: Create info file
         run: |
-          echo "prerelease=${{ needs.build.outputs.prerelease }}" >> $GITHUB_OUTPUT
-          echo "draft=${{ needs.build.outputs.draft }}" >> $GITHUB_OUTPUT
-          echo "name=${{ needs.build.outputs.name }}" >> $GITHUB_OUTPUT
-          debian_target=$(find . -maxdepth 1 -type d -name "*-debian-*" -printf %f)
-          mingw_target=$(find . -maxdepth 1 -type d -name "*-mingw-*" -printf %f)
-          echo "target_debian=$target_debian" >> $GITHUB_OUTPUT
-          echo "target_mingw=$target_mingw" >> $GITHUB_OUTPUT
-          if [ "$debian_target" = "" ]; then
-            echo "Target name 'mingw_target' not defined"
-            exit 1
-          fi
-          if [ "$mingw_target" = "" ]; then
-            echo "Target name 'debian_target' not defined"
-            exit 1
-          fi
-          echo "debian_target=$debian_target" >> $GITHUB_OUTPUT
-          echo "mingw_target=$mingw_target" >> $GITHUB_OUTPUT
-      - name: Package binaries as zip files
-        run: |
-          cd ${{ steps.get-targets.outputs.debian_target }}
-          zip "${{ steps.get-targets.outputs.debian_target }}.zip" -r .
-          cd ..
-          cd ${{ steps.get-targets.outputs.mingw_target }}
-          zip "${{ steps.get-targets.outputs.mingw_target }}.zip" -r .
-          cd ..
-          mv ${{ steps.get-targets.outputs.debian_target }}/${{ steps.get-targets.outputs.debian_target }}.zip .
-          mv ${{ steps.get-targets.outputs.mingw_target }}/${{ steps.get-targets.outputs.mingw_target }}.zip .
-      - name: Publish binaries as artifacts
+          echo "ref: ${GITHUB_REF}" > info.txt
+          echo "commit: ${GITHUB_SHA}" >> info.txt
+          echo "build: $(date +"%Y-%m-%dT%H:%M:%SZ")" >> info.txt
+      - name: Publish release builds
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "*.zip"
+          artifacts: info.txt, ubuntu/openmsx-debugger-ubuntu-gh.tbz, macos/openmsx-debugger-macos-gh.tbz, mingw32/openmsx-debugger-mingw32-gh.zip
           body: "Build number ${{ github.run_number }}\n${{ github.event.head_commit.message }}"
           token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+          allowUpdates: true
