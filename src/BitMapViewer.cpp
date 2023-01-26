@@ -65,12 +65,13 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	useVDP = useVDPRegisters->isChecked();
 
 	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
-	const unsigned char* palette = VDPDataStore::instance().getPalettePointer();
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
-	imageWidget->setPaletteSource(palette);
+	// Palette data not received from VDPDataStore yet causing black image, so
+	// we start by using fixed palette until VDPDataStoreDataRefreshed kicks in.
+	imageWidget->setPaletteSource(currentPalette);
 	
-	//now hook up some signals and slots
+	// now hook up some signals and slots
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
 	        this, &BitMapViewer::VDPDataStoreDataRefreshed);
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
@@ -161,6 +162,9 @@ void BitMapViewer::decodeVDPregs()
 	if (useVDP) {
 		screenMode->setCurrentIndex(bits_mode[v3]);
 		updateDisplayAsFrame();
+	}
+	if (useVDPPalette) {
+		imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 	}
 
 	// Get the current visible page
