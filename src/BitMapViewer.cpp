@@ -205,14 +205,14 @@ void BitMapViewer::on_screenMode_currentIndexChanged(int /*index*/)
 void BitMapViewer::setPages()
 {
 	if (pageSize == 0) return;
-	static constexpr std::array pageNames = {"0", "1", "2", "3", "E0", "E1"};	
+	static const QStringList pageNames = {"0", "1", "2", "3", "E0", "E1"};
 	int oldIndex = currentPage->currentIndex();
 
 	currentPage->clear();
-	size_t pageCount = VDPDataStore::instance().getVRAMSize() / pageSize;
-	size_t pages = std::min(pageCount, pageNames.size());
+	int pageCount = VDPDataStore::instance().getVRAMSize() / pageSize;
+	int pages = std::min(pageCount, pageNames.count());
 
-	for (unsigned int p = 0; p < pages; ++p) {
+	for (int p = 0; p < pages; ++p) {
 		currentPage->insertItem(p, pageNames[p]);
 	}
 
