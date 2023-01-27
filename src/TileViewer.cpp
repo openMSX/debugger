@@ -8,7 +8,7 @@
 
 
 // static to feed to PaletteDialog and be used when VDP colors aren't selected
-uint8_t TileViewer::defaultPalette[32] = {
+static uint8_t currentPalette[32] = {
 //    RB  G
     0x00, 0,
     0x00, 0,
@@ -83,11 +83,7 @@ TileViewer::TileViewer(QWidget* parent)
     scrollArea->setWidget(imageWidget);
 
 	const auto* vram    = VDPDataStore::instance().getVramPointer();
-	const auto* palette = VDPDataStore::instance().getPalettePointer();
-    //imageWidget->setNameTableAddress(0);
-    //imageWidget->setPatternTableAddress(0);
-    //imageWidget->setColorTableAddress(0);
-	imageWidget->setPaletteSource(palette);
+    imageWidget->setPaletteSource(currentPalette);
     imageWidget->setVramSource(vram);
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
     imageWidget->setDrawGrid(cb_drawgrid->isChecked());
@@ -98,9 +94,6 @@ TileViewer::TileViewer(QWidget* parent)
             this, &TileViewer::imageMouseOver);
     connect(imageWidget, &VramTiledView::imageClicked,
             this, &TileViewer::displayCharInfo);
-
-	// and now go fetch the initial data
-	VDPDataStore::instance().refresh();
 }
 
 void TileViewer::VDPDataStoreDataRefreshed()
@@ -339,7 +332,7 @@ void TileViewer::on_useVDPRegisters_stateChanged(int state)
 void TileViewer::on_editPaletteButton_clicked(bool /*checked*/)
 {
     auto* p = new PaletteDialog();
-    p->setPalette(defaultPalette);
+    p->setPalette(currentPalette);
     p->setAutoSync(true);
     connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramTiledView::refresh);
     connect(p, &PaletteDialog::paletteSynced, this, &TileViewer::update_label_characterimage);
@@ -358,8 +351,8 @@ void TileViewer::on_useVDPPalette_stateChanged(int state)
     if (state) {
         imageWidget->setPaletteSource(palette);
     } else {
-        if (palette) memcpy(defaultPalette, palette, 32);
-        imageWidget->setPaletteSource(defaultPalette);
+        if (palette) memcpy(currentPalette, palette, 32);
+        imageWidget->setPaletteSource(currentPalette);
     }
     imageWidget->refresh();
     editPaletteButton->setEnabled(!state);

@@ -1256,6 +1256,7 @@ void DebuggerForm::toggleCharMappedDisplay()
 	//    dw->adjustSize();
 
 	// TODO: refresh should be handled by VDPDataStore...
+	connect(this, &DebuggerForm::connected, viewer, &TileViewer::refresh);
 	connect(this, &DebuggerForm::breakStateEntered, viewer, &TileViewer::refresh);
 }
 
