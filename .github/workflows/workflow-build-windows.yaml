@@ -69,5 +69,5 @@ jobs:
         path: |
           openmsx-debugger-mingw32-${{ env.package_origin }}.zip
         if-no-files-found: error
-        retention-days: 1
+        retention-days: 3
 
