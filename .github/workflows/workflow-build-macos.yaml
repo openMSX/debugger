@@ -16,6 +16,8 @@ jobs:
         git config --global init.defaultBranch master
     - name: Checkout repository code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Compile repository code
       id: compile
       shell: bash
