@@ -1,0 +1,14 @@
+name: Build on pull request
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-windows:
+    uses: ./.github/workflows/workflow-build-windows.yaml
+  build-macos:
+    uses: ./.github/workflows/workflow-build-macos.yaml
+  build-ubuntu:
+    uses: ./.github/workflows/workflow-build-ubuntu.yaml
