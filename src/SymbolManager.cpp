@@ -120,7 +120,9 @@ void SymbolManager::initFileList()
 	treeFiles->clear();
 	for (int i = 0; i < symTable.symbolFilesSize(); ++i) {
 		auto* item = new QTreeWidgetItem(treeFiles);
-		item->setText(FILENAME, symTable.symbolFile(i));
+		QFileInfo info(symTable.symbolFile(i));
+		item->setText(FILENAME, info.fileName());
+		item->setToolTip(FILENAME, symTable.symbolFile(i));
 		auto fmt = QLocale().dateTimeFormat(QLocale::ShortFormat);
 		createComboBox(i);
 		item->setText(LAST_REFRESH, symTable.symbolFileRefresh(i).toString(fmt));
