@@ -182,13 +182,13 @@ void SpriteViewer::spatwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character
     const uint8_t* vramBase = VDPDataStore::instance().getVramPointer();
     if (vramBase != nullptr && character < 32) {
         auto addr = spAtAddr + 4 * character;
-        ui->label_spat_posx->setText(QString::number(vramBase[addr + 0]));
-        ui->label_spat_posy->setText(QString::number(vramBase[addr + 1]));
+        ui->label_spat_posy->setText(QString::number(vramBase[addr + 0]));
+        ui->label_spat_posx->setText(QString::number(vramBase[addr + 1]));
         ui->label_spat_pattern->setText(QString::number(vramBase[addr + 2]));
         ui->label_spat_color->setText(QString::number(vramBase[addr + 3]));
     } else {
-        ui->label_spat_posx->setText("");
         ui->label_spat_posy->setText("");
+        ui->label_spat_posx->setText("");
         ui->label_spat_pattern->setText("");
         ui->label_spat_color->setText("");
     }
