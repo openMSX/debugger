@@ -23,11 +23,12 @@ DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	destroyable = true;
 	dragging = false;
 	setAttribute(Qt::WA_DeleteOnClose, true);
-#ifdef Q_OS_MAC
+#ifndef Q_OS_MAC
+	setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+#else
 	// on Mac the FramelessWindowHint hides the SizeGrip
 	setWindowFlags(Qt::Tool);
-#else
-	setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+	setAttribute(Qt::WA_MacAlwaysShowToolWindow, true);
 #endif
 
 	titleLabel = new QLabel();
@@ -143,12 +144,12 @@ void DockableWidget::setFloating(bool enable, bool showNow)
 
 	if (floating && showNow) {
 		// force widget to never get behind main window
-
-#ifdef Q_OS_MAC
+#ifndef Q_OS_MAC
+		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+#else
 		// on Mac the FramelessWindowHint hides the SizeGrip
 		setWindowFlags(Qt::Tool);
-#else
-		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+		setAttribute(Qt::WA_MacAlwaysShowToolWindow, true);
 #endif
 		show();
 	}
