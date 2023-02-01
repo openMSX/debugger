@@ -57,18 +57,20 @@ class VDPDataStoreDebuggableChecks : public SimpleCommand
 {
 public:
 	VDPDataStoreDebuggableChecks(VDPDataStore& dataStore_)
-		: SimpleCommand("debug_check_debuggables {{VDP register latch status} {VDP palette latch status} {VDP data latch value}}")
+		: SimpleCommand("debug_check_debuggables {{VDP register latch status} {VDP palette latch status} "
+		                "{VDP data latch value} {VRAM access status}}")
 		, dataStore(dataStore_)
 	{
 	}
 
 	void replyOk(const QString& message) override
 	{
-		assert(message.size() == 5);
+		assert(message.size() == 7);
 		QStringList s = message.split(' ');
 		dataStore.registerLatchAvailable = s[0] == '1';
 		dataStore.paletteLatchAvailable = s[1] == '1';
 		dataStore.dataLatchAvailable = s[2] == '1';
+		dataStore.vramAccessStatusAvailable = s[3] == '1';
 		dataStore.refresh3();
 		delete this;
 	}
@@ -83,7 +85,7 @@ private:
 };
 
 static constexpr unsigned MAX_VRAM_SIZE = 0x30000;
-static constexpr unsigned MAX_TOTAL_SIZE = MAX_VRAM_SIZE + 32 + 16 + 64 + 2 + 3;
+static constexpr unsigned MAX_TOTAL_SIZE = MAX_VRAM_SIZE + 32 + 16 + 64 + 2 + 3 + 1;
 
 VDPDataStore::VDPDataStore()
 	: vram(MAX_TOTAL_SIZE)
@@ -127,12 +129,14 @@ void VDPDataStore::refresh3()
 		"[debug read_block {VDP palette} 0 32]"
 		"[debug read_block {VDP status regs} 0 16]"
 		"[debug read_block {VDP regs} 0 64]"
-		"[debug read_block {VRAM pointer} 0 2]%1%2%3")
+		"[debug read_block {VRAM pointer} 0 2]%1%2%3%4")
 		.arg(registerLatchAvailable ? "[debug read_block {VDP register latch status} 0 1]" : "")
 		.arg(paletteLatchAvailable ? "[debug read_block {VDP palette latch status} 0 1]" : "")
-		.arg(dataLatchAvailable ? "[debug read_block {VDP data latch value} 0 1]" : "");
+		.arg(dataLatchAvailable ? "[debug read_block {VDP data latch value} 0 1]" : "")
+		.arg(vramAccessStatusAvailable ? "[debug read_block {VRAM access status} 0 1]" : "");
 
-	int total = MAX_TOTAL_SIZE - MAX_VRAM_SIZE + vramSize - !registerLatchAvailable - !paletteLatchAvailable - !dataLatchAvailable;
+	int total = MAX_TOTAL_SIZE - MAX_VRAM_SIZE + vramSize - !registerLatchAvailable
+		- !paletteLatchAvailable - !dataLatchAvailable - !vramAccessStatusAvailable;
 	new SimpleHexRequest(req, total, &vram[0], *this);
 }
 

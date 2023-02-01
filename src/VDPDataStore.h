@@ -25,6 +25,7 @@ public:
 	bool getRegisterLatchAvailable() const { return registerLatchAvailable; }
 	bool getPaletteLatchAvailable() const { return paletteLatchAvailable; }
 	bool getDataLatchAvailable() const { return dataLatchAvailable; }
+	bool getVramAccessStatusAvailable() const { return vramAccessStatusAvailable; }
 
 	void refresh();
 
@@ -58,6 +59,7 @@ private:
 	bool registerLatchAvailable = false;
 	bool paletteLatchAvailable = false;
 	bool dataLatchAvailable = false;
+	bool vramAccessStatusAvailable = false;
 
 	friend class VDPDataStoreVersionCheck;
 	friend class VDPDataStoreDebuggableChecks;
