@@ -37,7 +37,7 @@ def _extractRevisionFromStdout(log, command, regex):
 
 def extractGitRevision(log):
 	return _extractRevisionFromStdout(
-		log, 'git describe --dirty', r'\S+?-(\S+)$'
+		log, 'git describe --always --dirty', r'\S+?-(\S+)$'
 		)
 
 def extractNumberFromGitRevision(revisionStr):
@@ -56,14 +56,14 @@ def extractRevision():
 		return None
 	if not isdir('derived'):
 		makedirs('derived')
-	log = open('derived/version.log', 'w')
-	print('Extracting revision info...', file = log)
-	try:
+	with open('derived/version.log', 'w', encoding='utf-8') as log:
+		print('Extracting version info...', file=log)
+		print('Package version: %s' % packageVersion, file=log)
+		print('Extracting revision info...', file=log)
 		revision = extractGitRevision(log)
-		print('Revision string: %s' % revision, file = log)
-		print('Revision number: %s' % extractNumberFromGitRevision(revision), file = log)
-	finally:
-		log.close()
+		print('Revision string: %s' % revision, file=log)
+		revisionNumber = extractNumberFromGitRevision(revision)
+		print('Revision number: %s' % revisionNumber, file=log)
 	_cachedRevision = revision
 	return revision
 
@@ -72,6 +72,12 @@ def extractRevisionNumber():
 
 def extractRevisionString():
 	return extractRevision() or 'unknown'
+
+def getDetailedVersion():
+	if releaseFlag:
+		return packageVersion
+	else:
+		return '%s-%s' % (packageVersion, extractRevisionString())
 
 def getVersionedPackageName():
 	if releaseFlag:

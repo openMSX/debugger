@@ -43,6 +43,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 			this, &PreferencesDialog::fontSelectCustom);
 	connect(btnFontColor,  &QPushButton::clicked,
 			this, &PreferencesDialog::fontSelectColor);
+
+	initConfig();
 	initFontList();
 	listFonts->setCurrentRow(0);
 
@@ -70,6 +72,22 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 	updating=false;
 }
 
+/*
+ * Config settings
+ */
+void PreferencesDialog::initConfig()
+{
+	Settings& s = Settings::get();
+	int status1 = s.autoReloadSymbols() ? Qt::Checked : Qt::Unchecked;
+	cbAutoReloadSymbols->setChecked(status1);
+	connect(cbAutoReloadSymbols, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::autoReloadSymbols);
+
+	int status2 = s.preserveLostSymbols() ? Qt::Checked : Qt::Unchecked;
+	cbPreserveLostSymbols->setChecked(status2);
+	connect(cbPreserveLostSymbols, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::preserveLostSymbols);
+}
 /*
  * Font settings
  */
@@ -168,6 +186,16 @@ void PreferencesDialog::layoutTypeChanged(bool state)
 		s.setValue("creatingWorkspaceFile", leFileName->text());
 	}
 	s.setValue("creatingWorkspaceType", wst);
+}
+
+void PreferencesDialog::autoReloadSymbols(int state)
+{
+	Settings::get().setAutoReloadSymbols(state == Qt::Checked);
+}
+
+void PreferencesDialog::preserveLostSymbols(int state)
+{
+	Settings::get().setPreserveLostSymbols(state == Qt::Checked);
 }
 
 void PreferencesDialog::setFontPreviewColor(const QColor& c)

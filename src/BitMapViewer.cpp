@@ -6,14 +6,15 @@
 
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
-	, screenMod(0) // avoid UMR
+	, pageSize(0) // avoid UMR
+	, screenMod(0)
 {
 	setupUi(this);
-	//no connect slot byname anymore
-	connect(screenMode, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
-	connect(showPage, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_showPage_currentIndexChanged);
-	connect(linesVisible, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
-	connect(bgColor,  qOverload<int>(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
+    //no connect slot byname anymore
+    connect(screenMode, qOverload<int>(&QComboBox::currentIndexChanged), this, &BitMapViewer::on_screenMode_currentIndexChanged);
+    connect(currentPage, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_currentPage_currentIndexChanged);
+    connect(linesVisible, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
+    connect(bgColor,  qOverload<int>(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
 
 	connect(useVDPRegisters, &QCheckBox::stateChanged,this, &BitMapViewer::on_useVDPRegisters_stateChanged);
 
@@ -59,6 +60,12 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 	// and now go fetch the initial data
 	VDPDataStore::instance().refresh();
+}
+
+void BitMapViewer::updateDisplayAsFrame()
+{
+	screenMod = screenMode->itemText(screenMode->currentIndex()).toInt();
+	pageSize = screenMod >= 7 ? 65536 : 32768;
 }
 
 void BitMapViewer::decodeVDPregs()
@@ -125,7 +132,11 @@ void BitMapViewer::decodeVDPregs()
 	int v3 = ((regs[0] & 0x0E) << 1) | ((regs[1] & 0x18) >> 3) | ((regs[25] & 0x18) << 2);
 	printf("screenMod according to the bits: %i\n", v3);
 	modeLabel->setText(QString("%1").arg(bits_modetxt[v3], 0, 10));
-	if (useVDP) screenMode->setCurrentIndex(bits_mode[v3]);
+
+	if (useVDP) {
+		screenMode->setCurrentIndex(bits_mode[v3]);
+		updateDisplayAsFrame();
+	}
 
 	// Get the current visible page
 	unsigned p = (regs[2] >> 5) & 3;
@@ -139,9 +150,8 @@ void BitMapViewer::decodeVDPregs()
 	setPages();
 
 	addressLabel->setText(hexValue(p * q, 5));
-	if (useVDP) showPage->setCurrentIndex(p);
+	if (useVDP) currentPage->setCurrentIndex(p);
 }
-
 
 void BitMapViewer::refresh()
 {
@@ -149,12 +159,13 @@ void BitMapViewer::refresh()
 	VDPDataStore::instance().refresh();
 }
 
-void BitMapViewer::on_screenMode_currentIndexChanged(int index)
+void BitMapViewer::on_screenMode_currentIndexChanged(int /*index*/)
 {
-    screenMod = screenMode->itemText(index).toInt();
-	printf("\nnew screenMod: %i\n", screenMod);
-	//change then number of visibe pages when this changes
+	updateDisplayAsFrame();
+
+	// change the number of visible pages when this changes
 	imageWidget->setVramAddress(0);
+
 	// make sure that we are decoding new mode from page 0, imagine viewing
 	// page 3 of screen5 and then switching to screen 8 without changing the
 	// starting vram address....
@@ -164,27 +175,32 @@ void BitMapViewer::on_screenMode_currentIndexChanged(int index)
 
 void BitMapViewer::setPages()
 {
-	showPage->clear();
-	showPage->insertItem(0, "0");
-	showPage->insertItem(1, "1");
-	if (screenMod < 7 && VDPDataStore::instance().getVRAMSize() > 0x10000) {
-		showPage->insertItem(2, "2");
-		showPage->insertItem(3, "3");
+	if (pageSize == 0) return;
+	static const QStringList pageNames = {"0", "1", "2", "3", "E0", "E1"};
+	int oldIndex = currentPage->currentIndex();
+
+	currentPage->clear();
+	int pageCount = VDPDataStore::instance().getVRAMSize() / pageSize;
+	int pages = std::min(pageCount, pageNames.count());
+
+	for (int p = 0; p < pages; ++p) {
+		currentPage->insertItem(p, pageNames[p]);
+	}
+
+	if (!useVDP && oldIndex < currentPage->count()) {
+		currentPage->setCurrentIndex(oldIndex);
 	}
 }
 
-void BitMapViewer::on_showPage_currentIndexChanged(int index)
+void BitMapViewer::on_currentPage_currentIndexChanged(int index)
 {
-	//if this is the consequence of a .clear() in the
+	// if this is the consequence of a .clear() in the
 	// on_screenMode_currentIndexChanged we do nothing!
 	if (index == -1) return;
 
-	static const int m1[4] = { 0x00000, 0x08000, 0x10000, 0x18000 };
-	printf("\nvoid BitMapViewer::on_showPage_currentIndexChanged(int %i);\n", index);
-	if (screenMod >= 7) index *= 2;
-	int vramAddress = m1[index];
-	printf("vramAddress %i\n", vramAddress);
+	int vramAddress = pageSize * index;
 	imageWidget->setVramAddress(vramAddress);
+	addressLabel->setText(hexValue(vramAddress, 5));
 }
 
 void BitMapViewer::on_linesVisible_currentIndexChanged(int index)
@@ -192,6 +208,7 @@ void BitMapViewer::on_linesVisible_currentIndexChanged(int index)
 	static const int m[3] = { 192, 212, 256 };
 	int lines = m[index];
 	imageWidget->setLines(lines);
+	linesLabel->setText(QString("%1").arg(m[index]));
 }
 
 void BitMapViewer::on_bgColor_valueChanged(int value)
@@ -205,7 +222,7 @@ void BitMapViewer::on_useVDPRegisters_stateChanged(int state)
 
 	screenMode->setEnabled(!state);
 	linesVisible->setEnabled(!state);
-	showPage->setEnabled(!state);
+	currentPage->setEnabled(!state);
 	bgColor->setEnabled(!state);
 	decodeVDPregs();
 	imageWidget->refresh();
@@ -224,7 +241,6 @@ void BitMapViewer::on_saveImageButton_clicked(bool /*checked*/)
 		"Sorry, the save image dialog is not yet implemented");
 }
 
-
 void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
 	if (state) {
@@ -234,6 +250,7 @@ void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 	}
 	imageWidget->refresh();
 }
+
 /*
 void BitMapViewer::on_refreshButton_clicked(bool checked)
 {

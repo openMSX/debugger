@@ -73,9 +73,6 @@ TileViewer::TileViewer(QWidget* parent)
             this, &TileViewer::imageMouseOver);
     connect(imageWidget, &VramTiledView::imageClicked,
             this, &TileViewer::displayCharInfo);
-
-	// and now go fetch the initial data
-	VDPDataStore::instance().refresh();
 }
 
 void TileViewer::VDPDataStoreDataRefreshed()

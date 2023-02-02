@@ -2,8 +2,10 @@
 #define DEBUGGERFORM_H
 
 #include "DebugSession.h"
+#include "SymbolManager.h"
 #include <QMainWindow>
 #include <QMap>
+#include <QPointer>
 #include <cstdint>
 #include <memory>
 
@@ -226,6 +228,7 @@ signals:
 	void connected();
 	void settingsChanged();
 	void symbolsChanged();
+	void symbolFilesChanged();
 	void runStateEntered();
 	void breakStateEntered();
 	void breakpointsUpdated();

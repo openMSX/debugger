@@ -1,0 +1,38 @@
+name: Build workflow
+
+on:
+  workflow_call:
+
+env:
+  package_origin: gh
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    name: Mac OS builder
+    steps:
+    - name: Configure base system
+      run: |
+        git config --global init.defaultBranch master
+    - name: Checkout repository code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Compile repository code
+      id: compile
+      shell: bash
+      run: |
+        brew install qt@5
+        make
+        mkdir derived/root
+        mv derived/openMSX_Debugger.app "derived/root/openMSX Debugger.app"
+        cd derived/root
+        tar cvfj ../../openmsx-debugger-macos-${{ env.package_origin }}.tbz "openMSX Debugger.app"
+    - name: Upload redistributable package for Mac OS
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos
+        path: |
+          openmsx-debugger-macos-${{ env.package_origin }}.tbz
+        if-no-files-found: error
+        retention-days: 3

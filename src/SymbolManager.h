@@ -12,6 +12,8 @@ class SymbolManager : public QDialog, private Ui::SymbolManager
 public:
 	SymbolManager(SymbolTable& symtable, QWidget* parent = nullptr);
 
+	void refresh();
+
 signals:
 	void symbolTableChanged();
 
@@ -19,6 +21,7 @@ private:
 	void closeEvent(QCloseEvent* e) override;
 
 	void initFileList();
+	void createComboBox(int row);
 	void initSymbolList();
 
 	void closeEditor();
@@ -38,6 +41,7 @@ private:
 	void addFile();
 	void removeFile();
 	void reloadFiles();
+	void addSymbolFileDestination(int fileIndex, int validSlot);
 	void addLabel();
 	void removeLabel();
 	void labelEdit(QTreeWidgetItem* item, int column);
@@ -80,6 +84,7 @@ private:
 	void changeRegisterIYH(int state);
 	void changeRegisterOffset(int state);
 	void changeRegisterI(int state);
+	void wipeSelectedItem();
 
 private:
 	SymbolTable& symTable;

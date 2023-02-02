@@ -1,10 +1,20 @@
 #include "Settings.h"
 #include <QApplication>
+#include <QDebug>
+
+static const char* DebuggerConfigNames[Settings::CONFIG_END] = {
+	"AutoReloadSymbols", "PreserveLostSymbols"
+};
 
 static const char* DebuggerFontNames[Settings::FONT_END] = {
 	"Application Font", "Default Fixed Font", "Code Font",
 	"Label Font", "Hex viewer font"
 };
+
+static QString configLocation(Settings::DebuggerConfig c)
+{
+	return QString("Config/").append(DebuggerConfigNames[c]);
+}
 
 static QString fontLocation(Settings::DebuggerFont f)
 {
@@ -19,6 +29,7 @@ static QString fontColorLocation(Settings::DebuggerFont f)
 Settings::Settings()
 	: QSettings("openMSX", "debugger")
 {
+	getConfigFromSettings();
 	getFontsFromSettings();
 }
 
@@ -26,6 +37,30 @@ Settings& Settings::get()
 {
 	static Settings instance;
 	return instance;
+}
+
+void Settings::getBoolFromSetting(DebuggerConfig c, bool defaultValue)
+{
+	QVariant v = value(configLocation(c));
+
+	if (v.canConvert<bool>()) {
+		config[c] = v;
+	} else {
+		// default value
+		config[c] = defaultValue;
+	}
+}
+
+void Settings::getConfigFromSettings()
+{
+	getBoolFromSetting(AUTO_RELOAD_SYMBOLS, false);
+	getBoolFromSetting(PRESERVE_LOST_SYMBOLS, true);
+}
+
+void Settings::setConfig(DebuggerConfig c, const QVariant& v)
+{
+	config[c] = v;
+	setValue(configLocation(c), config[c]);
 }
 
 void Settings::getFontsFromSettings()
@@ -134,6 +169,26 @@ void Settings::setFontColor(DebuggerFont f, const QColor& c)
 		fontColors[f] = c;
 		setValue(fontColorLocation(f), c);
 	}
+}
+
+bool Settings::autoReloadSymbols() const
+{
+	return config[AUTO_RELOAD_SYMBOLS].value<bool>();
+}
+
+void Settings::setAutoReloadSymbols(bool b)
+{
+	setConfig(AUTO_RELOAD_SYMBOLS, b);
+}
+
+bool Settings::preserveLostSymbols() const
+{
+	return config[PRESERVE_LOST_SYMBOLS].value<bool>();
+}
+
+void Settings::setPreserveLostSymbols(bool b)
+{
+	setConfig(PRESERVE_LOST_SYMBOLS, b);
 }
 
 void Settings::updateFonts()

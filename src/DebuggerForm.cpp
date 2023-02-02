@@ -1216,7 +1216,12 @@ void DebuggerForm::systemSymbolManager()
 	SymbolManager symManager(session->symbolTable(), this);
 	connect(&symManager, &SymbolManager::symbolTableChanged,
 	        session, &DebugSession::sessionModified);
+	//connect(&symManager, &SymbolManager::symbolTableChanged,
+	//        bpView, &BreakpointViewer::onSymbolTableChanged);
+	connect(this, &DebuggerForm::symbolFilesChanged,
+	        &symManager, &SymbolManager::refresh);
     symManager.exec();
+
 	emit symbolsChanged();
 	updateWindowTitle();
 }
@@ -1363,14 +1368,17 @@ void DebuggerForm::symbolFileChanged()
 {
 	static bool shown(false);
 	if (shown) return;
-	shown = true;
-	int choice = QMessageBox::question(this, tr("Symbol file changed"),
-	                tr("One or more symbol file have changed.\n"
-	                   "Reload now?"),
-	                QMessageBox::Yes | QMessageBox::No);
-	shown = false;
-	if (choice == QMessageBox::Yes)
-        session->symbolTable().reloadFiles();
+	if (!Settings::get().autoReloadSymbols()) {
+		shown = true;
+		int choice = QMessageBox::question(this, tr("Symbol file changed"),
+						tr("One or more symbol file have changed.\n"
+						"Reload now?"),
+						QMessageBox::Yes | QMessageBox::No);
+		shown = false;
+		if (choice == QMessageBox::No) return;
+	}
+	session->symbolTable().reloadFiles();
+	emit symbolFilesChanged();
 }
 
 DebuggerForm::AddressSlotResult DebuggerForm::addressSlot(int addr) const

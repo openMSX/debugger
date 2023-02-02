@@ -119,6 +119,10 @@ BINARY_FULL:=$(BINARY_PATH)/$(BINARY_FILE)
 VERSION_SCRIPT:=build/version2code.py
 VERSION_HEADER:=$(BUILD_PATH)/config/Version.ii
 GENERATED_HEADERS:=$(VERSION_HEADER)
+VERSION_LOG:=$(BUILD_BASE)/version.log
+PACKAGE_DETAILED_VERSION:=$(shell PYTHONPATH=build $(PYTHON) -c \
+    "import version; print(version.getDetailedVersion())" \
+    )
 
 
 # Filesets

@@ -57,6 +57,11 @@
          </column>
          <column>
           <property name="text" >
+           <string>Destination slot</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
            <string>Last refresh</string>
           </property>
          </column>
@@ -224,7 +229,7 @@
              </property>
              <layout class="QHBoxLayout" >
               <item>
-               <layout class="QVBoxLayout" >
+               <layout class="QVBoxLayout" name="vbox0" >
                 <item>
                  <widget class="QCheckBox" name="chk00" >
                   <property name="text" >
@@ -256,7 +261,7 @@
                </layout>
               </item>
               <item>
-               <layout class="QVBoxLayout" >
+               <layout class="QVBoxLayout" name="vbox1" >
                 <item>
                  <widget class="QCheckBox" name="chk10" >
                   <property name="text" >
@@ -288,7 +293,7 @@
                </layout>
               </item>
               <item>
-               <layout class="QVBoxLayout" >
+               <layout class="QVBoxLayout" name="vbox2" >
                 <item>
                  <widget class="QCheckBox" name="chk20" >
                   <property name="text" >
@@ -320,7 +325,7 @@
                </layout>
               </item>
               <item>
-               <layout class="QVBoxLayout" >
+               <layout class="QVBoxLayout" name="vbox3" >
                 <item>
                  <widget class="QCheckBox" name="chk30" >
                   <property name="text" >
@@ -391,7 +396,7 @@
              <property name="title" >
               <string>Symbol type</string>
              </property>
-             <layout class="QVBoxLayout" >
+             <layout class="QVBoxLayout" name="vboxSymbolType" >
               <item>
                <widget class="QRadioButton" name="radJump" >
                 <property name="text" >
@@ -423,7 +428,7 @@
              </property>
              <layout class="QHBoxLayout" >
               <item>
-               <layout class="QGridLayout" >
+               <layout class="QGridLayout" name="gridRegs8" >
                 <property name="horizontalSpacing" >
                  <number>16</number>
                 </property>
@@ -530,7 +535,7 @@
              </property>
              <layout class="QHBoxLayout" >
               <item>
-               <layout class="QGridLayout" >
+               <layout class="QGridLayout" name="gridRegs16" >
                 <item row="0" column="0" >
                  <widget class="QCheckBox" name="chkRegBC" >
                   <property name="text" >

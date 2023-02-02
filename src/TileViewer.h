@@ -51,7 +51,6 @@ private:
     int mouseOverX = 0;
     int mouseOverY = 0;
     int mouseOverChar = 0;
-
 };
 
 #endif // TILEVIEWER_H

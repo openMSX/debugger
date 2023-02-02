@@ -1,0 +1,75 @@
+name: Build workflow
+
+on:
+  workflow_call:
+
+env:
+  package_origin: gh
+
+jobs:
+  build-windows:
+    runs-on: ubuntu-latest
+    name: Windows builder
+    container:
+      image: docker://pvmm/mingw-arch:latest
+      options: --user=0:0
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Configure base system
+      run: |
+        git config --global init.defaultBranch master
+    - name: Checkout repository code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Compile repository code
+      id: compile
+      shell: bash
+      run: |
+        # Setting QT_INSTALL_BINS differently won't work since it's overwritten.
+        # export QT_INSTALL_BINS=/usr/x86_64-w64-mingw32/lib/qt/bin/
+        export OPENMSX_TARGET_OS=mingw32
+        export CXX=/usr/bin/x86_64-w64-mingw32-g++
+        export WINDRES=/usr/bin/x86_64-w64-mingw32-windres
+        ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/uic /usr/x86_64-w64-mingw32/bin/uic
+        ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/moc /usr/x86_64-w64-mingw32/bin/moc
+        ln -sf /usr/x86_64-w64-mingw32/lib/qt/bin/rcc /usr/x86_64-w64-mingw32/bin/rcc
+        QMAKE=/usr/x86_64-w64-mingw32/lib/qt/bin/qmake make
+    - name: Prepare redistributable directory
+      run: |
+        cd derived/bin
+        /usr/bin/x86_64-w64-mingw32-strip openmsx-debugger.exe
+        find /usr/x86_64-w64-mingw32 -name 'libbrotlicommon.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libbrotlidec.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libbz2-1.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libfreetype-6.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libgcc_s_seh-1.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libglib-2.0-0.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libgraphite2.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libharfbuzz-0.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libiconv-2.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libintl-8.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libpcre-1.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libpcre2-16-0.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libpng16-16.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libssp-0.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libstdc++-6.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'libwinpthread-1.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'Qt5Core.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'Qt5Gui.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'Qt5Network.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'Qt5Widgets.dll' -exec cp {} . \;
+        find /usr/x86_64-w64-mingw32 -name 'zlib1.dll' -exec cp {} . \;
+        mkdir platforms
+        cp -rp /usr/x86_64-w64-mingw32/lib/qt/plugins/platforms/qwindows.dll platforms/
+        tar cvf ../../openmsx-debugger-mingw32-${{ env.package_origin }}.zip .
+    - name: Upload redistributable package for Windows
+      uses: actions/upload-artifact@v3
+      with:
+        name: mingw32
+        path: |
+          openmsx-debugger-mingw32-${{ env.package_origin }}.zip
+        if-no-files-found: error
+        retention-days: 3
+
