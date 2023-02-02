@@ -27,8 +27,8 @@ private:
 
 private:
 	int frameL, frameR, frameT, frameB;
-	unsigned char flags;
-	unsigned char flagsChanged;
+	uint8_t flags;
+	uint8_t flagsChanged;
 };
 
 #endif // FLAGSVIEWER_H

@@ -28,7 +28,6 @@ private:
     void on_cb_color0_stateChanged(int state);
     void on_useVDPRegisters_stateChanged(int state);
 
-    void on_editPaletteButton_clicked(bool checked);
     void on_useVDPPalette_stateChanged(int state);
     void on_zoomLevel_valueChanged(double d);
 

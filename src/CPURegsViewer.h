@@ -12,10 +12,12 @@ class CPURegsViewer : public QFrame
 public:
 	CPURegsViewer(QWidget* parent = nullptr);
 
-	void setData(unsigned char* datPtr);
 	int readRegister(int id);
-
 	QSize sizeHint() const override;
+
+public slots:
+    void setData(uint8_t* datPtr);
+    void setRegister(int id, int value);
 
 private:
 	void resizeEvent(QResizeEvent* e) override;
@@ -39,8 +41,7 @@ private:
 	int cursorLoc;
 
 	void drawValue(QPainter& p, int id, int x, int y);
-	void setRegister(int id, int value);
-	void getRegister(int id, unsigned char* data);
+	void getRegister(int id, uint8_t* data);
 	void applyModifications();
 	void cancelModifications();
 

@@ -10,8 +10,12 @@ class QXmlStreamReader;
 class DebugSession : public QObject
 {
 	Q_OBJECT
+
 public:
-	DebugSession();
+	DebugSession(const DebugSession&) = delete;
+	DebugSession& operator=(const DebugSession&) = delete;
+
+	static DebugSession* getDebugSession();
 
 	// session
 	void clear();
@@ -28,6 +32,7 @@ public:
 	void sessionModified();
 
 private:
+	DebugSession();
 	void skipUnknownElement(QXmlStreamReader& ses);
 
 private:
@@ -35,6 +40,8 @@ private:
 	SymbolTable symTable;
 	QString fileName;
 	bool modified;
+
+	static DebugSession* theDebugSession;
 };
 
 #endif // DEBUGSESSION_H

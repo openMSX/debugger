@@ -11,7 +11,7 @@ class StackRequest : public ReadDebugBlockCommand
 {
 public:
 	StackRequest(unsigned offset_, unsigned size,
-	           unsigned char* target, StackViewer& viewer_)
+	           uint8_t* target, StackViewer& viewer_)
 		: ReadDebugBlockCommand("memory", offset_, size, target)
 		, offset(offset_)
 		, viewer(viewer_)
@@ -41,10 +41,12 @@ StackViewer::StackViewer(QWidget* parent)
 	: QFrame(parent)
 	, wheelRemainder(0)
 {
+	static int count = 0;
+	setObjectName(QString("StackViewer_%1").arg(count++));
 	setFrameStyle(WinPanel | Sunken);
 	setFocusPolicy(Qt::StrongFocus);
 	setBackgroundRole(QPalette::Base);
-	setSizePolicy(QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred));
+	setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred));
 
 	setFont(Settings::get().font(Settings::HEX_FONT));
 
@@ -58,7 +60,7 @@ StackViewer::StackViewer(QWidget* parent)
 	frameL = frameT = frameB = frameWidth();
 	frameR = frameL + vertScrollBar->sizeHint().width();
 
-	setMinimumHeight(frameT+frameB+fontMetrics().height());
+	setMinimumHeight(frameT + frameB + fontMetrics().height());
 
 	connect(vertScrollBar, &QScrollBar::valueChanged,
 	        this, &StackViewer::setLocation);
@@ -66,7 +68,7 @@ StackViewer::StackViewer(QWidget* parent)
 
 QSize StackViewer::sizeHint() const
 {
-	return {frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF ") + 4 + frameR,
+    return {frameL + 4 + fontMetrics().horizontalAdvance("FFFFWFFFF   ") + 4 + frameR,
 	        frameT + 8 * fontMetrics().height() + frameB};
 }
 
@@ -117,7 +119,7 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	int d = fontMetrics().descent();
 
 	// set font
-	p.setPen(Qt::black);
+	//p.setPen(palette().color(QPalette::Text));
 
 	// calc and set drawing bounds
 	QRect r(e->rect());
@@ -132,16 +134,24 @@ void StackViewer::paintEvent(QPaintEvent* e)
 
 	// calc layout (not optimal)
 	int xAddr = frameL + 8;
-	int xStack = xAddr + fontMetrics().horizontalAdvance("FFFFF");
+	int xStack = xAddr + fontMetrics().horizontalAdvance("FFFFFF");
 	int y = frameT + h - 1;
 	int address = topAddress;
 
 	for (int i = 0; i < int(ceil(visibleLines)); ++i) {
+		// draw background
+		if (address == stackPointer){
+			//p.fillRect(frameL, y-h, width() - frameL- frameR, h,
+			//           palette().color(QPalette::Highlight));
+			p.setPen(palette().color(QPalette::LinkVisited));
+		} else {
+			p.setPen(palette().color(QPalette::Text));
+		}
 		// print address
-		QString hexStr;
-		hexStr = QString("%1").arg(address, 4, 16, QChar('0')).toUpper();
+		QString hexStr = QString("%1").arg(isEnabled()?address:0, 4, 16, QChar('0')).toUpper();
 		p.drawText(xAddr,  y - d, hexStr);
-		hexStr = QString("%1").arg(memory[address + 1] << 8 | memory[address], 4, 16, QChar('0')).toUpper();
+		int val = isEnabled() ? (memory[address + 1] << 8 | memory[address]) : 0;
+		hexStr = QString("%1").arg(val, 4, 16, QChar('0')).toUpper();
 		p.drawText(xStack, y - d, hexStr);
 		y += h;
 		address += 2;
@@ -149,7 +159,7 @@ void StackViewer::paintEvent(QPaintEvent* e)
 	}
 }
 
-void StackViewer::setData(unsigned char* memPtr, int memLength)
+void StackViewer::setData(uint8_t* memPtr, int memLength)
 {
 	memory = memPtr;
 	memoryLength = memLength;
@@ -158,6 +168,7 @@ void StackViewer::setData(unsigned char* memPtr, int memLength)
 
 void StackViewer::setLocation(int addr)
 {
+	qDebug() << "StackViewer::setLocation(int " << addr << ")     wdgt->objectName() " << objectName();
 	if (waitingForData) {
 		return; // ignore
 	}
@@ -167,21 +178,28 @@ void StackViewer::setLocation(int addr)
 	if (start + size >= memoryLength) {
 		size = memoryLength - start;
 	}
-	auto* req = new StackRequest(start, size, &memory[start], *this);
-	CommClient::instance().sendCommand(req);
-	waitingForData = true;
+	qDebug() << "StackViewer::setLocation isEnabled() " << isEnabled();
+	if (isEnabled()) { //only request data when enabled
+		auto* req = new StackRequest(start, size, &memory[start], *this);
+		CommClient::instance().sendCommand(req);
+		waitingForData = true;
+	}
 }
 
 void StackViewer::setStackPointer(quint16 addr)
 {
+	qDebug() << "StackViewer::setStackPointer(quint16 " << addr << ")     wdgt->objectName() " << objectName();
 	stackPointer = addr;
 	setScrollBarValues();
 	vertScrollBar->setValue(addr);
+	qDebug() << "StackViewer::setStackPointer is now calling ";
 	setLocation(addr);
 }
 
 void StackViewer::memDataTransferred(StackRequest* r)
 {
+	qDebug() << "StackViewer::memdataTransfered()     wdgt->objectName() " << objectName();
+
 	topAddress = r->offset;
 	update();
 

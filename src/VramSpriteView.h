@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <optional>
 
+#include "MSXPalette.h"
+
 class VramSpriteView : public QWidget
 {
     Q_OBJECT
@@ -27,7 +29,7 @@ public:
     [[nodiscard]] QSize sizeHint() const override;
 
     void setVramSource(const uint8_t* adr);
-    void setPaletteSource(const uint8_t* adr, bool useVDP);
+    void setPaletteSource(MSXPalette *pal, bool useVDP);
 
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent (QMouseEvent* e) override;
@@ -71,13 +73,11 @@ private:
     void paintEvent(QPaintEvent* e) override;
 
     void decode();
-    void decodePalette();
     void decodePgt();
     void decodeSpat();
     void decodeCol();
 
     void setSpritePixel(int x, int y, QRgb c);
-    QRgb getColor(int c);
 
     void drawMonochromeSpriteAt(int character, int spriteBox, int xOffset, int yOffset, QRgb fg, QRgb bg, bool ec = false);
     void drawLineColoredSpriteAt(int character, int spriteBox, int xOffset, int yOffset, int rowOffset, QRgb bg);
@@ -94,10 +94,9 @@ private:
     [[nodiscard]] QString colorInfo(uint8_t color) const;
 
 private:
-    QRgb msxPalette[16];
+    MSXPalette* msxPalette;
     QImage image;
     QPixmap pixImage;
-    const uint8_t* palette = nullptr;
     const uint8_t* vramBase = nullptr;
     int patternTableAddress = 0;
     int attributeTableAddress = 0;

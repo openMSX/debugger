@@ -6,6 +6,7 @@
 FlagsViewer::FlagsViewer(QWidget* parent)
 	: QFrame(parent)
 {
+    setObjectName("FlagsViewer");
 	flags = flagsChanged = 0; // avoid UMR
 
 	setFrameStyle(WinPanel | Sunken);

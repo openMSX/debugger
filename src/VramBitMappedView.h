@@ -8,6 +8,8 @@
 #include <QColor>
 #include <cstdint>
 
+class MSXPalette;
+
 class VramBitMappedView : public QWidget
 {
 	Q_OBJECT
@@ -20,7 +22,7 @@ public:
 	void setLines(int nrLines);
 	void setVramSource(const uint8_t* adr);
 	void setVramAddress(int adr);
-	void setPaletteSource(const uint8_t* adr);
+    void setPaletteSource(MSXPalette* adr);
 	void setBorderColor(int value);
 
 	void mousePressEvent(QMouseEvent* e) override;
@@ -39,7 +41,6 @@ private:
 	void paintEvent(QPaintEvent* e) override;
 
 	void decode();
-	void decodePallet();
 	void decodeSCR5();
 	void decodeSCR6();
 	void decodeSCR7();
@@ -51,10 +52,9 @@ private:
 	QRgb getColor(int c);
 
 private:
-	QRgb msxPalette[16];
 	QImage image;
 	QPixmap pixImage;
-	const uint8_t* palette = nullptr;
+    MSXPalette* palette = nullptr;
 	const uint8_t* vramBase = nullptr;
 	float zoomFactor;
 	unsigned vramAddress = 0;

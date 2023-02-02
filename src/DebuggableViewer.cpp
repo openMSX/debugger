@@ -2,10 +2,12 @@
 #include "HexViewer.h"
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <QJsonObject>
 
 DebuggableViewer::DebuggableViewer(QWidget* parent)
 	: QWidget(parent)
 {
+    setObjectName("DebuggableViewer");
 	// create selection list and viewer
 	debuggableList = new QComboBox();
 	debuggableList->setEditable(false);
@@ -24,6 +26,21 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	        this, &DebuggableViewer::locationChanged);
 }
 
+QJsonObject DebuggableViewer::save2json()
+{
+	QJsonObject obj;
+	obj["debuggable"] = debuggableList->currentText();
+	return obj;
+}
+
+bool DebuggableViewer::loadFromJson(const QJsonObject& obj)
+{
+	auto d = obj["debuggable"];
+	if (d == QJsonValue::Undefined) return false;
+	debuggableList->setCurrentText(d.toString());
+	return true;
+}
+
 void DebuggableViewer::settingsChanged()
 {
 	hexView->settingsChanged();
@@ -39,8 +56,9 @@ void DebuggableViewer::debuggableSelected(int index)
 	QString name = debuggableList->itemText(index);
 	int size = debuggableList->itemData(index).toInt();
 
-	if (index >= 0)
+	if (index >= 0) {
 		lastSelected = name;
+	}
 	// add braces when the name contains a space
 	if (name.contains(QChar(' '))) {
 		name.append(QChar('}'));
@@ -83,4 +101,9 @@ void DebuggableViewer::setDebuggables(const QMap<QString, int>& list)
 		debuggableList->setCurrentIndex(select);
 		hexView->setLocation(lastLocation);
 	}
+    if (!list.empty() && select == -1) {
+        hexView->setLocation(0);
+        debuggableList->setCurrentIndex(0);
+    }
+
 }

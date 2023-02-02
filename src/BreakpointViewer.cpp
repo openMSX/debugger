@@ -458,16 +458,16 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 
 void BreakpointViewer::disableSorting(BreakpointRef::Type type)
 {
-	auto unsort = [](auto* table) {
+	auto unSort = [](auto* table) {
 		table->sortByColumn(-1, Qt::AscendingOrder);
 	};
 
 	if (type == BreakpointRef::ALL) {
 		for (auto* table : tables) {
-			unsort(table);
+			unSort(table);
 		}
 	} else {
-		unsort(tables[type]);
+		unSort(tables[type]);
 	}
 }
 

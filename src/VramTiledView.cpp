@@ -1,5 +1,6 @@
 #include "VramTiledView.h"
 #include "VDPDataStore.h"
+#include "MSXPalette.h"
 #include "Convert.h"
 #include "ranges.h"
 #include <QPainter>
@@ -10,7 +11,8 @@ VramTiledView::VramTiledView(QWidget* parent)
 	: QWidget(parent)
 	, image(512, 512, QImage::Format_RGB32)
 {
-	ranges::fill(msxPalette, qRgb(80, 80, 80));
+    palette = nullptr;
+    setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
 	setZoom(1.0f);
 
 	// Mouse update events when mouse is moved over the image, Quibus likes this
@@ -80,21 +82,6 @@ void VramTiledView::decode()
 	update();
 }
 
-void VramTiledView::decodePalette()
-{
-	if (!palette) return;
-	//printf("VramTiledView::decodePallet  palletpointer %p \n", palette);
-
-	for (int i = 0; i < 16; ++i) {
-		int r = (palette[2 * i + 0] & 0xf0) >> 4;
-		int b = (palette[2 * i + 0] & 0x0f);
-		int g = (palette[2 * i + 1] & 0x0f);
-
-		auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-		msxPalette[i] = qRgb(scale(r), scale(g), scale(b));
-		//printf("VramTiledView::decodePallet  color %d => r %d  g %d  b %d \n", i, r, g, b);
-	}
-}
 
 void VramTiledView::decodePatternTable()
 {
@@ -211,12 +198,7 @@ void VramTiledView::setPixel2x2(int x, int y, QRgb c)
 QRgb VramTiledView::getColor(int c)
 {
 	// TODO do we need to look at the TP bit???
-	return msxPalette[c ? c : (tpBit ? 0 : borderColor)];
-}
-
-const uint8_t *VramTiledView::getPaletteSource() const
-{
-	return palette;
+    return palette->color(c ? c : (tpBit ? 0 : borderColor));
 }
 
 int VramTiledView::getScreenMode() const
@@ -434,8 +416,7 @@ void VramTiledView::paintEvent(QPaintEvent* /*event*/)
 
 void VramTiledView::refresh()
 {
-	decodePalette();
-	decode();
+    decode();
 }
 
 QString VramTiledView::byteAsPattern(uint8_t byte)
@@ -463,7 +444,7 @@ QString VramTiledView::textInfo(int x, int y, int character)
 	} else if (screenMode == 1) {
 		colordata = QString("- %1: %2").arg(
 			hexValue(colorTableAddress + (character >> 3), 4),
-			hexValue(vramBase[colorTableAddress+(character >> 3)], 2));
+			hexValue(vramBase[colorTableAddress + (character >> 3)], 2));
 	} else if (screenMode == 3) {
 		colordata = QString("- not used");
 	}
@@ -506,14 +487,16 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 	if (!vramBase) return {};
 
 	// I see negative y-coords sometimes, so for safety clip the coords
-	int x = std::clamp(int(float(e->x()) / zoomFactor),     0, 511);
-	int y = std::clamp(int(float(e->y()) / zoomFactor) / 2, 0, 255);
-	if (x >= horiStep * screenWidth) return {};
-	if (y >= 8 * screenHeight) return {};
+	int x = std::clamp(int(float(e->x()) / zoomFactor),     0, 511) / horiStep;
+	int y = std::clamp(int(float(e->y()) / zoomFactor) / 2, 0, 255) / 8;
+
+	if (x >= screenWidth) return {};
+	if (y >= screenHeight) return {};
 
 	x = int(x / horiStep);
 	y = int(y / 8);
 	int character = 0;
+
 	switch (tableToShow) {
 		case 0:
 			character = x + y * screenWidth;
@@ -529,7 +512,7 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 			}
 			break;
 	}
-	return MouseEventInfo{int(x / horiStep), int(y / 8), character};
+	return MouseEventInfo{x, y, character};
 }
 
 void VramTiledView::setBorderColor(int value)
@@ -568,9 +551,13 @@ void VramTiledView::setColorTableAddress(int adr)
 	decode();
 }
 
-void VramTiledView::setPaletteSource(const uint8_t* adr)
+void VramTiledView::setPaletteSource(MSXPalette *adr)
 {
 	if (palette == adr) return;
+    if (palette) {
+        disconnect(palette, &MSXPalette::paletteChanged, this, &VramTiledView::decode);
+    }
 	palette = adr;
+    connect(palette, &MSXPalette::paletteChanged, this, &VramTiledView::decode);
 	refresh();
 }

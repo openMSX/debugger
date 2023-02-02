@@ -4,11 +4,13 @@
 #include "CPURegsViewer.h"
 #include "SymbolTable.h"
 #include "Convert.h"
+#include "SignalDispatcher.h"
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <iostream>
+#include <QJsonObject>
 
 static const int linkRegisters[] = {
 	CpuRegs::REG_BC, CpuRegs::REG_DE, CpuRegs::REG_HL,
@@ -20,6 +22,7 @@ static const int linkRegisters[] = {
 MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	: QWidget(parent)
 {
+	setObjectName("MainMemoryViewer");
 	// create selection list, address edit line and viewer
 	addressSourceList = new QComboBox();
 	addressSourceList->setEditable(false);
@@ -52,7 +55,7 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 
 	isLinked = false;
 	linkedId = 0;
-	regsViewer = nullptr;
+//	regsViewer = nullptr;
 	symTable = nullptr;
 
 	connect(hexView, &HexViewer::locationChanged,
@@ -79,14 +82,36 @@ void MainMemoryViewer::setDebuggable(const QString& name, int size)
 	hexView->setDebuggable(name, size);
 }
 
-void MainMemoryViewer::setRegsView(CPURegsViewer* viewer)
+//void MainMemoryViewer::setRegsView(CPURegsViewer* viewer)
+//{
+//	regsViewer = viewer;
+//}
+
+void MainMemoryViewer::setSymbolTable(SymbolTable* newTable)
 {
-	regsViewer = viewer;
+	symTable = newTable;
 }
 
-void MainMemoryViewer::setSymbolTable(SymbolTable* symtable)
+QJsonObject MainMemoryViewer::save2json()
 {
-	symTable = symtable;
+	QJsonObject obj;
+	obj["addressValue"] = addressValue->text();
+	obj["addressSourceList"] = addressSourceList->currentIndex();
+	return obj;
+}
+
+bool MainMemoryViewer::loadFromJson(const QJsonObject& obj)
+{
+	auto asl = obj["addressSourceList"];
+	auto av  = obj["addressValue"];
+	if (asl == QJsonValue::Undefined || av  == QJsonValue::Undefined) {
+		return false;
+	}
+
+	addressSourceList->setCurrentIndex(asl.toInt());
+	addressValue->setText(av.toString());
+	hexView->setLocation(addressValue->text().toInt());
+	return true;
 }
 
 void MainMemoryViewer::refresh()
@@ -134,8 +159,9 @@ void MainMemoryViewer::addressSourceListChanged(int index)
 		linkedId = linkRegisters[index - 1];
 		addressValue->setReadOnly(true);
 		hexView->setIsInteractive(false);
-		if (regsViewer) {
-			setLocation(regsViewer->readRegister(linkedId));
-		}
+		//if (regsViewer) {
+		//	setLocation(regsViewer->readRegister(linkedId));
+		//}
+		setLocation(SignalDispatcher::instance().readRegister(linkedId));
 	}
 }

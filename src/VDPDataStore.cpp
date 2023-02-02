@@ -38,14 +38,40 @@ public:
 
 	void replyOk(const QString& message) override
 	{
-		//printf("dataStore.vramSize %i\n",dataStore.vramSize);
 		dataStore.vramSize = message.toInt();
-		//printf("dataStore.vramSize %i\n",dataStore.vramSize);
 		dataStore.refresh2();
 		delete this;
 	}
 	void replyNok(const QString& /*message*/) override
 	{
+		delete this;
+	}
+
+private:
+	VDPDataStore& dataStore;
+};
+
+
+class VDPDataStoreVDPVersionCheck : public SimpleCommand
+{
+public:
+	VDPDataStoreVDPVersionCheck(VDPDataStore& dataStore_)
+		: SimpleCommand("dict get [machine_info device VDP] version")
+		, dataStore(dataStore_)
+	{
+	}
+
+	void replyOk(const QString& message) override
+	{
+		if (!dataStore.machineVDPVersionString || message != QString::fromStdString(*dataStore.machineVDPVersionString)){
+			dataStore.machineVDPVersionString = message.toStdString();
+			emit dataStore.VDPVersionChanged(message);
+		};
+		delete this;
+	}
+	void replyNok(const QString& /*message*/) override
+	{
+		dataStore.machineVDPVersionString = "unknown";
 		delete this;
 	}
 
@@ -83,6 +109,7 @@ void VDPDataStore::refresh()
 
 void VDPDataStore::refresh1()
 {
+	CommClient::instance().sendCommand(new VDPDataStoreVDPVersionCheck(*this));
 	CommClient::instance().sendCommand(new VDPDataStoreVRAMSizeCheck(*this));
 }
 
@@ -100,6 +127,10 @@ void VDPDataStore::refresh2()
 
 void VDPDataStore::DataHexRequestReceived()
 {
+	//update MSXPalette that contains VDP palette
+	palettes[0].setPalette(&vram[vramSize]);
+	palettes[0].syncToMSX = true; //NO AUTOSYNC UNTIL WE GET THE PALETTE!
+
 	emit dataRefreshed();
 }
 
@@ -121,7 +152,17 @@ const uint8_t* VDPDataStore::getRegsPointer() const
 }
 const uint8_t* VDPDataStore::getVdpVramPointer() const
 {
-	return &vram[vramSize + 32 + 16 + 64];
+    return &vram[vramSize + 32 + 16 + 64];
+}
+
+MSXPalette* VDPDataStore::getPalette(int index)
+{
+    return &palettes[index];
+}
+
+std::optional<std::string> VDPDataStore::getVDPVersion() const
+{
+    return machineVDPVersionString;
 }
 
 size_t VDPDataStore::getVRAMSize() const

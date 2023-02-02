@@ -20,10 +20,21 @@ private:
 	void fontSelectCustom();
 	void fontSelectColor();
 
+
+	void layoutTypeChanged(bool state);
+	void on_btnBrowseLayout_clicked();
+	void openMSXConnectionChanged();
+
+	void on_leFileName_textChanged(const QString& arg1);
+	void on_btnSaveLayout_clicked();
+
 	void autoReloadSymbols(int state);
 	void preserveLostSymbols(int state);
 
+
 private:
+	void createCLI();
+	void testOpenMSXCommandLine();
 	bool updating;
 };
 

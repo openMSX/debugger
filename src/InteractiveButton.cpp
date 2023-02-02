@@ -60,7 +60,7 @@ void InteractiveButton::leaveEvent(QEvent* /*event*/)
 
 void InteractiveButton::newBitValueSlot(bool state)
 {
-	_state=state;
+	_state = state;
 	QString name = objectName();
 	int bit = name.right(1).toInt();
 	int reg = name.mid(

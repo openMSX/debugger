@@ -1,5 +1,6 @@
 #include "CommClient.h"
 #include "OpenMSXConnection.h"
+#include <QDebug>
 
 CommClient::~CommClient()
 {
@@ -33,8 +34,10 @@ void CommClient::closeConnection()
 void CommClient::sendCommand(CommandBase* command)
 {
 	if (connection) {
+		//qDebug() << "CommClient::sendCommand(CommandBase* " << command << ")  connection available";
 		connection->sendCommand(command);
 	} else {
+		//qDebug() << "CommClient::sendCommand(CommandBase* " << command << ")  connection NOT available";
 		command->cancel();
 	}
 }

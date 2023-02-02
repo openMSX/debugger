@@ -4,12 +4,12 @@
 #include <sstream>
 #include <iomanip>
 
-static char sign(unsigned char a)
+static char sign(uint8_t a)
 {
 	return (a & 128) ? '-' : '+';
 }
 
-static int abs(unsigned char a)
+static int abs(uint8_t a)
 {
 	return (a & 128) ? (256 - a) : a;
 }
@@ -31,12 +31,12 @@ static std::string translateAddress(
 	}
 }
 
-static int get16(const unsigned char* memBuf, int address)
+static int get16(const uint8_t* memBuf, int address)
 {
 	return memBuf[address] + 256 * memBuf[address + 1];
 }
 
-void dasm(const unsigned char* membuf, uint16_t startAddr, uint16_t endAddr,
+void dasm(const uint8_t* membuf, uint16_t startAddr, uint16_t endAddr,
           DisasmLines& disasm, MemoryLayout* memLayout, SymbolTable* symTable, int currentPC)
 {
 	int pc = startAddr;
@@ -116,14 +116,14 @@ void dasm(const unsigned char* membuf, uint16_t startAddr, uint16_t endAddr,
 				dest.numBytes += 2;
 				break;
 			case 'X': {
-				unsigned char offset = membuf[pc + dest.numBytes];
+				uint8_t offset = membuf[pc + dest.numBytes];
 				dest.instr += '(' + std::string(r) + sign(offset)
 				           +  '#' + toHex(abs(offset), 2) + ')';
 				dest.numBytes += 1;
 				break;
 			}
 			case 'Y': {
-				unsigned char offset = membuf[pc + 2];
+				uint8_t offset = membuf[pc + 2];
 				dest.instr += '(' + std::string(r) + sign(offset)
 				           +  '#' + toHex(abs(offset), 2) + ')';
 				break;

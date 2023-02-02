@@ -1,31 +1,8 @@
 #include "BitMapViewer.h"
-#include "PaletteDialog.h"
 #include "VramBitMappedView.h"
 #include "VDPDataStore.h"
 #include "Convert.h"
 #include <QMessageBox>
-
-
-// static to feed to PaletteDialog and be used when VDP colors aren't selected
-static uint8_t currentPalette[32] = {
-//    RB  G
-	0x00, 0,
-	0x00, 0,
-	0x11, 6,
-	0x33, 7,
-	0x17, 1,
-	0x27, 3,
-	0x51, 1,
-	0x27, 6,
-	0x71, 1,
-	0x73, 3,
-	0x61, 6,
-	0x64, 6,
-	0x11, 4,
-	0x65, 2,
-	0x55, 5,
-	0x77, 7,
-};
 
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
@@ -39,19 +16,18 @@ BitMapViewer::BitMapViewer(QWidget* parent)
     connect(linesVisible, qOverload<int>(&QComboBox:: currentIndexChanged), this, &BitMapViewer::on_linesVisible_currentIndexChanged);
     connect(bgColor,  qOverload<int>(&QSpinBox::valueChanged), this, &BitMapViewer::on_bgColor_valueChanged);
 
-    connect(useVDPRegisters, &QCheckBox::stateChanged,this, &BitMapViewer::on_useVDPRegisters_stateChanged);
+	connect(useVDPRegisters, &QCheckBox::stateChanged,this, &BitMapViewer::on_useVDPRegisters_stateChanged);
 
-    connect(saveImageButton, &QPushButton::clicked, this, &BitMapViewer::on_saveImageButton_clicked);
-    connect(editPaletteButton, &QPushButton::clicked, this, &BitMapViewer::on_editPaletteButton_clicked);
-    connect(useVDPPalette, &QCheckBox::stateChanged, this, &BitMapViewer::on_useVDPPalette_stateChanged);
-    connect(zoomLevel, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &BitMapViewer::on_zoomLevel_valueChanged);
+	connect(saveImageButton, &QPushButton::clicked, this, &BitMapViewer::on_saveImageButton_clicked);
+	connect(useVDPPalette, &QCheckBox::stateChanged, this, &BitMapViewer::on_useVDPPalette_stateChanged);
+	connect(zoomLevel, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &BitMapViewer::on_zoomLevel_valueChanged);
 
 	// hand code entering the actual display widget in the scrollarea With
 	// the designer-qt4 there is an extra scrollAreaWidget between the
 	// imageWidget and the QScrollArea so the scrollbars are not correctly
 	// handled when the image is resized. (since the intermediate widget
 	// stays the same size). I did not try to have this intermediate widget
-	// resize and all, since it was superflous anyway.
+	// resize and all, since it was superfluous anyway.
 	imageWidget = new VramBitMappedView();
 	QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	sizePolicy1.setHorizontalStretch(0);
@@ -64,14 +40,12 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 
 	useVDP = useVDPRegisters->isChecked();
 
-	const unsigned char* vram    = VDPDataStore::instance().getVramPointer();
+	const uint8_t* vram    = VDPDataStore::instance().getVramPointer();
 	imageWidget->setVramSource(vram);
 	imageWidget->setVramAddress(0);
-	// Palette data not received from VDPDataStore yet causing black image, so
-	// we start by using fixed palette until VDPDataStoreDataRefreshed kicks in.
-	imageWidget->setPaletteSource(currentPalette);
-	
-	// now hook up some signals and slots
+    imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
+
+	//now hook up some signals and slots
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
 	        this, &BitMapViewer::VDPDataStoreDataRefreshed);
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
@@ -96,17 +70,17 @@ void BitMapViewer::updateDisplayAsFrame()
 
 void BitMapViewer::decodeVDPregs()
 {
-	const unsigned char* regs = VDPDataStore::instance().getRegsPointer();
+	const uint8_t* regs = VDPDataStore::instance().getRegsPointer();
 
 	// Get the number of lines
 	int v1 = (regs[9] & 128) ? 212 : 192;
-	printf("\nlines acording to the bits %i,: %i\n", (regs[9] & 128), v1);
+	printf("\nlines according to the bits %i,: %i\n", (regs[9] & 128), v1);
 	linesLabel->setText(QString("%1").arg(v1, 0, 10));
 	if (useVDP) linesVisible->setCurrentIndex((regs[9] & 128) ? 1 : 0);
 
 	// Get the border color
 	int v2 = regs[7] & 15;
-	printf("\nborder acording to the regs %i,: %i\n", regs[7], v2);
+	printf("\nborder according to the regs %i,: %i\n", regs[7], v2);
 	if (regs[8] & 32) v2 = 0;
 	printf("\ncolor 0 is pallet regs %i,: %i\n", (regs[8] & 32), v2);
 	borderLabel->setText(QString("%1").arg(v2, 0, 10));
@@ -114,25 +88,25 @@ void BitMapViewer::decodeVDPregs()
 
 	// Get current screenmode
 	static const int bits_modetxt[128] = {
-		  1,   3,   0, 255,  2, 255, 255, 255,
-		  4, 255,  80, 255,  5, 255, 255, 255,
-		  6, 255, 255, 255,  7, 255, 255, 255,
-		255, 255, 255, 255,  8, 255, 255, 255,
+		  1,   3,   0, 255,   2, 255, 255, 255,
+		  4, 255,  80, 255,   5, 255, 255, 255,
+		  6, 255, 255, 255,   7, 255, 255, 255,
+		255, 255, 255, 255,   8, 255, 255, 255,
 
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255, 12, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255,  12, 255, 255, 255,
 
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
 
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255,255, 255, 255, 255,
-		255, 255, 255, 255, 11, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255, 255, 255, 255, 255,
+		255, 255, 255, 255,  11, 255, 255, 255,
 	};
 	static const int bits_mode[128] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -162,9 +136,6 @@ void BitMapViewer::decodeVDPregs()
 	if (useVDP) {
 		screenMode->setCurrentIndex(bits_mode[v3]);
 		updateDisplayAsFrame();
-	}
-	if (useVDPPalette) {
-		imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
 	}
 
 	// Get the current visible page
@@ -270,27 +241,14 @@ void BitMapViewer::on_saveImageButton_clicked(bool /*checked*/)
 		"Sorry, the save image dialog is not yet implemented");
 }
 
-void BitMapViewer::on_editPaletteButton_clicked(bool /*checked*/)
-{
-	auto* p = new PaletteDialog();
-	p->setPalette(currentPalette);
-	p->setAutoSync(true);
-	connect(p, &PaletteDialog::paletteSynced, imageWidget, &VramBitMappedView::refresh);
-	p->show();
-}
-
 void BitMapViewer::on_useVDPPalette_stateChanged(int state)
 {
-	const uint8_t* palette = VDPDataStore::instance().getPalettePointer();
 	if (state) {
-		imageWidget->setPaletteSource(palette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteVDP));
 	} else {
-		// Copy palette from VDP to allow changes.
-		if (palette) memcpy(currentPalette, palette, 32);
-		imageWidget->setPaletteSource(currentPalette);
+        imageWidget->setPaletteSource(VDPDataStore::instance().getPalette(paletteBitmap));
 	}
 	imageWidget->refresh();
-	editPaletteButton->setEnabled(!state);
 }
 
 /*

@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QMessageBox>
 
+DebugSession* DebugSession::theDebugSession = nullptr;
+
 DebugSession::DebugSession()
 	: modified(false)
 {
@@ -36,6 +38,15 @@ Breakpoints& DebugSession::breakpoints()
 SymbolTable& DebugSession::symbolTable()
 {
 	return symTable;
+}
+
+
+DebugSession *DebugSession::getDebugSession()
+{
+    if (theDebugSession == nullptr) {
+        theDebugSession = new DebugSession{};
+    }
+    return theDebugSession;
 }
 
 void DebugSession::clear()

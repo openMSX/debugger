@@ -13,7 +13,6 @@ public:
 	SlotViewer(QWidget* parent = nullptr);
 
 	void setMemoryLayout(MemoryLayout* ml);
-	void updateSlots(const QString& message);
 
 	QSize sizeHint() const override;
 
@@ -36,6 +35,10 @@ private:
 
 	bool slotsChanged[4];
 	bool segmentsChanged[4];
+
+signals:
+//	void slotsUpdated(bool slotsChanged);
+//	void contentsChanged();
 };
 
 #endif // SLOTVIEWER_H

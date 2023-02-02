@@ -38,7 +38,8 @@ VDPRegViewer::VDPRegViewer(QWidget *parent)
 {
 	setupUi(this);
 	connect(VDPcomboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &VDPRegViewer::on_VDPcomboBox_currentIndexChanged);
-
+	connect(cb_useOpenMSXVDP, &QCheckBox::stateChanged, this, &VDPRegViewer::on_cb_useOpenMSXVDP_stateChanged);
+	connect(&VDPDataStore::instance(),&VDPDataStore::VDPVersionChanged, this, &VDPRegViewer::on_VDPVersionChanged);
 	vdpId = 99; // make sure that we parse the first time the status registers are read
 	vdpId = VDP_V9958; //quick hack for now
 
@@ -362,23 +363,24 @@ void VDPRegViewer::decodeVDPRegs()
 		"let's find out 27", "SCREEN 8", "let's find out 29",
 		"let's find out 30", "let's find out 31"
 	};
-	int basicscreen;
-	switch (m) {
-		case  2: basicscreen=0;break;
-		case  0: basicscreen=1;break;
-		case  4: basicscreen=2;break;
-		case  1: basicscreen=3;break;
-		case  8: basicscreen=4;break;
-		case 12: basicscreen=5;break;
-		case 16: basicscreen=6;break;
-		case 20: basicscreen=7;break;
-		case 28: basicscreen=8;break;
-		case 10: basicscreen=9;break; //screen 0 width 80
-		default: basicscreen=10;    //not a valid basic screen mode
-	};
+	int basicScreen = [&] {
+		switch (m) {
+			case  2: return 0;
+			case  0: return 1;
+			case  4: return 2;
+			case  1: return 3;
+			case  8: return 4;
+			case 12: return 5;
+			case 16: return 6;
+			case 20: return 7;
+			case 28: return 8;
+			case 10: return 9; // screen 0 width 80
+			default: return 10; // not a valid basic screen mode
+		}
+	}();
 
 	// 2 vdps, 11 basic screenmodes, 12 registers
-	static const int mustbeone[][11][12] = {
+	static const int mustBeOne[][11][12] = {
 		{ // TMS99x8 MSX1 VDP chip
 		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 0;
 		{0, 0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0,0,0,0}, // screen 1;
@@ -447,12 +449,12 @@ void VDPRegViewer::decodeVDPRegs()
 			auto* i = findChild<InteractiveButton*>(name);
 			i->setChecked(regs[r] & (1 << b));
 			if (r < 12) {
-				i->mustBeSet(mustbeone[(vdpId == VDP_TMS99X8) ? 0 : 1][basicscreen][r] & (1 << b));
+				i->mustBeSet(mustBeOne[(vdpId == VDP_TMS99X8) ? 0 : 1][basicScreen][r] & (1 << b));
 				// if A8 of R5 is a 'must-be-one' then we indicate this for A9 also
 				// This bit is cleared in the table since it isn't used in the Sprite
 				// Attribute Table address calculation otherwise, but will only impact the
 				// Sprite Color Table
-				if (r == 5 && b == 2 && vdpId != VDP_TMS99X8 && mustbeone[1][basicscreen][5]) {
+				if (r == 5 && b == 2 && vdpId != VDP_TMS99X8 && mustBeOne[1][basicScreen][5]) {
 					i->mustBeSet(true);
 				}
 			}
@@ -525,17 +527,17 @@ void VDPRegViewer::decodeVDPRegs()
 	// some variables used for readability of the code below
 	int row = vdpId == VDP_TMS99X8 ? 0 : 1;
 	QString regtexttext;
-	int must,must2;
+	int must, must2;
 
 	// the pattern name table address
-	must=mustbeone[row][basicscreen][2] ;
-	long nameTable = ((255^must) & bitsused[row][basicscreen][2] & regs[2]) << 10;
+	must = mustBeOne[row][basicScreen][2] ;
+	long nameTable = ((255^must) & bitsused[row][basicScreen][2] & regs[2]) << 10;
 	if ((m == 20 || m == 28) && vdpId != VDP_TMS99X8)
 		nameTable = ((nameTable & 0xffff) << 1) | ((nameTable & 0x10000) >> 16);
 	regtexttext = hex5(nameTable);
 
 	if ((must & regs[2]) != must) {
-		label_dec_r2->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r2->setText("<font color=red>" + regtexttext + "</font>");
 		label_dec_r2->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r2->setText(regtexttext);
@@ -543,17 +545,17 @@ void VDPRegViewer::decodeVDPRegs()
 	}
 
 	// the color table address
-	must=mustbeone[row][basicscreen][3] ;
-	must2=mustbeone[row][basicscreen][10] ;
-	regtexttext=hex5(
+	must  = mustBeOne[row][basicScreen][3];
+	must2 = mustBeOne[row][basicScreen][10];
+	regtexttext = hex5(
 		(
-			((255 ^ must ) & bitsused[row][basicscreen][ 3] & regs[ 3]) <<  6
+			((255 ^ must ) & bitsused[row][basicScreen][ 3] & regs[ 3]) <<  6
 		  ) | (
-			((255 ^ must2) & bitsused[row][basicscreen][10] & regs[10]) << 14
+			((255 ^ must2) & bitsused[row][basicScreen][10] & regs[10]) << 14
 		)
 		);
 	if (((must & regs[3]) != must) || ((must2 & regs[10]) != must2)) {
-		label_dec_r3->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r3->setText("<font color=red>" + regtexttext + "</font>");
 		label_dec_r3->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r3->setText(regtexttext);
@@ -561,13 +563,13 @@ void VDPRegViewer::decodeVDPRegs()
 	}
 
 	// the pattern generator address
-	must=mustbeone[row][basicscreen][4] ;
-	regtexttext=hex5(
+	must = mustBeOne[row][basicScreen][4] ;
+	regtexttext = hex5(
 		(
-			(255 ^ must) & bitsused[row][basicscreen][4] & regs[4]) << 11
+			(255 ^ must) & bitsused[row][basicScreen][4] & regs[4]) << 11
 		);
 	if ((must & regs[4]) != must) {
-		label_dec_r4->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r4->setText("<font color=red>" + regtexttext + "</font>");
 		label_dec_r4->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r4->setText(regtexttext);
@@ -575,30 +577,30 @@ void VDPRegViewer::decodeVDPRegs()
 	}
 
 	// the sprite attribute tabel address
-	must  = mustbeone[row][basicscreen][ 5];
-	must2 = mustbeone[row][basicscreen][11];
+	must  = mustBeOne[row][basicScreen][ 5];
+	must2 = mustBeOne[row][basicScreen][11];
 	regtexttext = hex5(
 		(
-		(((255^must) & bitsused[row][basicscreen][ 5] & regs[ 5]) <<  7) |
-		(((255^must2) & bitsused[row][basicscreen][11] & regs[11]) << 15))
+		(((255^must) & bitsused[row][basicScreen][ 5] & regs[ 5]) <<  7) |
+		(((255^must2) & bitsused[row][basicScreen][11] & regs[11]) << 15))
 		);
 	if (((must & regs[5]) != must) || ((must2 & regs[11]) != must2)) {
-		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r5->setText("<font color=red>" + regtexttext + "</font>");
 		label_dec_r5->setToolTip("Some of the obligatory 1 bits are reset!");
 	} else {
 		label_dec_r5->setText(regtexttext);
 		label_dec_r5->setToolTip(nullptr);
-	};
+	}
 	// special case for sprite mode 2
 	if (must && !(4 & regs[ 5])) {  // only in mode2 there are some 'must'-bits :-)
-		label_dec_r5->setText("<font color=red>" + regtexttext +"</font>");
+		label_dec_r5->setText("<font color=red>" + regtexttext + "</font>");
 		label_dec_r5->setToolTip("Bit A9 should be set, to obtain the Sprite Color Table address this bit is masked<br>With the current bit reset the Color Tabel will use the same address as the Sprite Attribute Table!");
-	};
+	}
 
 
 	// the sprite pattern generator address
 	label_dec_r6->setText(hex5(
-		((255^mustbeone[row][basicscreen][6]) & bitsused[row][basicscreen][6] & regs[6]) << 11));
+		((255^mustBeOne[row][basicScreen][6]) & bitsused[row][basicScreen][6] & regs[6]) << 11));
 
 	// end of address calculations
 
@@ -907,8 +909,8 @@ void VDPRegViewer::connectHighLights()
 
 void VDPRegViewer::refresh()
 {
-	//new SimpleHexRequest("{VDP regs}",0,64,regs, *this);
-	//new SimpleHexRequest("{VDP status regs}",0,16,regs, *this);
+	//new SimpleHexRequest("{VDP regs}", 0, 64, regs, *this);
+	//new SimpleHexRequest("{VDP status regs}", 0, 16, regs, *this);
 	// now combined in one request:
 	new SimpleHexRequest(
 		"debug_bin2hex "
@@ -953,17 +955,67 @@ void VDPRegViewer::registerBitChanged(int reg, int bit, bool state)
 
 void VDPRegViewer::on_VDPcomboBox_currentIndexChanged(int index)
 {
+	int newVdpId = VDP_TMS99X8;
 	switch (index) {
 	case 0:
-		vdpId = VDP_V9958;
+		newVdpId = VDP_V9958;
 		break;
 	case 1:
-		vdpId = VDP_V9938;
+		newVdpId = VDP_V9938;
 		break;
 	case 2:
-		vdpId = VDP_TMS99X8;
+		newVdpId = VDP_TMS99X8;
 		break;
-	}
+	};
+
+	// on_VDPVersionChanged might have changed vdpId already so avoid calling decode twice
+	if (newVdpId != vdpId){
+		vdpId = newVdpId;
+		decodeStatusVDPRegs();
+		decodeVDPRegs();
+	};
+
+}
+
+void VDPRegViewer::on_VDPVersionChanged(QString VDPversion)
+{
+	if (!cb_useOpenMSXVDP->isChecked()){
+		label_VDPreported->setText(VDPversion);
+		return;
+	};
+
+	if (VDPversion == label_VDPreported->text()){
+		return;
+	} else {
+		label_VDPreported->setText(VDPversion);
+	};
+	VDPVersion_to_combobox(VDPversion);
+}
+
+void VDPRegViewer::on_cb_useOpenMSXVDP_stateChanged(int arg1)
+{
+	if (arg1 == Qt::Checked){
+		QString VDPversion = label_VDPreported->text();
+		VDPVersion_to_combobox(VDPversion);
+	};
+}
+
+void VDPRegViewer::VDPVersion_to_combobox(QString VDPversion)
+{
+	if (VDPversion == "unknown"){
+		return;
+	} else if (VDPversion == "V9958"){
+		vdpId = VDP_V9958;
+		VDPcomboBox->setCurrentIndex(0);
+	} else if (VDPversion == "V9938"){
+		vdpId = VDP_V9938;
+		VDPcomboBox->setCurrentIndex(1);
+	} else {
+		vdpId = VDP_TMS99X8;
+		VDPcomboBox->setCurrentIndex(2);
+	};
 	decodeStatusVDPRegs();
 	decodeVDPRegs();
 }
+
+

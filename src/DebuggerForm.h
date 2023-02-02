@@ -1,8 +1,6 @@
 #ifndef DEBUGGERFORM_H
 #define DEBUGGERFORM_H
 
-#include "DockableWidgetArea.h"
-#include "DockManager.h"
 #include "DebugSession.h"
 #include "SymbolManager.h"
 #include <QMainWindow>
@@ -25,6 +23,9 @@ class VDPStatusRegViewer;
 class VDPRegViewer;
 class VDPCommandRegViewer;
 class BreakpointViewer;
+class BlendSplitter;
+class QTabWidget;
+class TabRenamerHelper;
 
 class DebuggerForm : public QMainWindow
 {
@@ -35,16 +36,43 @@ public:
 	void showAbout();
 	void reloadBreakpoints(bool merge = false);
 	void onSlotsUpdated(bool slotsChanged);
-	void onPCChanged(uint16_t address);
+
+	enum factoryclasses {
+		disasmViewer,
+		mainMemoryViewer,
+		cpuRegsViewer,
+		flagsViewer,
+		stackViewer,
+		slotViewer,
+		breakpointViewer,
+		debuggableViewer,
+		vdpStatusRegViewer,
+		vdpCommandRegViewer,
+		bitMapViewer,
+		tileViewer,
+		spriteViewer,
+		vdpRegisters,
+		quickguide,
+		paletteViewer
+	};
+
+	bool saveWorkspacesAs(const QString& newFileName);
+	bool loadWorkspaces(const QString& filename);
+	QString fileSaveWorkspaceAs();
 
 private:
 	void closeEvent(QCloseEvent* e) override;
 
+	void createWidgetRegistry();
 	void createActions();
 	void createMenus();
 	void createToolbars();
 	void createStatusbar();
 	void createForm();
+
+    void autoConnectToOpenMSX();
+
+	static QWidget* widgetFactory(factoryclasses fctwidget);
 
 	void openSession(const QString& file);
 	void updateRecentFiles();
@@ -53,7 +81,7 @@ private:
 
 	void finalizeConnection(bool halted);
 	void pauseStatusChanged(bool isPaused);
-	void breakOccured();
+	void breakOccurred();
 	void setRunMode();
 	void updateData();
 
@@ -69,9 +97,7 @@ private:
 	QMenu* fileMenu;
 	QMenu* systemMenu;
 	QMenu* searchMenu;
-	QMenu* viewMenu;
-	QMenu* viewVDPDialogsMenu;
-	QMenu* viewFloatingWidgetsMenu;
+
 	QMenu* executeMenu;
 	QMenu* breakpointMenu;
 	QMenu* helpMenu;
@@ -83,9 +109,14 @@ private:
 	QAction* fileOpenSessionAction;
 	QAction* fileSaveSessionAction;
 	QAction* fileSaveSessionAsAction;
+
+	QAction* fileOpenWorkspaceLayoutAction;
+	QAction* fileSaveWorkspaceLayoutAction;
+	QAction* fileSaveWorkspaceLayoutAsAction;
+
 	QAction* fileQuitAction;
 
-	enum { MaxRecentFiles = 5 };
+	static const int MaxRecentFiles = 5;
 	QAction* recentFileActions[MaxRecentFiles];
 	QAction* recentFileSeparator;
 
@@ -97,61 +128,36 @@ private:
 	QAction* systemPreferencesAction;
 
 	QAction* searchGotoAction;
-
-	QAction* viewRegistersAction;
-	QAction* viewFlagsAction;
-	QAction* viewStackAction;
-	QAction* viewSlotsAction;
-	QAction* viewMemoryAction;
-	QAction* viewBreakpointsAction;
-	QAction* viewDebuggableViewerAction;
-
-	QAction* viewBitMappedAction;
-	QAction* viewCharMappedAction;
-	QAction* viewSpritesAction;
-	QAction* viewVDPStatusRegsAction;
-	QAction* viewVDPRegsAction;
-	QAction* viewVDPCommandRegsAction;
-
 	QAction* executeBreakAction;
 	QAction* executeRunAction;
 	QAction* executeStepAction;
 	QAction* executeStepOverAction;
-	QAction* executeRunToAction;
 	QAction* executeStepOutAction;
 	QAction* executeStepBackAction;
 
-	QAction* breakpointToggleAction;
 	QAction* breakpointAddAction;
 
 	QAction* helpAboutAction;
 
-	DockManager dockMan;
-	std::unique_ptr<DockableWidgetArea> mainArea;
+	QAction* addCPUWorkspaceAction;
+	QAction* addVDPRegsWorkspaceAction;
+	QAction* addVDPTilesWorkspaceAction;
+	QAction* addVDPBitmapWorkspaceAction;
+	QAction* addEmptyWorkspaceAction;
+	QAction* addFloatingSwitchingWidgetAction;
+
 	QStringList recentFiles;
 
-	DisasmViewer* disasmView;
-	MainMemoryViewer* mainMemoryView;
-	CPURegsViewer* regsView;
-	FlagsViewer* flagsView;
-	StackViewer* stackView;
-	SlotViewer* slotView;
-	VDPStatusRegViewer* VDPStatusRegView;
-	VDPRegViewer* VDPRegView;
-	VDPCommandRegViewer* VDPCommandRegView;
-	BreakpointViewer* bpView;
-	QPointer<SymbolManager> symManager;
-
 	CommClient& comm;
-	DebugSession session;
-	MemoryLayout memLayout;
-	uint8_t mainMemory[0x10000 + 4] = {}; // 4 extra to avoid wrap-check during disasm
+	DebugSession* session;
+
+	QTabWidget *workspaces;
+	TabRenamerHelper *tabRenamer;
 
 	bool mergeBreakpoints;
-	QMap<QString, int> debuggables;
+	static QMap<QString, int> debuggables;
 
 	static int counter;
-	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
 	uint16_t disasmAddress;
 
 	void fileNewSession();
@@ -159,6 +165,9 @@ private:
 	void fileSaveSession();
 	void fileSaveSessionAs();
 	void fileRecentOpen();
+	void fileOpenWorkspace();
+	void fileSaveWorkspace();
+
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();
@@ -183,22 +192,20 @@ private:
 	void executeRun();
 	void executeStep();
 	void executeStepOver();
-	void executeRunTo();
+//	void executeRunTo();
 	void executeStepOut();
 	void executeStepBack();
 
-	void toggleBreakpoint();
-	void toggleBreakpointAddress(uint16_t addr);
-	void addBreakpoint();
-
-	void toggleView(DockableWidget* widget);
+private slots:
+	void toggleBreakpoint(uint16_t addr);
+private:
+	void addBreakpoint(uint16_t cursorAddress);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
 	                  const QString& message);
 	void setDebuggables(const QString& list);
 	void setDebuggableSize(const QString& debuggable, int size);
 	void connectionClosed();
-	void dockWidgetVisibilityChanged(DockableWidget* w);
 	void updateViewMenu();
 	void updateVDPViewMenu();
 	void updateViewFloatingWidgetsMenu();
@@ -215,6 +222,8 @@ private:
 	friend class ListDebuggablesHandler;
 	friend class DebuggableSizeHandler;
 
+	friend class TabRenamerHelper;
+
 signals:
 	void connected();
 	void settingsChanged();
@@ -224,6 +233,23 @@ signals:
 	void breakStateEntered();
 	void breakpointsUpdated();
 	void debuggablesChanged(const QMap<QString, int>& list);
+
+protected:
+	BlendSplitter *createWorkspaceCPU();
+	BlendSplitter *createWorkspaceVDPRegs();
+	BlendSplitter *createWorkspaceVDPTiles();
+	BlendSplitter *createWorkspaceVDPBitmap();
+	void addInfoWorkspace();
+	void addCPUWorkspace();
+	void addVDPRegsWorkspace();
+	void addVDPTilesWorkspace();
+	void addVDPBitmapWorkspace();
+	void addEmptyWorkspace();
+	void addFloatingSwitchingWidget();
+	void addDefaultWorkspaces();
+
+protected slots:
+	void tabCloseRequest(int index);
 };
 
 #endif // DEBUGGERFORM_H

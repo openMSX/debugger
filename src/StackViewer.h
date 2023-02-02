@@ -13,7 +13,7 @@ class StackViewer : public QFrame
 public:
 	StackViewer(QWidget* parent = nullptr);
 
-	void setData(unsigned char* memPtr, int memLength);
+	void setData(uint8_t* memPtr, int memLength);
 	QSize sizeHint() const override;
 
 	void setLocation(int addr);
@@ -39,7 +39,7 @@ private:
 
 	int stackPointer;
 	int topAddress;
-	unsigned char* memory;
+	uint8_t* memory;
 	int memoryLength;
 
 	friend class StackRequest;

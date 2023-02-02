@@ -1,5 +1,6 @@
 #include "VramBitMappedView.h"
 #include "ranges.h"
+#include "VDPDataStore.h"
 #include <QPainter>
 #include <algorithm>
 #include <cstdio>
@@ -8,7 +9,7 @@ VramBitMappedView::VramBitMappedView(QWidget* parent)
 	: QWidget(parent)
 	, image(512, 512, QImage::Format_RGB32)
 {
-	ranges::fill(msxPalette, qRgb(80, 80, 80));
+    palette = VDPDataStore::instance().getPalette(paletteVDP);
 	setZoom(1.0f);
 
 	// Mouse update events when mouse is moved over the image, Quibus likes this
@@ -27,10 +28,6 @@ void VramBitMappedView::decode()
 {
 	if (!vramBase) return;
 
-	printf("\n"
-	       "screenMode: %i\n"
-	       "vram to start decoding: %i\n",
-	       screenMode, vramAddress);
 	switch (screenMode) {
 		case  5: decodeSCR5();  break;
 		case  6: decodeSCR6();  break;
@@ -42,19 +39,6 @@ void VramBitMappedView::decode()
 	}
 	pixImage = QPixmap::fromImage(image);
 	update();
-}
-
-void VramBitMappedView::decodePallet()
-{
-	if (!palette) return;
-
-	for (int i = 0; i < 16; ++i) {
-		int r = (palette[2 * i + 0] & 0xf0) >> 4;
-		int b = (palette[2 * i + 0] & 0x0f);
-		int g = (palette[2 * i + 1] & 0x0f);
-		auto scale = [](int x) { return (x >> 1) | (x << 2) | (x << 5); };
-		msxPalette[i] = qRgb(scale(r), scale(g), scale(b));
-	}
 }
 
 static unsigned interleave(unsigned x)
@@ -117,7 +101,7 @@ void VramBitMappedView::decodeSCR10()
 			int j = (p[2] & 7) + ((p[3] & 3) << 3) - ((p[3] & 4) << 3);
 			int k = (p[0] & 7) + ((p[1] & 3) << 3) - ((p[1] & 4) << 3);
 			for (int n = 0; n < 4; ++n) {
-				QRgb c = (p[n] & 0x08) ? msxPalette[p[n] >> 4] // YAE
+                QRgb c = (p[n] & 0x08) ? palette->color(p[n] >> 4) // YAE
 				                       : decodeYJK(p[n] >> 3, j, k); // YJK
 				setPixel2x2(x + n, y, c);
 			}
@@ -147,7 +131,7 @@ void VramBitMappedView::decodeSCR8()
 QRgb VramBitMappedView::getColor(int c)
 {
 	// TODO do we need to look at the TP bit???
-	return msxPalette[c ? c : borderColor];
+    return palette->color(c ? c : borderColor);
 }
 
 void VramBitMappedView::decodeSCR7()
@@ -193,15 +177,13 @@ void VramBitMappedView::paintEvent(QPaintEvent* /*event*/)
 	QRect srcRect(0, 0, 512, 2 * lines);
 	QRect dstRect(0, 0, int(512.0f * zoomFactor), int(2.0f * float(lines) * zoomFactor));
 	QPainter qp(this);
-	//qp.drawImage(rect(),image,srcRect);
+	//qp.drawImage(rect(), image, srcRect);
 	qp.drawPixmap(dstRect, pixImage, srcRect);
 }
 
 void VramBitMappedView::refresh()
 {
-	decodePallet();
 	decode();
-	update();
 }
 
 void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
@@ -270,55 +252,47 @@ void VramBitMappedView::mousePressEvent(QMouseEvent* e)
 	// since mouseMove only emits the correct signal we reuse/abuse that method
 	mouseMoveEvent(e);
 
-	decodePallet();
 	decode();
-	update();
 }
 
 void VramBitMappedView::setBorderColor(int value)
 {
 	borderColor = std::clamp(value, 0, 15);
-	decodePallet();
 	decode();
-	update();
 }
 
 void VramBitMappedView::setScreenMode(int mode)
 {
 	screenMode = mode;
 	decode();
-	update();
 }
 
 void VramBitMappedView::setLines(int nrLines)
 {
 	lines = nrLines;
-	decode();
 	setFixedSize(int(512.0f * zoomFactor), int(float(lines) * 2.0f * zoomFactor));
-	update();
+    decode();
 	//setZoom(zoomFactor);
 }
 
 void VramBitMappedView::setVramAddress(int adr)
 {
 	vramAddress = adr;
-	decodePallet();
 	decode();
-	update();
 }
 
 void VramBitMappedView::setVramSource(const uint8_t* adr)
 {
 	vramBase = adr;
-	decodePallet();
 	decode();
-	update();
 }
 
-void VramBitMappedView::setPaletteSource(const uint8_t* adr)
+void VramBitMappedView::setPaletteSource(MSXPalette *adr)
 {
+    if (palette) {
+        disconnect(palette, &MSXPalette::paletteChanged, this, &VramBitMappedView::decode);
+    }
 	palette = adr;
-	decodePallet();
+    connect(palette, &MSXPalette::paletteChanged, this, &VramBitMappedView::decode);
 	decode();
-	update();
 }
