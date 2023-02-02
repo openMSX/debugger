@@ -108,7 +108,7 @@
              <item>
               <widget class="QLabel" name="label_mouseover">
                <property name="text">
-                <string>TextLabel</string>
+                <string>col -  row -</string>
                </property>
               </widget>
              </item>
@@ -164,6 +164,15 @@
              </item>
              <item>
               <layout class="QFormLayout" name="formLayout_2">
+               <property name="rowWrapPolicy">
+                <enum>QFormLayout::WrapLongRows</enum>
+               </property>
+               <property name="labelAlignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_10">
                  <property name="text">
@@ -174,14 +183,20 @@
                <item row="0" column="1">
                 <widget class="QLabel" name="label_charpat">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string>- (-)</string>
                  </property>
                 </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_11">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
-                  <string>Address</string>
+                  <string>Address:</string>
                  </property>
                 </widget>
                </item>
@@ -219,16 +234,6 @@ NT: $196E (base+$16E)</string>
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="sp_highlight">
-               <property name="maximum">
-                <number>255</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QLabel" name="label_highligtinfo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -238,6 +243,16 @@ NT: $196E (base+$16E)</string>
                </property>
                <property name="text">
                 <string>($DD, not in NT)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="sp_highlight">
+               <property name="maximum">
+                <number>255</number>
+               </property>
+               <property name="value">
+                <number>0</number>
                </property>
               </widget>
              </item>
@@ -343,7 +358,7 @@ NT: $196E (base+$16E)</string>
                <item>
                 <widget class="QLabel" name="label_screenmode">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string>-</string>
                  </property>
                 </widget>
                </item>
@@ -646,6 +661,11 @@ NT: $196E (base+$16E)</string>
        </item>
        <item>
         <widget class="QPlainTextEdit" name="plainTextEdit">
+         <property name="font">
+          <font>
+           <family>Monospace</family>
+          </font>
+         </property>
          <property name="plainText">
           <string>Click on the tilemap to show character info</string>
          </property>
