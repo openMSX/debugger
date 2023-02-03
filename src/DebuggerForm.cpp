@@ -849,6 +849,13 @@ void DebuggerForm::initConnection()
 		"  return $result\n"
 		"}\n"));
 
+	// define 'debug_check_debuggables' proc for internal use
+	comm.sendCommand(new SimpleCommand(
+		"proc debug_check_debuggables { debuggables } {\n"
+		"  set all_debuggables [debug list]\n"
+		"  lmap x $debuggables {expr {[lsearch $all_debuggables $x] >= 0}}\n"
+		"}\n"));
+
 }
 
 void DebuggerForm::connectionClosed()
