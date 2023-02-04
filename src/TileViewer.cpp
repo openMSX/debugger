@@ -82,9 +82,7 @@ TileViewer::TileViewer(QWidget* parent)
 
     scrollArea->setWidget(imageWidget);
 
-	const auto* vram    = VDPDataStore::instance().getVramPointer();
     imageWidget->setPaletteSource(currentPalette);
-    imageWidget->setVramSource(vram);
     imageWidget->setUseBlink(cb_blinkcolors->isChecked());
     imageWidget->setDrawGrid(cb_drawgrid->isChecked());
 
@@ -94,10 +92,15 @@ TileViewer::TileViewer(QWidget* parent)
             this, &TileViewer::imageMouseOver);
     connect(imageWidget, &VramTiledView::imageClicked,
             this, &TileViewer::displayCharInfo);
+
+    VDPDataStore::instance().refresh();
 }
 
 void TileViewer::VDPDataStoreDataRefreshed()
 {
+    const auto* vram = VDPDataStore::instance().getVramPointer();
+    imageWidget->setVramSource(vram);
+
     if (useVDPPalette->isChecked()) {
         imageWidget->setPaletteSource(VDPDataStore::instance().getPalettePointer());
     }
