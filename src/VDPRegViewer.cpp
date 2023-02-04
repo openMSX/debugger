@@ -640,6 +640,11 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r15->setText(dec2(regs[15] & 15));
 		label_dec_r16->setText(dec2(regs[16] & 15));
 		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? "" : ", auto incr"));
+
+		label_dec_latch->setText(VDPDataStore::instance().getRegisterLatchAvailable() ?
+				QString("%1/%2")
+				.arg(hex2(regs[84]))
+				.arg(regs[82] ? "register" : "value") : "---/---");
 	}
 
 	//V9958 registers
