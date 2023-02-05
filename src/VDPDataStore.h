@@ -22,6 +22,10 @@ public:
 
 	size_t getVRAMSize() const;
 
+	bool getRegisterLatchAvailable() const { return registerLatchAvailable; }
+	bool getPaletteLatchAvailable() const { return paletteLatchAvailable; }
+	bool getDataLatchAvailable() const { return dataLatchAvailable; }
+
 	void refresh();
 
 signals:
@@ -43,6 +47,7 @@ private:
 
 	void refresh1();
 	void refresh2();
+	void refresh3();
 
 private:
 	std::vector<uint8_t> vram;
@@ -50,7 +55,12 @@ private:
 
 	std::optional<std::string> debuggableNameVRAM; // VRAM debuggable name
 
+	bool registerLatchAvailable = false;
+	bool paletteLatchAvailable = false;
+	bool dataLatchAvailable = false;
+
 	friend class VDPDataStoreVersionCheck;
+	friend class VDPDataStoreDebuggableChecks;
 	friend class VDPDataStoreVRAMSizeCheck;
 };
 

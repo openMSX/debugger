@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>826</height>
+    <width>1045</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -10913,6 +10913,20 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string>255</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>VDP latch state</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="label_dec_latch">
+            <property name="text">
+	      <string>255/value</string>
             </property>
            </widget>
           </item>
