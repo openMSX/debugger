@@ -529,7 +529,7 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 			}
 			break;
 	}
-	return MouseEventInfo{int(x / horiStep), int(y / 8), character};
+	return MouseEventInfo{x, y, character};
 }
 
 void VramTiledView::setBorderColor(int value)
