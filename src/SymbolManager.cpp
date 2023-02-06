@@ -219,7 +219,7 @@ void SymbolManager::removeFile()
 	if (r == 2) return;
 
 	for (int i = 0; i < treeFiles->selectedItems().size(); ++i) {
-		symTable.unloadFile(treeFiles->selectedItems().at(i)->text(0), r == 0);
+		symTable.unloadFile(treeFiles->selectedItems().at(i)->toolTip(0), r == 0);
 	}
 
 	initFileList();
