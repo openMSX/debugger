@@ -50,10 +50,9 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     // Now hook up some signals and slots.
     // This way we have created the VDPDataStore::instance before our imagewidget.
     // This allows the VDPDatastore to start asking for data as quickly as possible.
-    connect(ui->refreshButton, &QPushButton::clicked,
-            &VDPDataStore::instance(), &VDPDataStore::refresh);
-    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
-            this, &SpriteViewer::VDPDataStoreDataRefreshed);
+    auto& dataStore = VDPDataStore::instance();
+    connect(ui->refreshButton, &QPushButton::clicked, &dataStore, &VDPDataStore::refresh);
+    connect(&dataStore, &VDPDataStore::dataRefreshed, this, &SpriteViewer::VDPDataStoreDataRefreshed);
 
     imageWidget = new VramSpriteView();
     //QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -62,12 +61,11 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     //sizePolicy1.setHeightForWidth(imageWidget->sizePolicy().hasHeightForWidth());
     //imageWidget->setSizePolicy(sizePolicy1);
     imageWidget->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
-            imageWidget, &VramSpriteView::refresh);
+    connect(&dataStore, &VDPDataStore::dataRefreshed, imageWidget, &VramSpriteView::refresh);
     ui->spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(
         ui->spritePatternGenerator_widget, imageWidget);
 
-    imageWidget->setVramSource(VDPDataStore::instance().getVramPointer());
+    imageWidget->setVramSource(dataStore.getVramPointer());
 
     imageWidgetSingle = new VramSpriteView(nullptr, VramSpriteView::PatternMode, true);
     QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -76,35 +74,32 @@ SpriteViewer::SpriteViewer(QWidget* parent)
     sizePolicy3.setHeightForWidth(imageWidgetSingle->sizePolicy().hasHeightForWidth());
     imageWidgetSingle->setSizePolicy(sizePolicy3);
     imageWidgetSingle->setMinimumSize(QSize(64, 64));
-    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
-            imageWidgetSingle, &VramSpriteView::refresh);
+    connect(&dataStore, &VDPDataStore::dataRefreshed, imageWidgetSingle, &VramSpriteView::refresh);
     ui->single_spritePatternGenerator_widget->parentWidget()->layout()->replaceWidget(
         ui->single_spritePatternGenerator_widget, imageWidgetSingle);
 
-    imageWidgetSingle->setVramSource(VDPDataStore::instance().getVramPointer());
+    imageWidgetSingle->setVramSource(dataStore.getVramPointer());
 
 
     imageWidgetSpat = new VramSpriteView(nullptr, VramSpriteView::SpriteAttributeMode);
     imageWidgetSpat->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
-            imageWidgetSpat, &VramSpriteView::refresh);
+    connect(&dataStore, &VDPDataStore::dataRefreshed, imageWidgetSpat, &VramSpriteView::refresh);
     ui->spriteAttributeTable_widget->parentWidget()->layout()->replaceWidget(
         ui->spriteAttributeTable_widget, imageWidgetSpat);
 
-    imageWidgetSpat->setVramSource(VDPDataStore::instance().getVramPointer());
+    imageWidgetSpat->setVramSource(dataStore.getVramPointer());
 
 
     imageWidgetColor = new VramSpriteView(nullptr, VramSpriteView::ColorMode);
     imageWidgetColor->setMinimumSize(QSize(256, 212));
-    connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
-            imageWidgetColor, &VramSpriteView::refresh);
+    connect(&dataStore, &VDPDataStore::dataRefreshed, imageWidgetColor, &VramSpriteView::refresh);
     ui->spriteColorTable_widget->parentWidget()->layout()->replaceWidget(
         ui->spriteColorTable_widget, imageWidgetColor);
 
-    imageWidgetColor->setVramSource(VDPDataStore::instance().getVramPointer());
+    imageWidgetColor->setVramSource(dataStore.getVramPointer());
 
 
-    setPaletteSource(VDPDataStore::instance().getPalettePointer(), true);
+    setPaletteSource(dataStore.getPalettePointer(), true);
 
     setCorrectVDPData();
     setCorrectEnabled(ui->useVDPRegisters->isChecked());
@@ -153,7 +148,7 @@ SpriteViewer::SpriteViewer(QWidget* parent)
             this, &SpriteViewer::setDrawGrid);
 
     // And now go fetch the initial data
-    VDPDataStore::instance().refresh();
+    dataStore.refresh();
 }
 
 void SpriteViewer::setPaletteSource(const uint8_t* palSource, bool useVDP)
@@ -204,8 +199,8 @@ void SpriteViewer::spatwidget_mouseMoveEvent(int /*x*/, int /*y*/, int character
     const uint8_t* vramBase = VDPDataStore::instance().getVramPointer();
     if (vramBase != nullptr && character < 32) {
         auto addr = spAtAddr + 4 * character;
-        ui->label_spat_posx->setText(QString::number(vramBase[addr + 0]));
-        ui->label_spat_posy->setText(QString::number(vramBase[addr + 1]));
+        ui->label_spat_posy->setText(QString::number(vramBase[addr + 0]));
+        ui->label_spat_posx->setText(QString::number(vramBase[addr + 1]));
         ui->label_spat_pattern->setText(QString::number(vramBase[addr + 2]));
         ui->label_spat_color->setText(QString::number(vramBase[addr + 3]));
     } else {
