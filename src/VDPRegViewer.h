@@ -2,7 +2,7 @@
 #define VDPREGVIEWER_H
 
 #include "SimpleHexRequest.h"
-#include "ui_VDPRegistersExplained.h"
+#include "ui_VDPRegViewer.h"
 #include <QDialog>
 #include <cstdint>
 

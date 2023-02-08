@@ -23,7 +23,7 @@ SRC_ONLY:= \
 
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
-	BitMapViewer VDPStatusRegisters VDPRegistersExplained VDPCommandRegisters \
+	BitMapViewer VDPStatusRegisters VDPRegViewer VDPCommandRegisters \
 	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer
 
 include build/node-end.mk
