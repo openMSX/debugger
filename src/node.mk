@@ -7,7 +7,7 @@ MOC_SRC_HDR:= \
 	DockableWidget DockableWidgetArea DockableWidgetLayout \
 	CPURegsViewer CommClient DebuggerForm DisasmViewer FlagsViewer HexViewer \
 	SlotViewer StackViewer ConnectDialog OpenMSXConnection SymbolManager \
-	Settings PreferencesDialog BreakpointDialog DebuggableViewer \
+	Settings PreferencesDialog BreakpointDialog CommandDialog DebuggableViewer \
 	DebugSession MainMemoryViewer BitMapViewer VramBitMappedView \
 	VDPDataStore VDPStatusRegViewer VDPRegViewer InteractiveLabel \
 	InteractiveButton VDPCommandRegViewer GotoDialog SymbolTable \
@@ -23,7 +23,8 @@ SRC_ONLY:= \
 
 UI:= \
 	ConnectDialog SymbolManager PreferencesDialog BreakpointDialog \
-	BitMapViewer VDPStatusRegisters VDPRegViewer VDPCommandRegisters \
-	GotoDialog TileViewer PaletteDialog SpriteViewer BreakpointViewer
+	CommandDialog BitMapViewer VDPStatusRegisters VDPRegViewer \
+	VDPCommandRegisters GotoDialog TileViewer PaletteDialog SpriteViewer \
+	BreakpointViewer
 
 include build/node-end.mk

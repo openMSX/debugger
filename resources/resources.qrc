@@ -17,6 +17,7 @@
         <file>icons/symmanager.png</file>
         <file>icons/symman.png</file>
         <file>icons/symfil.png</file>
+        <file>icons/gear.png</file>
         <file>overlay.png</file>
     </qresource>
 </RCC>

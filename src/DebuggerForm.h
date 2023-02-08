@@ -5,6 +5,7 @@
 #include "DockManager.h"
 #include "DebugSession.h"
 #include "SymbolManager.h"
+#include "CommandDialog.h"
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
@@ -25,6 +26,7 @@ class VDPStatusRegViewer;
 class VDPRegViewer;
 class VDPCommandRegViewer;
 class BreakpointViewer;
+
 
 class DebuggerForm : public QMainWindow
 {
@@ -74,10 +76,13 @@ private:
 	QMenu* viewFloatingWidgetsMenu;
 	QMenu* executeMenu;
 	QMenu* breakpointMenu;
+	QMenu* commandMenu;
 	QMenu* helpMenu;
+	QDialog* commandDialog;
 
 	QToolBar* systemToolbar;
 	QToolBar* executeToolbar;
+	QToolBar* userToolbar;
 
 	QAction* fileNewSessionAction;
 	QAction* fileOpenSessionAction;
@@ -123,7 +128,7 @@ private:
 
 	QAction* breakpointToggleAction;
 	QAction* breakpointAddAction;
-
+	QAction* commandAction;
 	QAction* helpAboutAction;
 
 	DockManager dockMan;
@@ -153,6 +158,9 @@ private:
 	static int counter;
 	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
 	uint16_t disasmAddress;
+
+	QList<CommandRef> commands;
+	void updateCustomActions();
 
 	void fileNewSession();
 	void fileOpenSession();
@@ -191,6 +199,9 @@ private:
 	void toggleBreakpointAddress(uint16_t addr);
 	void addBreakpoint();
 
+	void manageCommandButtons();
+	void manageCommandButtonsFinished(int result);
+
 	void toggleView(DockableWidget* widget);
 	void initConnection();
 	void handleUpdate(const QString& type, const QString& name,
@@ -207,6 +218,9 @@ private:
 	void showFloatingWidget();
 	void processBreakpoints(const QString& message);
 	void processMerge(const QString& message);
+
+	QByteArray saveCommands() const;
+	void restoreCommands(const QByteArray& input);
 
 	friend class QueryPauseHandler;
 	friend class QueryBreakedHandler;
