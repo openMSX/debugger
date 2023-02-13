@@ -15,6 +15,7 @@
 #include "SymbolManager.h"
 #include "PreferencesDialog.h"
 #include "BreakpointDialog.h"
+#include "CommandDialog.h"
 #include "GotoDialog.h"
 #include "DebuggableViewer.h"
 #include "VDPRegViewer.h"
@@ -39,6 +40,8 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <iostream>
+
+
 class QueryPauseHandler : public SimpleCommand
 {
 public:
@@ -329,6 +332,10 @@ void DebuggerForm::createActions()
 	breakpointToggleAction->setIcon(QIcon(":/icons/break.png"));
 	breakpointToggleAction->setEnabled(false);
 
+	commandAction = new QAction(tr("Manage command buttons..."), this);
+	commandAction->setStatusTip(tr("Add new Tcl-scripted command button"));
+	commandAction->setEnabled(false);
+
 	breakpointAddAction = new QAction(tr("Add ..."), this);
 	breakpointAddAction->setShortcut(tr("CTRL+B"));
 	breakpointAddAction->setStatusTip(tr("Add a breakpoint at a location"));
@@ -371,6 +378,7 @@ void DebuggerForm::createActions()
 	connect(executeStepBackAction, &QAction::triggered, this, &DebuggerForm::executeStepBack);
 	connect(breakpointToggleAction, &QAction::triggered, this, &DebuggerForm::toggleBreakpoint);
 	connect(breakpointAddAction, &QAction::triggered, this, &DebuggerForm::addBreakpoint);
+	connect(commandAction, &QAction::triggered, this, &DebuggerForm::manageCommandButtons);
 	connect(helpAboutAction, &QAction::triggered, this, &DebuggerForm::showAbout);
 }
 
@@ -449,6 +457,10 @@ void DebuggerForm::createMenus()
 	breakpointMenu->addAction(breakpointToggleAction);
 	breakpointMenu->addAction(breakpointAddAction);
 
+	// create command menu
+	commandMenu = menuBar()->addMenu("&Commands");
+	commandMenu->addAction(commandAction);
+
 	// create help menu
 	helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(helpAboutAction);
@@ -475,6 +487,25 @@ void DebuggerForm::createToolbars()
 	executeToolbar->addAction(executeStepOutAction);
 	executeToolbar->addAction(executeStepBackAction);
 	executeToolbar->addAction(executeRunToAction);
+
+	// create customised toolbar
+	userToolbar = addToolBar(tr("User defined"));
+	userToolbar->setEnabled(false);
+	connect(&comm, &CommClient::connectionReady, userToolbar, [this]{ userToolbar->setEnabled(true); });
+	connect(&comm, &CommClient::connectionTerminated, userToolbar, [this]{ userToolbar->setEnabled(false); });
+	updateCustomActions();
+}
+
+void DebuggerForm::updateCustomActions()
+{
+	userToolbar->clear();
+	for (const auto& command : commands) {
+		auto* action = new QAction(command.name, this);
+		action->setStatusTip(command.description);
+		action->setIcon(QIcon(command.icon.isEmpty() ? ":/icons/gear.png" : command.icon));
+		connect(action, &QAction::triggered, [this, command]{ comm.sendCommand(new SimpleCommand(command.source)); });
+		userToolbar->addAction(action);
+	}
 }
 
 void DebuggerForm::createStatusbar()
@@ -603,6 +634,10 @@ void DebuggerForm::createForm()
 		                                             .arg(regW + flagW + slotW + stackW));
 	}
 
+	// restore commands
+	restoreCommands(Settings::get().value("Commands/Tcl", saveCommands()).toByteArray());
+	updateCustomActions();
+
 	// add widgets
 	for (int i = 0; i < list.size(); ++i) {
 		QStringList s = list.at(i).split(" ", Qt::SplitBehaviorFlags::SkipEmptyParts);
@@ -691,6 +726,9 @@ void DebuggerForm::closeEvent(QCloseEvent* e)
 		e->ignore();
 		return;
 	}
+
+	// store commands
+	Settings::get().setValue("Commands/Tcl", saveCommands());
 
 	// store layout
 	Settings::get().setValue("Layout/WindowGeometry", saveGeometry());
@@ -873,6 +911,7 @@ void DebuggerForm::connectionClosed()
 	systemConnectAction->setEnabled(true);
 	breakpointToggleAction->setEnabled(false);
 	breakpointAddAction->setEnabled(false);
+	commandAction->setEnabled(false);
 
 	for (auto* w : dockMan.managedWidgets()) {
 		w->widget()->setEnabled(false);
@@ -885,6 +924,8 @@ void DebuggerForm::finalizeConnection(bool halted)
 	systemRebootAction->setEnabled(true);
 	breakpointToggleAction->setEnabled(true);
 	breakpointAddAction->setEnabled(true);
+	commandAction->setEnabled(true);
+
 	// merge breakpoints on connect
 	mergeBreakpoints = true;
 	if (halted) {
@@ -1178,6 +1219,19 @@ void DebuggerForm::addBreakpoint()
 			reloadBreakpoints();
 		}
 	}
+}
+
+void DebuggerForm::manageCommandButtons()
+{
+	commandDialog = new CommandDialog(commands, this);
+	connect(commandDialog, &QDialog::finished, this, &DebuggerForm::manageCommandButtonsFinished);
+	commandDialog->open();
+}
+
+void DebuggerForm::manageCommandButtonsFinished(int result)
+{
+	if (result == QDialog::Accepted)
+		updateCustomActions();
 }
 
 void DebuggerForm::showAbout()
@@ -1534,6 +1588,48 @@ void DebuggerForm::processMerge(const QString& message)
 		reloadBreakpoints(false);
 	} else {
 		processBreakpoints(message);
+	}
+}
+
+QByteArray DebuggerForm::saveCommands() const
+{
+	QByteArray output;
+
+	auto first = true;
+	for (const auto& [name, description, source, icon, _] : commands) {
+		if (!first) output.append(':');
+		first = false;
+		output.append(name.toUtf8().toBase64());
+		output.append(';');
+		output.append(description.toUtf8().toBase64());
+		output.append(';');
+		output.append(source.toUtf8().toBase64());
+		output.append(';');
+		output.append(icon.toUtf8().toBase64());
+	}
+
+	return output;
+}
+
+void DebuggerForm::restoreCommands(const QByteArray& input)
+{
+	commands.clear();
+
+	auto commandBytes = input.split(':');
+	auto counter = 0;
+	for (const auto& cb : commandBytes) {
+		auto fields = cb.split(';');
+		if (fields.count() < 4) continue;
+
+		QString name = QByteArray::fromBase64(fields[0]);
+		CommandRef command{
+			name,
+			QByteArray::fromBase64(fields[1]),
+			QByteArray::fromBase64(fields[2]),
+			QByteArray::fromBase64(fields[3]),
+			counter++
+		};
+		commands.append(command);
 	}
 }
 
