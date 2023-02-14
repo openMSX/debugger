@@ -56,7 +56,7 @@ private:
 	void DataHexRequestReceived() override;
 
 private:
-	uint8_t regs[64 + 16 + 2 + 3] = {};
+	uint8_t regs[64 + 16 + 2 + 4] = {};
 	buttonHighlightDispatcher* modeBitsDispat;
 	int vdpId;
 };

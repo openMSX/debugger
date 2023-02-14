@@ -636,12 +636,15 @@ void VDPRegViewer::decodeVDPRegs()
 		label_dec_r19->setText(dec3(regs[19]));
 		label_dec_r23->setText(dec3(regs[23]));
 
-		label_dec_r14->setText(hex5(((regs[14] & 7) << 14) | ((regs[81] & 63) << 8) | regs[80]));
+		auto& dataStore = VDPDataStore::instance();
+		label_dec_r14->setText(hex5(((regs[14] & 7) << 14) | ((regs[81] & 63) << 8) | regs[80])
+				.append(dataStore.getVramAccessStatusAvailable() ? (regs[85] ? ", write" : ", read") : ""));
+
 		label_dec_r15->setText(dec2(regs[15] & 15));
 		label_dec_r16->setText(dec2(regs[16] & 15));
 		label_dec_r17->setText(dec3(regs[17] & 63).append((regs[17] & 128) ? "" : ", auto incr"));
 
-		label_dec_latch->setText(VDPDataStore::instance().getRegisterLatchAvailable() ?
+		label_dec_latch->setText(dataStore.getRegisterLatchAvailable() ?
 				QString("%1/%2")
 				.arg(hex2(regs[84]))
 				.arg(regs[82] ? "register" : "value") : "---/---");
@@ -917,18 +920,21 @@ void VDPRegViewer::refresh()
 	bool registerLatchAvailable = dataStore.getRegisterLatchAvailable();
 	bool paletteLatchAvailable = dataStore.getPaletteLatchAvailable();
 	bool dataLatchAvailable = dataStore.getDataLatchAvailable();
+	bool vramAccessStatusAvailable = dataStore.getVramAccessStatusAvailable();
 
 	// three to six different requests now combined in a single one:
 	QString req = QString(
 		"debug_bin2hex "
 		"[ debug read_block {VDP regs} 0 64 ]"
 		"[ debug read_block {VDP status regs} 0 16 ]"
-		"[ debug read_block {VRAM pointer} 0 2 ]%1%2%3")
+		"[ debug read_block {VRAM pointer} 0 2 ]%1%2%3%4")
 		.arg(registerLatchAvailable ? "[debug read_block {VDP register latch status} 0 1]" : "")
 		.arg(paletteLatchAvailable ? "[debug read_block {VDP palette latch status} 0 1]" : "")
-		.arg(dataLatchAvailable ? "[debug read_block {VDP data latch value} 0 1]" : "");
+		.arg(dataLatchAvailable ? "[debug read_block {VDP data latch value} 0 1]" : "")
+		.arg(vramAccessStatusAvailable ? "[debug read_block {VRAM access status} 0 1]" : "");
 
-	int total = sizeof(regs) - !registerLatchAvailable - !paletteLatchAvailable - !dataLatchAvailable;
+	int total = sizeof(regs) - !registerLatchAvailable - !paletteLatchAvailable - !dataLatchAvailable
+		- !vramAccessStatusAvailable;
 	new SimpleHexRequest(req, total, regs, *this);
 }
 
