@@ -321,8 +321,11 @@
        </item>
        <item>
         <widget class="QPushButton" name="editPaletteButton" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="text" >
-          <string>Edit palette..</string>
+          <string>Edit palette...</string>
          </property>
         </widget>
        </item>
@@ -422,7 +425,7 @@
      <widget class="QWidget" name="scrollAreaWidgetContents" >
       <property name="geometry" >
        <rect>
-        <x>85</x>
+        <x>82</x>
         <y>0</y>
         <width>508</width>
         <height>420</height>

@@ -35,7 +35,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Edit palette..</string>
+        <string>Edit palette...</string>
        </property>
       </widget>
      </item>
