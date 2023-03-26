@@ -10301,7 +10301,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="InteractiveLabel" name="label_dec_bl">
             <property name="text">
-             <string>Display enabeled</string>
+             <string>Display enabled</string>
             </property>
            </widget>
           </item>
