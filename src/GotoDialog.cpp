@@ -31,7 +31,7 @@ void GotoDialog::addressChanged(const QString& text)
 {
 	auto addr = stringToValue<uint16_t>(text);
 
-	if (addr && debugSession) {
+	if (!text.isEmpty() && !addr && debugSession) {
 		// try finding a label
 		currentSymbol = debugSession->symbolTable().getAddressSymbol(text);
 		if (!currentSymbol) currentSymbol = debugSession->symbolTable().getAddressSymbol(text, Qt::CaseInsensitive);
