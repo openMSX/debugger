@@ -816,6 +816,8 @@ void DebuggerForm::initConnection()
 
 	comm.sendCommand(new SimpleCommand("openmsx_update enable status"));
 
+	comm.sendCommand(new SimpleCommand("openmsx_update enable debug"));
+
 	comm.sendCommand(new ListDebuggablesHandler(*this));
 
 	// define 'debug_bin2hex' proc for internal use
@@ -945,7 +947,10 @@ void DebuggerForm::finalizeConnection(bool halted)
 void DebuggerForm::handleUpdate(const QString& type, const QString& name,
                                 const QString& message)
 {
-	if (type == "status") {
+	if (type == "debug") {
+		// TODO: read only new breakpoint
+		reloadBreakpoints(false);
+	} else if (type == "status") {
 		if (name == "cpu") {
 			// running state by default.
 			if (message == "suspended") {
