@@ -689,7 +689,7 @@ void DebuggerForm::createForm()
 	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
-	connect(bpView, &BreakpointViewer::contentsUpdated, this, &DebuggerForm::reloadBreakpoints);
+	connect(bpView, &BreakpointViewer::contentsUpdated, this, [this]{ reloadBreakpoints(false); });
 
 	// CPU regs viewer
 	// Hook up the register viewer with the main memory viewer

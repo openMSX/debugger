@@ -16,9 +16,12 @@ struct BreakpointRef {
 	enum Type { BREAKPOINT, WATCHPOINT, CONDITION, ALL } type;
 
 	QString id;
+	int tableIndex = -1;
+	int breakpointIndex = -1;
 
-	int row = -1;
-	int index = -1;
+	bool operator==(const QString &id_) const {
+		return id_ == id;
+	}
 };
 
 class BreakpointViewer : public QTabWidget, private Ui::BreakpointViewer
@@ -41,28 +44,31 @@ public:
 	void sync();
 
 signals:
-	void contentsUpdated(bool merge);
+	void contentsUpdated();
 
 private:
 	void setTextField(BreakpointRef::Type type, int row, int column, const QString& value, const QString& tooltip = {});
 
 	std::optional<AddressRange> parseSymbolOrValue(const QString& field) const;
 
-	std::optional<AddressRange> parseLocationField(std::optional<int> index,
+	QString findSymbolOrValue(uint16_t address) const;
+
+	std::optional<AddressRange> parseLocationField(std::optional<int> bpIndex,
 	                                               BreakpointRef::Type type,
 	                                               const QString& field,
 	                                               const QString& combo = {});
-	Slot parseSlotField(std::optional<int> index, const QString& field);
-	std::optional<uint8_t> parseSegmentField(std::optional<int> index, const QString& field);
+	Slot parseSlotField(std::optional<int> bpIndex, const QString& field);
+	std::optional<uint8_t> parseSegmentField(std::optional<int> bpIndex, const QString& field);
 	void changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);
 	int  createTableRow(BreakpointRef::Type type, int row = -1);
-	void fillTableRow(int index, BreakpointRef::Type type, int row);
+	void fillTableRowLocation(BreakpointRef::Type type, int row, const QString& location);
+	void fillTableRow(BreakpointRef::Type type, int row, int bpIndex);
 	std::optional<Breakpoint> parseTableRow(BreakpointRef::Type type, int row);
-	bool connectBreakpointID(const QString& id, BreakpointRef& data);
-	void populate();
+	bool addBreakpointRef(const QString& id, BreakpointRef& data);
 
+	std::optional<int> getTableIndexByRow(BreakpointRef::Type type, int row) const;
 	void createBreakpoint(BreakpointRef::Type type, int row);
 	void _handleSyncError(const QString& error);
 	void _handleKeyAlreadyExists();
@@ -71,15 +77,15 @@ private:
 	void _createCondition(int row);
 
 	void replaceBreakpoint(BreakpointRef::Type type, int row);
-	void removeBreakpoint(BreakpointRef::Type type, int row, bool logical = false);
+	void removeBreakpoint(BreakpointRef::Type type, int row, bool removeLocal = false);
 	void setBreakpointChecked(BreakpointRef::Type type, int row, Qt::CheckState state);
 	void onAddBtnClicked(BreakpointRef::Type type);
 	void onRemoveBtnClicked(BreakpointRef::Type type);
 	void stretchTable(BreakpointRef::Type type = BreakpointRef::ALL);
 
-	BreakpointRef* scanBreakpointRef(BreakpointRef::Type type, int row);
+	std::optional<int> findTableRowByIndex(BreakpointRef::Type type, int index) const;
 	BreakpointRef* findBreakpointRef(BreakpointRef::Type type, int row);
-	BreakpointRef* scanBreakpointRef(const Breakpoint& bp);
+	BreakpointRef* findBreakpointRefById(BreakpointRef::Type type, const QString& id);
 
 	void changeCurrentWpType(int row, int index);
 	void disableSorting(BreakpointRef::Type type = BreakpointRef::ALL);
