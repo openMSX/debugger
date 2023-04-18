@@ -626,7 +626,7 @@ void BreakpointViewer::sync()
 				// update symbol name
 				if (type == BreakpointRef::BREAKPOINT) {
 					auto* location = tables[type]->item(*row, LOCATION);
-					if (location->text() == hexValue(bp.range->start, 4)) {
+					if (location->text().toUpper() == hexValue(bp.range->start, 4)) {
 						fillTableRowLocation(type, *row, findSymbolOrValue(bp.range->start));
 					}
 				}
@@ -646,7 +646,7 @@ void BreakpointViewer::sync()
 			// update symbol name
 			if (type == BreakpointRef::BREAKPOINT) {
 				auto* location = tables[type]->item(row, LOCATION);
-				if (location->text() == hexValue(bp.range->start, 4)) {
+				if (location->text().toUpper() == hexValue(bp.range->start, 4)) {
 					fillTableRowLocation(type, row, findSymbolOrValue(bp.range->start));
 				}
 			}
