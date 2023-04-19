@@ -507,9 +507,12 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 	return true;
 }
 
-void SymbolTable::fileChanged(const QString & /*path*/)
+void SymbolTable::fileChanged(const QString& path)
 {
 	emit symbolFileChanged();
+	if (QFile::exists(path)) {
+		fileWatcher.addPath(path);
+	}
 }
 
 void SymbolTable::reloadFiles()

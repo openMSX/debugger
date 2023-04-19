@@ -117,7 +117,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Index</string>
+        <string>Address</string>
        </property>
       </column>
      </widget>
@@ -244,7 +244,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Index</string>
+        <string>Address</string>
        </property>
       </column>
      </widget>
@@ -371,7 +371,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Index</string>
+        <string>Address</string>
        </property>
       </column>
      </widget>

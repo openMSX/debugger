@@ -22,6 +22,7 @@ private:
 
 	void autoReloadSymbols(int state);
 	void preserveLostSymbols(int state);
+	void preserveBreakpointSymbol(int state);
 
 private:
 	bool updating;

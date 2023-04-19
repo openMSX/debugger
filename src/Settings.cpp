@@ -3,7 +3,7 @@
 #include <QDebug>
 
 static const char* DebuggerConfigNames[Settings::CONFIG_END] = {
-	"AutoReloadSymbols", "PreserveLostSymbols"
+	"AutoReloadSymbols", "PreserveLostSymbols", "PreserveBreakpointSymbol"
 };
 
 static const char* DebuggerFontNames[Settings::FONT_END] = {
@@ -55,6 +55,7 @@ void Settings::getConfigFromSettings()
 {
 	getBoolFromSetting(AUTO_RELOAD_SYMBOLS, false);
 	getBoolFromSetting(PRESERVE_LOST_SYMBOLS, true);
+	getBoolFromSetting(PRESERVE_BREAKPOINT_SYMBOL, false);
 }
 
 void Settings::setConfig(DebuggerConfig c, const QVariant& v)
@@ -189,6 +190,16 @@ bool Settings::preserveLostSymbols() const
 void Settings::setPreserveLostSymbols(bool b)
 {
 	setConfig(PRESERVE_LOST_SYMBOLS, b);
+}
+
+bool Settings::preserveBreakpointSymbol() const
+{
+	return config[PRESERVE_BREAKPOINT_SYMBOL].value<bool>();
+}
+
+void Settings::setPreserveBreakpointSymbol(bool b)
+{
+	setConfig(PRESERVE_BREAKPOINT_SYMBOL, b);
 }
 
 void Settings::updateFonts()

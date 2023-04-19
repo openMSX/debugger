@@ -42,6 +42,11 @@ void PreferencesDialog::initConfig()
 	cbPreserveLostSymbols->setChecked(status2);
 	connect(cbPreserveLostSymbols, &QCheckBox::stateChanged,
 			this, &PreferencesDialog::preserveLostSymbols);
+
+	int status3 = s.preserveBreakpointSymbol() ? Qt::Checked : Qt::Unchecked;
+	cbPreserveBreakpointSymbol->setChecked(status3);
+	connect(cbPreserveBreakpointSymbol, &QCheckBox::stateChanged,
+			this, &PreferencesDialog::preserveBreakpointSymbol);
 }
 /*
  * Font settings
@@ -134,6 +139,11 @@ void PreferencesDialog::autoReloadSymbols(int state)
 void PreferencesDialog::preserveLostSymbols(int state)
 {
 	Settings::get().setPreserveLostSymbols(state == Qt::Checked);
+}
+
+void PreferencesDialog::preserveBreakpointSymbol(int state)
+{
+	Settings::get().setPreserveBreakpointSymbol(state == Qt::Checked);
 }
 
 void PreferencesDialog::setFontPreviewColor(const QColor& c)

@@ -14,17 +14,6 @@ class DebugSession;
 
 enum BreakpointType { BREAKPOINT, WATCHPOINT, CONDITION, ALL };
 
-struct BreakpointRef {
-	enum BreakpointType type;
-	QString id;
-	int tableIndex = -1;
-	int breakpointIndex = -1;
-
-	bool operator==(const QString &id_) const {
-		return id_ == id;
-	}
-};
-
 class BreakpointViewer : public QTabWidget, private Ui::BreakpointViewer
 {
 	Q_OBJECT
@@ -63,11 +52,10 @@ private:
 	void changeTableItem(BreakpointType type, QTableWidgetItem* item);
 	void createComboBox(int row);
 	Breakpoint::Type readComboBox(int row);
-	int  createTableRow(BreakpointType type, int row = -1);
+	int createTableRow(BreakpointType type, int row = -1);
 	void fillTableRowLocation(BreakpointType type, int row, const QString& location);
 	void fillTableRow(BreakpointType type, int row, int bpIndex);
 	std::optional<Breakpoint> parseTableRow(BreakpointType type, int row);
-	bool addBreakpointRef(const QString& id, BreakpointRef& data);
 
 	std::optional<int> getTableIndexByRow(BreakpointType type, int row) const;
 	void createBreakpoint(BreakpointType type, int row);
@@ -84,9 +72,8 @@ private:
 	void onRemoveBtnClicked(BreakpointType type);
 	void stretchTable(BreakpointType type = BreakpointType::ALL);
 
-	std::optional<int> findTableRowByIndex(BreakpointType type, int index) const;
-	BreakpointRef* findBreakpointRef(BreakpointType type, int row);
-	BreakpointRef* findBreakpointRefById(BreakpointType type, const QString& id);
+	std::optional<int> findBreakpointIndex(BreakpointType type, int row) const;
+	std::optional<int> findBreakpointRow(BreakpointType type, const QString& id) const;
 
 	void changeCurrentWpType(int row, int index);
 	void disableSorting(BreakpointType type = BreakpointType::ALL);
@@ -95,13 +82,13 @@ private:
 	void changeCnTableItem(QTableWidgetItem* item);
 	void on_itemPressed(QTableWidgetItem* item);
 	void on_headerClicked(int index);
+	void refreshTableRow(int bpIndex, BreakpointType type, int row);
 
 private:
 	Ui::BreakpointViewer* ui;
 	DebugSession& debugSession;
 
 	QTableWidget* tables[BreakpointType::ALL];
-	std::map<QString, BreakpointRef> maps[BreakpointType::ALL];
 
 	bool disableRefresh = false;
 	bool userMode = true;
