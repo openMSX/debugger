@@ -41,7 +41,7 @@ public:
 
 	void setRunState();
 	void setBreakState();
-	void sync();
+	void refresh();
 
 signals:
 	void contentsUpdated();
@@ -102,7 +102,7 @@ private:
 	QTableWidget* tables[BreakpointRef::ALL];
 	std::map<QString, BreakpointRef> maps[BreakpointRef::ALL];
 
-	bool selfUpdating = false;
+	bool disableRefresh = false;
 	bool userMode = true;
 	bool runState;
 	bool conditionsMsg = false;

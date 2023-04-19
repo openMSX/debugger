@@ -171,11 +171,11 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 			// update breakpoint id
 			setTextField(type, row, ID, id);
 
-			selfUpdating = false;
+			disableRefresh = false;
 			emit contentsUpdated();
 		},
 		[this] (const QString& error) {
-			selfUpdating = false;
+			disableRefresh = false;
 			_handleSyncError(error);
 		}
 	);
@@ -189,8 +189,8 @@ void BreakpointViewer::replaceBreakpoint(BreakpointRef::Type type, int row)
 	auto* table = tables[type];
 	auto* item  = table->item(row, ID);
 	QString id  = item->text();
-	// remove and create breakpoint without calling sync in between.
-	selfUpdating = true;
+	// remove and create breakpoint without calling refresh in between.
+	disableRefresh = true;
 
 	// replacing is the same as removing an old breakpoint and then create a new one
 	const QString cmdStr = breakpoints->createRemoveCommand(id);
@@ -200,7 +200,7 @@ void BreakpointViewer::replaceBreakpoint(BreakpointRef::Type type, int row)
 		},
 		[this](const QString& error) {
 			// restore default behaviour on error
-			selfUpdating = false;
+			disableRefresh = false;
 			_handleSyncError(error);
 		}
 	);
@@ -271,7 +271,7 @@ void BreakpointViewer::_createCondition(int row)
 			// update breakpoint id
 			setTextField(type, row, ID, id);
 			// restore default behaviour if replacing a Breakpoint
-			selfUpdating = false;
+			disableRefresh = false;
 		},
 		[this] (const QString& error) { _handleSyncError(error); }
 	);
@@ -593,10 +593,10 @@ std::optional<int> BreakpointViewer::findTableRowByIndex(BreakpointRef::Type typ
 	return {};
 }
 
-void BreakpointViewer::sync()
+void BreakpointViewer::refresh()
 {
 	// don't reload if self-inflicted update
-	if (selfUpdating) return;
+	if (disableRefresh) return;
 
 	// store unused items position by disabling ordering
 	disableSorting();
