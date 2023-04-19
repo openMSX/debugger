@@ -686,7 +686,7 @@ void DebuggerForm::createForm()
 	connect(slotView, &SlotViewer::slotsUpdated, this, &DebuggerForm::onSlotsUpdated);
 
 	// Breakpoint viewer
-	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::sync);
+	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::refresh);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
 	connect(bpView, &BreakpointViewer::contentsUpdated, this, [this]{ reloadBreakpoints(false); });
@@ -1114,6 +1114,8 @@ void DebuggerForm::systemSymbolManager()
 	        bpView, &BreakpointViewer::onSymbolTableChanged);
 	connect(this, &DebuggerForm::symbolFilesChanged,
 	        symManager, &SymbolManager::refresh);
+	connect(this, &DebuggerForm::symbolFilesChanged,
+	        bpView, &BreakpointViewer::refresh);
 	symManager->exec();
 
 	emit symbolsChanged();
