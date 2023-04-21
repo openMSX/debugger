@@ -24,7 +24,7 @@ enum TableColumns {
 	T_CONDITION = 3,
 	SLOT = 4,
 	SEGMENT = 5,
-	ID = 6,
+	BREAKPOINT_ID = 6,
 	TABLE_INDEX = 7,
 };
 
@@ -53,7 +53,7 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 	bpTableWidget->horizontalHeader()->setHighlightSections(false);
 	bpTableWidget->sortByColumn(LOCATION, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);
-	bpTableWidget->setColumnHidden(ID, true);
+	bpTableWidget->setColumnHidden(BREAKPOINT_ID, true);
 	bpTableWidget->setColumnHidden(TABLE_INDEX, true);
 	bpTableWidget->resizeColumnsToContents();
 	bpTableWidget->setSortingEnabled(true);
@@ -63,7 +63,7 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 	        &BreakpointViewer::on_headerClicked);
 
 	wpTableWidget->horizontalHeader()->setHighlightSections(false);
-	wpTableWidget->setColumnHidden(ID, true);
+	wpTableWidget->setColumnHidden(BREAKPOINT_ID, true);
 	wpTableWidget->setColumnHidden(TABLE_INDEX, true);
 	wpTableWidget->sortByColumn(WP_REGION, Qt::AscendingOrder);
 	wpTableWidget->resizeColumnsToContents();
@@ -73,7 +73,7 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 
 	cnTableWidget->horizontalHeader()->setHighlightSections(false);
 	cnTableWidget->setColumnHidden(WP_TYPE, true);
-	cnTableWidget->setColumnHidden(ID, true);
+	cnTableWidget->setColumnHidden(BREAKPOINT_ID, true);
 	cnTableWidget->setColumnHidden(LOCATION, true);
 	cnTableWidget->setColumnHidden(SLOT, true);
 	cnTableWidget->setColumnHidden(SEGMENT, true);
@@ -169,7 +169,7 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 			addBreakpointRef(id, newRef);
 
 			// update breakpoint id
-			setTextField(type, row, ID, id);
+			setTextField(type, row, BREAKPOINT_ID, id);
 
 			disableRefresh = false;
 			emit contentsUpdated();
@@ -187,7 +187,7 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 void BreakpointViewer::replaceBreakpoint(BreakpointRef::Type type, int row)
 {
 	auto* table = tables[type];
-	auto* item  = table->item(row, ID);
+	auto* item  = table->item(row, BREAKPOINT_ID);
 	QString id  = item->text();
 	// remove and create breakpoint without calling refresh in between.
 	disableRefresh = true;
@@ -213,7 +213,7 @@ void BreakpointViewer::removeBreakpoint(BreakpointRef::Type type, int row, bool 
 {
 	auto* table = tables[type];
 
-	auto* item  = table->item(row, ID);
+	auto* item  = table->item(row, BREAKPOINT_ID);
 	assert(!item->text().isEmpty());
 	QString id  = item->text();
 	const QString cmdStr = Breakpoints::createRemoveCommand(id);
@@ -269,7 +269,7 @@ void BreakpointViewer::_createCondition(int row)
 			setBreakpointChecked(type, row, Qt::Checked);
 
 			// update breakpoint id
-			setTextField(type, row, ID, id);
+			setTextField(type, row, BREAKPOINT_ID, id);
 			// restore default behaviour if replacing a Breakpoint
 			disableRefresh = false;
 		},
@@ -480,7 +480,7 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 			if (!enabled) return;
 			break;
 		}
-		case ID:
+		case BREAKPOINT_ID:
 			return;
 		default:
 			qWarning() << "Unknown table column" << table->column(item);
@@ -675,7 +675,7 @@ void BreakpointViewer::refresh()
 BreakpointRef* BreakpointViewer::findBreakpointRef(BreakpointRef::Type type, int row)
 {
 	auto& table = tables[type];
-	auto* item = table->item(row, ID);
+	auto* item = table->item(row, BREAKPOINT_ID);
 	auto it = maps[type].find(item->text());
 	if (it != maps[type].end()) return &it->second;
 	return nullptr;
@@ -771,11 +771,11 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 	item5->setText("X");
 	table->setItem(row, SEGMENT, item5);
 
-	// breakpoint ID
+	// breakpoint id
 	auto* item6 = new QTableWidgetItem();
 	item6->setFlags(Qt::NoItemFlags);
 	item6->setText("");
-	table->setItem(row, ID, item6);
+	table->setItem(row, BREAKPOINT_ID, item6);
 
 	// tableIndex
 	auto* item7 = new QTableWidgetItem();
@@ -841,7 +841,7 @@ void BreakpointViewer::fillTableRow(BreakpointRef::Type type, int row, int bpInd
 	item5->setText(segment);
 
 	// id
-	auto* item6 = table->item(row, ID);
+	auto* item6 = table->item(row, BREAKPOINT_ID);
 	item6->setText(bp.id);
 }
 
