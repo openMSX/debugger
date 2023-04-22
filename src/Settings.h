@@ -10,7 +10,8 @@ class Settings : public QSettings
 	Q_OBJECT
 public:
 	enum DebuggerConfig {
-		AUTO_RELOAD_SYMBOLS, PRESERVE_LOST_SYMBOLS, CONFIG_END
+		AUTO_RELOAD_SYMBOLS, PRESERVE_LOST_SYMBOLS, PRESERVE_BREAKPOINT_SYMBOL,
+		CONFIG_END
 	};
 	enum DebuggerFont {
 		APP_FONT, FIXED_FONT, CODE_FONT, LABEL_FONT, HEX_FONT, FONT_END
@@ -33,6 +34,8 @@ public:
 	void setAutoReloadSymbols(bool b);
 	bool preserveLostSymbols() const;
 	void setPreserveLostSymbols(bool b);
+	bool preserveBreakpointSymbol() const;
+	void setPreserveBreakpointSymbol(bool b);
 	void setConfig(DebuggerConfig c, const QVariant& v);
 
 private:

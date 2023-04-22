@@ -41,6 +41,7 @@
 #include <QCloseEvent>
 #include <iostream>
 
+bool forceBreak = false;
 
 class QueryPauseHandler : public SimpleCommand
 {
@@ -689,7 +690,6 @@ void DebuggerForm::createForm()
 	connect(this, &DebuggerForm::breakpointsUpdated, bpView, &BreakpointViewer::refresh);
 	connect(this, &DebuggerForm::runStateEntered, bpView, &BreakpointViewer::setRunState);
 	connect(this, &DebuggerForm::breakStateEntered, bpView, &BreakpointViewer::setBreakState);
-	connect(bpView, &BreakpointViewer::contentsUpdated, this, [this]{ reloadBreakpoints(false); });
 
 	// CPU regs viewer
 	// Hook up the register viewer with the main memory viewer
@@ -816,7 +816,13 @@ void DebuggerForm::initConnection()
 
 	comm.sendCommand(new SimpleCommand("openmsx_update enable status"));
 
-	comm.sendCommand(new SimpleCommand("openmsx_update enable debug"));
+	auto* command = new Command("openmsx_update enable debug",
+		[=](const QString& /*message*/) {},
+		[=](const QString& /*error*/) {
+			// force reload if debug is disabled
+			connect(bpView, &BreakpointViewer::contentsUpdated, this, [this]{ reloadBreakpoints(false); });
+		});
+	comm.sendCommand(command);
 
 	comm.sendCommand(new ListDebuggablesHandler(*this));
 
@@ -1108,6 +1114,8 @@ void DebuggerForm::systemSymbolManager()
 {
 	symManager = new SymbolManager(session.symbolTable(), this);
 
+	connect(this, &DebuggerForm::symbolFilesChanged,
+	        disasmView, &DisasmViewer::refresh);
 	connect(symManager, &SymbolManager::symbolTableChanged,
 	        &session, &DebugSession::sessionModified);
 	connect(symManager, &SymbolManager::symbolTableChanged,

@@ -3,6 +3,7 @@
 #include "CommClient.h"
 #include "DebugSession.h"
 #include "OpenMSXConnection.h"
+#include "Settings.h"
 #include "ScopedAssign.h"
 #include "ranges.h"
 #include <QPainter>
@@ -14,18 +15,15 @@
 
 static constexpr int UNDEFINED_ROW = -1;
 
-static int newTableItem = 0;
-
 enum TableColumns {
 	ENABLED = 0,
 	WP_TYPE = 1,
 	LOCATION = 2,
-	WP_REGION = 2,
 	T_CONDITION = 3,
 	SLOT = 4,
 	SEGMENT = 5,
-	ID = 6,
-	TABLE_INDEX = 7,
+	BREAKPOINT_ID = 6,
+	ADDRESS = 7,
 };
 
 static QString locationString(const AddressRange& range, int adrLen)
@@ -53,8 +51,8 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 	bpTableWidget->horizontalHeader()->setHighlightSections(false);
 	bpTableWidget->sortByColumn(LOCATION, Qt::AscendingOrder);
 	bpTableWidget->setColumnHidden(WP_TYPE, true);
-	bpTableWidget->setColumnHidden(ID, true);
-	bpTableWidget->setColumnHidden(TABLE_INDEX, true);
+	bpTableWidget->setColumnHidden(BREAKPOINT_ID, true);
+	bpTableWidget->setColumnHidden(ADDRESS, true);
 	bpTableWidget->resizeColumnsToContents();
 	bpTableWidget->setSortingEnabled(true);
 	connect(bpTableWidget, &QTableWidget::itemPressed, this, &BreakpointViewer::on_itemPressed);
@@ -63,9 +61,9 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 	        &BreakpointViewer::on_headerClicked);
 
 	wpTableWidget->horizontalHeader()->setHighlightSections(false);
-	wpTableWidget->setColumnHidden(ID, true);
-	wpTableWidget->setColumnHidden(TABLE_INDEX, true);
-	wpTableWidget->sortByColumn(WP_REGION, Qt::AscendingOrder);
+	wpTableWidget->setColumnHidden(BREAKPOINT_ID, true);
+	wpTableWidget->setColumnHidden(ADDRESS, true);
+	wpTableWidget->sortByColumn(LOCATION, Qt::AscendingOrder);
 	wpTableWidget->resizeColumnsToContents();
 	wpTableWidget->setSortingEnabled(true);
 	connect(wpTableWidget, &QTableWidget::itemChanged, this,
@@ -73,34 +71,26 @@ BreakpointViewer::BreakpointViewer(DebugSession& session, QWidget* parent)
 
 	cnTableWidget->horizontalHeader()->setHighlightSections(false);
 	cnTableWidget->setColumnHidden(WP_TYPE, true);
-	cnTableWidget->setColumnHidden(ID, true);
+	cnTableWidget->setColumnHidden(BREAKPOINT_ID, true);
 	cnTableWidget->setColumnHidden(LOCATION, true);
 	cnTableWidget->setColumnHidden(SLOT, true);
 	cnTableWidget->setColumnHidden(SEGMENT, true);
-	cnTableWidget->setColumnHidden(TABLE_INDEX, true);
+	cnTableWidget->setColumnHidden(ADDRESS, true);
 	cnTableWidget->sortByColumn(T_CONDITION, Qt::AscendingOrder);
 	cnTableWidget->resizeColumnsToContents();
 	cnTableWidget->setSortingEnabled(true);
 	connect(cnTableWidget, &QTableWidget::itemChanged, this,
 	        &BreakpointViewer::changeCnTableItem);
 
-	tables[BreakpointRef::BREAKPOINT] = bpTableWidget;
-	tables[BreakpointRef::WATCHPOINT] = wpTableWidget;
-	tables[BreakpointRef::CONDITION]  = cnTableWidget;
-}
-
-std::optional<int> BreakpointViewer::getTableIndexByRow(BreakpointRef::Type type, int row) const
-{
-	auto* table = tables[type];
-	if (row >= table->rowCount()) return {};
-	auto* item = table->item(row, TABLE_INDEX);
-	return item->text().toInt();
+	tables[BreakpointType::BREAKPOINT] = bpTableWidget;
+	tables[BreakpointType::WATCHPOINT] = wpTableWidget;
+	tables[BreakpointType::CONDITION]  = cnTableWidget;
 }
 
 // TODO: move the createSetCommand to a session manager
-void BreakpointViewer::createBreakpoint(BreakpointRef::Type type, int row)
+void BreakpointViewer::createBreakpoint(BreakpointType type, int row)
 {
-	if (type == BreakpointRef::CONDITION) _createCondition(row);
+	if (type == BreakpointType::CONDITION) _createCondition(row);
 	else _createBreakpoint(type, row);
 }
 
@@ -136,13 +126,13 @@ void BreakpointViewer::_handleKeyNotFound()
 	}
 }
 
-void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
+void BreakpointViewer::_createBreakpoint(BreakpointType type, int row)
 {
-	assert(type != BreakpointRef::CONDITION);
+	assert(type != BreakpointType::CONDITION);
 	auto* table = tables[type];
 	auto* model = table->model();
 	auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
-	Breakpoint::Type wtype = type == BreakpointRef::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
+	Breakpoint::Type wtype = type == BreakpointType::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
 
 	QString location = table->item(row, LOCATION)->text();
 	auto range = parseLocationField({}, type, location, combo ? combo->currentText() : "");
@@ -156,25 +146,13 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 
 	auto* command = new Command(cmdStr,
 		[=] (const QString& id) {
-			auto tableIndex = getTableIndexByRow(type, row);
-			assert(tableIndex);
-
-			// remove old BreakpointRef
-			if (auto* ref = findBreakpointRef(type, row)) {
-				maps[type].erase(ref->id);
-			}
-
-			// ref doesn't exist, so it must be a new breakpoint
-			BreakpointRef newRef = {type, id, *tableIndex, -1};
-			addBreakpointRef(id, newRef);
-
 			// update breakpoint id
-			setTextField(type, row, ID, id);
+			setTextField(type, row, BREAKPOINT_ID, id);
 
 			disableRefresh = false;
 			emit contentsUpdated();
 		},
-		[this] (const QString& error) {
+		[=] (const QString& error) {
 			disableRefresh = false;
 			_handleSyncError(error);
 		}
@@ -184,10 +162,10 @@ void BreakpointViewer::_createBreakpoint(BreakpointRef::Type type, int row)
 }
 
 // TODO: move the createRemoveCommand to a session manager
-void BreakpointViewer::replaceBreakpoint(BreakpointRef::Type type, int row)
+void BreakpointViewer::replaceBreakpoint(BreakpointType type, int row)
 {
 	auto* table = tables[type];
-	auto* item  = table->item(row, ID);
+	auto* item  = table->item(row, BREAKPOINT_ID);
 	QString id  = item->text();
 	// remove and create breakpoint without calling refresh in between.
 	disableRefresh = true;
@@ -209,31 +187,22 @@ void BreakpointViewer::replaceBreakpoint(BreakpointRef::Type type, int row)
 }
 
 // TODO: move the createRemoveCommand to a session manager
-void BreakpointViewer::removeBreakpoint(BreakpointRef::Type type, int row, bool removeLocal)
+void BreakpointViewer::removeBreakpoint(BreakpointType type, int row, bool removeLocal)
 {
 	auto* table = tables[type];
 
-	auto* item  = table->item(row, ID);
+	auto* item  = table->item(row, BREAKPOINT_ID);
 	assert(!item->text().isEmpty());
 	QString id  = item->text();
 	const QString cmdStr = Breakpoints::createRemoveCommand(id);
 
 	auto* command = new Command(cmdStr,
 		[=] (const QString& /*result*/) {
-			size_t erased = maps[type].erase(id);
-
-			if (erased != 1) {
-				setBreakpointChecked(type, row, Qt::Unchecked);
-				_handleKeyNotFound();
-				return;
-			}
-
 			if (removeLocal) {
 				auto* table = tables[type];
 				auto     sa = ScopedAssign(userMode, false);
 				table->removeRow(row);
 			}
-
 			emit contentsUpdated();
 		},
 		[this] (const QString& error) { _handleSyncError(error); }
@@ -245,31 +214,22 @@ void BreakpointViewer::removeBreakpoint(BreakpointRef::Type type, int row, bool 
 // TODO: move the createSetCommand to a session manager
 void BreakpointViewer::_createCondition(int row)
 {
-	BreakpointRef::Type type = BreakpointRef::CONDITION;
+	BreakpointType type = BreakpointType::CONDITION;
 	QString condition = cnTableWidget->item(row, T_CONDITION)->text();
 	if (condition.isEmpty()) {
-		setBreakpointChecked(BreakpointRef::CONDITION, row, Qt::Unchecked);
+		setBreakpointChecked(BreakpointType::CONDITION, row, Qt::Unchecked);
 		return;
 	} else {
-		setBreakpointChecked(BreakpointRef::CONDITION, row, Qt::Checked);
+		setBreakpointChecked(BreakpointType::CONDITION, row, Qt::Checked);
 	}
 	const QString cmdStr = Breakpoints::createSetCommand(Breakpoint::CONDITION, {}, {}, {}, condition);
 
 	auto* command = new Command(cmdStr,
 		[=] (const QString& id) {
-			auto tableIndex = getTableIndexByRow(type, row);
-			assert(tableIndex);
-			auto* ref = findBreakpointRef(type, row);
-
-			if (ref == nullptr) {
-				// ref doesn't exist, so it must be a new breakpoint
-				BreakpointRef ref = {type, id, *tableIndex, -1};
-				addBreakpointRef(id, ref);
-			}
 			setBreakpointChecked(type, row, Qt::Checked);
 
 			// update breakpoint id
-			setTextField(type, row, ID, id);
+			setTextField(type, row, BREAKPOINT_ID, id);
 			// restore default behaviour if replacing a Breakpoint
 			disableRefresh = false;
 		},
@@ -279,7 +239,7 @@ void BreakpointViewer::_createCondition(int row)
 	CommClient::instance().sendCommand(command);
 }
 
-void BreakpointViewer::setBreakpointChecked(BreakpointRef::Type type, int row, Qt::CheckState state)
+void BreakpointViewer::setBreakpointChecked(BreakpointType type, int row, Qt::CheckState state)
 {
 	auto sa = ScopedAssign(userMode, false);
 
@@ -293,13 +253,14 @@ void BreakpointViewer::setBreakpointChecked(BreakpointRef::Type type, int row, Q
 	table->setSortingEnabled(oldValue);
 }
 
-void BreakpointViewer::setTextField(BreakpointRef::Type type, int row, int column, const QString& value, const QString& tooltip)
+void BreakpointViewer::setTextField(BreakpointType type, int row, int column, const QString& value, const QString& tooltip)
 {
 	auto sa = ScopedAssign(userMode, false);
 
 	auto* table    = tables[type];
 	bool  oldValue = table->isSortingEnabled();
 	auto* item     = table->item(row, column);
+	assert(item);
 
 	table->setSortingEnabled(false);
 	item->setText(value);
@@ -375,9 +336,9 @@ QString BreakpointViewer::findSymbolOrValue(uint16_t address) const
 static const char* ComboTypeNames[] = { "read_mem", "write_mem", "read_io", "write_io" };
 
 std::optional<AddressRange> BreakpointViewer::parseLocationField(
-	std::optional<int> bpIndex, BreakpointRef::Type type, const QString& field, const QString& comboTxt)
+	std::optional<int> bpIndex, BreakpointType type, const QString& field, const QString& comboTxt)
 {
-	if (type == BreakpointRef::BREAKPOINT) {
+	if (type == BreakpointType::BREAKPOINT) {
 		auto value = parseSymbolOrValue(field);
 		return value ? AddressRange{*value}
 		    : (bpIndex ? breakpoints->getBreakpoint(*bpIndex).range : std::optional<AddressRange>());
@@ -405,7 +366,7 @@ std::optional<AddressRange> BreakpointViewer::parseLocationField(
 	return breakpoints->getBreakpoint(*bpIndex).range;
 }
 
-void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetItem* item)
+void BreakpointViewer::changeTableItem(BreakpointType type, QTableWidgetItem* item)
 {
 	if (!userMode) return;
 	auto* table = tables[type];
@@ -413,8 +374,7 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 
 	// trying to modify a bp instead of creating a new one
 	bool createBp = false;
-	auto ref = findBreakpointRef(type, row);
-	auto index = ref ? std::optional<int>(ref->breakpointIndex) : std::nullopt;
+	auto bpIndex  = findBreakpointIndex(type, row);
 
 	// check if breakpoint is enabled
 	auto* enabledItem = table->item(row, ENABLED);
@@ -433,9 +393,9 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 			auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
 			int adrLen;
 
-			if (type == BreakpointRef::CONDITION) {
+			if (type == BreakpointType::CONDITION) {
 				return;
-			} else if (type == BreakpointRef::WATCHPOINT) {
+			} else if (type == BreakpointType::WATCHPOINT) {
 				auto wType = static_cast<Breakpoint::Type>(combo->currentIndex() + 1);
 				adrLen = (wType == Breakpoint::WATCHPOINT_IOREAD || wType == Breakpoint::WATCHPOINT_IOWRITE)
 				       ? 2 : 4;
@@ -443,21 +403,23 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 				adrLen = 4;
 			}
 
-			if (auto range = parseLocationField(index, type, item->text(), combo ? combo->currentText() : "")) {
+			if (auto range = parseLocationField(bpIndex, type, item->text(), combo ? combo->currentText() : "")) {
 				auto rangeStr = locationString(*range, adrLen);
 				// Use a symbolic address in the location field if available
 				QString location = debugSession.symbolTable().getAddressSymbol(item->text()) ? item->text() : rangeStr;
 				setTextField(type, row, LOCATION, location, location != rangeStr ? rangeStr : "");
+				setTextField(type, row, ADDRESS, QString("%1").arg(range->start));
 			} else {
 				enabled = false;
 				setTextField(type, row, LOCATION, "");
+				setTextField(type, row, ADDRESS, "");
 				setBreakpointChecked(type, row, Qt::Unchecked);
 			}
 			if (!enabled) return;
 			break;
 		}
 		case SLOT: {
-			auto slot = parseSlotField(index, item->text());
+			auto slot = parseSlotField(bpIndex, item->text());
 			auto [ps, ss] = slot;
 			setTextField(type, row, SLOT, QString("%1/%2")
 			        .arg(ps ? QChar('0' + *ps) : QChar('X'))
@@ -466,7 +428,7 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 			break;
 		}
 		case SEGMENT: {
-			auto segment = parseSegmentField(index, item->text());
+			auto segment = parseSegmentField(bpIndex, item->text());
 			setTextField(type, row, SEGMENT, segment ? QString::number(*segment) : "X");
 			if (!enabled) return;
 			break;
@@ -474,13 +436,13 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 		case T_CONDITION: {
 			setTextField(type, row, T_CONDITION, item->text().simplified());
 
-			if (type == BreakpointRef::CONDITION) {
+			if (type == BreakpointType::CONDITION) {
 				setBreakpointChecked(type, row, item->text().isEmpty() ? Qt::Unchecked : item->checkState());
 			}
 			if (!enabled) return;
 			break;
 		}
-		case ID:
+		case BREAKPOINT_ID:
 			return;
 		default:
 			qWarning() << "Unknown table column" << table->column(item);
@@ -494,17 +456,17 @@ void BreakpointViewer::changeTableItem(BreakpointRef::Type type, QTableWidgetIte
 			replaceBreakpoint(type, row);
 		}
 	} else {
-		if (index) removeBreakpoint(type, row, false);
+		if (bpIndex) removeBreakpoint(type, row, false);
 	}
 }
 
-void BreakpointViewer::disableSorting(BreakpointRef::Type type)
+void BreakpointViewer::disableSorting(BreakpointType type)
 {
 	auto unsort = [](auto* table) {
 		table->sortByColumn(-1, Qt::AscendingOrder);
 	};
 
-	if (type == BreakpointRef::ALL) {
+	if (type == BreakpointType::ALL) {
 		for (auto* table : tables) {
 			unsort(table);
 		}
@@ -516,22 +478,22 @@ void BreakpointViewer::disableSorting(BreakpointRef::Type type)
 void BreakpointViewer::changeBpTableItem(QTableWidgetItem* item)
 {
 	if (!userMode) return;
-	disableSorting(BreakpointRef::BREAKPOINT);
-	changeTableItem(BreakpointRef::BREAKPOINT, item);
+	disableSorting(BreakpointType::BREAKPOINT);
+	changeTableItem(BreakpointType::BREAKPOINT, item);
 }
 
 void BreakpointViewer::changeWpTableItem(QTableWidgetItem* item)
 {
 	if (!userMode) return;
-	disableSorting(BreakpointRef::WATCHPOINT);
-	changeTableItem(BreakpointRef::WATCHPOINT, item);
+	disableSorting(BreakpointType::WATCHPOINT);
+	changeTableItem(BreakpointType::WATCHPOINT, item);
 }
 
 void BreakpointViewer::changeCnTableItem(QTableWidgetItem* item)
 {
 	if (!userMode) return;
-	disableSorting(BreakpointRef::CONDITION);
-	changeTableItem(BreakpointRef::CONDITION, item);
+	disableSorting(BreakpointType::CONDITION);
+	changeTableItem(BreakpointType::CONDITION, item);
 }
 
 void BreakpointViewer::setBreakpoints(Breakpoints* bps)
@@ -549,7 +511,7 @@ void BreakpointViewer::setBreakState()
 	runState = false;
 }
 
-void BreakpointViewer::stretchTable(BreakpointRef::Type type)
+void BreakpointViewer::stretchTable(BreakpointType type)
 {
 	auto stretch = [](auto* table) {
 		// stretching will not work without sorting
@@ -557,7 +519,7 @@ void BreakpointViewer::stretchTable(BreakpointRef::Type type)
 		table->resizeColumnsToContents();
 	};
 
-	if (type == BreakpointRef::ALL) {
+	if (type == BreakpointType::ALL) {
 		for (auto* table : tables) {
 			stretch(table);
 		}
@@ -566,31 +528,58 @@ void BreakpointViewer::stretchTable(BreakpointRef::Type type)
 	}
 }
 
-BreakpointRef* BreakpointViewer::findBreakpointRefById(BreakpointRef::Type type, const QString& id)
+std::optional<int> BreakpointViewer::findBreakpointIndex(BreakpointType type, int row) const
 {
-	auto it = std::find_if(maps[type].begin(), maps[type].end(),
-		[&id](std::pair<const QString, BreakpointRef>& tmp) -> bool { return id == tmp.second.id; }
-	);
-	if (it != maps[type].end()) return &it->second;
-	return nullptr;
+	auto* table = tables[type];
+	if (table->rowCount() <= row) return {};
+	const QString& id = table->item(row, BREAKPOINT_ID)->text();
+	if (id.isEmpty()) return {};
+
+	for (int bpIndex = 0; bpIndex < breakpoints->breakpointCount(); ++bpIndex) {
+		const Breakpoint& bp = breakpoints->getBreakpoint(bpIndex);
+		if (bp.id == id) return bpIndex;
+	}
+	return {};
 }
 
-bool BreakpointViewer::addBreakpointRef(const QString& id, BreakpointRef& ref)
-{
-	auto [_, result] = maps[ref.type].try_emplace(id, ref);
-	return result;
-}
-
-std::optional<int> BreakpointViewer::findTableRowByIndex(BreakpointRef::Type type, int index) const
+std::optional<int> BreakpointViewer::findBreakpointRow(BreakpointType type, const QString& id) const
 {
 	auto* table = tables[type];
 
 	for (int row = 0; row < table->rowCount(); ++row) {
-		auto* item = table->item(row, TABLE_INDEX);
-		int tmp = item->text().toInt();
-		if (index == tmp) return row;
+		const QString& id_ = table->item(row, BREAKPOINT_ID)->text();
+		if (id_ == id) return row;
 	}
 	return {};
+}
+
+void BreakpointViewer::refreshTableRow(int bpIndex, BreakpointType type, int row)
+{
+	bool preserveSymbol = Settings::get().preserveBreakpointSymbol();
+	const Breakpoint& bp = breakpoints->getBreakpoint(bpIndex);
+	const auto* location = tables[type]->item(row, LOCATION);
+	auto* addressItem = tables[type]->item(row, ADDRESS);
+
+	if (type == BreakpointType::BREAKPOINT) {
+		// symbol changed address?
+		bool ok;
+		Symbol* symbol = debugSession.symbolTable().getAddressSymbol(location->text());
+		uint16_t address = addressItem->text().toInt(&ok);
+		assert(ok);
+
+		// preserve symbol name?
+		if (preserveSymbol && symbol && symbol->value() != address) {
+			addressItem->setText(QString("%1").arg(symbol->value()));
+			replaceBreakpoint(type, row);
+		} else {
+			fillTableRow(type, row, bpIndex);
+			if (location->text().toUpper() == hexValue(bp.range->start, 4)) {
+				fillTableRowLocation(type, row, findSymbolOrValue(bp.range->start));
+			}
+		}
+	} else {
+		fillTableRow(type, row, bpIndex);
+	}
 }
 
 void BreakpointViewer::refresh()
@@ -601,91 +590,46 @@ void BreakpointViewer::refresh()
 	// store unused items position by disabling ordering
 	disableSorting();
 
-	// reset breakpoint index
-	for (int type = 0; type < BreakpointRef::ALL; ++type) {
-		for (auto& [_, ref] : maps[type]) {
-			ref.breakpointIndex = -1;
-		}
-	}
-
 	for (int bpIndex = 0; bpIndex < breakpoints->breakpointCount(); ++bpIndex) {
 		const Breakpoint& bp = breakpoints->getBreakpoint(bpIndex);
 
-		BreakpointRef::Type type = bp.type == Breakpoint::BREAKPOINT ? BreakpointRef::BREAKPOINT
-		                         : (bp.type == Breakpoint::CONDITION  ? BreakpointRef::CONDITION : BreakpointRef::WATCHPOINT);
+		BreakpointType type = bp.type == Breakpoint::BREAKPOINT ? BreakpointType::BREAKPOINT
+		                    : (bp.type == Breakpoint::CONDITION  ? BreakpointType::CONDITION 
+		                    : BreakpointType::WATCHPOINT);
+		auto row = findBreakpointRow(type, bp.id);
 
-		BreakpointRef* ref = findBreakpointRefById(type, bp.id);
-		if (ref != nullptr && ref->breakpointIndex == -1) {
-			auto row = findTableRowByIndex(ref->type, ref->tableIndex);
-			if (row) {
-				// reattach old breakpoints
-				auto sa = ScopedAssign(userMode, false);
-				ref->breakpointIndex = bpIndex;
-				fillTableRow(type, *row, bpIndex);
-
-				// update symbol name
-				if (type == BreakpointRef::BREAKPOINT) {
-					auto* location = tables[type]->item(*row, LOCATION);
-					if (location->text().toUpper() == hexValue(bp.range->start, 4)) {
-						fillTableRowLocation(type, *row, findSymbolOrValue(bp.range->start));
-					}
-				}
-			}
+		if (row) {
+			auto sa = ScopedAssign(userMode, false);
+			refreshTableRow(bpIndex, type, *row);
 		} else {
 			// new breakpoints created on OpenMSX will go through here
-			auto sa = ScopedAssign(userMode, false);
-
-			auto  row        = createTableRow(type);
-			auto  tableIndex = getTableIndexByRow(type, row);
-
-			// create BreakpointRef
-			BreakpointRef ref2 = {type, bp.id, *tableIndex, bpIndex};
-			addBreakpointRef(bp.id, ref2);
+			auto row = createTableRow(type);
 			fillTableRow(type, row, bpIndex);
-
-			// update symbol name
-			if (type == BreakpointRef::BREAKPOINT) {
-				auto* location = tables[type]->item(row, LOCATION);
-				if (location->text().toUpper() == hexValue(bp.range->start, 4)) {
-					fillTableRowLocation(type, row, findSymbolOrValue(bp.range->start));
-				}
-			}
 		}
 	}
 
 	// remove remaining unpaired BreakpointRef whose breakpoints were replaced or deleted
-	for (auto& map : maps) {
-		auto it = map.begin();
-		while (it != map.end()) {
-			auto& ref = it->second;
-			auto* table = tables[ref.type];
-			it++;
-
-			if (ref.breakpointIndex == -1) {
-				auto row = findTableRowByIndex(ref.type, ref.tableIndex);
-				if (row) table->removeRow(*row);
-				map.erase(ref.id);
+	for (const auto& type : {BreakpointType::BREAKPOINT, BreakpointType::WATCHPOINT, BreakpointType::CONDITION}) {
+		const auto& table = tables[type];
+		for (int row = 0; row < table->rowCount();) {
+			auto* item = table->item(row, ENABLED);
+			auto  bpIndex = findBreakpointIndex(type, row);
+			if (item->checkState() == Qt::Checked && !bpIndex) {
+				table->removeRow(row);
+				continue;
 			}
+			row++;
 		}
 	}
 
-	stretchTable(BreakpointRef::ALL);
-}
-
-BreakpointRef* BreakpointViewer::findBreakpointRef(BreakpointRef::Type type, int row)
-{
-	auto& table = tables[type];
-	auto* item = table->item(row, ID);
-	auto it = maps[type].find(item->text());
-	if (it != maps[type].end()) return &it->second;
-	return nullptr;
+	stretchTable(BreakpointType::ALL);
 }
 
 void BreakpointViewer::changeCurrentWpType(int row, int /*selected*/)
 {
 	if (!userMode) return;
 	auto* item = wpTableWidget->item(row, WP_TYPE);
-	changeTableItem(BreakpointRef::WATCHPOINT, item);
+	changeTableItem(BreakpointType::WATCHPOINT, item);
 }
 
 void BreakpointViewer::createComboBox(int row)
@@ -712,7 +656,7 @@ Breakpoint::Type BreakpointViewer::readComboBox(int row)
 	return static_cast<Breakpoint::Type>(combo->currentIndex() + 1);
 }
 
-int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
+int BreakpointViewer::createTableRow(BreakpointType type, int row)
 {
 	auto     sa = ScopedAssign(userMode, false);
 	auto& table = tables[type];
@@ -737,7 +681,7 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 	item1->setTextAlignment(Qt::AlignCenter);
 	table->setItem(row, WP_TYPE, item1);
 
-	if (type == BreakpointRef::WATCHPOINT) {
+	if (type == BreakpointType::WATCHPOINT) {
 		createComboBox(row);
 	}
 
@@ -746,7 +690,7 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 	item2->setTextAlignment(Qt::AlignCenter);
 	table->setItem(row, LOCATION, item2);
 
-	if (type == BreakpointRef::CONDITION) {
+	if (type == BreakpointType::CONDITION) {
 		item2->setFlags(Qt::NoItemFlags);
 		item2->setText("0");
 	} else {
@@ -771,29 +715,29 @@ int BreakpointViewer::createTableRow(BreakpointRef::Type type, int row)
 	item5->setText("X");
 	table->setItem(row, SEGMENT, item5);
 
-	// breakpoint ID
+	// breakpoint id
 	auto* item6 = new QTableWidgetItem();
 	item6->setFlags(Qt::NoItemFlags);
 	item6->setText("");
-	table->setItem(row, ID, item6);
+	table->setItem(row, BREAKPOINT_ID, item6);
 
-	// tableIndex
+	// address
 	auto* item7 = new QTableWidgetItem();
 	item7->setFlags(Qt::NoItemFlags);
-	item7->setText(QString("%1").arg(newTableItem++));
-	table->setItem(row, TABLE_INDEX, item7);
+	item7->setText("");
+	table->setItem(row, ADDRESS, item7);
 
 	return row;
 }
 
-void BreakpointViewer::fillTableRowLocation(BreakpointRef::Type type, int row, const QString& location)
+void BreakpointViewer::fillTableRowLocation(BreakpointType type, int row, const QString& location)
 {
 	auto* table = tables[type];
 	auto* item = table->item(row, LOCATION);
 	item->setText(location);
 }
 
-void BreakpointViewer::fillTableRow(BreakpointRef::Type type, int row, int bpIndex)
+void BreakpointViewer::fillTableRow(BreakpointType type, int row, int bpIndex)
 {
 	auto sa = ScopedAssign(userMode, false);
 
@@ -804,7 +748,7 @@ void BreakpointViewer::fillTableRow(BreakpointRef::Type type, int row, int bpInd
 	setBreakpointChecked(type, row, Qt::Checked);
 
 	// watchpoint type
-	if (type == BreakpointRef::WATCHPOINT) {
+	if (type == BreakpointType::WATCHPOINT) {
 		auto* model = table->model();
 		auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
 		combo->setCurrentIndex(static_cast<int>(bp.type) - 1);
@@ -840,19 +784,23 @@ void BreakpointViewer::fillTableRow(BreakpointRef::Type type, int row, int bpInd
 	auto* item5 = table->item(row, SEGMENT);
 	item5->setText(segment);
 
-	// id
-	auto* item6 = table->item(row, ID);
+	// breakpoint id
+	auto* item6 = table->item(row, BREAKPOINT_ID);
 	item6->setText(bp.id);
+
+	// address
+	auto* item7 = table->item(row, ADDRESS);
+	item7->setText(bp.range ? QString("%1").arg(bp.range->start) : "");
 }
 
-std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointRef::Type type, int row)
+std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointType type, int row)
 {
 	Breakpoint bp;
 
 	auto* table = tables[type];
 	auto* model = table->model();
 	auto* combo = (QComboBox*) table->indexWidget(model->index(row, WP_TYPE));
-	bp.type = type == BreakpointRef::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
+	bp.type = type == BreakpointType::WATCHPOINT ? readComboBox(row) : Breakpoint::BREAKPOINT;
 
 	QString location = table->item(row, LOCATION)->text();
 	auto range = parseLocationField({}, type, location, combo ? combo->currentText() : "");
@@ -871,27 +819,23 @@ std::optional<Breakpoint> BreakpointViewer::parseTableRow(BreakpointRef::Type ty
 void BreakpointViewer::onSymbolTableChanged()
 {
 	for (int row = 0; row < bpTableWidget->rowCount(); ++row) {
-		auto*  ref = findBreakpointRef(BreakpointRef::BREAKPOINT, row);
-		auto* item = bpTableWidget->item(row, LOCATION);
+		auto bpIndex = findBreakpointIndex(BreakpointType::BREAKPOINT, row);
+		auto*   item = bpTableWidget->item(row, LOCATION);
 
-		if (ref->breakpointIndex > -1) {
-			Breakpoint  bp = breakpoints->getBreakpoint(ref->breakpointIndex);
-
-			if (!item->text().isEmpty()) {
-				Symbol* symbol = debugSession.symbolTable().getAddressSymbol(item->text());
-				if (symbol) {
-					setTextField(BreakpointRef::BREAKPOINT, row, LOCATION, symbol->text());
-				} else {
-					setTextField(BreakpointRef::BREAKPOINT, row, LOCATION, findSymbolOrValue(bp.range->start));
-				}
+		if (bpIndex && !item->text().isEmpty()) {
+			if (Symbol* symbol = debugSession.symbolTable().getAddressSymbol(item->text())) {
+				setTextField(BreakpointType::BREAKPOINT, row, LOCATION, symbol->text());
+			} else {
+				const Breakpoint& bp = breakpoints->getBreakpoint(*bpIndex);
+				setTextField(BreakpointType::BREAKPOINT, row, LOCATION, findSymbolOrValue(bp.range->start));
 			}
 		}
 	}
-	stretchTable(BreakpointRef::ALL);
+	stretchTable(BreakpointType::ALL);
 }
 
 
-void BreakpointViewer::onAddBtnClicked(BreakpointRef::Type type)
+void BreakpointViewer::onAddBtnClicked(BreakpointType type)
 {
 	auto sa = ScopedAssign(userMode, false);
 
@@ -905,15 +849,15 @@ void BreakpointViewer::onAddBtnClicked(BreakpointRef::Type type)
 	table->setSortingEnabled(true);
 }
 
-void BreakpointViewer::onRemoveBtnClicked(BreakpointRef::Type type)
+void BreakpointViewer::onRemoveBtnClicked(BreakpointType type)
 {
 	auto* table = tables[type];
 
 	if (table->currentRow() == -1)
 		return;
 
-	auto sa = ScopedAssign(userMode, false);
-	QTableWidgetItem* item = table->item(table->currentRow(), ENABLED);
+	auto  sa = ScopedAssign(userMode, false);
+	auto* item = table->item(table->currentRow(), ENABLED);
 	if (item->checkState() == Qt::Checked) {
 		removeBreakpoint(type, table->currentRow(), true);
 	} else {
@@ -923,32 +867,32 @@ void BreakpointViewer::onRemoveBtnClicked(BreakpointRef::Type type)
 
 void BreakpointViewer::on_btnAddBp_clicked()
 {
-	onAddBtnClicked(BreakpointRef::BREAKPOINT);
+	onAddBtnClicked(BreakpointType::BREAKPOINT);
 }
 
 void BreakpointViewer::on_btnRemoveBp_clicked()
 {
-	onRemoveBtnClicked(BreakpointRef::BREAKPOINT);
+	onRemoveBtnClicked(BreakpointType::BREAKPOINT);
 }
 
 void BreakpointViewer::on_btnAddWp_clicked()
 {
-	onAddBtnClicked(BreakpointRef::WATCHPOINT);
+	onAddBtnClicked(BreakpointType::WATCHPOINT);
 }
 
 void BreakpointViewer::on_btnRemoveWp_clicked()
 {
-	onRemoveBtnClicked(BreakpointRef::WATCHPOINT);
+	onRemoveBtnClicked(BreakpointType::WATCHPOINT);
 }
 
 void BreakpointViewer::on_btnAddCn_clicked()
 {
-	onAddBtnClicked(BreakpointRef::CONDITION);
+	onAddBtnClicked(BreakpointType::CONDITION);
 }
 
 void BreakpointViewer::on_btnRemoveCn_clicked()
 {
-	onRemoveBtnClicked(BreakpointRef::CONDITION);
+	onRemoveBtnClicked(BreakpointType::CONDITION);
 }
 
 void BreakpointViewer::on_itemPressed(QTableWidgetItem* /*item*/)

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 class SymbolTable;
 struct MemoryLayout;
