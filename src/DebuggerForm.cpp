@@ -961,6 +961,9 @@ void DebuggerForm::handleUpdate(const QString& type, const QString& name,
 			// running state by default.
 			if (message == "suspended") {
 				breakOccured();
+			} else if (message == "running") {
+				emit runStateEntered();
+				updateData();
 			}
 		} else if (name == "paused") {
 			pauseStatusChanged(message == "true");
