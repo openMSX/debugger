@@ -194,6 +194,10 @@ void DebuggerForm::createActions()
 		connect(rfa, &QAction::triggered, this, &DebuggerForm::fileRecentOpen);
 	}
 
+	copyCodeViewAction = new QAction(tr("Copy code view"));
+	copyCodeViewAction->setStatusTip(tr("Copy contents of Code View to the Clipboard"));
+	copyCodeViewAction->setEnabled(false);
+
 	systemConnectAction = new QAction(tr("&Connect"), this);
 	systemConnectAction->setShortcut(tr("Ctrl+C"));
 	systemConnectAction->setStatusTip(tr("Connect to openMSX"));
@@ -350,6 +354,7 @@ void DebuggerForm::createActions()
 	connect(fileSaveSessionAction, &QAction::triggered, this, &DebuggerForm::fileSaveSession);
 	connect(fileSaveSessionAsAction, &QAction::triggered, this, &DebuggerForm::fileSaveSessionAs);
 	connect(fileQuitAction, &QAction::triggered, this, &DebuggerForm::close);
+	connect(copyCodeViewAction, &QAction::triggered, this, &DebuggerForm::copyCodeView);
 	connect(systemConnectAction, &QAction::triggered, this, &DebuggerForm::systemConnect);
 	connect(systemDisconnectAction, &QAction::triggered, this, &DebuggerForm::systemDisconnect);
 	connect(systemPauseAction, &QAction::triggered, this, &DebuggerForm::systemPause);
@@ -398,6 +403,10 @@ void DebuggerForm::createMenus()
 
 	fileMenu->addSeparator();
 	fileMenu->addAction(fileQuitAction);
+
+	// create edit menu
+	editMenu = menuBar()->addMenu(tr("&Edit"));
+	editMenu->addAction(copyCodeViewAction);
 
 	// create system menu
 	systemMenu = menuBar()->addMenu(tr("&System"));
@@ -808,6 +817,7 @@ void DebuggerForm::updateWindowTitle()
 
 void DebuggerForm::initConnection()
 {
+	copyCodeViewAction->setEnabled(true);
 	systemConnectAction->setEnabled(false);
 	systemDisconnectAction->setEnabled(true);
 
@@ -915,6 +925,7 @@ void DebuggerForm::connectionClosed()
 	executeStepOutAction->setEnabled(false);
 	executeStepBackAction->setEnabled(false);
 	executeRunToAction->setEnabled(false);
+	copyCodeViewAction->setEnabled(false);
 	systemDisconnectAction->setEnabled(false);
 	systemConnectAction->setEnabled(true);
 	breakpointToggleAction->setEnabled(false);
@@ -1079,6 +1090,11 @@ void DebuggerForm::fileRecentOpen()
 	if (auto* action = qobject_cast<QAction *>(sender())) {
 		openSession(action->data().toString());
 	}
+}
+
+void DebuggerForm::copyCodeView()
+{
+	disasmView->copyCodeToClipboard();
 }
 
 void DebuggerForm::systemConnect()

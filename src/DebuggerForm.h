@@ -69,6 +69,7 @@ private:
 	AddressSlotResult addressSlot(int addr) const;
 
 	QMenu* fileMenu;
+	QMenu* editMenu;
 	QMenu* systemMenu;
 	QMenu* searchMenu;
 	QMenu* viewMenu;
@@ -89,6 +90,8 @@ private:
 	QAction* fileSaveSessionAction;
 	QAction* fileSaveSessionAsAction;
 	QAction* fileQuitAction;
+
+	QAction* copyCodeViewAction;
 
 	enum { MaxRecentFiles = 5 };
 	QAction* recentFileActions[MaxRecentFiles];
@@ -167,6 +170,7 @@ private:
 	void fileSaveSession();
 	void fileSaveSessionAs();
 	void fileRecentOpen();
+	void copyCodeView();
 	void systemConnect();
 	void systemDisconnect();
 	void systemPause();

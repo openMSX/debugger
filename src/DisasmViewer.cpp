@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 #include <QApplication>
+#include <QClipboard>
 #include <QDesktopWidget>
 #include <algorithm>
 #include <cmath>
@@ -279,6 +280,39 @@ void DisasmViewer::paintEvent(QPaintEvent* e)
 	}
 	partialBottomLine = y > height() - frameB;
 	visibleLines -= partialBottomLine;
+}
+
+void DisasmViewer::copyCodeToClipboard() const
+{
+	if (!memory || !isEnabled()) return;
+
+    QClipboard *clipboard = QApplication::clipboard();
+	QString buffer;
+	
+	// calculate lines while writing
+	int maxY = height() - frameB;
+	int maxLine = int(disasmLines.size());
+	int y = frameT;
+
+	for (int currentLine = disasmTopLine;
+			(y < maxY) && (currentLine < maxLine);
+			++currentLine) {
+		const DisasmRow* row = &disasmLines[currentLine];
+		switch (row->rowType) {
+			case DisasmRow::INSTRUCTION:
+				buffer += QString("%1%2\n")
+						.arg(row->instr.substr(0, 7).c_str())
+						.arg(row->instr.substr(7   ).c_str());
+				break;
+			case DisasmRow::LABEL:
+				buffer += QString("%1:\n").arg(row->instr.c_str());
+				break;
+		}
+		// next line
+		y += row->rowType == DisasmRow::INSTRUCTION ? codeFontHeight : labelFontHeight;
+	}
+
+	clipboard->setText(buffer, QClipboard::Clipboard);
 }
 
 void DisasmViewer::setCursorAddress(uint16_t addr, int infoLine, int method)
