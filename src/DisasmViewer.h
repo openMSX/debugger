@@ -32,6 +32,7 @@ public:
 
 	void setAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
 	void setCursorAddress(uint16_t addr, int infoLine = FIRST_INFO_LINE, int method = Top);
+	void copyCodeToClipboard() const;
 	void setProgramCounter(uint16_t pc, bool reload = false);
 	void scrollBarAction(int action);
 	void scrollBarChanged(int value);
