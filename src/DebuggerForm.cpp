@@ -41,8 +41,6 @@
 #include <QCloseEvent>
 #include <iostream>
 
-bool forceBreak = false;
-
 class QueryPauseHandler : public SimpleCommand
 {
 public:
@@ -682,6 +680,7 @@ void DebuggerForm::createForm()
 
 	// Disasm viewer
 	connect(disasmView, &DisasmViewer::breakpointToggled, this, &DebuggerForm::toggleBreakpointAddress);
+	connect(this, &DebuggerForm::connected, disasmView, &DisasmViewer::refresh);
 	connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
 	connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
 
