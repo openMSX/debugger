@@ -4,6 +4,7 @@
 #include <QPainter>
 #include "PaletteDialog.h"
 #include "Convert.h"
+#include "VDPDataStore.h"
 #include "ranges.h"
 
 
@@ -40,13 +41,11 @@ void PalettePatch::setHighlightTest(int colorNr)
 
 void PalettePatch::paintEvent(QPaintEvent* /*event*/)
 {
-	QPainter painter(this);
-	painter.setPen(isSelected ? Qt::white : QColor(myColor));
-	painter.setBrush(QBrush(myColor));
-	painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
+    QPainter painter(this);
+    painter.setPen(isSelected ? Qt::white : QColor(myColor));
+    painter.setBrush(QBrush(myColor));
+    painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
 }
-
-
 
 PaletteDialog::PaletteDialog(QWidget* parent)
     : QDialog(parent), ui(std::make_unique<Ui::PaletteDialog>())
@@ -172,6 +171,15 @@ void PaletteDialog::syncToSource()
     emit paletteSynced();
 }
 
+void PaletteDialog::restoreDefaultPalette()
+{
+    memcpy(myPal, VDPDataStore::instance().getDefaultPalettePointer(), 32);
+    emit paletteChanged(myPal);
+    if (autoSync) {
+        syncToSource();
+    }
+}
+
 void PaletteDialog::setAutoSync(bool value)
 {
     if (autoSync == value) return;
@@ -199,8 +207,9 @@ void PaletteDialog::on_horizontalSlider_B_valueChanged(int value)
 
 void PaletteDialog::on_buttonBox_clicked(QAbstractButton* button)
 {
-    if (button== ui->buttonBox->button(QDialogButtonBox::Apply) ||
-        button== ui->buttonBox->button(QDialogButtonBox::Ok)) {
+    if (button== ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)) {
+        restoreDefaultPalette();
+    } else if (button== ui->buttonBox->button(QDialogButtonBox::Ok)) {
         syncToSource();
     } else if (button== ui->buttonBox->button(QDialogButtonBox::Reset) ||
                button== ui->buttonBox->button(QDialogButtonBox::Cancel)) {

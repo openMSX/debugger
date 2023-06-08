@@ -1,6 +1,27 @@
 #include "VDPDataStore.h"
 #include "CommClient.h"
 
+// static vector to feed PaletteDialog and be used when VDP colors aren't selected
+static const uint8_t defaultPalette[32] = {
+//    RB  G
+        0x00, 0,
+        0x00, 0,
+        0x11, 6,
+        0x33, 7,
+        0x17, 1,
+        0x27, 3,
+        0x51, 1,
+        0x27, 6,
+        0x71, 1,
+        0x73, 3,
+        0x61, 6,
+        0x64, 6,
+        0x11, 4,
+        0x65, 2,
+        0x55, 5,
+        0x77, 7,
+};
+
 class VDPDataStoreVersionCheck : public SimpleCommand
 {
 public:
@@ -148,6 +169,10 @@ void VDPDataStore::DataHexRequestReceived()
 const uint8_t* VDPDataStore::getVramPointer() const
 {
 	return &vram[0];
+}
+const uint8_t* VDPDataStore::getDefaultPalettePointer() const
+{
+	return defaultPalette;
 }
 const uint8_t* VDPDataStore::getPalettePointer() const
 {

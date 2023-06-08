@@ -6,26 +6,7 @@
 #include <QMessageBox>
 
 
-// static to feed to PaletteDialog and be used when VDP colors aren't selected
-static uint8_t currentPalette[32] = {
-//    RB  G
-	0x00, 0,
-	0x00, 0,
-	0x11, 6,
-	0x33, 7,
-	0x17, 1,
-	0x27, 3,
-	0x51, 1,
-	0x27, 6,
-	0x71, 1,
-	0x73, 3,
-	0x61, 6,
-	0x64, 6,
-	0x11, 4,
-	0x65, 2,
-	0x55, 5,
-	0x77, 7,
-};
+static uint8_t currentPalette[32] = { 0 };
 
 BitMapViewer::BitMapViewer(QWidget* parent)
 	: QDialog(parent)
@@ -69,7 +50,7 @@ BitMapViewer::BitMapViewer(QWidget* parent)
 	imageWidget->setVramAddress(0);
 	// Palette data not received from VDPDataStore yet causing black image, so
 	// we start by using fixed palette until VDPDataStoreDataRefreshed kicks in.
-	imageWidget->setPaletteSource(currentPalette);
+	imageWidget->setPaletteSource(VDPDataStore::instance().getDefaultPalettePointer());
 	
 	// now hook up some signals and slots
 	connect(&VDPDataStore::instance(), &VDPDataStore::dataRefreshed,
