@@ -15,6 +15,7 @@ public:
 	static VDPDataStore& instance();
 
 	const uint8_t* getVramPointer() const;
+	const uint8_t* getDefaultPalettePointer() const;
 	const uint8_t* getPalettePointer() const;
 	const uint8_t* getRegsPointer() const;
 	const uint8_t* getStatusRegsPointer() const;

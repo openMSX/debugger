@@ -4,6 +4,7 @@
 #include <QPainter>
 #include "PaletteDialog.h"
 #include "Convert.h"
+#include "VDPDataStore.h"
 #include "ranges.h"
 
 
@@ -172,6 +173,15 @@ void PaletteDialog::syncToSource()
     emit paletteSynced();
 }
 
+void PaletteDialog::restoreDefaultPalette()
+{
+    memcpy(myPal, VDPDataStore::instance().getDefaultPalettePointer(), 32);
+    emit paletteChanged(myPal);
+    if (autoSync) {
+        syncToSource();
+    }
+}
+
 void PaletteDialog::setAutoSync(bool value)
 {
     if (autoSync == value) return;
@@ -199,8 +209,9 @@ void PaletteDialog::on_horizontalSlider_B_valueChanged(int value)
 
 void PaletteDialog::on_buttonBox_clicked(QAbstractButton* button)
 {
-    if (button== ui->buttonBox->button(QDialogButtonBox::Apply) ||
-        button== ui->buttonBox->button(QDialogButtonBox::Ok)) {
+    if (button== ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)) {
+        restoreDefaultPalette();
+    } else if (button== ui->buttonBox->button(QDialogButtonBox::Ok)) {
         syncToSource();
     } else if (button== ui->buttonBox->button(QDialogButtonBox::Reset) ||
                button== ui->buttonBox->button(QDialogButtonBox::Cancel)) {

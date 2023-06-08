@@ -41,6 +41,7 @@ public:
     void setPalette(uint8_t* pal);
     uint8_t* getPalette();
     void syncToSource();
+    void restoreDefaultPalette();
     void setAutoSync(bool value);
 
 signals:
