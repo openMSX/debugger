@@ -41,13 +41,11 @@ void PalettePatch::setHighlightTest(int colorNr)
 
 void PalettePatch::paintEvent(QPaintEvent* /*event*/)
 {
-	QPainter painter(this);
-	painter.setPen(isSelected ? Qt::white : QColor(myColor));
-	painter.setBrush(QBrush(myColor));
-	painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
+    QPainter painter(this);
+    painter.setPen(isSelected ? Qt::white : QColor(myColor));
+    painter.setBrush(QBrush(myColor));
+    painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
 }
-
-
 
 PaletteDialog::PaletteDialog(QWidget* parent)
     : QDialog(parent), ui(std::make_unique<Ui::PaletteDialog>())
