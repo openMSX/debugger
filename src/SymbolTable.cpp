@@ -214,6 +214,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 					type = TNIASM1_FILE;
 				} else if (line.contains(": equ ", Qt::CaseInsensitive)) {
 					type = SJASM_FILE;
+				} else if (line.contains("Sections:", Qt::CaseInsensitive)) {
+					type = VASM_FILE;
 				} else {
 					// this is a blunt conclusion but I
 					// don't know a way to detect this file
