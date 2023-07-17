@@ -249,6 +249,8 @@ bool SymbolTable::readFile(const QString& filename, FileType type)
 		return readNoICEFile(filename);
 	case PASMO_FILE:
 		return readPASMOFile(filename);
+	case VASM_FILE:
+		return readVASMFile(filename);
 	default:
 		return false;
 	}
@@ -394,6 +396,33 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 		l = line.split(QRegExp("(\t+)|( +)"));
 		if (l.size() == 3) {
 			add(std::make_unique<Symbol>(l.at(0), l.at(2).left(5).toInt(nullptr, 16), source));
+		}
+	}
+	return true;
+}
+
+bool SymbolTable::readVASMFile(const QString& filename) {
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+	appendFile(filename, VASM_FILE);
+	const auto* source = &symbolFiles.back().fileName;
+
+	bool skipline = true;
+
+	QTextStream in(&file);
+	while (!in.atEnd()) {
+		QString line;
+		QStringList l;
+		line = in.readLine();
+		if (line.startsWith("Symbols by value:"))
+			skipline = false;
+		if (skipline) 
+			continue;
+		l = line.split(QRegExp("(\t+)|( +)"));
+		if (l.size() == 2) {
+			add(std::make_unique<Symbol>(l.at(1), l.at(0).toInt(nullptr, 16), source));
 		}
 	}
 	return true;

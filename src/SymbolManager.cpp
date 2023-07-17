@@ -166,7 +166,8 @@ void SymbolManager::addFile()
 	      << "HiTech C symbol files (*.sym)"
 	      << "HiTech C link map files (*.map)"
 	      << "NoICE command files (*.noi)"
-	      << "pasmo symbol files (*.symbol *.publics *.sys)";
+	      << "pasmo symbol files (*.symbol *.publics *.sys)"
+	      << "vasm symbol files (*.sym)";
 	d->setNameFilters(types);
 	d->setAcceptMode(QFileDialog::AcceptOpen);
 	d->setFileMode(QFileDialog::ExistingFile);
@@ -194,6 +195,8 @@ void SymbolManager::addFile()
 			read = symTable.readFile(n, SymbolTable::NOICE_FILE);
 		} else if (f.startsWith("pasmo")) {
 			read = symTable.readFile(n, SymbolTable::PASMO_FILE);
+		} else if (f.startsWith("vasm")) {
+			read = symTable.readFile(n, SymbolTable::VASM_FILE);
 		} else {
 			read = symTable.readFile(n);
 		}

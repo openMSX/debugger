@@ -89,7 +89,8 @@ public:
 		LINKMAP_FILE,
 		HTC_FILE,
 		NOICE_FILE,
-		PASMO_FILE
+		PASMO_FILE,
+		VASM_FILE
 	};
 
 	SymbolTable();
@@ -141,6 +142,7 @@ private:
 	bool readNoICEFile(const QString& filename);
 	bool readLinkMapFile(const QString& filename);
 	bool readPASMOFile(const QString& filename);
+	bool readVASMFile(const QString& filename);
 
 	void mapSymbol(Symbol* symbol);
 	void unmapSymbol(Symbol* symbol);
