@@ -19,7 +19,7 @@ signals:
 	void newBitValue(int reg, int bit, bool state);
 
 protected:
-	void enterEvent(QEvent* event) override;
+	void enterEvent(QEnterEvent* event) override;
 	void leaveEvent(QEvent* event) override;
 
 private:

@@ -10,7 +10,7 @@ static const int SNAP_DISTANCE = 16;
 DockableWidgetLayout::DockableWidgetLayout(QWidget* parent, int margin, int spacing)
 	: QLayout(parent)
 {
-	setMargin(margin);
+	setContentsMargins(margin, margin, margin, margin);
 	setSpacing(spacing);
 	minWidth = minHeight = 0;
 	maxWidth = maxHeight = 0;

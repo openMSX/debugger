@@ -197,14 +197,14 @@ void CPURegsViewer::mousePressEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton) {
 		int pos = -1;
-		if (e->x() >= leftValuePos && e->x() < rightRegPos) {
+		if (e->position().x() >= leftValuePos && e->position().x() < rightRegPos) {
 			pos = 0;
 		}
-		if (e->x() >= rightValuePos) {
+		if (e->position().x() >= rightValuePos) {
 			pos = 4;
 		}
-		if (pos >= 0 && e->y() < frameT + 7 * rowHeight) {
-			int row = (e->y() - frameT) / rowHeight;
+		if (pos >= 0 && e->position().y() < frameT + 7 * rowHeight) {
+			int row = (e->position().y() - frameT) / rowHeight;
 			cursorLoc = pos + 8 * row;
 			if (row == 6) cursorLoc += 2;
 		}

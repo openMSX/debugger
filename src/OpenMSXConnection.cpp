@@ -202,21 +202,21 @@ void OpenMSXConnection::processData()
 	}
 }
 
-bool OpenMSXConnection::startElement(const QStringRef& /*qName*/, const QXmlStreamAttributes& atts)
+bool OpenMSXConnection::startElement(QStringView /*qName*/, const QXmlStreamAttributes& atts)
 {
 	xmlAttrs = atts;
 	xmlData.clear();
 	return true;
 }
 
-bool OpenMSXConnection::endElement(const QStringRef& qName)
+bool OpenMSXConnection::endElement(QStringView qName)
 {
-	if (qName == "openmsx-output") {
+	if (qName == QString("openmsx-output")) {
 		// ignore
-	} else if (qName == "reply") {
+	} else if (qName == QString("reply")) {
 		if (connected) {
 			CommandBase* command = commands.dequeue();
-			if (xmlAttrs.value("result") == "ok") {
+			if (xmlAttrs.value("result") == QString("ok")) {
 				command->replyOk (xmlData);
 			} else {
 				command->replyNok(xmlData);
@@ -225,9 +225,9 @@ bool OpenMSXConnection::endElement(const QStringRef& qName)
 			// still receive a reply while we're already closing
 			// the connection, ignore it
 		}
-	} else if (qName == "log") {
+	} else if (qName == QString("log")) {
 		emit logParsed(xmlAttrs.value("level").toString(), xmlData);
-	} else if (qName == "update") {
+	} else if (qName == QString("update")) {
 		emit updateParsed(xmlAttrs.value("type").toString(), xmlAttrs.value("name").toString(), xmlData);
 	} else {
 		qWarning("Unknown XML tag: %s", qName.toLatin1().data());
@@ -235,7 +235,7 @@ bool OpenMSXConnection::endElement(const QStringRef& qName)
 	return true;
 }
 
-bool OpenMSXConnection::characters(const QStringRef& ch)
+bool OpenMSXConnection::characters(QStringView ch)
 {
 	xmlData += ch;
 	return true;

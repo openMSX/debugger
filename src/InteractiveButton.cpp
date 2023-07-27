@@ -48,7 +48,7 @@ void InteractiveButton::setColor()
 	update();
 }
 
-void InteractiveButton::enterEvent(QEvent* /*event*/)
+void InteractiveButton::enterEvent(QEnterEvent* /*event*/)
 {
 	emit mouseOver(true);
 }

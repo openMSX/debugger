@@ -10,7 +10,6 @@
 #include <QWheelEvent>
 #include <QApplication>
 #include <QClipboard>
-#include <QDesktopWidget>
 #include <algorithm>
 #include <cmath>
 #include <cassert>
@@ -131,8 +130,12 @@ void DisasmViewer::updateLayout()
 	xMnemArg = xMnem  + 7 * charWidth;
 
 	setMinimumSize(xMCode[0], 2*codeFontHeight);
-	setMaximumSize(QApplication::desktop()->width(),
-	               QApplication::desktop()->height());
+
+	QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry();
+    int height = screenGeometry.height();
+    int width = screenGeometry.width();
+	setMaximumSize(width, height);
 	update();
 }
 
@@ -722,10 +725,10 @@ void DisasmViewer::mousePressEvent(QMouseEvent* e)
 		return;
 	}
 
-	if (e->x() >= frameL && e->x() < width()  - frameR &&
-	    e->y() >= frameT && e->y() < height() - frameB) {
+	if (e->position().x() >= frameL && e->position().x() < width()  - frameR &&
+	    e->position().y() >= frameT && e->position().y() < height() - frameB) {
 		int line = lineAtPos(e->pos());
-		if (e->x() > frameL + 32) {
+		if (e->position().x() > frameL + 32) {
 			// check if the line exists
 			// (bottom of memory could have an empty line)
 			if (line + disasmTopLine < int(disasmLines.size())) {
@@ -741,7 +744,7 @@ void DisasmViewer::mousePressEvent(QMouseEvent* e)
 			} else {
 				update();
 			}
-		} else if (e->x() < frameL + 16) {
+		} else if (e->position().x() < frameL + 16) {
 			// clicked on the breakpoint area
 			if (line + disasmTopLine < int(disasmLines.size())) {
 				emit breakpointToggled(disasmLines[line + disasmTopLine].addr);

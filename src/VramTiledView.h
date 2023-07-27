@@ -1,5 +1,5 @@
-#ifndef VRAMBITMAPPEDVIEW
-#define VRAMBITMAPPEDVIEW
+#ifndef VRAMTILEDVIEW
+#define VRAMTILEDVIEW
 
 #include <QString>
 #include <QWidget>

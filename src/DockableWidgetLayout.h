@@ -6,7 +6,6 @@
 
 class QLayoutItem;
 class DockableWidget;
-class QStringList;
 
 class DockableWidgetLayout : public QLayout
 {

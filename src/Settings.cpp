@@ -68,7 +68,7 @@ void Settings::getFontsFromSettings()
 {
 	// first get application default
 	QVariant v = value(fontLocation(APP_FONT));
-	if (v.type() == QVariant::Font) {
+	if (v.typeId() == QMetaType::QFont) {
 		fonts[APP_FONT] = v.value<QFont>();
 		fontTypes[APP_FONT] = CUSTOM;
 	} else {
@@ -78,7 +78,7 @@ void Settings::getFontsFromSettings()
 
 	// then get default fixed spacing font
 	v = value(fontLocation(FIXED_FONT));
-	if (v.type() == QVariant::Font) {
+	if (v.typeId() == QMetaType::QFont) {
 		fonts[FIXED_FONT] = v.value<QFont>();
 		fontTypes[FIXED_FONT] = CUSTOM;
 	} else {
@@ -89,7 +89,7 @@ void Settings::getFontsFromSettings()
 	// then the rest
 	for (int f = CODE_FONT; f < FONT_END; ++f) {
 		v = value(fontLocation((DebuggerFont)f));
-		if (v.type() == QVariant::Font) {
+		if (v.typeId() == QMetaType::QFont) {
 			fonts[f] = v.value<QFont>();
 			fontTypes[f] = CUSTOM;
 		} else if (v.toString() == "FixedDefault") {

@@ -100,9 +100,9 @@ private:
 	void cleanup();
 	void cancelPending();
 
-	bool startElement(const QStringRef& qName, const QXmlStreamAttributes& atts);
-	bool endElement(const QStringRef& qName);
-	bool characters(const QStringRef& ch);
+	bool startElement(QStringView qName, const QXmlStreamAttributes& atts);
+	bool endElement(QStringView qName);
+	bool characters(QStringView ch);
 
 private:
 	//std::unique_ptr<QAbstractSocket> socket;

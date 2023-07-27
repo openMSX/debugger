@@ -4,7 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QFileInfo>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -73,12 +73,12 @@ void SymbolTable::mapSymbol(Symbol* symbol)
 
 void SymbolTable::unmapSymbol(Symbol* symbol)
 {
-	QMutableMapIterator<int, Symbol*> i(addressSymbols);
+	QMutableMultiMapIterator<int, Symbol*> i(addressSymbols);
 	while (i.hasNext()) {
 		i.next();
 		if (i.value() == symbol) i.remove();
 	}
-	QMutableHashIterator<int, Symbol*> j(valueSymbols);
+	QMutableMultiHashIterator<int, Symbol*> j(valueSymbols);
 	while (j.hasNext()) {
 		j.next();
 		if (j.value() == symbol) j.remove();
@@ -395,7 +395,7 @@ bool SymbolTable::readPASMOFile(const QString& filename)
 		QString line;
 		QStringList l;
 		line = in.readLine();
-		l = line.split(QRegExp("(\t+)|( +)"));
+		l = line.split(QRegularExpression("(\t+)|( +)"));
 		if (l.size() == 3) {
 			add(std::make_unique<Symbol>(l.at(0), l.at(2).left(5).toInt(nullptr, 16), source));
 		}
@@ -422,7 +422,7 @@ bool SymbolTable::readVASMFile(const QString& filename) {
 			skipline = false;
 		if (skipline) 
 			continue;
-		l = line.split(QRegExp("(\t+)|( +)"));
+		l = line.split(QRegularExpression("(\t+)|( +)"));
 		if (l.size() == 2) {
 			add(std::make_unique<Symbol>(l.at(1), l.at(0).toInt(nullptr, 16), source));
 		}
@@ -480,8 +480,8 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 	const QString magic("Machine type");
 	const QString tableStart("Symbol Table");
 
-	QRegExp rx(" [0-9A-Fa-f]{4}  (?![ 0-9])");
-	QRegExp rp("^([^ ]+) +[^ ]* +([0-9A-Fa-f]{4})  $");
+	QRegularExpression rx(" [0-9A-Fa-f]{4}  (?![ 0-9])");
+	QRegularExpression rp("^([^ ]+) +[^ ]* +([0-9A-Fa-f]{4})  $");
 
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -515,12 +515,13 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 		// a column for psect may be blank so the address may in
 		// the first or second match.
 		for (int tries = 0; (tries < 2) && !ok; ++tries) {
-			pos = rx.indexIn(line, pos);
-			l = pos + rx.matchedLength();
+			auto rm = rx.match(line, pos);
+			auto pos = rm.capturedStart();
+			l = pos + rm.capturedLength();
 			if ((l > 0) && (len % l) == 0) {
 				ok = true;
 				for (int posn = pos + l; (posn < len) && ok; posn += l) {
-					ok = (posn == rx.indexIn(line, posn));
+					ok = (posn == rx.match(line, posn).capturedStart());
 				}
 			}
 			pos = l - 1;
@@ -529,8 +530,9 @@ bool SymbolTable::readLinkMapFile(const QString& filename)
 
 		for (pos = 0; pos < len; pos += l) {
 			QString part = line.mid(pos, l);
-			if (rp.indexIn(part) == 0) {
-				QStringList l = rp.capturedTexts();
+			auto rm = rp.match(part);
+			if (rm.hasMatch()) {
+				QStringList l = rm.capturedTexts();
 				add(std::make_unique<Symbol>(l.at(1), l.last().toInt(nullptr, 16), source));
 			}
 		}
@@ -609,13 +611,13 @@ void SymbolTable::unloadFile(const QString& file, bool keepSymbols)
 
 		if (!keepSymbols) {
 			// remove symbols from address map
-			QMutableMapIterator<int, Symbol*> mi(addressSymbols);
+			QMutableMultiMapIterator<int, Symbol*> mi(addressSymbols);
 			while (mi.hasNext()) {
 				mi.next();
 				if (mi.value()->source() == name) mi.remove();
 			}
 			// remove symbols from value hash
-			QMutableHashIterator<int, Symbol*> hi(valueSymbols);
+			QMutableMultiHashIterator<int, Symbol*> hi(valueSymbols);
 			while (hi.hasNext()) {
 				hi.next();
 				if (hi.value()->source() == name) hi.remove();
@@ -669,7 +671,7 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 			break;
 		}
 		xml.writeAttribute("refreshTime",
-		                   QString::number(symbolFiles[i].refreshTime.toTime_t()));
+		                   QString::number(symbolFiles[i].refreshTime.toMSecsSinceEpoch()));
 		xml.writeCharacters(symbolFiles[i].fileName);
 		xml.writeEndElement();
 	}
@@ -710,11 +712,11 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 	while (!xml.atEnd()) {
 		xml.readNext();
 		// exit if closing of main tag
-		if (xml.isEndElement() && xml.name() == "Symbols") break;
+		if (xml.isEndElement() && xml.name() == QString("Symbols")) break;
 
 		// begin tag
 		if (xml.isStartElement()) {
-			if (xml.name() == "SymbolFile") {
+			if (xml.name() == QString("SymbolFile")) {
 				// read attributes and text
 				QString ftype = xml.attributes().value("type").toString().toLower();
 				QString rtime = xml.attributes().value("refreshTime").toString();
@@ -731,9 +733,9 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 				// append file
 				appendFile(fname, type);
 				// change time
-				symbolFiles.back().refreshTime.setTime_t(rtime.toUInt());
+				symbolFiles.back().refreshTime.setMSecsSinceEpoch(rtime.toUInt());
 
-			} else if (xml.name() == "Symbol") {
+			} else if (xml.name() == QString("Symbol")) {
 				// add empty symbol
 				sym = add(std::make_unique<Symbol>("", 0));
 				// get status attribute
@@ -744,7 +746,7 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 					sym->setStatus(Symbol::LOST);
 				}
 
-			} else if (sym && xml.name() == "type") {
+			} else if (sym && xml.name() == QString("type")) {
 				// read symbol type element
 				QString type = xml.readElementText().trimmed().toLower();
 				if (type == "jump") {
@@ -755,23 +757,23 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 					sym->setType(Symbol::VALUE);
 				}
 
-			} else if (sym && xml.name() == "name") {
+			} else if (sym && xml.name() == QString("name")) {
 				// read symbol name
 				sym->setText(xml.readElementText());
 
-			} else if (sym && xml.name() == "value") {
+			} else if (sym && xml.name() == QString("value")) {
 				// read symbol value
 				sym->setValue(xml.readElementText().toInt());
 
-			} else if (sym && xml.name() == "validSlots") {
+			} else if (sym && xml.name() == QString("validSlots")) {
 				// read numeric valid slot mask
 				sym->setValidSlots(xml.readElementText().toInt());
 
-			} else if (sym && xml.name() == "validRegisters") {
+			} else if (sym && xml.name() == QString("validRegisters")) {
 				// read numeric valid registers mask
 				sym->setValidRegisters(xml.readElementText().toInt());
 
-			} else if (sym && xml.name() == "source") {
+			} else if (sym && xml.name() == QString("source")) {
 				// read source file id
 				int id = xml.readElementText().toInt();
 				if (id >= 0 && id < symbolFiles.size()) {

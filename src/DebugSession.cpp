@@ -64,7 +64,7 @@ void DebugSession::open(const QString& file)
 	ses.setDevice(&f);
 	while (!ses.atEnd()) {
 		ses.readNext();
-		if (ses.isStartElement() && (ses.name() == "DebugSession")) {
+		if (ses.isStartElement() && (ses.name() == QString("DebugSession"))) {
 			// debug session data
 			while (!ses.atEnd()) {
 				ses.readNext();
@@ -72,9 +72,9 @@ void DebugSession::open(const QString& file)
 				if (ses.isEndElement()) break;
 				// begin tag
 				if (ses.isStartElement()) {
-					if (ses.name() == "Symbols") {
+					if (ses.name() == QString("Symbols")) {
 						symTable.loadSymbols(ses);
-					} else if (ses.name() == "Breakpoints") {
+					} else if (ses.name() == QString("Breakpoints")) {
 						breaks.loadBreakpoints(ses);
 					} else {
 						skipUnknownElement(ses);

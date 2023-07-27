@@ -233,8 +233,8 @@ void VramBitMappedView::mouseMoveEvent(QMouseEvent* e)
 		1
 	};
 
-	int x = int(float(e->x()) / zoomFactor);
-	int y = int(float(e->y()) / zoomFactor) / 2;
+	int x = int(float(e->position().x()) / zoomFactor);
+	int y = int(float(e->position().y()) / zoomFactor) / 2;
 
 	// I see negative y-coords sometimes, so for safety clip the coords
 	x = std::clamp(x, 0, 511);

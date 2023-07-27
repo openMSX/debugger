@@ -139,7 +139,7 @@ static std::unique_ptr<OpenMSXConnection> createConnection(const QDir& dir, cons
 		return std::make_unique<OpenMSXConnection>(socket);
 	} else {
 		// cannot connect, must be a stale socket, try to clean it up
-		deleteSocket(socketName);
+		deleteSocket(QFileInfo(socketName));
 		return {};
 	}
 }

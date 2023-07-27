@@ -506,8 +506,8 @@ std::optional<VramTiledView::MouseEventInfo> VramTiledView::infoFromMouseEvent(Q
 	if (!vramBase) return {};
 
 	// I see negative y-coords sometimes, so for safety clip the coords
-	int x = std::clamp(int(float(e->x()) / zoomFactor),     0, 511);
-	int y = std::clamp(int(float(e->y()) / zoomFactor) / 2, 0, 255);
+	int x = std::clamp(int(float(e->position().x()) / zoomFactor),     0, 511);
+	int y = std::clamp(int(float(e->position().y()) / zoomFactor) / 2, 0, 255);
 	if (x >= horiStep * screenWidth) return {};
 	if (y >= 8 * screenHeight) return {};
 

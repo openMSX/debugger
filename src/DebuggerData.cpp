@@ -1,4 +1,5 @@
 #include "DebuggerData.h"
+#include <QRegularExpression>
 #include "Convert.h"
 #include "ranges.h"
 #include <qglobal.h>
@@ -217,12 +218,13 @@ void Breakpoints::parseCondition(Breakpoint& bp)
 	if (bp.condition[0] == '{' && bp.condition.endsWith('}')) {
 		if (bp.type != Breakpoint::CONDITION) {
 			// check for slot argument
-			QRegExp rx(R"(^\{\s*\[\s*(pc|watch)_in_slot\s([X0123])\s([X0123])\s(X|\d{1,3})\s*\]\s*(&&\s*\((.+)\)\s*)?\}$)");
-			if (rx.indexIn(bp.condition) == 0) {
-				bp.slot.ps = stringToValue<uint8_t>(rx.cap(2));
-				bp.slot.ss = stringToValue<uint8_t>(rx.cap(3));
-				bp.segment = stringToValue<uint8_t>(rx.cap(4));
-				bp.condition = rx.cap(6).trimmed();
+			QRegularExpression rx(R"(^\{\s*\[\s*(pc|watch)_in_slot\s([X0123])\s([X0123])\s(X|\d{1,3})\s*\]\s*(&&\s*\((.+)\)\s*)?\}$)");
+			auto rm = rx.match(bp.condition);
+			if (rm.hasMatch()) {
+				bp.slot.ps = stringToValue<uint8_t>(rm.captured(2));
+				bp.slot.ss = stringToValue<uint8_t>(rm.captured(3));
+				bp.segment = stringToValue<uint8_t>(rm.captured(4));
+				bp.condition = rm.captured(6).trimmed();
 			} else {
 				bp.condition.chop(1);
 				bp.condition = bp.condition.mid(1).trimmed();
@@ -367,15 +369,15 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 		xml.readNext();
 		// exit if closing of main tag
 		if (xml.isEndElement()) {
-			if (xml.name() == "Breakpoints") {
+			if (xml.name() == QString("Breakpoints")) {
 				break;
-			} else if (xml.name() == "Breakpoint") {
+			} else if (xml.name() == QString("Breakpoint")) {
 				insertBreakpoint(bp);
 			}
 		}
 		// begin tag
 		if (xml.isStartElement()) {
-			if (xml.name() == "Breakpoint") {
+			if (xml.name() == QString("Breakpoint")) {
 				// set type
 				QString label = xml.attributes().value("type").toString().toLower();
 				if (auto it = ranges::find(TypeNames, label); it != std::end(TypeNames)) {
@@ -395,18 +397,18 @@ void Breakpoints::loadBreakpoints(QXmlStreamReader& xml)
 				bp.segment = stringToValue<uint8_t>(xml.attributes().value("segment")
 						.toString());
 
-			} else if (xml.name() == "address" || xml.name() == "regionStart") {
+			} else if (xml.name() == QString("address") || xml.name() == QString("regionStart")) {
 				// read symbol name
 				auto s = xml.readElementText();
 				auto start = stringToValue<uint16_t>(s);
 				if (!start) continue;
 				bp.range = AddressRange(*start);
 				if (bp.type == Breakpoint::BREAKPOINT) bp.range->end = {};
-			} else if (xml.name() == "regionEnd") {
+			} else if (xml.name() == QString("regionEnd")) {
 				// read symbol name
 				assert(bp.range);
 				bp.range->end = stringToValue<uint16_t>(xml.readElementText());
-			} else if (xml.name() == "condition") {
+			} else if (xml.name() == QString("condition")) {
 				bp.condition = xml.readElementText().trimmed();
 			}
 		}

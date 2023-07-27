@@ -15,7 +15,7 @@ DebuggableViewer::DebuggableViewer(QWidget* parent)
 	hexView->setIsEditable(true);
 
 	auto* vbox = new QVBoxLayout();
-	vbox->setMargin(0);
+	vbox->setContentsMargins(0, 0, 0, 0);
 	vbox->addWidget(debuggableList);
 	vbox->addWidget(hexView);
 	setLayout(vbox);

@@ -48,7 +48,7 @@ private:
 	bool floating;
 	bool closable, movable, destroyable;
 	bool dragging;
-	QPoint dragStart, dragOffset;
+	QPointF dragStart, dragOffset;
 	QRubberBand* rubberBand;
 
 	QWidget* mainWidget;

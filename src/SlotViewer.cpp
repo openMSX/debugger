@@ -74,7 +74,6 @@ void SlotViewer::paintEvent(QPaintEvent* e)
 	p.fillRect(r, palette().color(QPalette::Base));
 
 	QStyleOptionHeader so;
-	so.init(this);
 	so.state |= QStyle::State_Raised;
 	so.orientation = Qt::Horizontal;
 	so.position = QStyleOptionHeader::Beginning;

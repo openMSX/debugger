@@ -126,8 +126,8 @@ std::optional<VramSpriteView::MouseEventInfo> VramSpriteView::infoFromMouseEvent
     if (!vramBase) return {};
 
     // I see negative y-coords sometimes, so for safety clip the coords to zero as lowest value
-    int x = std::max(0, e->x());
-    int y = std::max(0, e->y());
+    int x = std::max(0, (int)e->position().x());
+    int y = std::max(0, (int)e->position().y());
     // maybe clip to maximum to furthest spritepixel drawn?
     //x = std::clamp(e->x(), 0, nrOfSpritesHorizontal * sizeOfSpritesHorizontal * zoomFactor - 1);
     //y = std::clamp(e->y(), 0, nrOfSpritesVertical   * sizeOfSpritesVertical   * zoomFactor - 1);

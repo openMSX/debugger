@@ -364,7 +364,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
 				}
 				p.setPen(penClr);
 			}
-			p.drawText(x, y + a, QString(chr));
+			p.drawText(x, y + a, QString(QChar(chr)));
 			x += charWidth;
 		}
 
@@ -688,7 +688,7 @@ bool HexViewer::event(QEvent* e)
 void HexViewer::mousePressEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton && isInteractive) {
-		int offset=coorToOffset(e->x(), e->y());
+		int offset=coorToOffset(e->position().x(), e->position().y());
 		if (offset >= 0) {
 			int addr = hexTopAddress + offset;
 			if (useMarker && (hexMarkAddress != addr)) {
@@ -699,7 +699,7 @@ void HexViewer::mousePressEvent(QMouseEvent* e)
 				cursorPosition = 0;
 				beingEdited = isEditable;
 			}
-			editedChars = (e->x() >= xChar);
+			editedChars = (e->position().x() >= xChar);
 		}
 		update();
 	}

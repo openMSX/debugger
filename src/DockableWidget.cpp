@@ -42,7 +42,7 @@ DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	connect(closeButton, &QToolButton::clicked, this, &DockableWidget::close);
 
 	headerLayout = new QHBoxLayout();
-	headerLayout->setMargin(0);
+	headerLayout->setContentsMargins(0, 0, 0, 0);
 	headerLayout->addWidget(titleLabel, 1);
 	headerLayout->addWidget(closeButton, 0);
 
@@ -50,7 +50,7 @@ DockableWidget::DockableWidget(DockManager& manager, QWidget* parent)
 	headerWidget->setLayout(headerLayout);
 
 	widgetLayout = new QVBoxLayout();
-	widgetLayout->setMargin(3);
+	widgetLayout->setContentsMargins(3, 3, 3, 3);
 	widgetLayout->setSpacing(1);
 	widgetLayout->addWidget(headerWidget);
 	setLayout(widgetLayout);
@@ -215,7 +215,7 @@ void DockableWidget::mousePressEvent(QMouseEvent* event)
 {
 	if (movable && event->button() == Qt::LeftButton) {
 		dragging = true;
-		dragStart = event->globalPos();
+		dragStart = event->globalPosition();
 		dragOffset = event->pos();
 	}
 }
@@ -227,23 +227,23 @@ void DockableWidget::mouseMoveEvent(QMouseEvent* event)
 	if (event->buttons() & Qt::LeftButton) {
 		// dragging of widget in progress, update rubberband
 		if (!rubberBand->isVisible()) {
-			if (abs(event->globalX() - dragStart.x()) > 20 ||
-			    abs(event->globalY() - dragStart.y()) > 20) {
+			if (abs(event->globalPosition().x() - dragStart.x()) > 20 ||
+			    abs(event->globalPosition().y() - dragStart.y()) > 20) {
 				rubberBand->resize(width(), height());
-				rubberBand->move(event->globalX()-dragOffset.x(),
-				                 event->globalY()-dragOffset.y());
+				rubberBand->move(event->globalPosition().x()-dragOffset.x(),
+				                 event->globalPosition().y()-dragOffset.y());
 				rubberBand->show();
 			}
 		} else {
-			QRect r(event->globalX()-dragOffset.x(),
-			        event->globalY()-dragOffset.y(),
+			QRect r(event->globalPosition().x()-dragOffset.x(),
+			        event->globalPosition().y()-dragOffset.y(),
 			        width(), height());
 			if (floating && dockManager.insertLocation(r, sizePolicy())) {
 				rubberBand->move(r.x(), r.y());
 				rubberBand->resize(r.width(), r.height());
 			} else {
-				rubberBand->move(event->globalX()-dragOffset.x(),
-				                 event->globalY()-dragOffset.y());
+				rubberBand->move(event->globalPosition().x()-dragOffset.x(),
+				                 event->globalPosition().y()-dragOffset.y());
 				rubberBand->resize(width(), height());
 			}
 		}
@@ -262,25 +262,28 @@ void DockableWidget::mouseReleaseEvent(QMouseEvent* event)
 
 	// only do anything if this was a meaningful drag
 	if (!movable ||
-	    (abs(event->globalX() - dragStart.x()) <= 20 &&
-	     abs(event->globalY() - dragStart.y()) <= 20)) {
+	    (abs(event->globalPosition().x() - dragStart.x()) <= 20 &&
+	     abs(event->globalPosition().y() - dragStart.y()) <= 20)) {
 		return;
 	}
 
 	if (floating) {
-		QRect mouseRect(event->globalX() - dragOffset.x(),
-		                event->globalY() - dragOffset.y(),
+		QRect mouseRect(event->globalPosition().x() - dragOffset.x(),
+		                event->globalPosition().y() - dragOffset.y(),
 		                width(), height());
 		QRect r(mouseRect);
 		if (dockManager.insertLocation(r, sizePolicy())) {
 			setFloating(false);
 			dockManager.dockWidget(this, QPoint(), mouseRect);
 		} else {
-			move(event->globalPos() - dragOffset);
+			auto m = event->globalPosition() - dragOffset;
+			move((int)m.x(), (int)m.y());
 		}
 	} else {
 		dockManager.undockWidget(this);
 		setFloating(true);
-		move(event->globalPos() - dragOffset);
+
+		auto m = event->globalPosition() - dragOffset;
+		move((int)m.x(), (int)m.y());
 	}
 }

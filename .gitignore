@@ -1,6 +1,5 @@
-build/*.pyc
 derived/
-build/msvc/.vs/*
+build/
 .vscode/
 __pycache__/
 ui_*.h

@@ -191,7 +191,7 @@ void BitMapViewer::setPages()
 
 	currentPage->clear();
 	int pageCount = VDPDataStore::instance().getVRAMSize() / pageSize;
-	int pages = std::min(pageCount, pageNames.count());
+	int pages = std::min(pageCount, (int)pageNames.count());
 
 	for (int p = 0; p < pages; ++p) {
 		currentPage->insertItem(p, pageNames[p]);

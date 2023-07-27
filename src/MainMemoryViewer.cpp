@@ -40,12 +40,12 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	hexView->setIsInteractive(true);
 	hexView->setDisplayMode(HexViewer::FILL_WIDTH_POWEROF2);
 	auto* hbox = new QHBoxLayout();
-	hbox->setMargin(0);
+	hbox->setContentsMargins(0, 0, 0, 0);
 	hbox->addWidget(addressSourceList);
 	hbox->addWidget(addressValue);
 
 	auto* vbox = new QVBoxLayout();
-	vbox->setMargin(0);
+	vbox->setContentsMargins(0, 0, 0, 0);
 	vbox->addLayout(hbox);
 	vbox->addWidget(hexView);
 	setLayout(vbox);

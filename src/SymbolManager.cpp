@@ -213,16 +213,13 @@ void SymbolManager::addFile()
 
 void SymbolManager::removeFile()
 {
-	int r = QMessageBox::question(
-		this,
-		tr("Remove symbol file(s)"),
-		tr("When removing the symbol file(s), do you want keep or "
-		   "delete the attached symbols?"),
-		"Keep symbols", "Delete symbols", "Cancel", 1, 2);
-	if (r == 2) return;
-
+	QMessageBox mb;
+	mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	mb.setWindowTitle(tr("Remove symbol file(s)"));
+    mb.setText(tr("When removing the symbol file(s), do you want keep or delete the attached symbols?"));
+	auto keep = mb.exec() == QMessageBox::Yes;
 	for (int i = 0; i < treeFiles->selectedItems().size(); ++i) {
-		symTable.unloadFile(treeFiles->selectedItems().at(i)->toolTip(0), r == 0);
+		symTable.unloadFile(treeFiles->selectedItems().at(i)->toolTip(0), keep);
 	}
 
 	initFileList();

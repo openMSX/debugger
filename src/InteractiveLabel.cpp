@@ -25,7 +25,7 @@ void InteractiveLabel::highlight(bool state)
 	update();
 }
 
-void InteractiveLabel::enterEvent(QEvent* /*event*/)
+void InteractiveLabel::enterEvent(QEnterEvent* /*event*/)
 {
 	emit mouseOver(true);
 }

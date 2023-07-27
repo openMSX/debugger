@@ -19,9 +19,11 @@ A (reasonably) new version of openMSX.
 
 Build with:
 
-make
+mkdir build
+cd build
+Qt6_DIR=~/Qt/6.6.0/gcc_64 cmake .. -G Ninja
+ninja
 
 * Installing
 
-Install derived/bin/openmsx-debugger manually in any place you want.
-
+Install build/openmsx-debugger manually in any place you want.
