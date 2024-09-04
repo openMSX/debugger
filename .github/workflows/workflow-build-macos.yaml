@@ -23,6 +23,8 @@ jobs:
       shell: bash
       run: |
         brew install qt@5
+        PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+        export PATH
         make
         mkdir derived/root
         mv derived/openMSX_Debugger.app "derived/root/openMSX Debugger.app"
