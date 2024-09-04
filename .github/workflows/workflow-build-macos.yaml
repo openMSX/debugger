@@ -15,7 +15,7 @@ jobs:
       run: |
         git config --global init.defaultBranch master
     - name: Checkout repository code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Compile repository code
@@ -31,7 +31,7 @@ jobs:
         cd derived/root
         tar cvfj ../../openmsx-debugger-macos-${{ env.package_origin }}.tbz "openMSX Debugger.app"
     - name: Upload redistributable package for Mac OS
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: macos
         path: |

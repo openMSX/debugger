@@ -15,7 +15,7 @@ jobs:
       run: |
         git config --global init.defaultBranch master
     - name: Checkout repository code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Compile repository code
@@ -28,7 +28,7 @@ jobs:
         cd derived/bin
         tar cvf ../../openmsx-debugger-ubuntu-${{ env.package_origin }}.tbz .
     - name: Upload redistributable package for Ubuntu
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ubuntu
         path: |
