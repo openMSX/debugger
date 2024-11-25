@@ -683,6 +683,7 @@ void DebuggerForm::createForm()
 	connect(this, &DebuggerForm::connected, disasmView, &DisasmViewer::refresh);
 	connect(this, &DebuggerForm::symbolsChanged, disasmView, &DisasmViewer::refresh);
 	connect(this, &DebuggerForm::settingsChanged, disasmView, &DisasmViewer::updateLayout);
+	connect(this, &DebuggerForm::breakStateEntered, disasmView, &DisasmViewer::refresh);
 
 	// Main memory viewer
 	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
