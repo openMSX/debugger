@@ -92,6 +92,10 @@ public:
 		PASMO_FILE,
 		VASM_FILE
 	};
+	enum {
+		LoadSymbolFiles = 1,
+		IgnoreSymbolTag = 2,
+	};
 
 	SymbolTable();
 
@@ -103,7 +107,7 @@ public:
 
 	// xml session file functions
 	void saveSymbols(QXmlStreamWriter& xml);
-	void loadSymbols(QXmlStreamReader& xml);
+	void loadSymbols(QXmlStreamReader& xml, unsigned flags);
 
 	// Symbol access functions
 	[[nodiscard]] Symbol* findFirstAddressSymbol(int addr, MemoryLayout* ml = nullptr);

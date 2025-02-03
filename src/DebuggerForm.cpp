@@ -150,6 +150,8 @@ int DebuggerForm::counter = 0;
 DebuggerForm::DebuggerForm(QWidget* parent)
 	: QMainWindow(parent)
 	, comm(CommClient::instance())
+	, isReloadSymbolFilesPerSession(false) // false: past version behavior
+	, isIgnoreSymbolsOfPrevSession(false) // false: past version behavior
 {
 	VDPRegView = nullptr;
 	VDPStatusRegView = nullptr;
@@ -163,6 +165,23 @@ DebuggerForm::DebuggerForm(QWidget* parent)
 
 	recentFiles = Settings::get().value("MainWindow/RecentFiles").toStringList();
 	updateRecentFiles();
+	// configure symbols reloading
+	struct {
+		bool *val;
+		const char *key;
+	} mapping[] = {
+		{ &isReloadSymbolFilesPerSession, "Session/ReloadSymbolFilesPerSession" },
+		{ &isIgnoreSymbolsOfPrevSession, "Session/IgnoreSymbolsOfPrevSession" },
+		{ NULL, NULL }
+	}, *p = mapping;
+	QSettings &cfg = Settings::get();
+	for (; p->val; ++p) {
+		if (cfg.contains(p->key)) {
+			*p->val = cfg.value(p->key).toBool();
+		} else if (cfg.isWritable()) {
+			cfg.setValue(p->key, *p->val);
+		}
+	}
 
 	connect(&session.symbolTable(), &SymbolTable::symbolFileChanged, this, &DebuggerForm::symbolFileChanged);
 }
@@ -1044,10 +1063,14 @@ void DebuggerForm::fileOpenSession()
 void DebuggerForm::openSession(const QString& file)
 {
 	fileNewSession();
-	session.open(file);
+	unsigned symConf = 0;
+	symConf |= (isReloadSymbolFilesPerSession) ? SymbolTable::LoadSymbolFiles : 0;
+	symConf |= ( isIgnoreSymbolsOfPrevSession) ? SymbolTable::IgnoreSymbolTag : 0;
+	session.open(file, symConf);
 	if (systemDisconnectAction->isEnabled()) {
 		// active connection, merge loaded breakpoints
 		reloadBreakpoints(true);
+		emit symbolsChanged();
 	}
 	// update recent
 	if (session.existsAsFile()) {

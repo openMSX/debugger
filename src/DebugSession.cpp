@@ -47,7 +47,7 @@ void DebugSession::clear()
 	modified = false;
 }
 
-void DebugSession::open(const QString& file)
+void DebugSession::open(const QString& file, unsigned symConf)
 {
 	QFile f(file);
 	if (!f.open(QFile::ReadOnly | QFile::Text)) {
@@ -73,7 +73,7 @@ void DebugSession::open(const QString& file)
 				// begin tag
 				if (ses.isStartElement()) {
 					if (ses.name() == "Symbols") {
-						symTable.loadSymbols(ses);
+						symTable.loadSymbols(ses, symConf);
 					} else if (ses.name() == "Breakpoints") {
 						breaks.loadBreakpoints(ses);
 					} else {

@@ -322,7 +322,8 @@ bool SymbolTable::readOMDSFile(const QString& filename)
 
 	QXmlStreamReader ses;
 	ses.setDevice(&file);
-	loadSymbols(ses);
+	unsigned flags = 0; // same as past behavior
+	loadSymbols(ses, flags);
 	return true;
 }
 bool SymbolTable::readTNIASM0File(const QString& filename)
@@ -704,9 +705,10 @@ void SymbolTable::saveSymbols(QXmlStreamWriter& xml)
 	}
 }
 
-void SymbolTable::loadSymbols(QXmlStreamReader& xml)
+void SymbolTable::loadSymbols(QXmlStreamReader& xml, unsigned flags)
 {
-	Symbol* sym = nullptr;
+	Symbol dummy("", 0); // for ignoring
+	Symbol* sym = (LoadSymbolFiles & flags) ? &dummy : nullptr;
 	while (!xml.atEnd()) {
 		xml.readNext();
 		// exit if closing of main tag
@@ -728,12 +730,18 @@ void SymbolTable::loadSymbols(QXmlStreamReader& xml)
 				} else if (ftype == "linkmap") {
 					type = LINKMAP_FILE;
 				}
-				// append file
-				appendFile(fname, type);
+				if (LoadSymbolFiles & flags) {
+					// (append file +) read file
+					bool ok = readFile(fname, type);
+					if (!ok) continue; // file cannot open, invalid format, ...
+				} else {
+					// append file
+					appendFile(fname, type);
+				}
 				// change time
 				symbolFiles.back().refreshTime.setTime_t(rtime.toUInt());
 
-			} else if (xml.name() == "Symbol") {
+			} else if (xml.name() == "Symbol" && !(IgnoreSymbolTag & flags)) {
 				// add empty symbol
 				sym = add(std::make_unique<Symbol>("", 0));
 				// get status attribute
