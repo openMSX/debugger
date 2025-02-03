@@ -161,6 +161,8 @@ private:
 	static int counter;
 	enum {RESET = 0, SLOTS_CHECKED, PC_CHANGED, SLOTS_CHANGED} disasmStatus = RESET;
 	uint16_t disasmAddress;
+	bool isReloadSymbolFilesPerSession;
+	bool isIgnoreSymbolsOfPrevSession;
 
 	QList<CommandRef> commands;
 	void updateCustomActions();

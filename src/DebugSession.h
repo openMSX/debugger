@@ -15,7 +15,7 @@ public:
 
 	// session
 	void clear();
-	void open(const QString& file);
+	void open(const QString& file, unsigned symConf);
 	bool save();
 	bool saveAs(const QString& file);
 	bool existsAsFile() const;
