@@ -687,6 +687,7 @@ void DebuggerForm::createForm()
 	// Main memory viewer
 	connect(this, &DebuggerForm::connected, mainMemoryView, &MainMemoryViewer::refresh);
 	connect(this, &DebuggerForm::breakStateEntered, mainMemoryView, &MainMemoryViewer::refresh);
+	connect(this, &DebuggerForm::symbolsChanged, mainMemoryView, &MainMemoryViewer::updateCompleter);
 
 	// Slot viewer
 	connect(this, &DebuggerForm::connected, slotView, &SlotViewer::refresh);
@@ -718,6 +719,7 @@ void DebuggerForm::createForm()
 	disasmView->setMemoryLayout(&memLayout);
 	disasmView->setSymbolTable(&session.symbolTable());
 	mainMemoryView->setRegsView(regsView);
+	mainMemoryView->setMemoryLayout(&memLayout);
 	mainMemoryView->setSymbolTable(&session.symbolTable());
 	mainMemoryView->setDebuggable("memory", 0x10000);
 	stackView->setData(mainMemory, 0x10000);

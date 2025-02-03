@@ -9,6 +9,8 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <iostream>
+#include <cassert>
+#include <QCompleter>
 
 static const int linkRegisters[] = {
 	CpuRegs::REG_BC, CpuRegs::REG_DE, CpuRegs::REG_HL,
@@ -54,11 +56,15 @@ MainMemoryViewer::MainMemoryViewer(QWidget* parent)
 	linkedId = 0;
 	regsViewer = nullptr;
 	symTable = nullptr;
+	memLayout = nullptr;
+	completer = nullptr;
 
 	connect(hexView, &HexViewer::locationChanged,
 	        this, &MainMemoryViewer::hexViewChanged);
 	connect(addressValue, &QLineEdit::returnPressed,
 	        this, &MainMemoryViewer::addressValueChanged);
+	connect(addressValue, &QLineEdit::textEdited,
+	        this, &MainMemoryViewer::addressValueChanging);
 	connect(addressSourceList, qOverload<int>(&QComboBox::currentIndexChanged),
 	        this, &MainMemoryViewer::addressSourceListChanged);
 }
@@ -97,6 +103,32 @@ void MainMemoryViewer::refresh()
 void MainMemoryViewer::hexViewChanged(int addr)
 {
 	addressValue->setText(hexValue(addr, 4));
+}
+
+void MainMemoryViewer::setMemoryLayout(MemoryLayout* ml)
+{
+	memLayout = ml;
+}
+
+void MainMemoryViewer::updateCompleter()
+{
+	assert(symTable);
+	assert(memLayout);
+	// release the previous
+	if (completer) {
+		addressValue->setCompleter(nullptr);
+		//delete completer; // PENDING: done in setCompleter() above? (not obvious in document)
+		completer = nullptr; // safety
+	}
+	// create address completer
+	completer = new QCompleter(symTable->labelList(true, memLayout), this);
+	completer->setCaseSensitivity(Qt::CaseInsensitive);
+	addressValue->setCompleter(completer);
+}
+
+void MainMemoryViewer::addressValueChanging()
+{
+	// PENDING: Needing the color, someone will implement.
 }
 
 void MainMemoryViewer::addressValueChanged()
