@@ -548,7 +548,7 @@ void SymbolTable::fileChanged(const QString& path)
 
 void SymbolTable::reloadFiles()
 {
-	for (int i = 0; i < symbolFiles.size(); ++i) {
+	for (int i = symbolFiles.size() -1; 0 <= i; --i) {
 		// check if file is newer
 		QFileInfo fi = QFileInfo(symbolFiles[i].fileName);
 		if (fi.lastModified() <= symbolFiles[i].refreshTime) continue;
